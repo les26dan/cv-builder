@@ -1,0 +1,1 @@
+export { cvUpload } from './vi/cvUpload' 

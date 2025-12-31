@@ -1,0 +1,998 @@
+import { useState, useEffect } from 'react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { ContactSection } from './sections/ContactSection';
+import { SummarySection } from './sections/SummarySection';
+import { WorkExperienceSection } from './sections/WorkExperienceSection';
+import { SkillsSection } from './sections/SkillsSection';
+import { EducationSection } from './sections/EducationSection';
+import { DraggableSection } from './common/DraggableSection';
+import { ScoreIndicator } from './common/ScoreIndicator';
+import { XIcon, Sparkles, CheckCircle } from 'lucide-react';
+import { CVWorkflowDataService } from '../shared/services/cvWorkflowDataService';
+import { jdAnalysisTexts } from '../config/texts/vi/jdAnalysis';
+import { UpgradeModal } from './common/UpgradeModal';
+import { KeywordAnalysisSection } from './jdOptimization/KeywordAnalysisSection';
+import { SuggestionPanel } from './jdOptimization/SuggestionPanel';
+// Mock services for build compatibility
+const mockFetch = async (url: string, options?: any) => {
+  console.log('Mock fetch called:', url, options);
+  return { ok: true, json: () => Promise.resolve({}) };
+};
+
+const JDOptimizationService = {
+  getInstance: () => ({
+    generateUnifiedAnalysis: async (jdInput: string, cvData: any, language: string) => {
+      console.log('Mock JD analysis:', { jdInput, cvData, language });
+      return { 
+        analysisId: 'mock-analysis-id',
+        jobMatch: {
+          overallScore: 75,
+          keywordMatches: [],
+          matchedKeywords: [],
+          missingKeywords: [],
+          strengthAreas: [],
+          improvementAreas: [],
+          suggestedChanges: []
+        }
+      };
+    }
+  })
+};
+
+interface EditorPanelProps {
+  cvData: any;
+  onUpdateSection: (sectionId: string, data: any) => void;
+  onSectionOrderChange: (newOrder: string[]) => void;
+  activeSection: string | null;
+  setActiveSection: (section: string | null) => void;
+  cvScore: number;
+  suggestions?: {
+    [sectionId: string]: any[];
+  };
+  onApplySuggestion?: (sectionId: string, suggestion: any) => void;
+  onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
+}
+
+// Available section types that can be added
+const availableSectionTypes = [
+  { id: 'projects', name: 'Dự án', description: 'Các dự án đã thực hiện' },
+  { id: 'volunteer', name: 'Hoạt động tình nguyện', description: 'Kinh nghiệm tình nguyện và xã hội' },
+  { id: 'certifications', name: 'Chứng chỉ', description: 'Các chứng chỉ chuyên môn' },
+  { id: 'languages', name: 'Ngôn ngữ', description: 'Các ngôn ngữ biết sử dụng' },
+  { id: 'hobbies', name: 'Sở thích', description: 'Sở thích cá nhân' },
+  { id: 'custom', name: 'Phần tùy chỉnh', description: 'Tạo phần mới với nội dung tùy ý' }
+];
+
+export const EditorPanel = ({
+  cvData,
+  onUpdateSection,
+  onSectionOrderChange,
+  activeSection,
+  setActiveSection,
+  cvScore,
+  suggestions = {},
+  onApplySuggestion,
+  onDismissSuggestion
+}: EditorPanelProps) => {
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  
+  // JD Analysis state
+  const [jdInput, setJdInput] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [missingKeywords, setMissingKeywords] = useState<string[]>([]);
+  const [matchedKeywords, setMatchedKeywords] = useState<string[]>([]);
+  const [analysisResults, setAnalysisResults] = useState<any>(null);
+  const [lastAnalysisId, setLastAnalysisId] = useState<string | null>(null);
+  
+  // Apply All state
+  const [isApplyingAll, setIsApplyingAll] = useState(false);
+  const [applyAllProgress, setApplyAllProgress] = useState({ current: 0, total: 0 });
+  
+  // Monetization state
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [userCredits, setUserCredits] = useState(3);
+
+  // Initialize data service
+  const dataService = CVWorkflowDataService.getInstance();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    
+    if (active.id !== over.id && cvData?.sectionOrder) {
+      const oldIndex = cvData.sectionOrder.indexOf(active.id);
+      const newIndex = cvData.sectionOrder.indexOf(over.id);
+      const newOrder = arrayMove(cvData.sectionOrder, oldIndex, newIndex) as string[];
+      onSectionOrderChange(newOrder);
+    }
+  };
+
+  const handleNavigateToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    // Scroll to section if needed
+    const sectionElement = document.getElementById(`section-${sectionId}`);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  // Monetization functions
+  const checkSubscriptionStatus = () => {
+    // Check localStorage for subscription status (mock implementation)
+    const testSubscription = localStorage.getItem('okbuddy_test_subscription');
+    if (testSubscription) {
+      try {
+        const subscription = JSON.parse(testSubscription);
+        setIsPremiumUser(subscription.plan === 'premium' || subscription.plan === 'enterprise');
+      } catch (error) {
+        setIsPremiumUser(false);
+      }
+    } else {
+      setIsPremiumUser(false);
+    }
+    
+    // Check credits
+    const savedCredits = localStorage.getItem('okbuddy_user_credits');
+    if (savedCredits) {
+      setUserCredits(parseInt(savedCredits, 10) || 0);
+    }
+  };
+
+  const canUseApplyAll = (): boolean => {
+    return isPremiumUser;
+  };
+
+  const canUsePremiumSuggestion = (): boolean => {
+    return isPremiumUser || userCredits > 0;
+  };
+
+  const consumeCredit = () => {
+    if (userCredits > 0) {
+      const newCredits = userCredits - 1;
+      setUserCredits(newCredits);
+      localStorage.setItem('okbuddy_user_credits', newCredits.toString());
+    }
+  };
+
+
+
+  // JD Analysis handlers
+  const handleJdInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setJdInput(value);
+    setAnalysisError(null);
+    
+    // Auto-save to localStorage
+    localStorage.setItem('okbuddy_jd_draft', value);
+  };
+
+  const handleAnalyzeJob = async () => {
+    console.log('🔥 handleAnalyzeJob triggered', { jdInput: jdInput.length, cvData: !!cvData });
+    console.log('🔍 Full CV Data Structure:', JSON.stringify(cvData, null, 2));
+    
+    if (!jdInput.trim()) {
+      setAnalysisError('Vui lòng nhập mô tả công việc để phân tích');
+      return;
+    }
+
+    if (jdInput.length > 5000) {
+      setAnalysisError('Mô tả công việc quá dài (tối đa 5000 ký tự)');
+      return;
+    }
+
+    // Clear old analysis results first
+    setAnalysisResults(null);
+    setMissingKeywords([]);
+    setMatchedKeywords([]);
+    
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    console.log('🔄 Starting fresh analysis, cleared old results');
+
+    try {
+      console.log('🚀 Starting Feature 4 unified analysis...');
+      
+      // NEW: Use the unified analysis service directly
+      const jdOptimizationService = JDOptimizationService.getInstance();
+      console.log('✅ JD Optimization service instance created');
+      
+      const result = await jdOptimizationService.generateUnifiedAnalysis(
+        jdInput,
+        cvData,
+        'vi' // TODO: Get from language context
+      );
+      
+      console.log('🎉 Analysis result received:', result);
+      
+      // Save complete analysis results to state
+      setAnalysisResults(result);
+      setLastAnalysisId(result.analysisId);
+      
+      // Update keywords from analysis result
+      if (result.jobMatch?.missingKeywords) {
+        setMissingKeywords(result.jobMatch.missingKeywords);
+        console.log('📝 Missing keywords updated:', result.jobMatch.missingKeywords);
+      }
+      if (result.jobMatch?.matchedKeywords) {
+        setMatchedKeywords(result.jobMatch.matchedKeywords);
+        console.log('✅ Matched keywords updated:', result.jobMatch.matchedKeywords);
+      }
+      
+      // Save to database with fallback to localStorage
+      if (cvData?.id) {
+        try {
+          const saveResult = await dataService.saveJDAnalysis(cvData.id, {
+            ...result,
+            originalJobDescription: jdInput
+          });
+          if (saveResult.success) {
+            console.log('💾 JD Analysis saved to database successfully');
+          } else {
+            console.warn('⚠️ Failed to save to database:', saveResult.error);
+          }
+        } catch (error) {
+          console.error('❌ Error saving analysis to database:', error);
+        }
+      }
+      
+      console.log('🎯 Unified JD Analysis completed successfully!');
+      
+    } catch (error) {
+      console.error('❌ JD Analysis Error:', error);
+      
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
+      
+      setAnalysisError(
+        error instanceof Error 
+          ? `Lỗi phân tích: ${error.message}` 
+          : 'Đã xảy ra lỗi khi phân tích JD. Vui lòng thử lại.'
+      );
+    } finally {
+      setIsAnalyzing(false);
+      console.log('🏁 Analysis process completed, isAnalyzing set to false');
+    }
+  };
+
+  // Handle Apply All functionality
+  const handleApplyAll = async () => {
+    if (!analysisResults?.suggestions) return;
+
+    // Check premium access for Apply All
+    if (!canUseApplyAll()) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
+    // Count total suggestions
+    const allSuggestions = Object.values(analysisResults.suggestions).flat();
+    const totalSuggestions = allSuggestions.length;
+    
+    if (totalSuggestions === 0) return;
+
+    setIsApplyingAll(true);
+    setApplyAllProgress({ current: 0, total: totalSuggestions });
+
+    try {
+      let appliedCount = 0;
+
+      // Apply suggestions sequentially by section
+      const sectionOrder = ['summary', 'experience', 'skills', 'education', 'other'];
+      
+      for (const section of sectionOrder) {
+        const sectionSuggestions = analysisResults.suggestions[section] || [];
+        
+        for (const suggestion of sectionSuggestions) {
+          try {
+            await handleApplySuggestion(suggestion);
+            appliedCount++;
+            setApplyAllProgress({ current: appliedCount, total: totalSuggestions });
+            
+            // Small delay to show progress
+            await new Promise(resolve => setTimeout(resolve, 300));
+          } catch (error) {
+            console.error('Error applying suggestion:', suggestion.id, error);
+            // Continue with next suggestion even if one fails
+          }
+        }
+      }
+
+      // Clear analysis results after successful application
+      if (appliedCount > 0) {
+        setAnalysisResults(null);
+        setMissingKeywords([]);
+      }
+
+    } catch (error) {
+      console.error('Apply All Error:', error);
+      setAnalysisError('Đã xảy ra lỗi khi áp dụng gợi ý. Vui lòng thử lại.');
+    } finally {
+      setIsApplyingAll(false);
+      setApplyAllProgress({ current: 0, total: 0 });
+    }
+  };
+
+  // Load saved JD and analysis results on component mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      // Load JD input from localStorage
+      const savedJd = localStorage.getItem('okbuddy_jd_draft');
+      if (savedJd) {
+        setJdInput(savedJd);
+      }
+      
+      // Try to load analysis from database first, then fallback to localStorage
+      if (cvData?.id) {
+        try {
+          const dbResult = await dataService.loadJDAnalysis(cvData.id);
+          if (dbResult.success && dbResult.data) {
+            setAnalysisResults(dbResult.data);
+            setLastAnalysisId(dbResult.data.analysisId);
+            
+            if (dbResult.data.jobMatch?.missingKeywords) {
+              setMissingKeywords(dbResult.data.jobMatch.missingKeywords);
+            }
+            if (dbResult.data.jobMatch?.matchedKeywords) {
+              setMatchedKeywords(dbResult.data.jobMatch.matchedKeywords);
+            }
+            return; // Found in database, skip localStorage check
+          }
+        } catch (error) {
+          console.error('Error loading analysis from database:', error);
+        }
+      }
+      
+      // Fallback to localStorage
+      const savedAnalysis = localStorage.getItem('okbuddy_jd_analysis');
+      const savedAnalysisId = localStorage.getItem('okbuddy_jd_analysis_id');
+      
+      if (savedAnalysis && savedAnalysisId) {
+        try {
+          const parsedAnalysis = JSON.parse(savedAnalysis);
+          setAnalysisResults(parsedAnalysis);
+          setLastAnalysisId(savedAnalysisId);
+          
+                      // Load keywords if available
+            if (parsedAnalysis.jobMatch?.missingKeywords) {
+              setMissingKeywords(parsedAnalysis.jobMatch.missingKeywords);
+            }
+            if (parsedAnalysis.jobMatch?.matchedKeywords) {
+              setMatchedKeywords(parsedAnalysis.jobMatch.matchedKeywords);
+            }
+        } catch (error) {
+          console.error('Error loading saved analysis:', error);
+          // Clear corrupted data
+          localStorage.removeItem('okbuddy_jd_analysis');
+          localStorage.removeItem('okbuddy_jd_analysis_id');
+        }
+      }
+    };
+    
+    loadInitialData();
+  }, [cvData?.id]);
+  
+  // Auto-save analysis results to localStorage
+  useEffect(() => {
+    if (analysisResults && lastAnalysisId) {
+      localStorage.setItem('okbuddy_jd_analysis', JSON.stringify(analysisResults));
+      localStorage.setItem('okbuddy_jd_analysis_id', lastAnalysisId);
+    }
+  }, [analysisResults, lastAnalysisId]);
+
+
+
+  // Check subscription status on mount
+  useEffect(() => {
+    checkSubscriptionStatus();
+  }, []);
+
+  // Handle applying individual suggestions
+  const handleApplySuggestion = async (suggestion: any) => {
+    try {
+      console.log('Applying suggestion:', suggestion);
+      
+      const response = await mockFetch('/api/suggestions/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          suggestionId: suggestion.id,
+          suggestionType: suggestion.type,
+          section: suggestion.section,
+          cvData: cvData,
+          cvId: cvData?.id,
+          userId: 'current-user', // TODO: Get from auth context
+          suggestionData: {
+            title: suggestion.title,
+            description: suggestion.description,
+            suggestedText: suggestion.suggestedText,
+            keywords: suggestion.keywords,
+            originalText: suggestion.originalText
+          }
+        }),
+      });
+
+      const result = await response.json() as any;
+      
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to apply suggestion');
+      }
+
+      // Update the CV section with the applied changes
+      if (result.updatedSection) {
+        onUpdateSection(suggestion.section, result.updatedSection);
+      }
+
+      // Mark suggestion as applied (remove from list for now)
+      setAnalysisResults((prev: any) => {
+        if (!prev || !prev.suggestions) return prev;
+        
+        const updatedSuggestions = { ...prev.suggestions };
+        const sectionSuggestions = updatedSuggestions[suggestion.section] || [];
+        updatedSuggestions[suggestion.section] = sectionSuggestions.filter(
+          (s: any) => s.id !== suggestion.id
+        );
+        
+        return {
+          ...prev,
+          suggestions: updatedSuggestions
+        };
+      });
+
+      console.log('Suggestion applied successfully:', result); // Small delay to allow CV data to update
+      
+    } catch (error) {
+      console.error('Error applying suggestion:', error);
+      setAnalysisError(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi áp dụng gợi ý. Vui lòng thử lại.');
+    }
+  };
+
+  const handleDismissSuggestion = (sectionId: string, suggestion: any) => {
+    if (onDismissSuggestion) {
+      onDismissSuggestion(sectionId, suggestion);
+    }
+  };
+
+  const handleAddSection = (sectionType: string) => {
+    const newSectionId = `${sectionType}-${Date.now()}`;
+    
+    // Create default data structure based on section type
+    let defaultData;
+    switch (sectionType) {
+      case 'projects':
+        defaultData = {
+          items: [{
+            id: `project-${Date.now()}`,
+            title: '',
+            description: '',
+            technologies: [],
+            startDate: '',
+            endDate: '',
+            url: ''
+          }]
+        };
+        break;
+      case 'volunteer':
+        defaultData = {
+          items: [{
+            id: `volunteer-${Date.now()}`,
+            organization: '',
+            role: '',
+            description: '',
+            startDate: '',
+            endDate: ''
+          }]
+        };
+        break;
+      case 'certifications':
+        defaultData = {
+          items: [{
+            id: `cert-${Date.now()}`,
+            name: '',
+            issuer: '',
+            date: '',
+            url: ''
+          }]
+        };
+        break;
+      case 'languages':
+        defaultData = {
+          items: []
+        };
+        break;
+      case 'hobbies':
+        defaultData = {
+          content: ''
+        };
+        break;
+      case 'custom':
+        defaultData = {
+          title: 'Phần mới',
+          content: ''
+        };
+        break;
+      default:
+        defaultData = { content: '' };
+    }
+
+    // Add to CV data
+    onUpdateSection(newSectionId, defaultData);
+    
+    // Add to section order
+    const newOrder = [...(cvData?.sectionOrder || []), newSectionId];
+    onSectionOrderChange(newOrder);
+    
+    // Close modal and activate new section
+    setShowAddSectionModal(false);
+    setActiveSection(newSectionId);
+    
+    // Scroll to new section after a brief delay
+    setTimeout(() => {
+      const sectionElement = document.getElementById(`section-${newSectionId}`);
+      if (sectionElement) {
+        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
+  const handleDeleteSection = (sectionId: string) => {
+    // Remove from section order
+    const newOrder = (cvData?.sectionOrder || []).filter((id: string) => id !== sectionId);
+    onSectionOrderChange(newOrder);
+    
+    // Remove section data by setting it to undefined
+    onUpdateSection(sectionId, undefined);
+    
+    // If the deleted section was active, clear active section
+    if (activeSection === sectionId) {
+      setActiveSection(null);
+    }
+  };
+
+  const handleSectionTitleChange = (sectionId: string, newTitle: string) => {
+    // Update section titles in CV data
+    const updatedTitles = {
+      ...cvData.sectionTitles,
+      [sectionId]: newTitle
+    };
+    
+    // Create a temporary CV data object to update section titles
+    const updatedCvData = {
+      ...cvData,
+      sectionTitles: updatedTitles
+    };
+    
+    // We need to call onUpdateSection with a special key for section titles
+    onUpdateSection('sectionTitles', updatedTitles);
+  };
+
+  const handleApplySuggestionInternal = (sectionId: string, suggestion: any) => {
+    if (onApplySuggestion) {
+      onApplySuggestion(sectionId, suggestion);
+    }
+  };
+
+  const handleDismissSuggestionInternal = (sectionId: string, suggestion: any) => {
+    if (onDismissSuggestion) {
+      onDismissSuggestion(sectionId, suggestion);
+    }
+  };
+
+  const renderSection = (sectionId: string) => {
+    const commonProps = {
+      cvData,
+      onNavigateToSection: handleNavigateToSection,
+      isActive: activeSection === sectionId
+    };
+
+    switch (sectionId) {
+      case 'contact':
+        return (
+          <ContactSection 
+            data={cvData.contact} 
+            onUpdate={(data: any) => onUpdateSection('contact', data)} 
+            {...commonProps}
+          />
+        );
+      case 'summary':
+        return (
+          <SummarySection 
+            data={cvData.summary} 
+            onUpdate={(data: any) => onUpdateSection('summary', data)} 
+            {...commonProps}
+          />
+        );
+      case 'experience':
+        return (
+          <WorkExperienceSection 
+            data={cvData.experience} 
+            onUpdate={(data: any) => onUpdateSection('experience', data)} 
+            {...commonProps}
+          />
+        );
+      case 'skills':
+        return (
+          <SkillsSection 
+            data={cvData.skills} 
+            onUpdate={(data: any) => onUpdateSection('skills', data)} 
+            {...commonProps}
+          />
+        );
+      case 'education':
+        return (
+          <EducationSection 
+            data={cvData.education} 
+            onUpdate={(data: any) => onUpdateSection('education', data)} 
+            {...commonProps}
+          />
+        );
+      default: {
+        // Handle custom sections
+        const sectionData = cvData[sectionId];
+        if (!sectionData) return null;
+        
+        return (
+          <div className="space-y-4">
+            <textarea 
+              className="w-full p-3 border border-gray-300 rounded-md min-h-[120px]" 
+              value={sectionData.content || ''} 
+              onChange={(e) => onUpdateSection(sectionId, { ...sectionData, content: e.target.value })}
+              placeholder="Nhập nội dung cho phần này..."
+            />
+          </div>
+        );
+      }
+    }
+  };
+
+  return (
+    <div className="w-full">
+      {/* Header Section */}
+      <div className="bg-white rounded-lg shadow-sm mb-6">
+        <div className="p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-medium">Chỉnh sửa CV</h2>
+            {/* Inline CV Score */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500">Độ hoàn thiện CV</span>
+              <ScoreIndicator score={cvScore} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Job Description Analysis Panel - Separated as distinct section */}
+      <div className="bg-white rounded-lg shadow-sm mb-6">
+        <div className="px-6 py-6" data-jd-analysis-section>
+          <div className="space-y-4">
+            {/* Title Group - Following Design Spec */}
+            <div className="flex flex-row items-center gap-4 mb-6">
+              {/* Icon Container */}
+              <div className="flex flex-col justify-center items-center p-0 w-12 h-12 bg-blue-50 rounded-xl">
+                {/* Target Icon with Vector Implementation */}
+                <div className="relative w-6 h-6">
+                  {/* Outer circle */}
+                  <div className="absolute inset-[8.33%] border-2 border-blue-600 rounded-full"></div>
+                  {/* Middle circle */}
+                  <div className="absolute inset-[25%] border-2 border-blue-600 rounded-full"></div>
+                  {/* Inner circle */}
+                  <div className="absolute inset-[41.67%] border-2 border-blue-600 rounded-full"></div>
+                </div>
+              </div>
+
+                             {/* Title Text */}
+               <div className="flex flex-col items-start gap-1.5 flex-1">
+                 <h3 className="text-lg font-semibold leading-6 text-slate-800">
+                   Phân tích JD
+                 </h3>
+                 <p className="text-sm font-normal leading-5 text-slate-500">
+                   OkBuddy giúp bạn phân tích mô tả công việc và đưa ra gợi ý tối ưu CV của bạn
+                 </p>
+               </div>
+              <button 
+                onClick={handleAnalyzeJob}
+                className="px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                disabled={isAnalyzing || !jdInput.trim()}
+              >
+                {isAnalyzing && (
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {isAnalyzing ? 'Đang phân tích...' : 'Phân tích'}
+              </button>
+            </div>
+            
+            {/* JD Input Section */}
+            <div className="space-y-3">
+
+              
+              <div className="relative">
+                <textarea
+                  id="jd-input"
+                  value={jdInput}
+                  onChange={handleJdInputChange}
+                  className={`w-full h-32 p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs leading-relaxed ${
+                    analysisError ? 'border-red-300' : 'border-gray-300'
+                  }`}
+                  placeholder="Dán mô tả công việc vào đây để nhận được gợi ý tối ưu hóa CV từ AI..."
+                  maxLength={3000}
+                />
+                
+                <div className={`absolute bottom-2 right-2 text-xs ${
+                  jdInput.length > 2900 ? 'text-red-500' : 'text-gray-500'
+                }`}>
+                  {jdInput.length}/3000
+                </div>
+              </div>
+              
+              {/* Error State */}
+              {analysisError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm text-red-800 font-medium">{analysisError}</p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Enhanced Keyword Analysis Display */}
+              {(matchedKeywords.length > 0 || missingKeywords.length > 0) && (
+                                 <KeywordAnalysisSection
+                   matchedKeywords={matchedKeywords}
+                   missingKeywords={{
+                     highPriority: missingKeywords.slice(0, 5), // Only show top 5 most critical
+                     mediumPriority: [] // Remove medium priority to keep it simple
+                   }}
+                   language="vi"
+                   className="w-full"
+                 />
+              )}
+              
+
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced AI Suggestions Dashboard - Template Design */}
+        {analysisResults && analysisResults.suggestions && (
+          <div className="px-6 mb-6">
+            {/* AI Suggestions Header - Matching Target Design */}
+            <div 
+              className="flex flex-col items-start p-6 gap-5 bg-blue-50 border border-blue-300 rounded-[20px]"
+              style={{ maxWidth: '100%', minHeight: '103px' }}
+            >
+              {/* AI Title Row */}
+              <div className="flex flex-row justify-between items-center w-full">
+                {/* Title Group */}
+                <div className="flex flex-row items-center gap-4">
+                  {/* AI Icon - Using Lucide Sparkles */}
+                  <div className="flex flex-col justify-center items-center w-[52px] h-[52px] bg-primary-500 rounded-2xl">
+                    <Sparkles className="w-[26px] h-[26px] text-white" />
+                  </div>
+                  
+                  {/* Title Text */}
+                  <div className="flex flex-col items-start gap-1">
+                    <h3 className="text-lg font-bold text-slate-800 leading-7">
+                      Gợi ý từ OkBuddy AI
+                    </h3>
+                    <p className="text-sm font-normal text-slate-500 leading-5">
+                      Bổ sung nhanh các từ khoá còn thiếu để tối ưu CV
+                    </p>
+                  </div>
+                </div>
+
+                {/* Apply All Button - Using Lucide CheckCircle */}
+                <button
+                  className="flex flex-row justify-center items-center px-5 py-3 gap-2.5 bg-violet-500 rounded-lg text-white font-medium hover:bg-violet-600 transition-colors"
+                  onClick={handleApplyAll}
+                  disabled={isApplyingAll}
+                >
+                  <CheckCircle className="w-4 h-4 text-white" />
+                  <span>Áp dụng tất cả</span>
+                  <span className="bg-yellow-400 text-yellow-900 px-1 py-0.5 text-xs rounded font-bold">
+                    PRO
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Template-Matching Suggestions Display */}
+            <div className="mt-6 space-y-3 pb-6">
+              {analysisResults.suggestions && Object.entries(analysisResults.suggestions).map(([section, suggestions]) => {
+                console.log('🔍 Rendering section:', section, 'suggestions:', suggestions);
+                
+                const typedSuggestions = Array.isArray(suggestions) ? suggestions : [suggestions];
+                if (!typedSuggestions || typedSuggestions.length === 0) return null;
+                
+                const sectionTitles = {
+                  summary: 'Tóm tắt chuyên môn',
+                  experience: 'Kinh nghiệm làm việc',
+                  skills: 'Kỹ năng',
+                  education: 'Học vấn'
+                };
+
+                // For experience sections, try to get the job title and company from the suggestion metadata
+                let sectionTitle;
+                if (section.startsWith('experience-') && typedSuggestions.length > 0) {
+                  const suggestion = typedSuggestions[0];
+                  if (suggestion?.metadata?.jobTitle && suggestion?.metadata?.company) {
+                    sectionTitle = `${suggestion.metadata.jobTitle} tại ${suggestion.metadata.company}`;
+                  } else {
+                    sectionTitle = `Kinh nghiệm làm việc - Vị trí ${parseInt(section.split('-')[1]) + 1}`;
+                  }
+                } else {
+                  sectionTitle = sectionTitles[section as keyof typeof sectionTitles] || section;
+                }
+
+                // Convert suggestions to the proper format with safe fallbacks
+                const formattedSuggestions = typedSuggestions.map((suggestion: any, index: number) => {
+                  console.log('🔍 Formatting suggestion:', suggestion);
+                  
+                  const formattedSuggestion = {
+                    id: suggestion?.id || `${section}-${index}`,
+                    sectionId: section,
+                    sectionType: section as 'summary' | 'experience' | 'skills' | 'education',
+                    originalText: String(suggestion?.originalText || suggestion?.description || ''),
+                    suggestedText: String(suggestion?.suggestedText || suggestion?.title || ''),
+                    addedKeywords: Array.isArray(suggestion?.addedKeywords) ? suggestion.addedKeywords : [],
+                    confidence: typeof suggestion?.confidence === 'number' ? suggestion.confidence : 80,
+                    reasoning: String(suggestion?.reasoning || 'AI-generated suggestion'),
+                    priority: (suggestion?.priority || 'medium') as 'high' | 'medium' | 'low',
+                    metadata: suggestion?.metadata || {}
+                  };
+                  
+                  console.log('✅ Formatted suggestion:', formattedSuggestion);
+                  return formattedSuggestion;
+                });
+
+                return (
+                  <SuggestionPanel
+                    key={section}
+                    sectionId={section}
+                    sectionTitle={sectionTitle}
+                    suggestions={formattedSuggestions}
+                    language="vi"
+                    onApplySuggestion={(suggestion) => handleApplySuggestion({
+                      ...suggestion,
+                      section: section,
+                      type: 'suggestion'
+                    })}
+                    onDismissSuggestion={(suggestion) => {
+                      // Handle dismissing suggestion
+                      setAnalysisResults((prev: any) => {
+                        if (!prev || !prev.suggestions) return prev;
+                        
+                        const updatedSuggestions = { ...prev.suggestions };
+                        updatedSuggestions[section] = (updatedSuggestions[section] || []).filter(
+                          (s: any) => s.id !== suggestion.id
+                        );
+                        
+                        return {
+                          ...prev,
+                          suggestions: updatedSuggestions
+                        };
+                      });
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sections Container */}
+      <div className="bg-white rounded-lg shadow-sm">
+        <DndContext 
+          sensors={sensors} 
+          collisionDetection={closestCenter} 
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext 
+            items={cvData?.sectionOrder || []} 
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="p-4 space-y-4">
+              {(cvData?.sectionOrder || []).map((sectionId: string) => (
+                <div key={sectionId} id={`section-${sectionId}`}>
+                  <DraggableSection 
+                    id={sectionId}
+                    onActivate={() => setActiveSection(sectionId)}
+                    isActive={activeSection === sectionId}
+                    onDelete={() => handleDeleteSection(sectionId)}
+                    customTitle={cvData.sectionTitles?.[sectionId]}
+                    onTitleChange={handleSectionTitleChange}
+                    suggestions={suggestions[sectionId] || []}
+                    onApplySuggestion={handleApplySuggestionInternal}
+                    onDismissSuggestion={handleDismissSuggestionInternal}
+                  >
+                    {renderSection(sectionId)}
+                  </DraggableSection>
+                </div>
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+
+        {/* Add Section Button */}
+        <div className="p-4 border-t border-gray-200">
+          <button 
+            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors"
+            onClick={() => setShowAddSectionModal(true)}
+          >
+            + Thêm phần mới
+          </button>
+        </div>
+      </div>
+
+      {/* Add Section Modal */}
+      {showAddSectionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">Thêm phần mới</h3>
+              <button 
+                onClick={() => setShowAddSectionModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <XIcon size={20} />
+              </button>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-4">
+              Chọn loại phần bạn muốn thêm vào CV
+            </p>
+            
+            <div className="space-y-3">
+              {availableSectionTypes.map((sectionType) => (
+                <button
+                  key={sectionType.id}
+                  onClick={() => handleAddSection(sectionType.id)}
+                  className="w-full text-left p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                >
+                  <div className="font-medium text-gray-900">{sectionType.name}</div>
+                  <div className="text-sm text-gray-600">{sectionType.description}</div>
+                </button>
+              ))}
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button 
+                onClick={() => setShowAddSectionModal(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureName="Apply All Suggestions"
+        featureDescription="Áp dụng tất cả gợi ý AI với một click để tối ưu hóa CV của bạn ngay lập tức."
+      />
+    </div>
+  );
+};
