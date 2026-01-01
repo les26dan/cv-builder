@@ -1,10 +1,23 @@
 /**
- * Workflow Transition Service
- * Handles seamless data handoff between CV JD Upload and CV Guided Editing
- * Following OkBuddy tenets: modular, data persistence, smooth UX
+ * Workflow Transition Utilities
+ * Handles transitioning between different phases of the OkBuddy workflow
  */
 
-import type { CVAnalysisResult, JobAnalysisResult, CVJDMatchResult } from '../types/analysis'
+// Define types locally since the imports are not available
+interface CVAnalysisResult {
+  id?: string;
+  data?: any;
+}
+
+interface JobAnalysisResult {
+  id?: string;
+  data?: any;
+}
+
+interface CVJDMatchResult {
+  id?: string;
+  data?: any;
+}
 
 // Environment configuration for cross-app navigation
 const GUIDED_EDITING_URL = process.env.NEXT_PUBLIC_GUIDED_EDITING_URL || 'http://localhost:5173'

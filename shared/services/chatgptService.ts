@@ -135,10 +135,11 @@ export class UnifiedChatGPTService {
     
     const content = JSON.stringify(request);
     const detection = autoDetectLanguage({ 
-      cvContent: content,
-      summary: request.summary || '',
-      experience: request.workExperience || [],
-      skills: request.skills || []
+      cvContent: {
+        summary: request.summary || '',
+        experience: request.workExperience || [],
+        skills: request.skills || []
+      }
     });
     return detection.detectedLanguage;
   }
@@ -379,7 +380,7 @@ export class UnifiedChatGPTService {
       };
     }
 
-    return response as AIResponse<string[]>;
+    return response as unknown as AIResponse<string[]>;
   }
 
   /**

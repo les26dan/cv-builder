@@ -99,7 +99,7 @@ export class WorkflowAuthService {
 
     try {
       // Initialize Supabase client if not in mock mode
-      if (!shouldUseMockMode) {
+      if (!shouldUseMockMode()) {
         await this.initializeSupabase()
       }
 
@@ -188,7 +188,7 @@ export class WorkflowAuthService {
    * Get current authentication state
    */
   public getAuthState(): AuthState {
-    if (shouldUseMockMode) {
+    if (shouldUseMockMode()) {
       return {
         isAuthenticated: true,
         user: MOCK_USER,
@@ -250,7 +250,7 @@ export class WorkflowAuthService {
    * Sign in user (for future implementation)
    */
   public async signIn(email: string, password: string): Promise<AuthResult<AuthSession>> {
-    if (shouldUseMockMode) {
+    if (shouldUseMockMode()) {
       const mockSession: AuthSession = {
         user: MOCK_USER,
         accessToken: 'mock-token',
@@ -297,7 +297,7 @@ export class WorkflowAuthService {
    * Sign out user
    */
   public async signOut(): Promise<AuthResult<boolean>> {
-    if (shouldUseMockMode) {
+    if (shouldUseMockMode()) {
       this.currentSession = null
       await this.clearPersistedSession()
       this.notifyAuthStateChange()
@@ -329,7 +329,7 @@ export class WorkflowAuthService {
    * Refresh session token
    */
   public async refreshSession(): Promise<AuthResult<AuthSession>> {
-    if (shouldUseMockMode) {
+    if (shouldUseMockMode()) {
       const mockSession: AuthSession = {
         user: MOCK_USER,
         accessToken: 'mock-token-refreshed',

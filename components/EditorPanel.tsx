@@ -848,6 +848,9 @@ export const EditorPanel = ({
                   
                   const formattedSuggestion = {
                     id: suggestion?.id || `${section}-${index}`,
+                    type: suggestion?.type || 'optimization',
+                    title: String(suggestion?.title || suggestion?.suggestedText || 'Optimization suggestion'),
+                    description: String(suggestion?.description || suggestion?.reasoning || 'AI-generated optimization'),
                     sectionId: section,
                     sectionType: section as 'summary' | 'experience' | 'skills' | 'education',
                     originalText: String(suggestion?.originalText || suggestion?.description || ''),

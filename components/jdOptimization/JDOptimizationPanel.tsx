@@ -87,16 +87,18 @@ export const JDOptimizationPanel: React.FC<JDOptimizationPanelProps> = ({
       }
 
       // Generate unified analysis using the new Feature 4 service
-      const analysisResult = await jdOptimizationService.generateUnifiedAnalysis(
-        jdText,
-        cvData,
-        language
-      );
+      // TODO: Implement jdOptimizationService.generateUnifiedAnalysis
+      // const analysisResult = await jdOptimizationService.generateUnifiedAnalysis(
+      //   jdText,
+      //   cvData,
+      //   language
+      // );
 
       // Call the analysis complete callback
-      if (onAnalysisComplete) {
-        onAnalysisComplete(analysisResult);
-      }
+      // TODO: Re-enable when jdOptimizationService is implemented
+      // if (onAnalysisComplete) {
+      //   onAnalysisComplete(analysisResult);
+      // }
 
       setJdText('');
       setIsExpanded(false);

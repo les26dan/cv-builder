@@ -25,7 +25,7 @@ export function MobileBlockingOverlay({
   detection, 
   onBackToWorkspace, 
   onLogout 
-}: MobileBlockingOverlayProps): JSX.Element {
+}: MobileBlockingOverlayProps): React.JSX.Element {
   return (
     <div className="fixed inset-0 bg-okbuddy-light-blue flex items-center justify-center p-4 z-50">
       <div className="bg-white w-full max-w-sm mx-auto flex flex-col items-center p-6 gap-8">

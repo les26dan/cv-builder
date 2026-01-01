@@ -11,7 +11,22 @@ import { ChevronDown, ChevronUp, CheckCircle, X, User, Briefcase, Lightbulb, Gra
 import { viJDOptimizationTexts } from '../../config/texts/vi/jdOptimization';
 import { enJDOptimizationTexts } from '../../config/texts/en/jdOptimization';
 import { KeywordHighlighter } from './KeywordHighlighter';
-import type { JDOptimizationSuggestion } from '../../types/jdOptimization';
+
+interface JDOptimizationSuggestion {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  reasoning?: string;
+  originalText?: string;
+  suggestedText: string;
+  applied?: boolean;
+  addedKeywords?: string[];
+  metadata?: {
+    jobTitle?: string;
+    company?: string;
+  };
+}
 
 interface SuggestionPanelProps {
   sectionId: string;

@@ -6,7 +6,7 @@
 
 import { AIConfigOptions } from '../types/aiInterfaces';
 import { SupportedLanguage } from '../types/workflow';
-import { SecureAPIKeyManager } from '../../security/apiKeyManagement';
+// import { SecureAPIKeyManager } from '../../security/apiKeyManagement'; // TODO: Implement this module
 
 /**
  * AI Configuration Class
@@ -60,11 +60,10 @@ export class AIConfig implements AIConfigOptions {
   private getDefaultApiKey(): string {
     const environment = (process.env.NODE_ENV || 'development') as 'development' | 'staging' | 'production';
     
-    // Import security infrastructure
-    try {
-      return SecureAPIKeyManager.getSecureAPIKey(environment);
-    } catch (importError) {
-      // Fallback if security module not available
+    // Use environment variable directly (TODO: Implement SecureAPIKeyManager)
+    const apiKey = process.env.OPENAI_API_KEY;
+    
+    if (!apiKey) {
       if (environment === 'production') {
         throw new Error('OPENAI_API_KEY environment variable is required in production');
       }
@@ -72,6 +71,8 @@ export class AIConfig implements AIConfigOptions {
       console.warn('⚠️ Security module not available - using basic validation');
       return process.env.OPENAI_API_KEY || '';
     }
+    
+    return apiKey;
   }
 
   /**

@@ -45,7 +45,7 @@ class DatabaseService {
       // Use environment configuration
       const { supabaseUrl, supabaseAnonKey } = environmentConfig.database
 
-      if (!supabaseUrl || !supabaseAnonKey || shouldUseMockMode) {
+      if (!supabaseUrl || !supabaseAnonKey || shouldUseMockMode()) {
         console.warn('Supabase credentials not configured or mock mode enabled, using mock mode')
         this.isInitialized = true
         return null
