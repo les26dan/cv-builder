@@ -1,0 +1,441 @@
+{
+  "id": "1:1067",
+  "name": "Waitlist Section",
+  "type": "FRAME",
+  "x": 6707,
+  "y": 9989,
+  "width": 1200,
+  "height": 352,
+  "relativeTransform": [
+    [
+      1,
+      0,
+      6707
+    ],
+    [
+      0,
+      1,
+      9989
+    ]
+  ],
+  "constraints": {
+    "horizontal": "MIN",
+    "vertical": "MIN"
+  },
+  "fills": [
+    {
+      "type": "SOLID",
+      "visible": true,
+      "opacity": 1,
+      "blendMode": "NORMAL",
+      "color": {
+        "r": 0.8784313797950745,
+        "g": 0.9686274528503418,
+        "b": 0.9803921580314636
+      },
+      "boundVariables": {}
+    }
+  ],
+  "strokes": [],
+  "strokeWeight": 0,
+  "cornerRadius": 0,
+  "effects": [],
+  "blendMode": "PASS_THROUGH",
+  "layoutAlign": "INHERIT",
+  "layoutGrow": 0,
+  "layoutMode": "VERTICAL",
+  "itemSpacing": 32,
+  "children": [
+    {
+      "id": "1:1070",
+      "name": "Content Container",
+      "type": "FRAME",
+      "x": 300,
+      "y": 80,
+      "width": 600,
+      "height": 192,
+      "relativeTransform": [
+        [
+          1,
+          0,
+          300
+        ],
+        [
+          0,
+          1,
+          80
+        ]
+      ],
+      "constraints": {
+        "horizontal": "MIN",
+        "vertical": "MIN"
+      },
+      "fills": [],
+      "strokes": [],
+      "strokeWeight": 0,
+      "cornerRadius": 0,
+      "effects": [],
+      "blendMode": "PASS_THROUGH",
+      "layoutAlign": "INHERIT",
+      "layoutGrow": 0,
+      "layoutMode": "VERTICAL",
+      "itemSpacing": 24,
+      "children": [
+        {
+          "id": "1:1071",
+          "name": "Waitlist Title",
+          "type": "TEXT",
+          "x": 0,
+          "y": 0,
+          "width": 600,
+          "height": 44,
+          "relativeTransform": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ]
+          ],
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "opacity": 1,
+              "blendMode": "NORMAL",
+              "color": {
+                "r": 0.06666667014360428,
+                "g": 0.0941176488995552,
+                "b": 0.15294118225574493
+              },
+              "boundVariables": {}
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "effects": [],
+          "blendMode": "PASS_THROUGH",
+          "layoutAlign": "STRETCH",
+          "layoutGrow": 0,
+          "children": []
+        },
+        {
+          "id": "1:1072",
+          "name": "Waitlist Description",
+          "type": "TEXT",
+          "x": 0,
+          "y": 68,
+          "width": 600,
+          "height": 44,
+          "relativeTransform": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              68
+            ]
+          ],
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "fills": [
+            {
+              "type": "SOLID",
+              "visible": true,
+              "opacity": 1,
+              "blendMode": "NORMAL",
+              "color": {
+                "r": 0.21568627655506134,
+                "g": 0.2549019753932953,
+                "b": 0.3176470696926117
+              },
+              "boundVariables": {}
+            }
+          ],
+          "strokes": [],
+          "strokeWeight": 1,
+          "effects": [],
+          "blendMode": "PASS_THROUGH",
+          "layoutAlign": "STRETCH",
+          "layoutGrow": 0,
+          "children": []
+        },
+        {
+          "id": "1:1073",
+          "name": "Email Form",
+          "type": "FRAME",
+          "x": 0,
+          "y": 136,
+          "width": 600,
+          "height": 56,
+          "relativeTransform": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              136
+            ]
+          ],
+          "constraints": {
+            "horizontal": "MIN",
+            "vertical": "MIN"
+          },
+          "fills": [],
+          "strokes": [],
+          "strokeWeight": 0,
+          "cornerRadius": 0,
+          "effects": [],
+          "blendMode": "PASS_THROUGH",
+          "layoutAlign": "STRETCH",
+          "layoutGrow": 0,
+          "layoutMode": "HORIZONTAL",
+          "itemSpacing": 16,
+          "children": [
+            {
+              "id": "1:1074",
+              "name": "Email Input",
+              "type": "FRAME",
+              "x": 52,
+              "y": 0,
+              "width": 360,
+              "height": 56,
+              "relativeTransform": [
+                [
+                  1,
+                  0,
+                  52
+                ],
+                [
+                  0,
+                  1,
+                  0
+                ]
+              ],
+              "constraints": {
+                "horizontal": "MIN",
+                "vertical": "MIN"
+              },
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "visible": true,
+                  "opacity": 1,
+                  "blendMode": "NORMAL",
+                  "color": {
+                    "r": 1,
+                    "g": 1,
+                    "b": 1
+                  },
+                  "boundVariables": {}
+                }
+              ],
+              "strokes": [
+                {
+                  "type": "SOLID",
+                  "visible": true,
+                  "opacity": 1,
+                  "blendMode": "NORMAL",
+                  "color": {
+                    "r": 0.6980392336845398,
+                    "g": 0.9215686321258545,
+                    "b": 0.9490196108818054
+                  },
+                  "boundVariables": {}
+                }
+              ],
+              "strokeWeight": 1,
+              "cornerRadius": 8,
+              "effects": [],
+              "blendMode": "PASS_THROUGH",
+              "layoutAlign": "INHERIT",
+              "layoutGrow": 0,
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "children": [
+                {
+                  "id": "1:1075",
+                  "name": "Enter your email",
+                  "type": "TEXT",
+                  "x": 16,
+                  "y": 18,
+                  "width": 123,
+                  "height": 20,
+                  "relativeTransform": [
+                    [
+                      1,
+                      0,
+                      16
+                    ],
+                    [
+                      0,
+                      1,
+                      18
+                    ]
+                  ],
+                  "constraints": {
+                    "horizontal": "MIN",
+                    "vertical": "MIN"
+                  },
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "visible": true,
+                      "opacity": 1,
+                      "blendMode": "NORMAL",
+                      "color": {
+                        "r": 0.41960784792900085,
+                        "g": 0.4470588266849518,
+                        "b": 0.501960813999176
+                      },
+                      "boundVariables": {}
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "effects": [],
+                  "blendMode": "PASS_THROUGH",
+                  "layoutAlign": "INHERIT",
+                  "layoutGrow": 0,
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "1:1076",
+              "name": "Submit Button",
+              "type": "FRAME",
+              "x": 428,
+              "y": 0,
+              "width": 120,
+              "height": 56,
+              "relativeTransform": [
+                [
+                  1,
+                  0,
+                  428
+                ],
+                [
+                  0,
+                  1,
+                  0
+                ]
+              ],
+              "constraints": {
+                "horizontal": "MIN",
+                "vertical": "MIN"
+              },
+              "fills": [
+                {
+                  "type": "SOLID",
+                  "visible": true,
+                  "opacity": 1,
+                  "blendMode": "NORMAL",
+                  "color": {
+                    "r": 0.007843137718737125,
+                    "g": 0.5333333611488342,
+                    "b": 0.8196078538894653
+                  },
+                  "boundVariables": {}
+                }
+              ],
+              "strokes": [],
+              "strokeWeight": 0,
+              "cornerRadius": 8,
+              "effects": [
+                {
+                  "type": "DROP_SHADOW",
+                  "visible": true,
+                  "radius": 12,
+                  "boundVariables": {},
+                  "color": {
+                    "r": 0.007843137718737125,
+                    "g": 0.5333333611488342,
+                    "b": 0.8196078538894653,
+                    "a": 0.125490203499794
+                  },
+                  "offset": {
+                    "x": 0,
+                    "y": 4
+                  },
+                  "spread": 0,
+                  "blendMode": "NORMAL",
+                  "showShadowBehindNode": false
+                }
+              ],
+              "blendMode": "PASS_THROUGH",
+              "layoutAlign": "INHERIT",
+              "layoutGrow": 0,
+              "layoutMode": "HORIZONTAL",
+              "itemSpacing": 0,
+              "children": [
+                {
+                  "id": "1:1077",
+                  "name": "Button Text",
+                  "type": "TEXT",
+                  "x": 24,
+                  "y": 18,
+                  "width": 72,
+                  "height": 20,
+                  "relativeTransform": [
+                    [
+                      1,
+                      0,
+                      24
+                    ],
+                    [
+                      0,
+                      1,
+                      18
+                    ]
+                  ],
+                  "constraints": {
+                    "horizontal": "MIN",
+                    "vertical": "MIN"
+                  },
+                  "fills": [
+                    {
+                      "type": "SOLID",
+                      "visible": true,
+                      "opacity": 1,
+                      "blendMode": "NORMAL",
+                      "color": {
+                        "r": 1,
+                        "g": 1,
+                        "b": 1
+                      },
+                      "boundVariables": {}
+                    }
+                  ],
+                  "strokes": [],
+                  "strokeWeight": 1,
+                  "effects": [],
+                  "blendMode": "PASS_THROUGH",
+                  "layoutAlign": "INHERIT",
+                  "layoutGrow": 0,
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
