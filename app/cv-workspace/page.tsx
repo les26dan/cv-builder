@@ -46,18 +46,26 @@ function WorkspaceContent() {
         return
       }
       
-      // Check for user session in localStorage
-      const userSession = localStorage.getItem('userSession')
-      
-      if (!userSession) {
-        // Redirect to login if no session
-        router.push('/login')
-        return
-      }
+      // Check authentication using the proper auth API
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      })
 
-      const userData = JSON.parse(userSession)
-      setUser(userData)
-      await loadCVs(userData.id)
+      if (response.ok) {
+        const userData = await response.json()
+        setUser({
+          id: userData.id,
+          fullName: userData.name,
+          email: userData.email,
+          emailVerified: true, // Assume verified if they have a session
+          createdAt: new Date().toISOString()
+        })
+        await loadCVs(userData.id)
+      } else {
+        // Not authenticated, redirect to login
+        router.push('/login')
+      }
     } catch (error) {
       console.error('Error checking authentication:', error)
       router.push('/login')
@@ -92,6 +100,10 @@ function WorkspaceContent() {
     } finally {
       setIsCreating(false)
     }
+  }
+
+  const handleUploadCV = () => {
+    router.push('/cv-upload')
   }
 
   const handleEditCV = (cvId: string) => {
@@ -136,7 +148,7 @@ function WorkspaceContent() {
           </p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 flex gap-4">
           <button
             onClick={handleCreateNewCV}
             disabled={isCreating}
@@ -155,6 +167,16 @@ function WorkspaceContent() {
                 {workspace.page.createButton}
               </>
             )}
+          </button>
+          
+          <button
+            onClick={handleUploadCV}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Tải CV lên
           </button>
         </div>
 

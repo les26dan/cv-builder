@@ -1,14 +1,11 @@
-- Read the master Product Brief at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Materials/Documents/Product Brief.md`.
 - Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
-- Review these previous projects and carefully analyze the existing components, features, and user flows implemented in their respective codebases, as well as the associated Product Specifications, to gain full understanding of the system logic, architecture, and UX patterns at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects` with these pages:
+- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy` and these previous projects and carefully analyze the existing components, features, and user flows implemented in their respective codebases, as well as the associated Product Specifications, to gain full understanding of the system logic, architecture, and UX patterns:
    - Landing Page
    - Account Creation & Login
    - CV Workspace
    - CV & JD Upload
    - CV Guided Editing
    - CV Workflow Integration
-- Pay special attention to the technical stack development workflows file structure and project organization patterns used across all previous projects to ensure consistency and correctness in implementation.
-- Always check carefully to confirm that you are working inside the correct project directory before executing any implementation or modification tasks.
 - Let the user know once you have finished.
 
 *Implementation*

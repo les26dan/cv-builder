@@ -7,7 +7,7 @@ cd /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV\ Workflow/cv-w
 npm run dev
 
 # *Tasks Update*
-Update the Tasks.md file to marking what we have implemented being completed. If the entire task is completed, move it down to the Completed Tasks section.
+Update the Tasks.md file to marking what we have implemented being completed. If an entire task (with all of its subtasks) is completed, move it down to the Completed Tasks section.
 
 # *Restart all servers*
 Restart all servers using '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/start-all-servers.sh'

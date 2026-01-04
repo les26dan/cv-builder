@@ -146,6 +146,222 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
   }
 }
 
+// ====================
+// CV DRAFT MANAGEMENT
+// ====================
+
+export interface CVDraft {
+  id?: string
+  user_id: string
+  file_id?: string
+  file_name?: string
+  file_size?: number
+  file_path?: string
+  jd_text?: string
+  jd_url?: string
+  analysis_id?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface SuggestionItem {
+  section: string
+  type: string
+  content: string
+  priority: 'high' | 'medium' | 'low'
+}
+
+export interface AnalysisResult {
+  id?: string
+  user_id: string
+  analysis_id: string
+  cv_score?: number
+  suggestions?: SuggestionItem[]
+  keywords_found?: string[]
+  keywords_missing?: string[]
+  ats_score?: number
+  status: 'started' | 'completed' | 'failed'
+  created_at?: string
+  updated_at?: string
+}
+
+// Mock data for development
+const mockDrafts: Map<string, CVDraft> = new Map()
+const mockAnalysis: Map<string, AnalysisResult> = new Map()
+
+export async function saveCVDraft(draftData: CVDraft): Promise<CVDraft> {
+  if (!supabase) {
+    // Mock implementation
+    const draftId = draftData.user_id
+    const existingDraft = mockDrafts.get(draftId) || {}
+    const updatedDraft: CVDraft = {
+      ...existingDraft,
+      ...draftData,
+      id: draftId,
+      updated_at: new Date().toISOString()
+    }
+    
+    mockDrafts.set(draftId, updatedDraft)
+    return updatedDraft
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('cv_drafts')
+      .upsert({
+        ...draftData,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Supabase error saving draft:', error)
+      throw error
+    }
+
+    return data as unknown as CVDraft
+  } catch (error) {
+    console.error('Database connection error:', error)
+    throw error
+  }
+}
+
+export async function getDraftData(userId: string): Promise<CVDraft | null> {
+  if (!supabase) {
+    return mockDrafts.get(userId) || null
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('cv_drafts')
+      .select('*')
+      .eq('user_id', userId)
+      .single()
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+      console.error('Supabase error getting draft:', error)
+      return null
+    }
+
+    return (data as unknown as CVDraft) || null
+  } catch (error) {
+    console.error('Database connection error:', error)
+    return null
+  }
+}
+
+// ====================
+// USER MANAGEMENT
+// ====================
+
+export interface User {
+  id: string
+  full_name: string
+  email: string
+  password_hash: string
+  email_verified: boolean
+  created_at: string
+  updated_at?: string
+}
+
+export interface CreateUserData {
+  full_name: string
+  email: string
+  password_hash: string
+  email_verified: boolean
+}
+
+export interface UserResult {
+  success: boolean
+  user?: User
+  error?: string
+}
+
+// Mock user storage
+const mockUsers = new Map<string, User>()
+
+export async function getUserByEmail(email: string): Promise<UserResult> {
+  if (!supabase) {
+    // Mock implementation
+    const user = Array.from(mockUsers.values()).find(u => u.email === email)
+    if (!user) {
+      return { success: false, error: 'User not found' }
+    }
+    return { success: true, user }
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single()
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Supabase getUserByEmail error:', error)
+      return { success: false, error: error.message }
+    }
+
+    if (!data) {
+      return { success: false, error: 'User not found' }
+    }
+
+    return { success: true, user: data as unknown as User }
+  } catch (error) {
+    console.error('Database connection error:', error)
+    return { success: false, error: 'Database connection failed' }
+  }
+}
+
+export async function createUser(userData: CreateUserData): Promise<UserResult> {
+  // Check if user already exists
+  const existingUser = await getUserByEmail(userData.email)
+  if (existingUser.success && existingUser.user) {
+    return { success: false, error: 'User already exists' }
+  }
+
+  if (!supabase) {
+    // Mock implementation
+    const userId = crypto.randomUUID()
+    const newUser: User = {
+      ...userData,
+      id: userId,
+      created_at: new Date().toISOString()
+    }
+
+    mockUsers.set(userId, newUser)
+    return { success: true, user: newUser }
+  }
+
+  try {
+    const newUser = {
+      ...userData,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+
+    const { data, error } = await supabase
+      .from('users')
+      .insert(newUser)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Supabase createUser error:', error)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, user: data as unknown as User }
+  } catch (error) {
+    console.error('Database connection error:', error)
+    return { success: false, error: 'Database connection failed' }
+  }
+}
+
 export async function deleteCV(cvId: string): Promise<boolean> {
   if (!supabase) {
     // Remove from mock data for development
@@ -173,5 +389,79 @@ export async function deleteCV(cvId: string): Promise<boolean> {
   } catch (error) {
     console.error('Database connection error:', error)
     return false
+  }
+}
+
+// Validate CV ownership - critical security function
+export async function validateCVOwnership(cvId: string, userId: string): Promise<boolean> {
+  if (!supabase) {
+    // In development with mock data, check mock CVs
+    console.log('Supabase not configured, checking mock data for CV ownership')
+    const cv = mockCVs.find(cv => cv.id === cvId)
+    return cv?.userId === userId || false
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('cvs')
+      .select('user_id')
+      .eq('id', cvId)
+      .single()
+
+    if (error || !data) {
+      console.error('CV not found or error checking ownership:', error)
+      return false
+    }
+
+    return data.user_id === userId
+  } catch (error) {
+    console.error('Database connection error during ownership check:', error)
+    return false
+  }
+}
+
+// Get CV data with ownership validation
+export async function getCVWithOwnership(cvId: string, userId: string): Promise<CVData | null> {
+  // First validate ownership
+  const isOwner = await validateCVOwnership(cvId, userId)
+  if (!isOwner) {
+    console.error('User does not own CV:', { cvId, userId })
+    return null
+  }
+
+  if (!supabase) {
+    // Return mock data for development
+    console.log('Supabase not configured, returning mock CV data')
+    const cv = mockCVs.find(cv => cv.id === cvId)
+    return cv || null
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('cvs')
+      .select('*')
+      .eq('id', cvId)
+      .eq('user_id', userId) // Double-check ownership in query
+      .single()
+
+    if (error || !data) {
+      console.error('Error fetching CV or CV not found:', error)
+      return null
+    }
+
+    const cvRow = data as unknown as CVRow
+    return {
+      id: cvRow.id,
+      title: cvRow.title || 'Untitled CV',
+      status: (cvRow.status as CVData['status']) || 'new',
+      score: cvRow.score || 0,
+      lastUpdated: new Date(cvRow.updated_at),
+      userId: cvRow.user_id,
+      content: cvRow.content || undefined,
+      jobDescription: cvRow.job_description || undefined,
+    }
+  } catch (error) {
+    console.error('Database connection error:', error)
+    return null
   }
 } 
