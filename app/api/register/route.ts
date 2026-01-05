@@ -4,6 +4,9 @@ import { hashPassword } from '@/lib/password';
 import { DatabaseService } from '@/lib/database';
 import { checkRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rateLimit';
 
+// Explicitly use Node.js runtime to avoid Edge Runtime warnings
+export const runtime = 'nodejs'
+
 interface RegisterData {
   fullName: string;
   email: string;

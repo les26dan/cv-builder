@@ -1,5 +1,5 @@
 - Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
-- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy` and these previous projects and carefully analyze the existing components, features, and user flows implemented in their respective codebases, as well as the associated Product Specifications, to gain full understanding of the system logic, architecture, and UX patterns:
+- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy`, carefully analyze the existing components, features, and user flows implemented in their respective codebases, to gain full understanding of the system logic, architecture, and UX patterns:
    - Landing Page
    - Account Creation & Login
    - CV Workspace
@@ -9,7 +9,7 @@
 - Let the user know once you have finished.
 
 *Implementation*
-- With all context reviewed, start or continue implementation of the project:
+- With all context reviewed, start or continue implementation of the initiative:
    - Use the Product Spec at: `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-suggestions-ai/JD–CV Optimization and Apply All.md`[//]
       - This is the single source of truth. It takes precedence over all other documentation.  
       - You must implement the feature as described — precisely, completely, and without deviation or assumption.

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getCVWithOwnership } from '@/lib/supabase'
 
+// Explicitly use Node.js runtime to avoid Edge Runtime warnings
+export const runtime = 'nodejs'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ cvId: string }> }

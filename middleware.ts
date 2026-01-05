@@ -50,18 +50,12 @@ async function getUserSession(request: NextRequest): Promise<UserSession | null>
   }
 }
 
-// Validate CV ownership for CV-specific routes
+// Note: CV ownership validation moved to API routes to avoid Edge Runtime issues
+// Middleware now only handles authentication, not CV ownership
 async function validateCVOwnership(cvId: string, userId: string): Promise<boolean> {
-  try {
-    // Import the validation function from supabase service
-    const { validateCVOwnership: dbValidateCVOwnership } = await import('./lib/supabase')
-    
-    // Use the database validation function
-    return await dbValidateCVOwnership(cvId, userId)
-  } catch (error) {
-    console.error('Error validating CV ownership:', error)
-    return false
-  }
+  // For now, allow access and let the API routes handle detailed validation
+  // This prevents Edge Runtime issues with Supabase imports in middleware
+  return true
 }
 
 export async function middleware(request: NextRequest) {

@@ -5,6 +5,9 @@ import path from 'path'
 import { saveCVDraft } from '@/lib/supabase'
 import { processFile, analyzeExtractedText } from '@/lib/fileProcessing'
 
+// Explicitly use Node.js runtime to avoid Edge Runtime warnings
+export const runtime = 'nodejs'
+
 interface UploadResponse {
   success: boolean
   message: string

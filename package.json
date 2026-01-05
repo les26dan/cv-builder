@@ -9,7 +9,9 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "restart": "pkill -f 'next dev' || true && sleep 2 && npm run dev",
+    "clean": "rm -rf .next && npm run dev"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
