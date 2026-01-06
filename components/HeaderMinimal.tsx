@@ -1,12 +1,9 @@
 'use client'
 
-import { workspace } from '../config/texts/vi/workspace'
-import { AutosaveStatus } from '../lib/hooks/useAutosave'
-
 interface HeaderMinimalProps {
   showAutosave?: boolean
   userInitial?: string
-  autosaveStatus?: AutosaveStatus
+  autosaveStatus?: 'idle' | 'saving' | 'saved' | 'error'
 }
 
 export default function HeaderMinimal({ 
@@ -14,36 +11,41 @@ export default function HeaderMinimal({
   userInitial = 'N',
   autosaveStatus = 'saved'
 }: HeaderMinimalProps) {
+  // Inline workspace text to avoid import issues
+  const workspaceText = {
+    logo: 'OkBuddy',
+    autosave: {
+      saving: 'Đang lưu...',
+      saved: 'Đã lưu tự động',
+    }
+  }
+
   // Determine autosave display properties based on status
   const getAutosaveDisplay = () => {
     switch (autosaveStatus) {
       case 'saving':
         return {
-          text: workspace.header.autosave.saving,
-          iconColor: '#F59E0B', // Orange for saving
-          textColor: '#F59E0B',
+          text: workspaceText.autosave.saving,
+          statusClass: 'bg-orange-50 text-orange-600 border-orange-200',
           showSpinner: true,
         }
       case 'saved':
         return {
-          text: workspace.header.autosave.saved,
-          iconColor: '#4CAF50', // Green for saved
-          textColor: '#4CAF50',
+          text: workspaceText.autosave.saved,
+          statusClass: 'bg-green-50 text-green-600 border-green-200',
           showSpinner: false,
         }
       case 'error':
         return {
           text: 'Lỗi lưu tự động',
-          iconColor: '#EF4444', // Red for error
-          textColor: '#EF4444',
+          statusClass: 'bg-red-50 text-red-600 border-red-200',
           showSpinner: false,
         }
       case 'idle':
       default:
         return {
-          text: workspace.header.autosave.saved,
-          iconColor: '#6B7280', // Gray for idle
-          textColor: '#6B7280',
+          text: workspaceText.autosave.saved,
+          statusClass: 'bg-gray-50 text-gray-600 border-gray-200',
           showSpinner: false,
         }
     }
@@ -52,121 +54,41 @@ export default function HeaderMinimal({
   const autosaveDisplay = getAutosaveDisplay()
 
   return (
-    <header style={{
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '16px 24px',
-      gap: '16px',
-      width: '100%',
-      maxWidth: '1152px',
-      height: '64px',
-      background: '#FFFFFF',
-      border: '1px solid #E5E7EB',
-      borderRadius: '12px',
-      flex: 'none',
-      order: 0,
-      alignSelf: 'stretch',
-      flexGrow: 0,
-    }}>
-      {/* Logo Section - Far Left */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: '0px',
-        gap: '12px',
-        width: '109px',
-        height: '29px',
-        borderRadius: '0px',
-        flex: 'none',
-        order: 0,
-        flexGrow: 0,
-      }}>
+    <header className="w-full h-16 sm:h-20 bg-white flex items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-100 shadow-sm">
+      {/* Logo Section */}
+      <div className="flex items-center">
         <button
           onClick={() => {
-            // Since we're already in workspace, just refresh the page
-            window.location.reload();
+            // Navigate back to workspace home
+            window.location.href = '/cv-workspace';
           }}
-          style={{
-            width: '109px',
-            height: '29px',
-            fontFamily: 'Inter',
-            fontStyle: 'normal',
-            fontWeight: 700,
-            fontSize: '24px',
-            lineHeight: '29px',
-            color: '#0288D1',
-            flex: 'none',
-            order: 0,
-            flexGrow: 0,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '4px 8px',
-            borderRadius: '6px',
-            transition: 'all 0.2s ease',
-            outline: 'none',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#0277BD';
-            e.currentTarget.style.backgroundColor = 'rgba(2, 136, 209, 0.05)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#0288D1';
-            e.currentTarget.style.backgroundColor = 'transparent';
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(2, 136, 209, 0.5)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.boxShadow = 'none';
-          }}
+          className="text-xl sm:text-2xl font-bold text-primary hover:text-primary-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
           title="Trang chủ CV Workspace"
           aria-label="Trang chủ CV Workspace"
         >
-          {workspace.header.logo}
+          {workspaceText.logo}
         </button>
       </div>
 
-      {/* User Actions - Far Right */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: '16px'
-      }}>
+      {/* User Actions Section */}
+      <div className="flex items-center gap-3 sm:gap-4">
         {/* Auto Save Status */}
         {showAutosave && (
-          <div style={{
-            padding: '4px 12px',
-            backgroundColor: '#F0FDF4',
-            color: '#22C55E',
-            fontSize: '14px',
-            borderRadius: '9999px',
-            border: '1px solid rgba(34, 197, 94, 0.2)',
-            fontFamily: 'Inter'
-          }}>
-            ✓ {autosaveDisplay.text}
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium border ${autosaveDisplay.statusClass}`}>
+            {autosaveDisplay.showSpinner && (
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+            )}
+            {!autosaveDisplay.showSpinner && (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+            {autosaveDisplay.text}
           </div>
         )}
 
         {/* User Avatar */}
-        <div style={{
-          width: '32px',
-          height: '32px',
-          backgroundColor: '#3B82F6',
-          borderRadius: '50%',
-          color: '#FFFFFF',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: 'Inter',
-          fontWeight: 'bold',
-          fontSize: '14px'
-        }}>
+        <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-primary-600 transition-colors cursor-pointer">
           {userInitial}
         </div>
       </div>

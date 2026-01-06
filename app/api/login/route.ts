@@ -44,22 +44,56 @@ export async function POST(request: NextRequest) {
       ));
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email)) {
-      return addHeaders(NextResponse.json(
-        { error: "Email không hợp lệ" },
-        { status: 400 }
-      ));
+    // Handle special admin username "adminbuddy"
+    let emailToLookup = body.email;
+    if (body.email === 'adminbuddy') {
+      emailToLookup = 'admin@example.com'; // Updated to Gmail address
+      console.log('🔑 Admin username detected, converting to email:', emailToLookup);
+    }
+
+    // Validate email format (skip for adminbuddy username)
+    if (body.email !== 'adminbuddy') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(body.email)) {
+        return addHeaders(NextResponse.json(
+          { error: "Email không hợp lệ" },
+          { status: 400 }
+        ));
+      }
     }
 
     // Find user in database
-    let userResult = await DatabaseService.getUserByEmail(body.email);
+    let userResult = await DatabaseService.getUserByEmail(emailToLookup);
     
-    // Auto-create admin account if it doesn't exist (development mode only)
+    // Auto-create admin account if using adminbuddy credentials or Gmail email
     if (!userResult.success || !userResult.user) {
-      if (body.email === 'masteradmin@okbuddy.com' && process.env.NODE_ENV === 'development') {
-        console.log('🔧 Auto-creating admin account...');
+      if ((body.email === 'adminbuddy' || body.email === 'admin@example.com') && body.password === '[REDACTED_PASSWORD]') {
+        console.log('🔧 Auto-creating adminbuddy account with Gmail email...');
+        try {
+          const { hashPassword } = await import('@/lib/password');
+          const passwordResult = await hashPassword(body.password);
+          
+          if (passwordResult.success && passwordResult.hashedPassword) {
+            const createResult = await DatabaseService.createUser({
+              full_name: 'Admin Buddy',
+              email: 'admin@example.com', // Always use Gmail email
+              password_hash: passwordResult.hashedPassword,
+              email_verified: true
+            });
+            
+            if (createResult.success) {
+              console.log('✅ Admin Buddy account auto-created successfully with Gmail email');
+              userResult = await DatabaseService.getUserByEmail('admin@example.com');
+            }
+          }
+        } catch (error) {
+          console.error('❌ Failed to auto-create adminbuddy account:', error);
+        }
+      }
+      
+      // Auto-create master admin account if needed (development mode only)
+      if (emailToLookup === 'masteradmin@okbuddy.com' && process.env.NODE_ENV === 'development') {
+        console.log('🔧 Auto-creating master admin account...');
         try {
           const { hashPassword } = await import('@/lib/password');
           const passwordResult = await hashPassword('[REDACTED_DEV_PASSWORD]');
@@ -73,12 +107,12 @@ export async function POST(request: NextRequest) {
             });
             
             if (createResult.success) {
-              console.log('✅ Admin account auto-created successfully');
-              userResult = await DatabaseService.getUserByEmail(body.email);
+              console.log('✅ Master admin account auto-created successfully');
+              userResult = await DatabaseService.getUserByEmail(emailToLookup);
             }
           }
         } catch (error) {
-          console.error('❌ Failed to auto-create admin account:', error);
+          console.error('❌ Failed to auto-create master admin account:', error);
         }
       }
       
@@ -110,6 +144,16 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get('user-agent'),
     });
 
+    // Create session data
+    const userRole = userResult.user.email === 'admin@example.com' ? 'admin' : 'user';
+    const sessionData = {
+      id: userResult.user.id,
+      email: userResult.user.email,
+      name: userResult.user.full_name,
+      provider: 'email',
+      role: userRole
+    };
+
     // Return success with user information (excluding sensitive data)
     const successResponse = NextResponse.json({
       success: true,
@@ -119,9 +163,20 @@ export async function POST(request: NextRequest) {
         fullName: userResult.user.full_name,
         email: userResult.user.email,
         emailVerified: userResult.user.email_verified,
-        createdAt: userResult.user.created_at
+        createdAt: userResult.user.created_at,
+        role: userRole
       }
     }, { status: 200 });
+
+    // Set session cookie for authentication
+    successResponse.cookies.set('user_session', JSON.stringify(sessionData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7 // 7 days
+    });
+
+    console.log(`🍪 Session cookie set for ${userRole}:`, userResult.user.email);
 
     return addRateLimitHeaders(successResponse, rateLimitResult.remaining, rateLimitResult.resetTime);
 

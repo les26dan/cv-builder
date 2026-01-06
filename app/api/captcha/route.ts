@@ -4,17 +4,20 @@ import { checkRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/
 // In-memory storage for CAPTCHA sessions (in production, use Redis or database)
 const captchaSessions = new Map<string, { answer: number; expires: number }>();
 
-// Clean up expired sessions every 5 minutes
-setInterval(() => {
+// Clean up expired sessions on each request
+function cleanupExpiredSessions() {
   const now = Date.now();
   Array.from(captchaSessions.entries()).forEach(([sessionId, session]) => {
     if (session.expires < now) {
       captchaSessions.delete(sessionId);
     }
   });
-}, 5 * 60 * 1000);
+}
 
 export async function GET(request: NextRequest) {
+  // Clean up expired sessions
+  cleanupExpiredSessions();
+  
   // Apply rate limiting
   const rateLimitResult = checkRateLimit(request, 'captcha');
   
@@ -46,6 +49,8 @@ export async function GET(request: NextRequest) {
       expires: Date.now() + 10 * 60 * 1000 // 10 minutes
     });
 
+    console.log('✅ CAPTCHA generated successfully:', { sessionId, num1, num2, answer });
+
     const successResponse = NextResponse.json({
       sessionId,
       problem: {
@@ -69,6 +74,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Clean up expired sessions
+  cleanupExpiredSessions();
+  
   // Apply rate limiting
   const rateLimitResult = checkRateLimit(request, 'captcha');
   

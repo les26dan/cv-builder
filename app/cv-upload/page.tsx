@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import HeaderMinimal from '@/components/HeaderMinimal'
 import { cvUpload } from '@/config/texts/vi/cvUpload'
 
 export default function CVUploadPage() {
@@ -72,34 +73,25 @@ export default function CVUploadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <button 
-                onClick={() => router.push('/cv-workspace')}
-                className="text-blue-600 hover:text-blue-700 mr-4"
-              >
-                {cvUpload.header.backToWorkspace}
-              </button>
-              <h1 className="text-xl font-semibold text-gray-900">
-                {cvUpload.header.title}
-              </h1>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Enhanced Header */}
+      <HeaderMinimal showAutosave={false} />
 
       <main className="max-w-4xl mx-auto px-4 py-8">
+        {/* Page Title Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {cvUpload.header.title}
+          </h1>
+          <p className="text-gray-600">
+            {cvUpload.header.subtitle}
+          </p>
+        </div>
+
         <div className="bg-white rounded-lg shadow-sm p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {cvUpload.upload.title}
             </h2>
-            <p className="text-gray-600">
-              {cvUpload.header.subtitle}
-            </p>
           </div>
 
           {/* File Upload Section */}

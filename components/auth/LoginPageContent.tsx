@@ -77,32 +77,28 @@ export default function LoginPageContent() {
           console.log('✅ User data stored in localStorage:', result.user);
         }
         
-        // Multiple redirect attempts for better compatibility
-        console.log('🔄 Attempting redirect to CV Workspace...');
+        // Check if user is admin and redirect accordingly
+        const isAdmin = result.user?.email === 'admin@example.com';
+        const redirectPath = isAdmin ? '/admin' : '/cv-workspace';
+        
+        console.log(`🔄 Redirecting ${isAdmin ? 'admin' : 'user'} to ${redirectPath}...`);
         
         try {
-          // Method 1: Direct window.location assignment
-          window.location.href = 'http://localhost:3002/workspace';
+          // Use unified app routing with role-based redirect
+          window.location.href = redirectPath;
           
-          // Method 2: Fallback with timeout
+          // Fallback redirect
           setTimeout(() => {
-            if (window.location.href.includes('localhost:3001')) {
+            if (window.location.pathname !== redirectPath) {
               console.log('🔄 Fallback redirect attempt...');
-              window.location.replace('http://localhost:3002/workspace');
+              window.location.replace(redirectPath);
             }
           }, 1000);
           
-          // Method 3: Show manual link if redirect fails
-          setTimeout(() => {
-            if (window.location.href.includes('localhost:3001')) {
-              console.log('⚠️ Automatic redirect failed, showing manual option');
-              alert('Đăng nhập thành công! Nếu không tự động chuyển hướng, vui lòng nhấp vào: http://localhost:3002/workspace');
-            }
-          }, 3000);
-          
         } catch (redirectError) {
           console.error('❌ Redirect error:', redirectError);
-          alert('Đăng nhập thành công! Vui lòng truy cập: http://localhost:3002/workspace');
+          // Use Next.js router as fallback
+          window.location.pathname = redirectPath;
         }
       } else {
         const errorResult = await response.json();
@@ -243,7 +239,7 @@ export default function LoginPageContent() {
         <div className="text-center mt-4 sm:mt-6">
           <p className="text-xs sm:text-sm text-gray-400">
             Chưa có tài khoản?{" "}
-            <Link href="/dang-ky" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded font-medium">
+            <Link href="/register" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded font-medium">
               Đăng ký ngay
             </Link>
           </p>

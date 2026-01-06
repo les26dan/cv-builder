@@ -102,7 +102,7 @@ export default function RegisterPageContent() {
         }
         
         // Redirect new users to CV Upload page as per Product Spec
-        window.location.href = 'http://localhost:4000';
+        window.location.href = '/cv-upload';
       } else {
         const errorData = await response.json();
         setError("root", { message: errorData.error || account.errors.registrationFailed });
@@ -270,7 +270,7 @@ export default function RegisterPageContent() {
             <label className="text-xs sm:text-sm text-gray-700 leading-relaxed">
               {account.register.form.tosCheckbox}{" "}
               <Link 
-                href="/dieu-khoan" 
+                href="/terms-of-service" 
                 className="text-primary hover:underline"
                 target="_blank"
               >
@@ -301,7 +301,7 @@ export default function RegisterPageContent() {
         <div className="text-center mt-4 sm:mt-6">
           <p className="text-xs sm:text-sm text-gray-400">
             Đã có tài khoản?{" "}
-            <Link href="/dang-nhap" className="text-primary hover:underline font-medium">
+            <Link href="/login" className="text-primary hover:underline font-medium">
               Đăng nhập ngay
             </Link>
           </p>

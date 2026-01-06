@@ -17,15 +17,15 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
 // In-memory storage for rate limiting (in production, use Redis)
 const rateLimitStore = new Map<string, { requests: number; resetTime: number }>();
 
-// Clean up expired entries every 5 minutes
-setInterval(() => {
+// Clean up expired entries when called
+function cleanupExpiredEntries() {
   const now = Date.now();
   Array.from(rateLimitStore.entries()).forEach(([key, data]) => {
     if (data.resetTime < now) {
       rateLimitStore.delete(key);
     }
   });
-}, 5 * 60 * 1000);
+}
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -38,6 +38,9 @@ export interface RateLimitResult {
  * Check if a request should be rate limited
  */
 export function checkRateLimit(request: NextRequest, endpoint: string): RateLimitResult {
+  // Clean up expired entries
+  cleanupExpiredEntries();
+  
   // Get client identifier (IP address)
   const clientIp = 
     request.headers.get('x-forwarded-for')?.split(',')[0] ||

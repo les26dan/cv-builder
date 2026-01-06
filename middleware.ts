@@ -8,7 +8,7 @@ const protectedRoutes = [
   '/cv-guided-editing'
 ]
 
-// Define admin routes (if any in future)
+// Define admin routes
 const adminRoutes = [
   '/admin'
 ]
@@ -24,6 +24,7 @@ interface UserSession {
   email: string
   name: string
   provider: string
+  role?: string // Add role support
 }
 
 // Get user session from cookie
@@ -41,6 +42,11 @@ async function getUserSession(request: NextRequest): Promise<UserSession | null>
     // Validate session data
     if (!userSession.id || !userSession.email) {
       return null
+    }
+    
+    // Check if this is an admin user
+    if (userSession.email === 'admin@example.com') {
+      userSession.role = 'admin'
     }
     
     return userSession
@@ -114,9 +120,23 @@ export async function middleware(request: NextRequest) {
   // Handle admin routes (future feature)
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
   if (isAdminRoute) {
-    // TODO: Implement admin role checking
-    // For now, redirect to workspace
-    return NextResponse.redirect(new URL('/cv-workspace', request.url))
+    if (!isAuthenticated) {
+      // Redirect unauthenticated users to login
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    
+    // Check if user has admin role
+    if (userSession.role !== 'admin') {
+      // Redirect non-admin users to workspace with error
+      const workspaceUrl = new URL('/cv-workspace', request.url)
+      workspaceUrl.searchParams.set('error', 'admin_access_required')
+      return NextResponse.redirect(workspaceUrl)
+    }
+    
+    // Allow admin access
+    console.log('✅ Admin access granted to:', userSession.email)
   }
   
   // Add security headers to all responses

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { EditorPanel } from './EditorPanel';
 import { PreviewPanel } from './PreviewPanel';
-import { Header } from './Header';
+import { HeaderCVEditor } from './HeaderCVEditor';
 import { initialCV, emptyCV, CVData } from '../utils/mockData';
 import { calculateCvScore } from '../utils/cvScoring';
 import { useCVWorkflow } from '../shared/contexts/CVWorkflowContext';
@@ -319,7 +319,7 @@ export const CVEditor = ({ initialData, dataSource = 'mock' }: CVEditorProps) =>
     <div className="h-screen flex flex-col overflow-hidden">
       {/* Fixed Header - Full Width */}
       <div className="flex-shrink-0 bg-white border-b border-gray-200 z-10 px-6">
-        <Header 
+        <HeaderCVEditor 
           cvScore={cvScore} 
           cvData={cvData}
           onUpdateCvData={setCvData}

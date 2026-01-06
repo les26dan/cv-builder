@@ -1,4 +1,4 @@
-import HeaderMinimal from '../components/HeaderMinimal';
+import Header from '../components/Header';
 import HeroSection from '../components/HeroSection';
 import SectionDivider from '../components/SectionDivider';
 import ProblemATS from '../components/ProblemATS';
@@ -12,7 +12,7 @@ import Footer from '../components/Footer';
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <HeaderMinimal showAutosave={false} />
+      <Header />
       <HeroSection />
       <SectionDivider activeIndex={0} />
       <ProblemATS />

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     console.error('❌ Google OAuth initiation error:', error);
     
     // Redirect back to login with error
-    const loginUrl = new URL('/dang-nhap', request.url);
+    const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('error', 'oauth_init_failed');
     
     return NextResponse.redirect(loginUrl);
