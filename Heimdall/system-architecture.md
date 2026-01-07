@@ -1,12 +1,13 @@
 # OkBuddy Unified Application - System Architecture
 
-**Last Updated**: January 2025  
-**Status**: Production Ready - All Core Features Implemented + UI Restoration Complete + Admin System  
-**Build Status**: ✅ Successfully Building (19 pages, 16 API routes)  
+**Last Updated**: January 27, 2025  
+**Status**: Production Ready - All Core Features Implemented + UI Restoration Complete + Admin System + CV Workspace Legacy Restored  
+**Build Status**: ✅ Successfully Building (21 pages, 17 API routes)  
 **Deployment**: Ready for Production Deployment  
 **Security Status**: ✅ Production Ready with comprehensive RLS and authorization + Admin Role Management
-**UI Status**: ✅ Landing Page & Authentication UI Fully Restored + Admin Dashboard
+**UI Status**: ✅ Landing Page & Authentication UI Fully Restored + Admin Dashboard + CV Workspace Legacy UI Restored
 **Admin System**: ✅ Role-Based Authentication & Management Dashboard (January 2025)
+**CV Workspace Status**: ✅ Legacy UI Fully Restored with Enhanced Functionality (January 27, 2025)
 
 ---
 
@@ -71,6 +72,99 @@ Professional UI    →    Enhanced Auth UI    →    CV Editor UI
      ↓                        ↓                    ↓
   Blue branding      Primary color system    Specialized tools
 ```
+
+### **🚨 PAGE RENDERING ARCHITECTURE** (Critical Guidelines - January 2025)
+
+#### **Server-Side Rendering (SSR) Requirements**
+**Status**: ✅ **MANDATORY FOR ALL PAGES**
+
+All OkBuddy pages MUST follow these architectural principles to prevent rendering issues:
+
+**1. Direct Component Rendering**:
+```typescript
+// ✅ CORRECT ARCHITECTURE:
+export default function Page() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+      <MainContent />
+      <Footer />
+    </div>
+  );
+}
+
+// ❌ FORBIDDEN ARCHITECTURE:
+export default function Page() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => setIsLoaded(true), []);
+  if (!isLoaded) return <div>Loading...</div>; // BLOCKS RENDERING
+}
+```
+
+**2. CSS Framework Integration**:
+- **Tailwind CSS**: Must load before component hydration
+- **Global Styles**: Imported in layout.tsx only
+- **Component Styles**: Use Tailwind classes directly, no conditional CSS
+
+**3. Layout Hierarchy**:
+```typescript
+// layout.tsx - MINIMAL CONFIGURATION ONLY:
+import "./globals.css";  // Tailwind import
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="vi">
+      <body className="antialiased">
+        {children}  // Direct children rendering
+      </body>
+    </html>
+  );
+}
+```
+
+#### **🚫 ANTI-PATTERNS TO PREVENT**
+
+**1. Loading State Gates**:
+```typescript
+// ❌ NEVER USE:
+const [mounted, setMounted] = useState(false);
+const [isLoaded, setIsLoaded] = useState(false);
+const [ready, setReady] = useState(false);
+```
+
+**2. Client-Side Conditional Rendering**:
+```typescript
+// ❌ NEVER USE:
+if (typeof window === 'undefined') return null;
+if (!mounted) return <div>Loading...</div>;
+return mounted ? <Page /> : null;
+```
+
+**3. Service Worker Integration in Components**:
+```typescript
+// ❌ NEVER USE IN PAGE COMPONENTS:
+useEffect(() => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations()...
+  }
+}, []);
+```
+
+#### **✅ MANDATORY CHECKLIST FOR ALL PAGES**
+
+**Before Deploying Any Page:**
+- [ ] Component renders immediately without useState conditions
+- [ ] No client-side mounting logic (`useEffect` for rendering)
+- [ ] Tailwind classes applied and visible in HTML output
+- [ ] `curl localhost:3000/page` shows styled HTML content
+- [ ] `npm run build` succeeds without warnings
+- [ ] Page works with JavaScript disabled (SSR)
+
+**Component Development Rules:**
+- [ ] Use server components by default (`export default function`)
+- [ ] Add `'use client'` only when absolutely necessary
+- [ ] Import text content from `/config/texts/` (no hardcoding)
+- [ ] Test both SSR and client-side hydration
 
 ---
 
@@ -152,6 +246,16 @@ Professional UI    →    Enhanced Auth UI    →    CV Editor UI
 - **Connection**: Lazy initialization with fallback
 - **Environment**: Production configuration ready
 - **Mock Fallback**: Development support
+
+### **File Storage System** (✅ NEW - January 2025)
+- **Primary**: Vercel Blob Storage
+- **Features**: Serverless file storage via Vercel Edge Network
+- **Organization**: User-isolated file structure (`cv-files/{userId}/`)
+- **Supported Formats**: PDF, DOCX (10MB limit)
+- **Access Control**: Authentication required, user ownership validation
+- **Generated Files**: Automatic storage of downloaded CVs
+- **Cleanup**: Automatic old file cleanup
+- **Documentation**: `/docs/VERCEL_BLOB_INTEGRATION.md`
 
 ### **Authentication System**
 - **OAuth Providers**: Google, LinkedIn

@@ -83,35 +83,18 @@ export default function CVGuidedEditingPage() {
   const router = useRouter()
   const cvId = params.cvId as string
   const mobileDetection = useMobileDetection()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const handleBackToWorkspace = () => {
     router.push('/cv-workspace')
   }
 
-  // Handle mobile blocking
-  if (mounted && mobileDetection.isMobile) {
+  // Handle mobile blocking - use CSS classes for responsive behavior instead
+  if (mobileDetection.isMobile) {
     return (
       <MobileBlockingOverlay 
         detection={mobileDetection}
         onBackToWorkspace={handleBackToWorkspace}
       />
-    )
-  }
-
-  // Show loading while mounting to prevent hydration issues
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang khởi tạo...</p>
-        </div>
-      </div>
     )
   }
 
