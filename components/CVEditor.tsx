@@ -9,8 +9,68 @@ import { useCVWorkflow } from '../shared/contexts/CVWorkflowContext';
 // Props interface for CVEditor
 interface CVEditorProps {
   initialData?: CVData;
-  dataSource?: 'workflow' | 'mock' | 'cache';
+  dataSource?: 'workflow' | 'mock' | 'cache' | 'new' | 'existing';
+  cvId?: string;
 }
+
+// Create prefilled empty CV with user data
+const createUserPrefilledCV = (): CVData => {
+  let baseCV = { ...emptyCV };
+  
+  // Try to prefill contact info from user data
+  try {
+    if (typeof window !== 'undefined') {
+      const userData = localStorage.getItem('okbuddy_user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        baseCV = {
+          ...baseCV,
+          contact: {
+            ...baseCV.contact,
+            fullName: user.fullName || '',
+            email: user.email || '',
+            phone: user.phone || '',
+            location: user.location || '',
+            linkedin: user.linkedin || ''
+          }
+        };
+      }
+    }
+  } catch (error) {
+    console.log('No user data found for prefilling:', error);
+  }
+
+  // Add minimal structure for better UX
+  if (baseCV.experience.items.length === 0) {
+    baseCV.experience = {
+      items: [{
+        id: `exp-${Date.now()}`,
+        title: '',
+        company: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        current: false,
+        bullets: ['']
+      }]
+    };
+  }
+
+  if (baseCV.education.items.length === 0) {
+    baseCV.education = {
+      items: [{
+        id: `edu-${Date.now()}`,
+        degree: '',
+        institution: '',
+        location: '',
+        graduationDate: '',
+        description: ''
+      }]
+    };
+  }
+
+  return baseCV;
+};
 
 // Celebration Screen Component
 const CelebrationScreen = ({ onClose }: { onClose: () => void }) => {
@@ -25,13 +85,13 @@ const CelebrationScreen = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center relative">
+      <div className="bg-white rounded-lg p-8 max-w-md mx-4 text-center relative shadow-xl">
         {/* Confetti Animation */}
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(20)].map((_, i) => (
             <div
               key={i}
-              className="absolute w-2 h-2 bg-blue-500 animate-bounce"
+              className="absolute w-2 h-2 bg-primary animate-bounce"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -44,16 +104,16 @@ const CelebrationScreen = ({ onClose }: { onClose: () => void }) => {
         
         <div className="relative z-10">
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 font-inter">
             Chúc mừng!
           </h2>
-          <p className="text-lg text-gray-600 mb-6">
+          <p className="text-lg text-gray-600 mb-6 font-inter">
             CV của bạn đã đạt <span className="font-bold text-green-600">100%</span> hoàn thiện!
           </p>
           <div className="space-y-3">
             <button
               onClick={onClose}
-              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-600 transition-colors font-inter font-semibold"
             >
               Tiếp tục chỉnh sửa
             </button>
@@ -63,12 +123,12 @@ const CelebrationScreen = ({ onClose }: { onClose: () => void }) => {
                 console.log('Download CV');
                 onClose();
               }}
-              className="w-full px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+              className="w-full px-6 py-2 border border-primary text-primary rounded-lg hover:bg-primary-50 transition-colors font-inter font-medium"
             >
               Tải xuống CV
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-gray-500 mt-4 font-inter">
             Tự động đóng sau 5 giây
           </p>
         </div>
@@ -77,43 +137,98 @@ const CelebrationScreen = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-export const CVEditor = ({ initialData, dataSource = 'mock' }: CVEditorProps) => {
+export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorProps) => {
   // Get workflow context for state management and auto-save
   const { state, updateCVData, saveCVData } = useCVWorkflow();
   
-  // Get initial data with fallback logic
+  // Safe URL parameter extraction without useSearchParams
+  const getSourceFromURL = (): string => {
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('source') || dataSource;
+      } catch (error) {
+        console.log('Error parsing URL params:', error);
+        return dataSource;
+      }
+    }
+    return dataSource;
+  };
+  
+  const [source, setSource] = useState<string>(dataSource);
+  
+  // Update source when component mounts
+  useEffect(() => {
+    const urlSource = getSourceFromURL();
+    setSource(urlSource);
+  }, [dataSource]);
+  
+  // Comprehensive data initialization system
   const getInitialData = (): CVData => {
-    // If initialData is provided, use it
+    console.log(`🔧 CV Editor initializing with source: ${source}, cvId: ${cvId}`);
+    
+    // Priority 1: Explicit initial data provided
     if (initialData) {
-      console.log(`✅ Using ${dataSource} data for CV Editor`);
+      console.log(`✅ Using provided initial data`);
       return initialData;
     }
     
-    // Fallback to mock data logic
-    const isPort5000 = window.location.port === '5000';
-    let baseData = isPort5000 ? emptyCV : initialCV;
-    
-    // Check for stored user data from authentication and prefill contact info
-    try {
-      const userData = localStorage.getItem('okbuddy_user');
-      if (userData) {
-        const user = JSON.parse(userData);
-        if (user.fullName || user.email) {
-          baseData = {
-            ...baseData,
-            contact: {
-              ...baseData.contact,
-              fullName: user.fullName || baseData.contact.fullName,
-              email: user.email || baseData.contact.email
-            }
-          };
-        }
-      }
-    } catch (error) {
-      console.log('No user data found or error parsing user data:', error);
+    // Priority 2: Check URL parameters for data source
+    if (source === 'new') {
+      console.log(`✅ Creating new empty CV with user prefill`);
+      return createUserPrefilledCV();
     }
     
-    return baseData;
+    // Priority 3: Check workflow context for existing data
+    if (state.cvData && cvId && state.cvData.id === cvId) {
+      console.log(`✅ Using workflow context data for CV ${cvId}`);
+      return {
+        sectionOrder: state.cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'],
+        sectionTitles: state.cvData.sectionTitles || {},
+        contact: state.cvData.contact ? {
+          fullName: state.cvData.contact.fullName || '',
+          email: state.cvData.contact.email || '',
+          phone: state.cvData.contact.phone || '',
+          location: state.cvData.contact.location || '',
+          linkedin: state.cvData.contact.linkedin || ''
+        } : emptyCV.contact,
+        summary: state.cvData.summary || { content: '' },
+        experience: state.cvData.experience || { items: [] },
+        skills: state.cvData.skills || { items: [] },
+        education: state.cvData.education ? {
+          items: state.cvData.education.items.map(item => ({
+            id: item.id || `edu-${Date.now()}`,
+            degree: item.degree || '',
+            institution: item.institution || '',
+            location: item.location || '',
+            graduationDate: item.graduationDate || '',
+            description: item.description || ''
+          }))
+        } : { items: [] }
+      };
+    }
+    
+    // Priority 4: Try to load from localStorage/cache
+    if (cvId && typeof window !== 'undefined') {
+      try {
+        const cachedData = localStorage.getItem(`cv_data_${cvId}`);
+        if (cachedData) {
+          console.log(`✅ Using cached data for CV ${cvId}`);
+          return JSON.parse(cachedData);
+        }
+      } catch (error) {
+        console.log('No cached data found:', error);
+      }
+    }
+    
+    // Priority 5: Fallback logic - for existing CVs use prefilled, for demo use initialCV
+    if (source === 'existing' || cvId) {
+      console.log(`✅ Creating prefilled CV for existing context`);
+      return createUserPrefilledCV();
+    } else {
+      console.log(`✅ Using initial CV with sample data`);
+      return initialCV;
+    }
   };
   
   const [cvData, setCvData] = useState<CVData>(getInitialData);
@@ -122,6 +237,29 @@ export const CVEditor = ({ initialData, dataSource = 'mock' }: CVEditorProps) =>
   const [showCelebration, setShowCelebration] = useState(false);
   const [suggestions, setSuggestions] = useState<{[sectionId: string]: any[]}>({});
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+  // Re-initialize data when source changes
+  useEffect(() => {
+    const newData = getInitialData();
+    setCvData(newData);
+  }, [source, cvId]);
+
+  // Auto-save to localStorage whenever data changes
+  useEffect(() => {
+    if (cvId && cvData) {
+      const saveTimer = setTimeout(() => {
+        try {
+          localStorage.setItem(`cv_data_${cvId}`, JSON.stringify(cvData));
+          setLastSaved(new Date());
+          console.log(`💾 Auto-saved CV data for ${cvId}`);
+        } catch (error) {
+          console.error('Failed to save CV data to localStorage:', error);
+        }
+      }, 2000); // 2 second debounce
+
+      return () => clearTimeout(saveTimer);
+    }
+  }, [cvData, cvId]);
 
   // Calculate CV score whenever data changes
   useEffect(() => {
@@ -313,11 +451,9 @@ export const CVEditor = ({ initialData, dataSource = 'mock' }: CVEditorProps) =>
     return null;
   };
 
-
-
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      {/* Fixed Header - Full Width */}
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#E0F7FA' }}>
+      {/* Fixed Header - Full Width with OkBuddy Background */}
       <div className="flex-shrink-0 bg-white border-b border-gray-200 z-10 px-6">
         <HeaderCVEditor 
           cvScore={cvScore} 
@@ -327,10 +463,10 @@ export const CVEditor = ({ initialData, dataSource = 'mock' }: CVEditorProps) =>
         />
       </div>
       
-      {/* Two-Panel Layout System */}
+      {/* Two-Panel Layout System with OkBuddy Colors */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel (CV Editor) - 60% width, scrollable */}
-        <div className="w-3/5 overflow-y-auto bg-blue-50" onClick={handleEditorClick}>
+        {/* Left Panel (CV Editor) - 60% width, scrollable, OkBuddy Background */}
+        <div className="w-3/5 overflow-y-auto" style={{ background: '#E0F7FA' }} onClick={handleEditorClick}>
           <div className="p-6">
             <EditorPanel 
               cvData={cvData} 

@@ -109,7 +109,7 @@ export default function CVGuidedEditingPage() {
             </div>
           </div>
         }>
-          <CVEditor />
+          <CVEditor cvId={cvId} />
         </Suspense>
       </CVEditorErrorBoundary>
     </CVWorkflowProvider>

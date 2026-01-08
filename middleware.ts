@@ -8,6 +8,12 @@ const protectedRoutes = [
   '/cv-guided-editing'
 ]
 
+// Routes that can be accessed in development without authentication
+const devAllowedRoutes = [
+  '/cv-guided-editing',
+  '/cv-workspace'
+]
+
 // Define admin routes
 const adminRoutes = [
   '/admin'
@@ -94,6 +100,15 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
   
   if (isProtectedRoute && !isAuthenticated) {
+    // Allow CV guided editing in development for testing
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    const isDevAllowed = devAllowedRoutes.some(route => pathname.startsWith(route))
+    
+    if (isDevelopment && isDevAllowed) {
+      console.log(`🔧 Development mode: Allowing access to ${pathname}`)
+      return NextResponse.next()
+    }
+    
     // Redirect unauthenticated users to login
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)

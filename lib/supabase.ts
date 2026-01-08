@@ -11,7 +11,7 @@ export const mockCVs = [
     status: 'completed' as const,
     score: 92,
     lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    userId: 'mock-user-1',
+    userId: 'user-123',
   },
   {
     id: '2', 
@@ -19,7 +19,7 @@ export const mockCVs = [
     status: 'in_progress' as const,
     score: 75,
     lastUpdated: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-    userId: 'mock-user-1',
+    userId: 'user-123',
   },
   {
     id: '3',
@@ -27,7 +27,7 @@ export const mockCVs = [
     status: 'new' as const,
     score: 45,
     lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    userId: 'mock-user-1',
+    userId: 'user-123',
   },
 ]
 

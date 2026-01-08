@@ -1,13 +1,14 @@
 # OkBuddy Unified Application - System Architecture
 
 **Last Updated**: January 27, 2025  
-**Status**: Production Ready - All Core Features Implemented + UI Restoration Complete + Admin System + CV Workspace Legacy Restored  
+**Status**: Production Ready - All Core Features Implemented + UI Restoration Complete + Admin System + CV Workspace & Guided Editing Flow Fully Functional  
 **Build Status**: ✅ Successfully Building (21 pages, 17 API routes)  
 **Deployment**: Ready for Production Deployment  
 **Security Status**: ✅ Production Ready with comprehensive RLS and authorization + Admin Role Management
-**UI Status**: ✅ Landing Page & Authentication UI Fully Restored + Admin Dashboard + CV Workspace Legacy UI Restored
+**UI Status**: ✅ Landing Page & Authentication UI Fully Restored + Admin Dashboard + CV Workspace & Guided Editing Flow Restored
 **Admin System**: ✅ Role-Based Authentication & Management Dashboard (January 2025)
-**CV Workspace Status**: ✅ Legacy UI Fully Restored with Enhanced Functionality (January 27, 2025)
+**CV Workspace Status**: ✅ Legacy UI Fully Restored with Enhanced Functionality + Complete CV Creation Flow (January 27, 2025)
+**CV Guided Editing Status**: ✅ Data Flow Fixed + Auto-save Implementation + Professional UI Restoration (January 27, 2025)
 
 ---
 
@@ -38,13 +39,48 @@ OkBuddy is now a **unified Next.js 15 application** successfully deployed on Ver
 ```
 ├── components/
 │   ├── Header.tsx                 # Landing page professional header (✅ RESTORED)
-│   ├── HeaderCVEditor.tsx         # CV editor specialized header (✅ NEW)
+│   ├── HeaderCVEditor.tsx         # CV editor specialized header (✅ ENHANCED Jan 27)
+│   ├── HeaderMinimal.tsx          # CV workspace minimal header (✅ PRODUCTION READY)
 │   ├── auth/
 │   │   └── Header.tsx             # Authentication pages header (✅ ENHANCED)
+│   ├── CVEditor.tsx               # CV guided editing component (✅ DATA FLOW FIXED Jan 27)
+│   ├── EditorPanel.tsx            # CV editing sidebar (✅ PROFESSIONAL UI)
+│   ├── PreviewPanel.tsx           # CV preview panel (✅ LIVE PREVIEW)
 │   ├── HeroSection.tsx            # Landing page hero (✅ Production Ready)
 │   ├── Footer.tsx                 # Global footer (✅ Production Ready)
 │   └── [Other components...]
 ```
+
+### **CV Workflow Architecture** (Updated January 27, 2025)
+**Complete End-to-End CV Creation and Editing Flow**:
+
+```
+CV Workflow Data Flow:
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│   CV Workspace  │───▶│  Create New CV   │───▶│  CV Guided Editing  │
+│  (Dashboard)    │    │   (Mock Data)    │    │  (Editor + Preview) │
+└─────────────────┘    └──────────────────┘    └─────────────────────┘
+         │                       │                        │
+         │                       │                        │
+         ▼                       ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│  Mock User CVs  │    │  CVData Creation │    │   Auto-save to      │
+│   (3 examples)  │    │  (Empty + Prefill)│    │   localStorage      │
+└─────────────────┘    └──────────────────┘    └─────────────────────┘
+```
+
+**Data Initialization Priority System**:
+1. **Explicit initialData prop** (highest priority)
+2. **URL source=new parameter** → Creates empty CV with user prefill
+3. **CVWorkflowContext state** → Existing CV data from workflow
+4. **localStorage cache** → Auto-saved CV data by cvId
+5. **Fallback logic** → Empty template or mock data (lowest priority)
+
+**Auto-save Implementation**:
+- **Debounced saving**: 2-second delay to prevent excessive writes
+- **localStorage persistence**: Key format: `cv_data_{cvId}`
+- **Cross-session recovery**: CVs persist when users return
+- **Error handling**: Graceful fallbacks if localStorage fails
 
 ### **Design System Implementation**
 **Centralized Color Scheme** (`tailwind.config.js`):

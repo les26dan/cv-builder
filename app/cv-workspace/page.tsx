@@ -28,6 +28,7 @@ export default function WorkspacePage() {
 
   const checkAuthentication = async () => {
     try {
+      console.log('🔧 CV Workspace: Starting authentication check...')
       setIsLoading(true)
       const mockUser: User = {
         id: 'user-123',
@@ -36,20 +37,44 @@ export default function WorkspacePage() {
         emailVerified: true
       }
       
+      console.log('🔧 CV Workspace: Mock user created:', mockUser)
+      
+      // Create mock session cookie for development
+      if (typeof window !== 'undefined') {
+        const mockSession = {
+          id: mockUser.id,
+          email: mockUser.email,
+          name: mockUser.fullName,
+          provider: 'mock'
+        }
+        
+        // Set session cookie for middleware
+        document.cookie = `user_session=${JSON.stringify(mockSession)}; path=/; max-age=86400`
+        console.log('🔧 Mock session cookie created for development')
+      }
+      
+      console.log('🔧 CV Workspace: Setting user state...')
       setUser(mockUser)
+      
+      console.log('🔧 CV Workspace: Loading user CVs...')
       await loadUserCVs(mockUser.id)
+      console.log('🔧 CV Workspace: CVs loaded successfully')
     } catch (error) {
       console.error('Authentication failed:', error)
       router.push('/login?redirect=/cv-workspace')
     } finally {
+      console.log('🔧 CV Workspace: Setting loading to false')
       setIsLoading(false)
     }
   }
 
   const loadUserCVs = async (userId: string) => {
     try {
+      console.log('🔧 CV Workspace: Fetching CVs for user:', userId)
       const userCVs = await fetchUserCVs(userId)
+      console.log('🔧 CV Workspace: Fetched CVs:', userCVs)
       setCvs(userCVs)
+      console.log('🔧 CV Workspace: CVs state updated, count:', userCVs.length)
     } catch (error) {
       console.error('Failed to load CVs:', error)
       setCvs([])
@@ -74,8 +99,8 @@ export default function WorkspacePage() {
       if (newCV) {
         setCvs(prev => [newCV, ...prev])
         
-        // Navigate to CV upload page for new CV workflow
-        router.push(`/cv-upload?cvId=${newCV.id}`)
+        // Navigate directly to CV guided editing with new CV ID for immediate editing
+        router.push(`/cv-guided-editing/${newCV.id}?source=new`)
       } else {
         alert('Không thể tạo CV mới. Vui lòng thử lại.')
       }
@@ -129,25 +154,59 @@ export default function WorkspacePage() {
     setShowDeleteModal(null)
   }
 
-  if (isLoading) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: '#E0F7FA',
-      }}>
-        <div style={{
-          fontFamily: 'Inter',
-          fontSize: '16px',
-          color: '#6B7280',
-        }}>
-          Đang tải...
-        </div>
-      </div>
-    )
-  }
+  // Temporary: Remove SSR loading to debug client-side mounting
+  // if (isLoading) {
+  //   return (
+  //     <div style={{
+  //       display: 'flex',
+  //       flexDirection: 'column',
+  //       justifyContent: 'center',
+  //       alignItems: 'center',
+  //       minHeight: '100vh',
+  //       background: '#E0F7FA',
+  //       gap: '20px'
+  //     }}>
+  //       <div style={{
+  //         fontFamily: 'Inter',
+  //         fontSize: '16px',
+  //         color: '#6B7280',
+  //       }}>
+  //         Đang tải...
+  //       </div>
+  //       <div style={{
+  //         fontFamily: 'Inter',
+  //         fontSize: '12px',
+  //         color: '#9CA3AF',
+  //       }}>
+  //         Debug: Loading state = {isLoading.toString()}
+  //       </div>
+  //       <div style={{
+  //         fontFamily: 'Inter',
+  //         fontSize: '12px',
+  //         color: '#9CA3AF',
+  //       }}>
+  //         User: {user ? 'Set' : 'Not set'}
+  //       </div>
+  //       <button 
+  //         onClick={() => {
+  //           console.log('🔧 Force reload clicked')
+  //           setIsLoading(false)
+  //         }}
+  //         style={{
+  //           padding: '10px 20px',
+  //           background: '#0288D1',
+  //           color: 'white',
+  //           border: 'none',
+  //           borderRadius: '5px',
+  //           cursor: 'pointer',
+  //           fontFamily: 'Inter'
+  //         }}
+  //       >
+  //         Force Continue (Debug)
+  //       </button>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="min-h-screen" style={{ background: '#E0F7FA' }}>
