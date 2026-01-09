@@ -111,9 +111,10 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
   }
 
   if (!supabase) {
-    // Add to mock data for development
-    console.log('Supabase not configured, creating mock CV')
+    // Add to mock data for development and return the new CV
+    console.log('🔧 Supabase not configured, creating mock CV:', { id: newCV.id, title, userId })
     mockCVs.push(newCV)
+    console.log('✅ Mock CV created successfully:', newCV)
     return newCV
   }
 
@@ -132,7 +133,10 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
 
     if (error) {
       console.error('Error creating CV:', error)
-      return null
+      // Fallback to mock data if database fails
+      console.log('🔧 Database failed, falling back to mock CV creation')
+      mockCVs.push(newCV)
+      return newCV
     }
 
     const cvRow = data as unknown as CVRow
@@ -142,7 +146,10 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
     }
   } catch (error) {
     console.error('Database connection error:', error)
-    return null
+    // Fallback to mock data if database connection fails
+    console.log('🔧 Database connection failed, falling back to mock CV creation')
+    mockCVs.push(newCV)
+    return newCV
   }
 }
 

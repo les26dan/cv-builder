@@ -12,6 +12,11 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
+# Global variables
+PROJECT_DIR=""
+ACTUAL_PORT=""
+SERVER_PID=""
+
 # Banner
 echo -e "${BLUE}${BOLD}"
 echo "╔══════════════════════════════════════════════════════════════╗"
@@ -85,6 +90,40 @@ check_port() {
   fi
 }
 
+# Function to detect the actual port Next.js is using
+detect_actual_port() {
+  echo -e "${YELLOW}🔍 Detecting actual server port...${NC}"
+  
+  local attempt=1
+  local max_attempts=30
+  
+  while [ $attempt -le $max_attempts ]; do
+    # Check common ports
+    for port in 3000 3001 3002 3003 3004 3005; do
+      if check_port $port; then
+        # Verify it's our Next.js server by checking the response
+        local response=$(curl -s -I "http://localhost:$port" 2>/dev/null | head -1)
+        if [[ "$response" =~ "HTTP/1.1" ]]; then
+          ACTUAL_PORT=$port
+          echo -e "${GREEN}✅ Detected server running on port: $port${NC}"
+          return 0
+        fi
+      fi
+    done
+    
+    if [ $((attempt % 5)) -eq 0 ]; then
+      echo -e "${CYAN}   Attempt $attempt/$max_attempts - checking for active server...${NC}"
+    fi
+    
+    sleep 1
+    ((attempt++))
+  done
+  
+  echo -e "${YELLOW}⚠️ Could not detect server port, defaulting to 3000${NC}"
+  ACTUAL_PORT=3000
+  return 1
+}
+
 # Function to kill existing processes aggressively
 cleanup_existing_servers() {
   echo -e "${YELLOW}🧹 Aggressively cleaning up all existing servers...${NC}"
@@ -94,15 +133,8 @@ cleanup_existing_servers() {
   pkill -f "next-server" 2>/dev/null || true
   pkill -f "okbuddy" 2>/dev/null || true
   
-  # Kill Node processes that might be holding port 3000
-  if check_port 3000; then
-    echo -e "${YELLOW}⚠️ Port 3000 is occupied. Force-killing processes...${NC}"
-    lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-    sleep 2
-  fi
-  
-  # Check ports 3001-3005 as backup
-  for port in {3001..3005}; do
+  # Kill Node processes that might be holding ports
+  for port in {3000..3005}; do
     if check_port $port; then
       echo -e "${YELLOW}⚠️ Cleaning up port $port...${NC}"
       lsof -ti:$port | xargs kill -9 2>/dev/null || true
@@ -154,23 +186,71 @@ clear_cache() {
   echo ""
 }
 
+# Function to start server with error handling and capture output
+start_server() {
+  echo -e "${BLUE}🚀 Starting Next.js development server...${NC}"
+  echo ""
+  
+  # Create a temporary file to capture server output
+  local server_log=$(mktemp)
+  
+  # Start server and capture both stdout and stderr
+  npm run dev > "$server_log" 2>&1 &
+  SERVER_PID=$!
+  
+  # Give the server a moment to initialize
+  sleep 3
+  
+  # Check if the process is still running
+  if ! kill -0 $SERVER_PID 2>/dev/null; then
+    echo -e "${RED}❌ Server process failed to start${NC}"
+    echo -e "${YELLOW}Server output:${NC}"
+    cat "$server_log"
+    rm -f "$server_log"
+    return 1
+  fi
+  
+  # Extract the actual port from server output
+  if grep -q "Local:" "$server_log"; then
+    local port_line=$(grep "Local:" "$server_log" | head -1)
+    if [[ "$port_line" =~ localhost:([0-9]+) ]]; then
+      ACTUAL_PORT="${BASH_REMATCH[1]}"
+      echo -e "${GREEN}✅ Server started on port: $ACTUAL_PORT${NC}"
+    fi
+  fi
+  
+  # Clean up log file
+  rm -f "$server_log"
+  
+  # If we couldn't detect port from output, try detection
+  if [ -z "$ACTUAL_PORT" ]; then
+    detect_actual_port
+  fi
+  
+  return 0
+}
+
 # Function to verify server is actually working
 wait_for_server() {
-  local port=3000
-  local max_attempts=60  # Increased timeout
+  local max_attempts=60
   local attempt=1
   
   echo -e "${YELLOW}⏳ Waiting for server to start (up to 60 seconds)...${NC}"
   
+  # Default to 3000 if we couldn't detect the port
+  if [ -z "$ACTUAL_PORT" ]; then
+    ACTUAL_PORT=3000
+  fi
+  
   while [ $attempt -le $max_attempts ]; do
     # Check if process is still running
-    if ! pgrep -f "next dev" > /dev/null; then
+    if [ -n "$SERVER_PID" ] && ! kill -0 $SERVER_PID 2>/dev/null; then
       echo -e "${RED}❌ Server process died unexpectedly${NC}"
       return 1
     fi
     
     # Test if server responds
-    local status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$port 2>/dev/null || echo "000")
+    local status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$ACTUAL_PORT" 2>/dev/null || echo "000")
     
     if [[ "$status" =~ ^(200|302|308|404)$ ]]; then
       echo -e "${GREEN}✅ Server is responding (Status: $status)${NC}"
@@ -179,7 +259,7 @@ wait_for_server() {
     
     # Progress indicator
     if [ $((attempt % 10)) -eq 0 ]; then
-      echo -e "${CYAN}   Attempt $attempt/$max_attempts - server starting...${NC}"
+      echo -e "${CYAN}   Attempt $attempt/$max_attempts - server starting on port $ACTUAL_PORT...${NC}"
     elif [ $((attempt % 5)) -eq 0 ]; then
       echo -n "."
     fi
@@ -200,7 +280,7 @@ run_health_check() {
   local all_passed=true
   
   for page in "${pages[@]}"; do
-    local status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000$page" 2>/dev/null || echo "000")
+    local status=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$ACTUAL_PORT$page" 2>/dev/null || echo "000")
     
     case $status in
       200|302|308) 
@@ -236,7 +316,7 @@ show_server_info() {
   echo -e "${NC}"
   
   echo -e "${BLUE}📍 Server Information:${NC}"
-  echo -e "   🌐 URL:           http://localhost:3000"
+  echo -e "   🌐 URL:           http://localhost:$ACTUAL_PORT"
   echo -e "   📁 Directory:     $PROJECT_DIR"
   echo -e "   ⏰ Started:       $current_time"
   echo -e "   🔧 Node Version:  $(node --version 2>/dev/null || echo 'Unknown')"
@@ -244,17 +324,17 @@ show_server_info() {
   echo ""
   
   echo -e "${CYAN}🔗 Quick Access Links:${NC}"
-  echo -e "   🏠 Landing Page:      http://localhost:3000"
-  echo -e "   🔐 Login:             http://localhost:3000/login"
-  echo -e "   📝 Register:          http://localhost:3000/register"
-  echo -e "   💼 CV Workspace:      http://localhost:3000/cv-workspace"
-  echo -e "   📄 CV Upload:         http://localhost:3000/cv-upload"
-  echo -e "   ✏️ CV Editor (New):   http://localhost:3000/cv-guided-editing/test?source=new"
-  echo -e "   👑 Admin Dashboard:   http://localhost:3000/admin"
+  echo -e "   🏠 Landing Page:      http://localhost:$ACTUAL_PORT"
+  echo -e "   🔐 Login:             http://localhost:$ACTUAL_PORT/login"
+  echo -e "   📝 Register:          http://localhost:$ACTUAL_PORT/register"
+  echo -e "   💼 CV Workspace:      http://localhost:$ACTUAL_PORT/cv-workspace"
+  echo -e "   📄 CV Upload:         http://localhost:$ACTUAL_PORT/cv-upload"
+  echo -e "   ✏️ CV Editor (New):   http://localhost:$ACTUAL_PORT/cv-guided-editing/test?source=new"
+  echo -e "   👑 Admin Dashboard:   http://localhost:$ACTUAL_PORT/admin"
   echo ""
   
   echo -e "${YELLOW}⚡ Quick Commands (run from ANY directory):${NC}"
-  echo -e "   📊 Check Status:      curl -I http://localhost:3000"
+  echo -e "   📊 Check Status:      curl -I http://localhost:$ACTUAL_PORT"
   echo -e "   🔄 Restart Server:    $PROJECT_DIR/start-server"
   echo -e "   🛑 Stop Server:       pkill -f 'next dev'"
   echo ""
@@ -262,27 +342,6 @@ show_server_info() {
   echo -e "${GREEN}${BOLD}✅ Everything is ready! The server is running smoothly.${NC}"
   echo -e "${YELLOW}Press Ctrl+C to stop the server${NC}"
   echo ""
-}
-
-# Function to start server with error handling
-start_server() {
-  echo -e "${BLUE}🚀 Starting Next.js development server...${NC}"
-  echo ""
-  
-  # Start server in background and capture PID
-  npm run dev &
-  local server_pid=$!
-  
-  # Give the server a moment to initialize
-  sleep 2
-  
-  # Check if the process is still running
-  if ! kill -0 $server_pid 2>/dev/null; then
-    echo -e "${RED}❌ Server process failed to start${NC}"
-    return 1
-  fi
-  
-  return 0
 }
 
 # Handle script interruption gracefully
@@ -332,7 +391,7 @@ main() {
   # Step 10: Keep the script running (wait for Ctrl+C)
   echo -e "${CYAN}Monitoring server... (Press Ctrl+C to stop)${NC}"
   while true; do
-    if ! pgrep -f "next dev" > /dev/null; then
+    if [ -n "$SERVER_PID" ] && ! kill -0 $SERVER_PID 2>/dev/null; then
       echo -e "${RED}⚠️ Server process stopped unexpectedly!${NC}"
       break
     fi

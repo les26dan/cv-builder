@@ -169,20 +169,27 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
     
     // Priority 1: Explicit initial data provided
     if (initialData) {
-      console.log(`✅ Using provided initial data`);
-      return initialData;
+      console.log(`✅ Using provided initial data for CV: ${initialData.id || 'unnamed'}`);
+      return {
+        ...initialData,
+        id: initialData.id || cvId || Math.random().toString(36).substr(2, 9),
+      };
     }
     
     // Priority 2: Check URL parameters for data source
     if (source === 'new') {
       console.log(`✅ Creating new empty CV with user prefill`);
-      return createUserPrefilledCV();
+      const newCV = createUserPrefilledCV();
+      // Ensure CV has the correct ID
+      newCV.id = cvId || newCV.id || Math.random().toString(36).substr(2, 9);
+      return newCV;
     }
     
     // Priority 3: Check workflow context for existing data
     if (state.cvData && cvId && state.cvData.id === cvId) {
       console.log(`✅ Using workflow context data for CV ${cvId}`);
       return {
+        id: cvId,
         sectionOrder: state.cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'],
         sectionTitles: state.cvData.sectionTitles || {},
         contact: state.cvData.contact ? {
@@ -197,38 +204,54 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
         skills: state.cvData.skills || { items: [] },
         education: state.cvData.education ? {
           items: state.cvData.education.items.map(item => ({
-            id: item.id || `edu-${Date.now()}`,
+            id: item.id || `edu-${Date.now()}-${Math.random()}`,
             degree: item.degree || '',
             institution: item.institution || '',
             location: item.location || '',
             graduationDate: item.graduationDate || '',
             description: item.description || ''
           }))
-        } : { items: [] }
+        } : { items: [] },
+        certificates: state.cvData.certificates || { items: [] },
+        languages: state.cvData.languages || { items: [] },
+        projects: state.cvData.projects || { items: [] },
+        awards: state.cvData.awards || { items: [] }
       };
     }
     
-    // Priority 4: Try to load from localStorage/cache
+    // Priority 4: Check localStorage for auto-saved data
     if (cvId && typeof window !== 'undefined') {
       try {
-        const cachedData = localStorage.getItem(`cv_data_${cvId}`);
-        if (cachedData) {
-          console.log(`✅ Using cached data for CV ${cvId}`);
-          return JSON.parse(cachedData);
+        const savedData = localStorage.getItem(`cv_data_${cvId}`);
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          console.log(`✅ Using localStorage data for CV ${cvId}`);
+          return {
+            ...parsedData,
+            id: cvId, // Ensure ID matches
+          };
         }
       } catch (error) {
-        console.log('No cached data found:', error);
+        console.log(`⚠️ Error loading localStorage data for CV ${cvId}:`, error);
       }
     }
     
-    // Priority 5: Fallback logic - for existing CVs use prefilled, for demo use initialCV
-    if (source === 'existing' || cvId) {
-      console.log(`✅ Creating prefilled CV for existing context`);
-      return createUserPrefilledCV();
-    } else {
-      console.log(`✅ Using initial CV with sample data`);
-      return initialCV;
+    // Priority 5: Fallback - check for mock data or create empty CV
+    if (cvId) {
+      // Try to find mock data with this ID
+      const mockCV = initialCV; // You can extend this to check for specific mock data
+      console.log(`✅ Using fallback data for CV ${cvId}`);
+      return {
+        ...mockCV,
+        id: cvId,
+      };
     }
+    
+    // Final fallback: create empty CV with user prefill
+    console.log(`✅ Creating fallback empty CV with user prefill`);
+    const fallbackCV = createUserPrefilledCV();
+    fallbackCV.id = cvId || Math.random().toString(36).substr(2, 9);
+    return fallbackCV;
   };
   
   const [cvData, setCvData] = useState<CVData>(getInitialData);
@@ -249,17 +272,82 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
     if (cvId && cvData) {
       const saveTimer = setTimeout(() => {
         try {
+          // Save to localStorage for immediate persistence
           localStorage.setItem(`cv_data_${cvId}`, JSON.stringify(cvData));
           setLastSaved(new Date());
-          console.log(`💾 Auto-saved CV data for ${cvId}`);
+          console.log(`💾 Auto-saved CV data for ${cvId} at ${new Date().toLocaleTimeString()}`);
+          
+          // Also update workflow context if available
+          if (updateCVData) {
+            updateCVData(cvData);
+          }
+          
+          // Future enhancement: Save to database for production
+          // saveCVData(cvData).catch(error => {
+          //   console.warn('Failed to save to database, localStorage backup available:', error);
+          // });
+          
         } catch (error) {
-          console.error('Failed to save CV data to localStorage:', error);
+          console.error('Failed to save CV data:', error);
+          // Show user-friendly error message
+          if (typeof window !== 'undefined') {
+            console.warn('⚠️ Auto-save failed - please save your work manually');
+          }
         }
       }, 2000); // 2 second debounce
 
       return () => clearTimeout(saveTimer);
     }
+  }, [cvData, cvId, updateCVData]);
+
+  // Enhanced data recovery system
+  useEffect(() => {
+    const handlePageUnload = (event: BeforeUnloadEvent) => {
+      if (cvId && cvData) {
+        try {
+          // Emergency save before page unload
+          localStorage.setItem(`cv_data_${cvId}`, JSON.stringify(cvData));
+          localStorage.setItem(`cv_data_${cvId}_backup`, JSON.stringify({
+            data: cvData,
+            timestamp: new Date().toISOString(),
+            source: 'emergency_save'
+          }));
+        } catch (error) {
+          console.error('Emergency save failed:', error);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handlePageUnload);
+    return () => window.removeEventListener('beforeunload', handlePageUnload);
   }, [cvData, cvId]);
+
+  // Data recovery on component mount
+  useEffect(() => {
+    if (cvId && typeof window !== 'undefined') {
+      try {
+        // Check for emergency backup first
+        const backupData = localStorage.getItem(`cv_data_${cvId}_backup`);
+        if (backupData) {
+          const backup = JSON.parse(backupData);
+          const backupTime = new Date(backup.timestamp);
+          const now = new Date();
+          const hoursSinceBackup = (now.getTime() - backupTime.getTime()) / (1000 * 60 * 60);
+          
+          if (hoursSinceBackup < 24) { // Backup is less than 24 hours old
+            console.log(`🔄 Found recent backup data for CV ${cvId}, restoring...`);
+            setCvData(backup.data);
+            setLastSaved(backupTime);
+            
+            // Clean up backup after successful restore
+            localStorage.removeItem(`cv_data_${cvId}_backup`);
+          }
+        }
+      } catch (error) {
+        console.log('No backup data found or failed to restore:', error);
+      }
+    }
+  }, [cvId]);
 
   // Calculate CV score whenever data changes
   useEffect(() => {
@@ -283,7 +371,7 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
         setCvScore(0);
       }
     }
-  }, [cvData]);
+  }, [cvData, cvScore]);
 
   // Auto-save functionality when using workflow data
   useEffect(() => {
@@ -301,38 +389,84 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
           }
         };
         
+        // Save to workflow context and localStorage
         updateCVData(workflowData);
-        setLastSaved(new Date());
-      }, 2000); // 2 second debounce
-
+        
+        if (saveCVData) {
+          saveCVData(workflowData).catch(error => {
+            console.warn('Workflow auto-save failed:', error);
+          });
+        }
+      }, 3000); // 3 second debounce for workflow saves
+      
       return () => clearTimeout(saveTimer);
     }
-  }, [cvData, dataSource, state.cvData, updateCVData]);
+  }, [cvData, dataSource, state.cvData, updateCVData, saveCVData]);
 
   const handleUpdateSection = (sectionId: string, data: any) => {
-    setCvData(prev => {
-      if (sectionId === 'sectionTitles') {
-        // Handle section titles update
-        return {
-          ...prev,
-          sectionTitles: data
+    console.log(`🔧 Updating section: ${sectionId}`, data);
+    
+    try {
+      setCvData(prevData => {
+        const updatedData = {
+          ...prevData,
+          [sectionId]: data
         };
+        
+        // Validate the data structure
+        if (sectionId === 'contact' && data) {
+          // Ensure contact has required structure
+          updatedData.contact = {
+            fullName: data.fullName || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            location: data.location || '',
+            linkedin: data.linkedin || ''
+          };
+        }
+        
+        console.log(`✅ Section ${sectionId} updated successfully`);
+        return updatedData;
+      });
+    } catch (error) {
+      console.error(`❌ Error updating section ${sectionId}:`, error);
+    }
+  };
+
+  const handleUpdateCvData = (newData: CVData) => {
+    console.log('🔧 Updating entire CV data:', newData);
+    
+    try {
+      // Validate that newData has required structure
+      if (!newData || typeof newData !== 'object') {
+        console.error('❌ Invalid CV data provided');
+        return;
       }
       
-      // Handle regular section updates
-      return {
-        ...prev,
-        [sectionId]: data
-      };
-    });
+      setCvData(prevData => {
+        const mergedData = {
+          ...prevData,
+          ...newData,
+          id: newData.id || prevData.id || cvId // Preserve ID
+        };
+        
+        console.log('✅ CV data updated successfully');
+        return mergedData;
+      });
+    } catch (error) {
+      console.error('❌ Error updating CV data:', error);
+    }
   };
 
   const handleSectionOrder = (newOrder: string[]) => {
+    console.log('🔧 Updating section order:', newOrder);
+    
     setCvData(prev => {
       const newData = {
-        ...prev
+        ...prev,
+        sectionOrder: newOrder
       };
-      newData.sectionOrder = newOrder;
+      console.log('✅ Section order updated successfully');
       return newData;
     });
   };
@@ -342,42 +476,48 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
   };
 
   const handleApplySuggestion = (sectionId: string, suggestion: any) => {
-    // Apply suggestion to the appropriate section
-    switch (sectionId) {
-      case 'skills':
-        if (typeof suggestion === 'string') {
-          const currentSkills = cvData.skills?.items || [];
-          if (!currentSkills.includes(suggestion)) {
-            const updatedSkills = [...currentSkills, suggestion];
-            handleUpdateSection('skills', { items: updatedSkills });
+    console.log(`🎯 Applying suggestion to section: ${sectionId}`, suggestion);
+    
+    try {
+      // Apply suggestion to the appropriate section
+      switch (sectionId) {
+        case 'skills':
+          if (typeof suggestion === 'string') {
+            const currentSkills = cvData.skills?.items || [];
+            if (!currentSkills.includes(suggestion)) {
+              const updatedSkills = [...currentSkills, suggestion];
+              handleUpdateSection('skills', { items: updatedSkills });
+              console.log('✅ Skill suggestion applied');
+            }
           }
-        }
-        break;
-      case 'summary':
-        if (typeof suggestion === 'string') {
-          const currentSummary = cvData.summary?.content || '';
-          const updatedSummary = currentSummary ? `${currentSummary}\n\n${suggestion}` : suggestion;
-          handleUpdateSection('summary', { content: updatedSummary });
-        }
-        break;
-      case 'experience':
-        // Handle experience suggestions (e.g., bullet points)
-        if (suggestion.bulletPoint && cvData.experience?.items?.length > 0) {
-          const updatedItems = [...cvData.experience.items];
-          // Add to the first experience item for simplicity
-          if (updatedItems[0]) {
-            const currentBullets = updatedItems[0].bullets || [];
-            updatedItems[0].bullets = [...currentBullets, suggestion.bulletPoint];
-            handleUpdateSection('experience', { items: updatedItems });
+          break;
+        case 'summary':
+          if (suggestion && suggestion.content) {
+            handleUpdateSection('summary', { content: suggestion.content });
+            console.log('✅ Summary suggestion applied');
           }
-        }
-        break;
-      default:
-        console.log('Suggestion applied for section:', sectionId, suggestion);
+          break;
+        case 'experience':
+          if (suggestion && suggestion.bulletPoint) {
+            const currentExperience = cvData.experience?.items || [];
+            if (currentExperience.length > 0) {
+              const updatedExperience = [...currentExperience];
+              // Add to first experience item
+              updatedExperience[0] = {
+                ...updatedExperience[0],
+                bullets: [...(updatedExperience[0].bullets || []), suggestion.bulletPoint]
+              };
+              handleUpdateSection('experience', { items: updatedExperience });
+              console.log('✅ Experience suggestion applied');
+            }
+          }
+          break;
+        default:
+          console.log(`⚠️ No handler for suggestion type: ${sectionId}`);
+      }
+    } catch (error) {
+      console.error(`❌ Error applying suggestion to ${sectionId}:`, error);
     }
-
-    // Remove the applied suggestion
-    handleDismissSuggestion(sectionId, suggestion);
   };
 
   const handleDismissSuggestion = (sectionId: string, suggestion: any) => {
@@ -388,24 +528,85 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
   };
 
   const handleJobAnalysisComplete = (analysisResults: any) => {
-    // Convert analysis results to suggestions format
-    const newSuggestions: {[sectionId: string]: any[]} = {};
+    console.log('🎯 Job analysis completed:', analysisResults);
     
-    if (analysisResults.skills && analysisResults.skills.length > 0) {
-      newSuggestions.skills = analysisResults.skills;
+    try {
+      // Process analysis results and update suggestions
+      if (analysisResults && analysisResults.suggestions) {
+        setSuggestions(analysisResults.suggestions);
+        console.log('✅ Suggestions updated from job analysis');
+      }
+      
+      // Optional: Update CV data based on analysis
+      if (analysisResults && analysisResults.optimizedCV) {
+        handleUpdateCvData(analysisResults.optimizedCV);
+      }
+    } catch (error) {
+      console.error('❌ Error processing job analysis results:', error);
     }
+  };
+
+  const handleManualSave = async () => {
+    console.log('💾 Manual save triggered');
     
-    if (analysisResults.summary && analysisResults.summary.length > 0) {
-      newSuggestions.summary = analysisResults.summary;
+    try {
+      // Save to localStorage immediately
+      if (cvId && cvData) {
+        localStorage.setItem(`cv_data_${cvId}`, JSON.stringify(cvData));
+        setLastSaved(new Date());
+        console.log('✅ Manual save to localStorage successful');
+      }
+      
+      // Save to workflow context if available
+      if (updateCVData) {
+        updateCVData(cvData);
+        console.log('✅ Manual save to workflow context successful');
+      }
+      
+      // Future: Save to database
+      if (saveCVData) {
+        await saveCVData(cvData);
+        console.log('✅ Manual save to database successful');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Manual save failed:', error);
+      return false;
     }
+  };
+
+  const handleDataRecovery = () => {
+    console.log('🔄 Attempting data recovery');
     
-    if (analysisResults.workExperience && analysisResults.workExperience.length > 0) {
-      newSuggestions.experience = analysisResults.workExperience.map((bullet: string) => ({
-        bulletPoint: bullet
-      }));
+    try {
+      if (cvId && typeof window !== 'undefined') {
+        // Try to recover from localStorage
+        const savedData = localStorage.getItem(`cv_data_${cvId}`);
+        if (savedData) {
+          const recoveredData = JSON.parse(savedData);
+          setCvData(recoveredData);
+          console.log('✅ Data recovered from localStorage');
+          return true;
+        }
+        
+        // Try to recover from backup
+        const backupData = localStorage.getItem(`cv_data_${cvId}_backup`);
+        if (backupData) {
+          const backup = JSON.parse(backupData);
+          setCvData(backup.data);
+          setLastSaved(new Date(backup.timestamp));
+          console.log('✅ Data recovered from backup');
+          return true;
+        }
+      }
+      
+      console.log('⚠️ No recovery data found');
+      return false;
+    } catch (error) {
+      console.error('❌ Data recovery failed:', error);
+      return false;
     }
-    
-    setSuggestions(newSuggestions);
   };
 
   // Clear active section when clicking outside
@@ -427,28 +628,15 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
     }
   };
 
-  // Auto-save status for display
+  // Get auto-save status for display
   const getAutoSaveStatus = () => {
-    if (dataSource === 'mock') {
-      return null; // No auto-save for mock data
-    }
-    
-    if (state.isSaving) {
-      return { status: 'saving', message: 'Đang lưu...' };
-    }
-    
     if (lastSaved) {
-      const timeSince = Date.now() - lastSaved.getTime();
-      if (timeSince < 5000) { // Show "saved" message for 5 seconds
-        return { status: 'saved', message: 'Đã lưu tự động' };
+      const timeSinceLastSave = Date.now() - lastSaved.getTime();
+      if (timeSinceLastSave < 5000) { // Less than 5 seconds ago
+        return 'saved';
       }
     }
-    
-    if (state.error) {
-      return { status: 'error', message: 'Lỗi lưu tự động' };
-    }
-    
-    return null;
+    return 'idle';
   };
 
   return (
@@ -456,9 +644,9 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
       {/* Fixed Header - Full Width with OkBuddy Background */}
       <div className="flex-shrink-0 bg-white border-b border-gray-200 z-10 px-6">
         <HeaderCVEditor 
-          cvScore={cvScore} 
+          cvScore={cvScore}
           cvData={cvData}
-          onUpdateCvData={setCvData}
+          onUpdateCvData={handleUpdateCvData}
           onJobAnalysisComplete={handleJobAnalysisComplete}
         />
       </div>
@@ -468,16 +656,21 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
         {/* Left Panel (CV Editor) - 60% width, scrollable, OkBuddy Background */}
         <div className="w-3/5 overflow-y-auto" style={{ background: '#E0F7FA' }} onClick={handleEditorClick}>
           <div className="p-6">
-            <EditorPanel 
-              cvData={cvData} 
-              onUpdateSection={handleUpdateSection} 
-              onSectionOrderChange={handleSectionOrder} 
-              activeSection={activeSection} 
+            <EditorPanel
+              cvData={cvData}
+              onUpdateSection={handleUpdateSection}
+              onSectionOrderChange={handleSectionOrder}
+              activeSection={activeSection}
               setActiveSection={setActiveSection} 
               cvScore={cvScore}
               suggestions={suggestions}
               onApplySuggestion={handleApplySuggestion}
-              onDismissSuggestion={handleDismissSuggestion}
+              onDismissSuggestion={(sectionId: string, suggestion: any) => {
+                setSuggestions(prev => ({
+                  ...prev,
+                  [sectionId]: (prev[sectionId] || []).filter(s => s !== suggestion)
+                }));
+              }}
             />
           </div>
         </div>
@@ -485,16 +678,23 @@ export const CVEditor = ({ initialData, dataSource = 'mock', cvId }: CVEditorPro
         {/* Right Panel (CV Preview) - 40% width, fixed position */}
         <div className="w-2/5 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
           <PreviewPanel 
-            cvData={cvData} 
-            activeSection={activeSection} 
-            setActiveSection={setActiveSection} 
+            cvData={cvData}
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
           />
         </div>
       </div>
-
-      {/* Celebration Screen */}
+      
+      {/* Celebration Modal */}
       {showCelebration && (
         <CelebrationScreen onClose={handleCloseCelebration} />
+      )}
+      
+      {/* Auto-save Status Indicator */}
+      {lastSaved && (
+        <div className="fixed bottom-4 right-4 bg-green-50 text-green-600 px-4 py-2 rounded-lg border border-green-200 text-sm font-medium">
+          ✓ Đã lưu tự động lúc {lastSaved.toLocaleTimeString()}
+        </div>
       )}
     </div>
   );

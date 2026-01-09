@@ -1,4 +1,5 @@
 export interface CVData {
+  id?: string; // Optional ID for CV identification
   sectionOrder: string[];
   sectionTitles?: Record<string, string>;
   contact: {
@@ -34,6 +35,40 @@ export interface CVData {
       location: string;
       graduationDate: string;
       description: string;
+    }>;
+  };
+  certificates?: {
+    items: Array<{
+      id: string;
+      name: string;
+      issuer: string;
+      date: string;
+      url?: string;
+    }>;
+  };
+  languages?: {
+    items: Array<{
+      id: string;
+      language: string;
+      level: string;
+    }>;
+  };
+  projects?: {
+    items: Array<{
+      id: string;
+      name: string;
+      description: string;
+      technologies: string[];
+      url?: string;
+    }>;
+  };
+  awards?: {
+    items: Array<{
+      id: string;
+      title: string;
+      issuer: string;
+      date: string;
+      description?: string;
     }>;
   };
 }
@@ -91,6 +126,7 @@ if (typeof window !== 'undefined') {
 }
 
 export const initialCV: CVData = {
+  id: 'initial-cv', // Add default ID
   sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
   sectionTitles: {},
   contact: getContactDataWithUserInfo({
@@ -136,7 +172,11 @@ export const initialCV: CVData = {
       graduationDate: '2021',
       description: 'Tốt nghiệp loại Khá, điểm trung bình 7.8/10'
     }]
-  }
+  },
+  certificates: { items: [] },
+  languages: { items: [] },
+  projects: { items: [] },
+  awards: { items: [] }
 };
 
 // Empty CV data for testing UX from scratch
@@ -177,5 +217,9 @@ export const emptyCV: CVData = {
       graduationDate: '',
       description: ''
     }]
-  }
+  },
+  certificates: { items: [] },
+  languages: { items: [] },
+  projects: { items: [] },
+  awards: { items: [] }
 }; 

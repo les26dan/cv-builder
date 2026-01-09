@@ -87,26 +87,11 @@ export default function WorkspacePage() {
     try {
       setIsCreating(true)
       
-      // Check if user already has too many incomplete CVs (prevent spam)
-      const incompleteCVs = cvs.filter(cv => cv.status === 'new' || cv.status === 'in_progress')
-      if (incompleteCVs.length >= 5) {
-        alert('Bạn đã có quá nhiều CV đang thực hiện. Vui lòng hoàn thành một số CV trước khi tạo CV mới.')
-        return
-      }
-      
-      const newCV = await createNewCV(user.id, `CV - ${user.fullName}`)
-      
-      if (newCV) {
-        setCvs(prev => [newCV, ...prev])
-        
-        // Navigate directly to CV guided editing with new CV ID for immediate editing
-        router.push(`/cv-guided-editing/${newCV.id}?source=new`)
-      } else {
-        alert('Không thể tạo CV mới. Vui lòng thử lại.')
-      }
+      // Navigate directly to CV Upload page so users can upload existing CV or create from scratch
+      router.push('/cv-upload')
     } catch (error) {
-      console.error('Failed to create new CV:', error)
-      alert('Có lỗi xảy ra khi tạo CV mới. Vui lòng thử lại.')
+      console.error('Failed to navigate to CV upload:', error)
+      alert('Có lỗi xảy ra. Vui lòng thử lại.')
     } finally {
       setIsCreating(false)
     }
