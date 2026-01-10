@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { landingPage } from '../config/texts/vi/landingPage';
+import { landingPage } from '../config/texts/index';
 import { handlePrimaryCTA, trackCTAClick } from '../utils/navigation';
 
 const HeroSection: React.FC = () => {
@@ -92,10 +92,10 @@ const HeroSection: React.FC = () => {
                   {resume.preview.skills}
                 </h4>
                 <div className="flex flex-row flex-wrap items-center gap-2 w-full">
-                  {resume.preview.skillsList.map((skill, index) => (
+                  {resume.preview.skillsList.map((skill: any, index) => (
                     <div key={index} className="flex flex-row justify-center items-center px-2 md:px-3 h-7 md:h-8 bg-[#E1F5FE] rounded-2xl">
                       <span className="font-inter font-medium text-xs md:text-sm leading-[17px] text-[#0288D1]">
-                        {skill}
+                        {typeof skill === 'object' && skill.name ? skill.name : skill}
                       </span>
                     </div>
                   ))}

@@ -15,28 +15,28 @@ export interface WorkflowRoute {
 
 /**
  * Workflow routing configuration
- * Maps each component to its development URL and routing information
+ * Maps each component to its unified application URL (all on port 3000)
  */
 export const WORKFLOW_ROUTES: Record<string, WorkflowRoute> = {
   workspace: {
     component: 'workspace',
-    path: '/workspace',
-    baseUrl: 'http://localhost:3001' // cv-workspace-navigation
+    path: '/cv-workspace',
+    baseUrl: 'http://localhost:3000' // Unified application on port 3000
   },
   upload: {
     component: 'upload',
-    path: '/',
-    baseUrl: 'http://localhost:3000' // cv-jd-upload
+    path: '/cv-upload',
+    baseUrl: 'http://localhost:3000' // Unified application on port 3000
   },
   loading: {
     component: 'upload',
-    path: '/loading',
-    baseUrl: 'http://localhost:3000' // cv-jd-upload loading screen
+    path: '/cv-upload/loading',
+    baseUrl: 'http://localhost:3000' // Unified application on port 3000
   },
   editor: {
     component: 'editor',
-    path: '/',
-    baseUrl: 'http://localhost:5173' // cv-guided-editing
+    path: '/cv-guided-editing',
+    baseUrl: 'http://localhost:3000' // Unified application on port 3000
   }
 }
 

@@ -248,38 +248,38 @@ class AIService {
   }
 
   /**
-   * Get prompt templates for language (generic)
+   * Get prompt templates for language (generic) - English as default
    */
   private getPromptTemplates(language: SupportedLanguage) {
-    return language === 'vi' ? viAIPrompts : enAIPrompts;
+    return language === 'en' ? enAIPrompts : viAIPrompts;
   }
 
   /**
-   * Get section-specific prompt templates for language
+   * Get section-specific prompt templates for language - English as default
    */
   private getSummaryPromptTemplates(language: SupportedLanguage) {
-    return language === 'vi' ? viSummaryAIPrompts : enSummaryAIPrompts;
+    return language === 'en' ? enSummaryAIPrompts : viSummaryAIPrompts;
   }
 
   /**
-   * Get work experience prompt templates for language
+   * Get work experience prompt templates for language - English as default
    */
   private getWorkExperiencePromptTemplates(language: SupportedLanguage) {
-    return language === 'vi' ? viWorkExperienceAIPrompts : enWorkExperienceAIPrompts;
+    return language === 'en' ? enWorkExperienceAIPrompts : viWorkExperienceAIPrompts;
   }
 
   /**
    * Get skills prompt templates for language
    */
   private getSkillsPromptTemplates(language: SupportedLanguage) {
-    return language === 'vi' ? viSkillsAIPrompts : enSkillsAIPrompts;
+    return language === 'en' ? enSkillsAIPrompts : viSkillsAIPrompts;
   }
 
   /**
-   * Get JD analysis prompt templates for language
+   * Get JD analysis prompt templates for language - English as default
    */
   private getJDAnalysisPromptTemplates(language: SupportedLanguage) {
-    return language === 'vi' ? viJDAnalysisAIPrompts : enJDAnalysisAIPrompts;
+    return language === 'en' ? enJDAnalysisAIPrompts : viJDAnalysisAIPrompts;
   }
 
   /**
@@ -301,9 +301,9 @@ class AIService {
         throw new Error(`Summary template '${templateKey}' not found for language '${language}'`);
       }
 
-      return language === 'vi' 
-        ? formatViSummaryPrompt(template, context)
-        : formatEnSummaryPrompt(template, context);
+      return language === 'en' 
+        ? formatEnSummaryPrompt(template, context)
+        : formatViSummaryPrompt(template, context);
     }
 
     // Check if this is a work experience-specific template
@@ -317,9 +317,9 @@ class AIService {
         throw new Error(`Work experience template '${templateKey}' not found for language '${language}'`);
       }
 
-      return language === 'vi' 
-        ? formatViWorkExperiencePrompt(template, context)
-        : formatEnWorkExperiencePrompt(template, context);
+      return language === 'en' 
+        ? formatEnWorkExperiencePrompt(template, context)
+        : formatViWorkExperiencePrompt(template, context);
     }
 
     // Check if this is a skills-specific template (removed skillsPrioritization)
@@ -333,9 +333,9 @@ class AIService {
         throw new Error(`Skills template '${templateKey}' not found for language '${language}'`);
       }
 
-      return language === 'vi' 
-        ? formatViSkillsPrompt(template, context)
-        : formatEnSkillsPrompt(template, context);
+      return language === 'en' 
+        ? formatEnSkillsPrompt(template, context)
+        : formatViSkillsPrompt(template, context);
     }
 
     // Check if this is a JD analysis-specific template
@@ -349,9 +349,9 @@ class AIService {
         throw new Error(`JD Analysis template '${templateKey}' not found for language '${language}'`);
       }
 
-      return language === 'vi' 
-        ? formatViJDAnalysisPrompt(template, context)
-        : formatEnJDAnalysisPrompt(template, context);
+      return language === 'en' 
+        ? formatEnJDAnalysisPrompt(template, context)
+        : formatViJDAnalysisPrompt(template, context);
     }
 
     // Fall back to generic templates
@@ -362,9 +362,9 @@ class AIService {
       throw new Error(`Template '${templateKey}' not found for language '${language}'`);
     }
 
-    return language === 'vi' 
-      ? formatPrompt(template, context)
-      : formatEnglishPrompt(template, context);
+    return language === 'en' 
+      ? formatEnglishPrompt(template, context)
+      : formatPrompt(template, context);
   }
 
   /**

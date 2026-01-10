@@ -1,5 +1,5 @@
 import React from 'react';
-import { landingPage } from '../config/texts/vi/landingPage';
+import { landingPage } from '../config/texts/index';
 
 const TestimonialsSection: React.FC = () => {
   const { testimonials } = landingPage;

@@ -20,6 +20,15 @@ export const SummarySection = ({
 }: SummarySectionProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   
+  // Bulletproof type checking for summary content - moved to top for all uses
+  const safeContent = (() => {
+    if (!data?.content) return '';
+    if (typeof data.content === 'string') return data.content;
+    if (Array.isArray(data.content)) return (data.content as any[]).join(' ');
+    if (typeof data.content === 'object') return JSON.stringify(data.content);
+    return String(data.content || '');
+  })();
+  
   const handleChange = (content: string) => {
     onUpdate({
       ...data,
@@ -35,7 +44,7 @@ export const SummarySection = ({
         workExperience: cvData?.experience?.items || [],
         skills: cvData?.skills?.items || [],
         education: cvData?.education?.items || [],
-        existingContent: data.content
+        existingContent: safeContent
       };
 
       const result = await aiService.generateEnhancedSummary(request);
@@ -57,12 +66,13 @@ export const SummarySection = ({
   };
 
   const handleImproveSummary = async () => {
-    if (!data.content.trim()) return;
+    // Use the safeContent already calculated at component top
+    if (!safeContent.trim()) return;
     
     setIsGenerating(true);
     try {
       const result = await aiService.improveSummary({
-        content: data.content,
+        content: safeContent,
         sectionType: 'summary',
         context: { 
           workExperience: cvData?.experience?.items || [],
@@ -91,7 +101,7 @@ export const SummarySection = ({
   const hasWorkExperience = cvData?.experience?.items?.length > 0 && 
     cvData.experience.items.some((item: any) => item.title || item.company);
   
-  const isEmpty = !data?.content?.trim();
+  const isEmpty = !safeContent.trim();
   const shouldShowGuidance = isEmpty && !hasWorkExperience;
 
   const handleNavigateToExperience = () => {
@@ -128,7 +138,7 @@ export const SummarySection = ({
         
         <textarea 
           className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] resize-none transition-colors focus:border-primary-500 focus:ring-primary-500"
-          value={data.content} 
+          value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Viết tóm tắt về kinh nghiệm và mục tiêu nghề nghiệp của bạn..."
         />
@@ -149,7 +159,7 @@ export const SummarySection = ({
       <div className="relative">
         <textarea 
           className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] resize-none transition-colors focus:border-primary-500 focus:ring-primary-500"
-          value={data.content} 
+          value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
           placeholder="Tóm tắt ngắn gọn về kinh nghiệm và mục tiêu nghề nghiệp của bạn..."
           disabled={isGenerating}

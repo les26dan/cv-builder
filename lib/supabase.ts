@@ -66,13 +66,14 @@ interface CVRow {
 
 // Service functions with fallback to mock data
 export async function fetchUserCVs(userId: string): Promise<CVData[]> {
-  if (!supabase) {
-    // Return mock data for development
-    console.log('Supabase not configured, using mock data')
+  // Check if we're using mock data (development mode)
+  if (!supabase || userId.startsWith('user-') || userId.startsWith('mock-')) {
+    console.log('🔧 Supabase not configured or using mock user ID, using mock data for userId:', userId)
     return mockCVs.filter(cv => cv.userId === userId)
   }
 
   try {
+    console.log('🔍 Fetching CVs from Supabase for user:', userId)
     const { data, error } = await supabase
       .from('cvs')
       .select('*')
@@ -80,10 +81,12 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
       .order('updated_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching CVs:', error)
+      console.error('❌ Supabase error fetching CVs:', error)
+      console.log('🔄 Falling back to mock data for user:', userId)
       return mockCVs.filter(cv => cv.userId === userId)
     }
 
+    console.log('✅ Successfully fetched CVs from Supabase:', data?.length || 0)
     return (data as unknown as CVRow[])?.map(cv => ({
       id: cv.id,
       title: cv.title || 'Untitled CV',
@@ -95,7 +98,8 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
       jobDescription: cv.job_description || undefined,
     })) || []
   } catch (error) {
-    console.error('Database connection error:', error)
+    console.error('❌ Database connection error:', error)
+    console.log('🔄 Falling back to mock data for user:', userId)
     return mockCVs.filter(cv => cv.userId === userId)
   }
 }

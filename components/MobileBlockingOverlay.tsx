@@ -1,6 +1,6 @@
 import React from 'react';
 import { MobileDetectionResult } from '../utils/useMobileDetection';
-import { mobileBlockingTexts } from '../config/texts/vi/mobileBlocking';
+import { mobileBlockingTexts } from '../config/texts/index';
 
 interface MobileBlockingOverlayProps {
   detection: MobileDetectionResult;

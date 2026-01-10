@@ -1,0 +1,127 @@
+export const workExperienceWizardTexts = {
+  // Modal titles and headers
+  modalTitle: 'Add Work Experience',
+  aiModalTitle: 'Generate Job Description with AI',
+  
+  // Step titles
+  stepTitles: {
+    jobTitle: 'Job Title',
+    company: 'Company',
+    dates: 'Employment Period',
+    location: 'Location (optional)',
+    project: 'Main Project/Responsibility',
+    impact: 'Impact/Results',
+    responsibility: 'Role/Scope'
+  },
+
+  // Step questions/prompts
+  stepPrompts: {
+    jobTitle: 'What was your job title?',
+    company: 'Company or organization name?',
+    dates: 'Employment period',
+    location: 'Work location (optional)',
+    project: 'Main project or responsibility',
+    impact: 'Results or impact',
+    responsibility: 'Role and scope of responsibility (optional)'
+  },
+
+  // Placeholders
+  placeholders: {
+    jobTitle: 'e.g. Sales Representative, Software Engineer...',
+    company: 'e.g. ABC Corporation, XYZ Bank...',
+    startDate: '12/2023 or 2023',
+    endDate: '12/2024 or 2024',
+    location: 'e.g. New York, London, Remote...',
+    project: 'e.g. Developed new CRM system for sales department',
+    impact: 'e.g. Increased sales efficiency by 25%, reduced processing time by 40%',
+    responsibility: 'e.g. Led team of 5 people, managed budget of $500K, responsible for southern region...'
+  },
+
+  // Helper text and guidance
+  helperTexts: {
+    jobTitle: 'Enter the exact job title so AI can create the most suitable description.',
+    company: 'AI will use this information to create job descriptions suitable for the industry.',
+    location: 'You can leave this blank if you don\'t want to display location on your CV.',
+    project: 'Briefly describe an important project, task, or responsibility you undertook.',
+    impact: 'Describe specific results, can be numbers, process improvements, or benefits delivered.',
+    responsibility: 'Describe leadership role, scope of responsibility, or work scale so AI can create more comprehensive description.'
+  },
+
+  // Info banners and tips
+  infoBanners: {
+    aiIntro: {
+      title: '🎯 Generate Job Description with AI',
+      description: 'AI will help you create professional bullet points based on the information you provide.'
+    },
+    impactTip: {
+      title: '💡 Tip: Use specific numbers',
+      description: 'e.g. "Increased revenue by 30%", "Reduced processing time by 50%", "Managed budget of $2M"'
+    }
+  },
+
+  // Labels
+  labels: {
+    startDate: 'Start Date *',
+    endDate: 'End Date *',
+    currentJob: 'I currently work here',
+    required: '*',
+    optional: '(optional)'
+  },
+
+  // Progress indicators
+  progress: {
+    step: 'Step',
+    of: '/',
+    loading: 'Generating...'
+  },
+
+  // Buttons
+  buttons: {
+    cancel: 'Cancel',
+    back: 'Back',
+    next: 'Next',
+    skip: 'Skip',
+    skipAI: 'Skip AI',
+    generateWithAI: 'Generate with AI',
+    close: 'Close'
+  },
+
+  // Validation errors
+  errors: {
+    jobTitleRequired: 'Please enter job title',
+    companyRequired: 'Please enter company name',
+    startDateRequired: 'Please enter start date',
+    endDateRequired: 'Please enter end date or select "Current job"',
+    endDateBeforeStart: 'End date must be after start date',
+    projectRequired: 'Please describe main project or responsibility',
+    impactRequired: 'Please describe results or impact'
+  },
+
+  // Confirmation dialogs
+  confirmations: {
+    closeWizard: 'Are you sure you want to cancel? All entered information will be lost.',
+    skipAI: 'Skipping AI will require you to write bullet points manually. Are you sure?'
+  },
+
+  // Success messages
+  success: {
+    experienceAdded: 'Work experience added successfully!',
+    bulletGenerated: 'Job description generated with AI successfully!'
+  },
+
+  // Error messages
+  apiErrors: {
+    failedToGenerate: 'Unable to generate bullet points. Please try again.',
+    networkError: 'An error occurred while generating bullet points. Please try again.',
+    aiUnavailable: 'AI is currently unavailable. You can write job description manually.'
+  },
+
+  // Accessibility labels
+  aria: {
+    close: 'Close',
+    wizardDialog: 'Add work experience',
+    progressBar: 'Completion progress'
+  }
+};
+
+export default workExperienceWizardTexts; 

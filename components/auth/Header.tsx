@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { account } from "../../config/texts/vi/account";
+import { account } from "../../config/texts/index";
 
 export default function Header() {
   return (

@@ -1,23 +1,128 @@
 - Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
-- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy`, carefully analyze the existing components, features, and user flows implemented in their respective codebases, to gain full understanding of the system logic, architecture, and UX patterns:
+- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy`, carefully analyze the existing components, features, and user flows implemented in their respective codebases, to gain full understanding of the system logic, architecture, and UX patterns of these core pages:
    - Landing Page
    - Account Creation & Login
    - CV Workspace
-   - CV & JD Upload
+   - CV Upload
    - CV Guided Editing
    - CV Workflow Integration
-- Review the legacy codebase of OkBuddy before we deployed successfully on Vercel `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy Legacy UI'`. Each page was developed independently thus when we were trying to deploy on Vercel earlier, there were a lot of incompatibility issues across multiple frontend and backend components. We eventually deployed OkBuddy on Vercel successfully, but the price is now all the UI components across all pages are broken, especially headers of each page.
-- The goals of this initiative are:
-   - Fix & correct the UI components of all OkBuddy's pages:
-Landing Page (done)
-Account Register
-Account Login
-Terms of Service
-CV Workspace
-CV Upload
-CV Guided Editing (most important, core value proposition)
-   - At the same time, ensure compatibility across all pages & with Vercel. Do not introduce backward incompatibility.
+- The focus of our initiative is to completely remove the existing JD parser logic and function, which is completely broken and does NOT pass production quality, directly blocking our product launch. Instead, we will use LLM to effectively handle this, similarly to how the CV Guided Editing page walks the users step-by-step, calls ChatGPT API with prompts, receives the results and displays on the system.
+- Review the LLM Specs: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/LLM Prompts Spec.md'
+- Project Acceptance criteria:
+Input: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Materials/Documents/Sample CVs/Kien Vu Sr. Product Manager (Jan 2025).pdf'
+Output:
+1) JSON (for the CV Guided Editor panel):
+{
+  "contact": {
+    "full_name": "Kien (Jonathan) Vu Viet",
+    "address": "Ho Chi Minh City, Vietnam",
+    "email": "vuvietkien.ptithcm@gmail.com",
+    "phone": "+84 972 947 523",
+    "linkedin": "Linkedin",
+  },
+  "work_experience": [
+    {
+      "position": "Technical Product Manager",
+      "company": "DHF Platforms",
+      "location": "Vietnam, Singapore",
+      "start_date": "Jul 2024",
+      "end_date": "Now",
+      "bullets": [
+        "Optimized supply chain operations and production workflows, achieving 3x inventory update improvement and 90% reporting error reduction by implementing an ERP system.",
+        "Centralized fragmented data from ERP, CRM, B2B into a unified data warehouse for real-time KPI tracking.",
+        "Defined and prioritized 2025 product roadmap targeting 200% GMV growth with a farm application for suppliers.",
+        "Developed cohesive UI/UX design system in Figma to enhance usability and platform consistency."
+      ]
+    },
+    {
+      "position": "Product Manager",
+      "company": "Peeba (YC23)",
+      "location": "Indonesia, Vietnam",
+      "start_date": "May 2023",
+      "end_date": "Nov 2023",
+      "bullets": [
+        "Enhanced UI/UX, increasing conversion rates by 26% through a new sign-up flow.",
+        "Led development of pivotal features (inventory management, tiered pricing, payment methods, BNPL integration).",
+        "Conducted 3 comprehensive market research initiatives in Indonesia to inform product direction.",
+        "Launched wholesale subscription, free shipping, and Direct Sales App (SaaS), achieving $17,000 GMV within 3 weeks."
+      ]
+    },
+    {
+      "position": "Product Lead, Growth",
+      "company": "MoMo",
+      "location": "Ho Chi Minh (Vietnam)",
+      "start_date": "Mar 2020",
+      "end_date": "Apr 2023",
+      "bullets": [
+        "Increased daily transaction volume by 1.7x via multi-source funds; post-campaign volume was 1.5x pre-campaign average.",
+        "Educated financial hub to 12 million users via flexible fund sources and payment methods.",
+        "Developed cloud platform handling 10,000 simultaneous users on Google Cloud Platform.",
+        "Established UX guidelines for gamification features in Fintech."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Business Intelligence Program, Mastering Data Analytics",
+      "institution": "VN",
+      "start_date": "Nov 2024",
+      "end_date": "2025",
+      "details": "Analytics techniques, Dashboard insights, Storytelling, Business statistics, Analytical thinking."
+    },
+    {
+      "degree": "Leadership & Management, Master in Public Policy",
+      "institution": "Fulbright University VN",
+      "start_date": "Oct 2022",
+      "end_date": "2024",
+      "details": "Leadership, negotiation, data science, quantitative methods, economics, public policy, law, budgeting."
+    },
+    {
+      "degree": "Software Engineer",
+      "institution": "Posts and Telecommunication Institute of Technology",
+      "start_date": "Oct 2010",
+      "end_date": "Jan 2015",
+      "details": ""
+    }
+  ],
+  "skills": [
+    "Agile Methodology",
+    "Scrum",
+    "Product Roadmapping",
+    "UX/UI Design",
+    "Figma",
+    "Data Analytics",
+    "SQL",
+    "CI/CD",
+    "Kubernetes",
+    "Google Cloud Platform",
+    "Node.js",
+    "ReactJS",
+    "AngularJS"
+  ]
+}
+2) Texts output correctly parsed & displayed on CV Editor panel and CV Preview panel of CV Guided Editing Page.
 - Let me know once you have fully understood the context here. Do not proceed to make any change yet.
+
+- You need to:
++ Completely remove all existing JD parsing logic, component to avoid conflict with new logic. Proceed with extreme care & caution - you must NOT touch any other logic, component & feature.
++ Implement the CV attachment sent to ChatGPT API
++ Implement the prompts sent to ChatGPT API, depending the system's language being used
++ Implement the system's logic to handle the returned JSON. 
+1) In case the possibility score is >= 5, the system must navigate the user to the Guided Editing page, parse the structured returned data accurately to the CV Editing panel's section, then display a popup/ message informing the users about the successful parsing.
+2) In case the possibility score is < 5, the system must stay on CV Upload page, display a popup/ message informing the users:
+English:
+“The document uploaded doesn’t seem to be a CV or resume. Please upload a valid CV document.”
+
+Vietnamese:
+“Tài liệu vừa tải lên không giống CV hoặc hồ sơ ứng tuyển. Vui lòng tải lên đúng file CV hợp lệ.”
+
+Network Error Handling:
+	•	If the response is invalid or incomplete due to network errors, the system should clearly show the message:
+	•	English: “An error occurred. Please upload your CV again.”
+	•	Vietnamese: “Đã xảy ra lỗi. Vui lòng tải lại CV của bạn.”
+
+- Important note:
++ System language (user preferral - the langugage users are comfortable updating their CV with) vs user’s content language (Users Uploaded CV, CV Guided Editing content) must be handled separately. For example, a Vietnamese user might be preparing their CV in English for a foreign company must still prefer to do so (preparing CV) in Vietnamese.
 
 
 *Careful Documentation*

@@ -1,6 +1,6 @@
 {
   "name": "okbuddy-unified",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,14 +12,22 @@
     "test:coverage": "jest --coverage",
     "restart": "pkill -f 'next dev' || true && sleep 2 && npm run dev",
     "clean": "rm -rf .next && npm run dev",
-    "server": "./scripts/start-server.sh",
+    "server": "./start-server",
+    "server:stop": "./stop-server",
+    "server:status": "./check-server",
+    "server:logs": "tail -f server-persistent.log",
     "stop": "pkill -f 'next dev' || true",
     "status": "curl -s http://localhost:3000 >/dev/null && echo 'Server running ✅' || echo 'Server not running ❌'",
     "check": "curl -s -o /dev/null -w 'Landing: %{http_code}' http://localhost:3000 && echo ' | Login: '$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/login) && echo ' | Workspace: '$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/cv-workspace)",
     "test:workspace": "./scripts/test-cv-workspace.sh",
     "validate-pages": "./scripts/validate-pages.sh",
     "db:test": "node scripts/test-supabase-connection.js",
-    "db:deploy": "./scripts/deploy-database.sh"
+    "db:deploy": "./scripts/deploy-database.sh",
+    "deep-clean": "rm -rf .next node_modules/.cache package-lock.json && npm install && npm run build",
+    "fix-webpack": "rm -rf .next node_modules/.cache && npm run dev",
+    "reset": "pkill -f 'next dev' || true && rm -rf .next node_modules/.cache && npm install",
+    "audit-fix": "npm audit fix --force",
+    "permanent-fix": "./scripts/permanent-fix.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -47,7 +55,9 @@
     "mammoth": "^1.9.1",
     "next": "15.1.8",
     "nodemailer": "^7.0.3",
+    "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pdf2pic": "^3.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.52.1"

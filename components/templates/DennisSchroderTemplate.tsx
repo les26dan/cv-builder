@@ -59,7 +59,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
       case 'contact':
         return data.fullName || data.email || data.phone || data.location;
       case 'summary':
-        return data.content && data.content.trim();
+        return data.content && typeof data.content === 'string' && data.content.trim();
       case 'experience':
         return data.items && data.items.length > 0 && data.items.some((item: any) => item.title || item.company);
       case 'skills':
@@ -233,7 +233,15 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
           {getSectionTitle(sectionId)}
         </div>
         <div style={styles.skillsText}>
-          {data.items.join(' | ')}
+          {/* Handle both string arrays and skill objects */}
+          {data.items.map((skill: any) => {
+            // If skill is an object with name property, use name
+            if (typeof skill === 'object' && skill.name) {
+              return skill.name;
+            }
+            // If skill is a string, use it directly
+            return skill;
+          }).join(' | ')}
         </div>
       </div>
     );

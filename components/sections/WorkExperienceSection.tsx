@@ -799,7 +799,7 @@ export const WorkExperienceSection = ({
               )}
 
               {(experience.bullets || []).map((bullet, bulletIndex) => (
-                <div key={bulletIndex} className="mb-4">
+                <div key={`${experience.id}-bullet-${bulletIndex}`} className="mb-4">
                   <div className="flex items-start gap-2 w-full">
                     <div className="mt-3 text-gray-400 flex-shrink-0 w-4">•</div>
                     <textarea 

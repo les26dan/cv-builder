@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import SocialLoginButton from "./SocialLoginButton";
-import { account } from "../../config/texts/vi/account";
+import { account } from "../../config/texts/index";
 
 interface LoginFormData {
   email: string;

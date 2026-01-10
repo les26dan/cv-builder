@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { landingPage } from '../config/texts/vi/landingPage';
+import { landingPage } from '../config/texts/index';
 import { handlePrimaryCTA, trackCTAClick } from '../utils/navigation';
 
 const ProblemKeywords: React.FC = () => {

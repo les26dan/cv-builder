@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export interface MobileDetectionResult {
   isMobile: boolean;
@@ -16,6 +16,7 @@ export interface MobileDetectionResult {
  * - Large Tablet/Desktop: >= 1024px (allowed)
  */
 export function useMobileDetection(): MobileDetectionResult {
+  const mountedRef = useRef(true);
   const [detection, setDetection] = useState<MobileDetectionResult>(() => {
     // Initial state - use window dimensions if available
     const width = typeof window !== 'undefined' ? window.innerWidth : 1024;
@@ -30,6 +31,8 @@ export function useMobileDetection(): MobileDetectionResult {
 
   useEffect(() => {
     const updateDetection = () => {
+      if (!mountedRef.current) return; // Prevent state update if unmounted
+      
       const width = window.innerWidth;
       const newDetection: MobileDetectionResult = {
         isMobile: width < 768,
@@ -64,6 +67,7 @@ export function useMobileDetection(): MobileDetectionResult {
     });
 
     return () => {
+      mountedRef.current = false; // Mark as unmounted
       window.removeEventListener('resize', updateDetection);
       window.removeEventListener('orientationchange', updateDetection);
     };

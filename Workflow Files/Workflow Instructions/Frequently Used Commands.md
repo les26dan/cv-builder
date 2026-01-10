@@ -1,20 +1,14 @@
 # **Popular Commands**
-## Local Deployment Cmd
-Deploy this on local for me to test
-
-cd /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-workflow-integration
-cd /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV\ Workflow/cv-workflow-integration [//]
-npm run dev
 
 # *Tasks Update*
 Update the Tasks.md file to marking what we have implemented being completed. If an entire task (with all of its subtasks) is completed, move it down to the Completed Tasks section.
 
-# *Restart all servers*
-Restart all servers using '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/start-all-servers.sh'
+# *Restart server*
+Restart server using the start-server script in the project.
 
 # *Task Testing*
 
-Now enter **Focused QA & Testing Mode** and perform the following **high-value, low-maintenance** actions to validate implementation following tenet 5. Relentless, Rigorous Testing & Code Health.
+Then, enter **Focused QA & Testing Mode** and perform the following **high-value, low-maintenance** actions to validate implementation following tenet 5. Relentless, Rigorous Testing & Code Health.
 
 **🎯 Focus**: Quality over quantity, stability over perfection, practical over theoretical.
 
@@ -214,6 +208,15 @@ describe('Regression: User data loss bug (2024-01-15)', () => {
 - 🎯 Performance benchmarking
 
 **Remember**: A working product with 85% test coverage is infinitely better than a broken product with 100% test coverage.
+
+
+# *Careful Documentation*
+Then, ensure what we have implemented passes Heimdall Compliance:
+  - New changes in flows, modules & components are documented in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/system-architecture.md`
+  - New changes in components, features & their use are registered in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/features.yaml`
+  - If your implementation touched sensitive flows (PII, auth, input validation ...), update `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/security-audit.md`
+  - Any technical debt, skipped test, ad-hoc workaround or quick fix noted in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/tech-debt.md`. This serves as a dictionary/ audit log for all of our accumulated known code smell, TODOs, skipped tests.
+
 
 # *Project Testing*
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import MathCaptcha from "./MathCaptcha";
 import SocialLoginButton from "./SocialLoginButton";
-import { account } from "../../config/texts/vi/account";
+import { account } from "../../config/texts/index";
 
 interface RegisterFormData {
   fullName: string;

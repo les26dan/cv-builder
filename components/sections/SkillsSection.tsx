@@ -228,9 +228,10 @@ export const SkillsSection = ({
       
       {/* Skills Display */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {(data?.items || []).map((skill, index) => (
+        {(data?.items || []).map((skill: any, index) => (
           <div key={index} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-            {skill}
+            {/* Handle both string arrays and skill objects */}
+            {typeof skill === 'object' && skill.name ? skill.name : skill}
             <button 
               className="ml-1 text-blue-600 hover:text-blue-800" 
               onClick={() => handleRemoveSkill(index)}

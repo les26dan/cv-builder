@@ -17,7 +17,7 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
   constructor() {
     this.clientId = process.env.LINKEDIN_CLIENT_ID || '';
     this.clientSecret = process.env.LINKEDIN_CLIENT_SECRET || '';
-    this.redirectUri = process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:3001/api/auth/linkedin/callback';
+    this.redirectUri = process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:3000/api/auth/linkedin/callback';
     this.scopes = ['r_liteprofile', 'r_emailaddress'];
 
     if (!this.clientId || !this.clientSecret) {

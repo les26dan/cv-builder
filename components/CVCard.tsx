@@ -1,6 +1,6 @@
 'use client'
 
-import { workspace } from '@/config/texts/vi/workspace'
+import { workspace } from '@/config/texts/index'
 import { formatTimeAgo } from '@/lib/timeUtils'
 import { CVData } from '@/lib/supabase'
 

@@ -22,7 +22,7 @@ interface CVData {
     }>;
   };
   skills: {
-    items: string[];
+    items: Array<string | { name: string; level?: string }>;
   };
   education: {
     items: Array<{
@@ -133,7 +133,18 @@ function scoreSkillsSection(cvData: CVData): number {
   const skills = cvData.skills.items;
   if (!skills || skills.length === 0) return 0;
   
-  const validSkills = skills.filter(skill => skill && skill.trim());
+  // Handle both string skills and object skills with name property
+  const validSkills = skills.filter(skill => {
+    if (!skill) return false;
+    if (typeof skill === 'string') {
+      return skill.trim().length > 0;
+    }
+    if (typeof skill === 'object' && skill.name) {
+      return typeof skill.name === 'string' && skill.name.trim().length > 0;
+    }
+    return false;
+  });
+  
   if (validSkills.length >= 5) return 100;
   if (validSkills.length >= 3) return 80;
   if (validSkills.length >= 1) return 60;

@@ -248,7 +248,7 @@ export class SecurityService {
     if (!origin) return false;
     
     const allowedOrigins = [
-      'http://localhost:3001',
+      'http://localhost:3000',
       'https://okbuddy.com',
       process.env.NEXT_PUBLIC_APP_URL
     ].filter(Boolean);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { account } from "../../config/texts/vi/account";
+import { account } from "../../config/texts/index";
 
 interface MathCaptchaProps {
   onValidation: (isValid: boolean, sessionId?: string) => void;

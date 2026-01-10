@@ -10,10 +10,9 @@ import { DraggableSection } from './common/DraggableSection';
 import { ScoreIndicator } from './common/ScoreIndicator';
 import { XIcon, Sparkles, CheckCircle } from 'lucide-react';
 import { CVWorkflowDataService } from '../shared/services/cvWorkflowDataService';
-import { jdAnalysisTexts } from '../config/texts/vi/jdAnalysis';
+import { jdAnalysisTexts } from '../config/texts/index';
 import { UpgradeModal } from './common/UpgradeModal';
-import { KeywordAnalysisSection } from './jdOptimization/KeywordAnalysisSection';
-import { SuggestionPanel } from './jdOptimization/SuggestionPanel';
+// JD optimization components removed - using new LLM-based CV parser
 // Mock services for build compatibility
 const mockFetch = async (url: string, options?: any) => {
   console.log('Mock fetch called:', url, options);
@@ -383,6 +382,26 @@ export const EditorPanel = ({
     
     loadInitialData();
   }, [cvData?.id]);
+
+  // Auto-trigger JD analysis when CV data and JD input are available but no analysis exists
+  useEffect(() => {
+    const autoTriggerAnalysis = async () => {
+      // Only auto-trigger if we have both CV data and JD input, but no existing analysis
+      if (cvData && jdInput.trim() && !analysisResults && !isAnalyzing) {
+        console.log('🤖 Auto-triggering JD analysis with available data...');
+        console.log('📊 CV Data available:', !!cvData);
+        console.log('📋 JD Input length:', jdInput.length);
+        console.log('🔍 Analysis Results:', !!analysisResults);
+        
+        // Wait a short delay to ensure UI is ready
+        setTimeout(() => {
+          handleAnalyzeJob();
+        }, 1000);
+      }
+    };
+
+    autoTriggerAnalysis();
+  }, [cvData, jdInput, analysisResults]);
   
   // Auto-save analysis results to localStorage
   useEffect(() => {
@@ -753,18 +772,7 @@ export const EditorPanel = ({
                 </div>
               )}
               
-              {/* Enhanced Keyword Analysis Display */}
-              {(matchedKeywords.length > 0 || missingKeywords.length > 0) && (
-                                 <KeywordAnalysisSection
-                   matchedKeywords={matchedKeywords}
-                   missingKeywords={{
-                     highPriority: missingKeywords.slice(0, 5), // Only show top 5 most critical
-                     mediumPriority: [] // Remove medium priority to keep it simple
-                   }}
-                   language="vi"
-                   className="w-full"
-                 />
-              )}
+              {/* JD optimization components removed - using new LLM-based CV parser */}
               
 
             </div>
@@ -866,36 +874,8 @@ export const EditorPanel = ({
                   return formattedSuggestion;
                 });
 
-                return (
-                  <SuggestionPanel
-                    key={section}
-                    sectionId={section}
-                    sectionTitle={sectionTitle}
-                    suggestions={formattedSuggestions}
-                    language="vi"
-                    onApplySuggestion={(suggestion) => handleApplySuggestion({
-                      ...suggestion,
-                      section: section,
-                      type: 'suggestion'
-                    })}
-                    onDismissSuggestion={(suggestion) => {
-                      // Handle dismissing suggestion
-                      setAnalysisResults((prev: any) => {
-                        if (!prev || !prev.suggestions) return prev;
-                        
-                        const updatedSuggestions = { ...prev.suggestions };
-                        updatedSuggestions[section] = (updatedSuggestions[section] || []).filter(
-                          (s: any) => s.id !== suggestion.id
-                        );
-                        
-                        return {
-                          ...prev,
-                          suggestions: updatedSuggestions
-                        };
-                      });
-                    }}
-                  />
-                );
+                // JD optimization SuggestionPanel removed - using new LLM-based CV parser
+                return null;
               })}
             </div>
           </div>

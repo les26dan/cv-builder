@@ -1,5 +1,17 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { UserDrawer } from './common/UserDrawer'
+import { checkAuthentication } from '../lib/auth'
+
+interface UserSession {
+  id: string
+  email: string
+  name: string
+  provider: string
+  role?: 'admin' | 'user'
+}
+
 interface HeaderMinimalProps {
   showAutosave?: boolean
   userInitial?: string
@@ -11,6 +23,32 @@ export default function HeaderMinimal({
   userInitial = 'N',
   autosaveStatus = 'saved'
 }: HeaderMinimalProps) {
+  const [user, setUser] = useState<UserSession | null>(null)
+  const [showUserDrawer, setShowUserDrawer] = useState(false)
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi')
+
+  useEffect(() => {
+    // Check authentication status on component mount
+    const checkAuthStatus = async () => {
+      try {
+        const authResult = await checkAuthentication()
+        if (authResult.isAuthenticated && authResult.user) {
+          setUser(authResult.user)
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+      }
+    }
+
+    checkAuthStatus()
+
+    // Check for saved language preference
+    const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en'
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage)
+    }
+  }, [])
+
   // Inline workspace text to avoid import issues
   const workspaceText = {
     logo: 'OkBuddy',
@@ -53,6 +91,21 @@ export default function HeaderMinimal({
 
   const autosaveDisplay = getAutosaveDisplay()
 
+  const handleAvatarClick = () => {
+    setShowUserDrawer(true)
+  }
+
+  const getUserInitial = () => {
+    if (user?.name) return user.name.charAt(0).toUpperCase()
+    if (user?.email) return user.email.charAt(0).toUpperCase()
+    return userInitial
+  }
+
+  const handleLanguageChange = (language: 'vi' | 'en') => {
+    setCurrentLanguage(language)
+    localStorage.setItem('okbuddy_language', language)
+  }
+
   return (
     <header className="w-full h-16 sm:h-20 bg-white flex items-center justify-between px-4 sm:px-6 lg:px-10 border-b border-gray-100 shadow-sm">
       {/* Logo Section */}
@@ -88,10 +141,24 @@ export default function HeaderMinimal({
         )}
 
         {/* User Avatar */}
-        <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-primary-600 transition-colors cursor-pointer">
-          {userInitial}
-        </div>
+        <button
+          onClick={handleAvatarClick}
+          className="w-8 h-8 sm:w-9 sm:h-9 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-primary-600 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+          title={user ? `${user.name || user.email} - Nhấn để mở menu` : 'Mở menu người dùng'}
+          aria-label="Mở menu người dùng"
+        >
+          {getUserInitial()}
+        </button>
       </div>
+
+      {/* User Drawer */}
+      <UserDrawer
+        isOpen={showUserDrawer}
+        onClose={() => setShowUserDrawer(false)}
+        user={user}
+        currentLanguage={currentLanguage}
+        onLanguageChange={handleLanguageChange}
+      />
     </header>
   )
 } 

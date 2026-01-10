@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { landingPage } from '../config/texts/vi/landingPage';
+import { landingPage } from '../config/texts/index';
 
 const WaitlistSection: React.FC = () => {
   const [email, setEmail] = useState('');

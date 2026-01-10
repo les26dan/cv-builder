@@ -31,10 +31,10 @@ export interface LanguageConfiguration {
   browserLocaleEnabled: boolean;
 }
 
-// Default configuration - optimized for Vietnamese market with international support
+// Default configuration - optimized for international market with English as default
 export const defaultLanguageConfig: LanguageConfiguration = {
-  defaultLanguage: 'vi',
-  fallbackLanguage: 'vi',
+  defaultLanguage: 'en',
+  fallbackLanguage: 'en',
   detectionThreshold: 0.6,
   autoDetectionEnabled: true,
   userPreferenceEnabled: true,
@@ -228,8 +228,8 @@ export class LanguageConfigManager {
     const viConfidence = viMatches / totalMatches;
     const enConfidence = enMatches / totalMatches;
 
-    // Determine language with bias towards Vietnamese (default market)
-    const detectedLanguage: SupportedLanguage = viConfidence >= enConfidence ? 'vi' : 'en';
+    // Determine language with bias towards English (default market)
+    const detectedLanguage: SupportedLanguage = enConfidence >= viConfidence ? 'en' : 'vi';
     const confidence = Math.max(viConfidence, enConfidence);
 
     return {
@@ -322,8 +322,8 @@ export class LanguageConfigManager {
    * Get browser locale safely
    */
   getBrowserLocale(): string {
-    if (typeof window === 'undefined') return 'vi-VN';
-    return navigator.language || navigator.languages?.[0] || 'vi-VN';
+    if (typeof window === 'undefined') return 'en-US';
+    return navigator.language || navigator.languages?.[0] || 'en-US';
   }
 
   /**

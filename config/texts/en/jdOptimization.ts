@@ -7,18 +7,18 @@
 export const enJDOptimizationTexts = {
   // Prerequisite validation
   prerequisite: {
-    ctaPrompt: "Want to tailor your CV to a job posting? Paste the job description to get AI suggestions.",
-    ctaButton: "Optimize CV for Job",
-    incompleteMessage: "Please complete your contact information and at least one work experience entry to use this feature.",
-    completeTooltip: "Complete your CV to unlock JD optimization features"
+    ctaPrompt: "Want to optimize your CV for a specific job posting? Paste job description to get AI suggestions.",
+    ctaButton: "Optimize CV for JD",
+    incompleteMessage: "Please complete contact information and at least one work experience to use this feature.",
+    completeTooltip: "Complete CV to unlock JD optimization feature"
   },
 
   // JD Input
   input: {
     placeholder: "Paste job description content (max 5000 characters)...",
-    label: "Target Job Description",
+    label: "Analyze JD",
     charLimit: "characters",
-    submitButton: "Analyze & Generate Suggestions",
+    submitButton: "Analyze and generate suggestions",
     viewButton: "View JD",
     removeButton: "Remove JD",
     changeButton: "Change JD"
@@ -26,19 +26,19 @@ export const enJDOptimizationTexts = {
 
   // Processing states
   processing: {
-    analyzing: "Analyzing job description and scanning your CV for optimizations...",
+    analyzing: "Analyzing job description and scanning CV for optimization...",
     generatingSuggestions: "Generating suggestions for each CV section...",
-    completed: "Complete! Check the suggestions below."
+    completed: "Complete! Check suggestions below."
   },
 
   // Error messages
   errors: {
     tooShort: "Job description too short. Please provide more details.",
     tooLong: "Job description exceeds 5000 characters. Please shorten.",
-    invalid: "Invalid content. Please check and try again.",
+    invalid: "Invalid content. Please check again.",
     networkError: "Connection error. Please try again later.",
     analysisError: "Unable to analyze JD. Please try again.",
-    retryButton: "Retry"
+    retryButton: "Try again"
   },
 
   // Success messages
@@ -52,14 +52,14 @@ export const enJDOptimizationTexts = {
   guidance: {
     optimalLength: "For best results, job description should be 200-2000 characters",
     includeDetails: "Include: skill requirements, experience, job responsibilities",
-    privacyNote: "JD information is only used for suggestions and not stored"
+    privacyNote: "JD information is only used to generate suggestions and is not stored"
   },
 
   // Section headers
   sections: {
-    summary: "AI Suggestions for Resume Summary",
+    summary: "AI Suggestions for Profile Summary",
     workExperience: "AI Suggestions for Work Experience",
-    skills: "AI Suggestions for Skills",
+    skills: "AI Suggestions for Skills", 
     education: "AI Suggestions for Education",
     noSuggestions: "No suggestions for this section"
   },
@@ -70,7 +70,7 @@ export const enJDOptimizationTexts = {
     allButton: "Apply All",
     applied: "Applied",
     applying: "Applying...",
-    failed: "Apply Failed"
+    failed: "Apply failed"
   }
 } as const;
 

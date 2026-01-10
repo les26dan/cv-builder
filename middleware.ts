@@ -73,13 +73,29 @@ async function validateCVOwnership(cvId: string, userId: string): Promise<boolea
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  // Allow all API routes and static files to pass through
-  if (
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/favicon.ico') ||
-    pathname.includes('.')
-  ) {
+  // Enhanced navigation error handling
+  try {
+    // Allow all API routes and static files to pass through
+    if (
+      pathname.startsWith('/api/') ||
+      pathname.startsWith('/_next/') ||
+      pathname.startsWith('/favicon.ico') ||
+      pathname.startsWith('/.well-known/') ||
+      pathname.includes('.') ||
+      pathname === '/robots.txt' ||
+      pathname === '/sitemap.xml'
+    ) {
+      const response = NextResponse.next()
+      
+      // Add caching headers for static assets to prevent 500 errors
+      if (pathname.startsWith('/_next/static/')) {
+        response.headers.set('Cache-Control', 'public, max-age=31536000, immutable')
+      }
+      
+      return response
+    }
+  } catch (error) {
+    console.error('Middleware error for static assets:', error)
     return NextResponse.next()
   }
   

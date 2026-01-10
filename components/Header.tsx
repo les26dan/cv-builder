@@ -1,10 +1,49 @@
 'use client';
 
-import { landingPage } from '../config/texts/vi/landingPage';
+import { useState, useEffect } from 'react';
+import { landingPage } from '../config/texts/index';
 import { handleSecondaryCTA } from '../utils/navigation';
+import { UserDrawer } from './common/UserDrawer';
+import { checkAuthentication } from '../lib/auth';
+
+interface UserSession {
+  id: string;
+  email: string;
+  name: string;
+  provider: string;
+  role?: 'admin' | 'user';
+}
 
 export default function Header() {
   const { header } = landingPage;
+  const [user, setUser] = useState<UserSession | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showUserDrawer, setShowUserDrawer] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi');
+
+  useEffect(() => {
+    // Check authentication status on component mount
+    const checkAuthStatus = async () => {
+      try {
+        const authResult = await checkAuthentication();
+        if (authResult.isAuthenticated && authResult.user) {
+          setUser(authResult.user);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Check for saved language preference
+    const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en';
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+  }, []);
 
   const handleLoginClick = () => {
     handleSecondaryCTA(); // Routes to /login
@@ -12,6 +51,22 @@ export default function Header() {
 
   const handleSignupClick = () => {
     window.location.href = '/register'; // Routes to /register
+  };
+
+  const handleAvatarClick = () => {
+    setShowUserDrawer(true);
+  };
+
+  const getUserInitial = () => {
+    if (!user) return 'U';
+    return user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
+  };
+
+  const handleLanguageChange = (language: 'vi' | 'en') => {
+    setCurrentLanguage(language);
+    // Language change implementation would go here
+    // For now, just update localStorage
+    localStorage.setItem('okbuddy_language', language);
   };
 
   return (
@@ -42,28 +97,55 @@ export default function Header() {
         </a>
       </nav>
 
-      {/* Auth Buttons */}
+      {/* Auth Buttons / User Avatar */}
       <div className="flex flex-row justify-center items-center gap-4 w-[236px] h-10">
-        {/* Login Button */}
-        <button 
-          onClick={handleLoginClick}
-          className="flex flex-row justify-center items-center w-[100px] h-10 bg-white border border-[#0288D1] rounded-lg hover:bg-[#E1F5FE] transition-colors"
-        >
-          <span className="font-inter font-medium text-sm leading-[17px] text-[#0288D1]">
-            {header.auth.login}
-          </span>
-        </button>
+        {isLoading ? (
+          // Loading state
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+        ) : user ? (
+          // Authenticated user - Show avatar
+          <button
+            onClick={handleAvatarClick}
+            className="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+            title={`${user.name || user.email} - Nhấn để mở menu`}
+            aria-label="Mở menu người dùng"
+          >
+            {getUserInitial()}
+          </button>
+        ) : (
+          // Unauthenticated user - Show login/register buttons
+          <>
+            {/* Login Button */}
+            <button 
+              onClick={handleLoginClick}
+              className="flex flex-row justify-center items-center w-[100px] h-10 bg-white border border-[#0288D1] rounded-lg hover:bg-[#E1F5FE] transition-colors"
+            >
+              <span className="font-inter font-medium text-sm leading-[17px] text-[#0288D1]">
+                {header.auth.login}
+              </span>
+            </button>
 
-        {/* Signup Button */}
-        <button 
-          onClick={handleSignupClick}
-          className="flex flex-row justify-center items-center w-[120px] h-10 bg-[#0288D1] rounded-lg hover:bg-[#0277BD] transition-colors"
-        >
-          <span className="font-inter font-medium text-sm leading-[17px] text-white">
-            {header.auth.signup}
-          </span>
-        </button>
+            {/* Signup Button */}
+            <button 
+              onClick={handleSignupClick}
+              className="flex flex-row justify-center items-center w-[120px] h-10 bg-[#0288D1] rounded-lg hover:bg-[#0277BD] transition-colors"
+            >
+              <span className="font-inter font-medium text-sm leading-[17px] text-white">
+                {header.auth.signup}
+              </span>
+            </button>
+          </>
+        )}
       </div>
+
+      {/* User Drawer */}
+      <UserDrawer
+        isOpen={showUserDrawer}
+        onClose={() => setShowUserDrawer(false)}
+        user={user}
+        currentLanguage={currentLanguage}
+        onLanguageChange={handleLanguageChange}
+      />
     </header>
   );
 }

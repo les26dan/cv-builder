@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import HeaderMinimal from '@/components/HeaderMinimal'
 import CVCard from '@/components/CVCard'
-import { workspace } from '@/config/texts/vi/workspace'
+import { workspace } from '@/config/texts/index'
 import { fetchUserCVs, createNewCV, deleteCV, CVData } from '@/lib/supabase'
 
 interface User {
