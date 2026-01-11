@@ -4,14 +4,14 @@
 
 ### Recent System Health Updates
 
-#### **ALL CRITICAL FIXES COMPLETED (January 27, 2025)**
+#### **ALL CRITICAL FIXES COMPLETED**
 1. **✅ CV Parser TypeError Fixed** - Comprehensive bulletproof type safety implemented in SummarySection.tsx
 2. **✅ Supabase 400 Error Fixed** - Smart mock user ID detection prevents database conflicts  
 3. **✅ React Key Warning Fixed** - Added unique keys for WorkExperienceSection bullet mapping
 4. **✅ State Update Warning Fixed** - Added mounted ref to prevent updates after component unmount
 5. **✅ Production Ready** - Clean builds, no warnings, stable for immediate launch
 
-#### **COMPREHENSIVE TESTING VALIDATION (January 27, 2025)**
+#### **COMPREHENSIVE TESTING VALIDATION**
 **Build & Type Safety Validation:**
 - ✅ **Production Build**: SUCCESS - No build errors, optimized bundles
 - ✅ **ESLint Validation**: Zero errors/warnings (`npm run lint -- --max-warnings 0`)
@@ -87,34 +87,34 @@
   - `features.yaml` - Product feature registry 
   - `security-audit.md` - Security posture documentation
   - `tech-debt.md` - Technical debt tracking
-  - `cursor-guide.md` - Development guidelines
+  - `biggest-lessons.md` - Critical development lessons
 
 ---
 
-## 🎨 **UI ARCHITECTURE & DESIGN SYSTEM** (Updated December 2024)
+## 🎨 **UI ARCHITECTURE & DESIGN SYSTEM**
 
 ### **Component Architecture**
 ```
 ├── components/
-│   ├── Header.tsx                 # Landing page header with user drawer (✅ ENHANCED Jan 2025)
-│   ├── HeaderCVEditor.tsx         # CV editor specialized header (✅ ENHANCED Jan 27)
-│   ├── HeaderMinimal.tsx          # CV workspace header with user drawer (✅ ENHANCED Jan 2025)
+│   ├── Header.tsx                 # Landing page header with user drawer ✅ ENHANCED
+│   ├── HeaderCVEditor.tsx         # CV editor specialized header ✅ ENHANCED
+│   ├── HeaderMinimal.tsx          # CV workspace header with user drawer ✅ ENHANCED
 │   ├── auth/
-│   │   └── Header.tsx             # Authentication pages header (✅ ENHANCED)
+│   │   └── Header.tsx             # Authentication pages header ✅ ENHANCED
 │   ├── common/
-│   │   ├── UserDrawer.tsx         # User management drawer component (✅ NEW Jan 2025)
+│   │   ├── UserDrawer.tsx         # User management drawer component ✅ NEW
 │   │   ├── AIWizardModal.tsx      # AI content generation modal
 │   │   ├── TemplateSelectionModal.tsx # Template selection modal
 │   │   └── [Other common components...]
-│   ├── CVEditor.tsx               # CV guided editing component (✅ DATA FLOW FIXED Jan 27)
-│   ├── EditorPanel.tsx            # CV editing sidebar (✅ PROFESSIONAL UI)
-│   ├── PreviewPanel.tsx           # CV preview panel (✅ LIVE PREVIEW)
-│   ├── HeroSection.tsx            # Landing page hero (✅ Production Ready)
-│   ├── Footer.tsx                 # Global footer (✅ Production Ready)
+│   ├── CVEditor.tsx               # CV guided editing component ✅ DATA FLOW FIXED
+│   ├── EditorPanel.tsx            # CV editing sidebar ✅ PROFESSIONAL UI
+│   ├── PreviewPanel.tsx           # CV preview panel ✅ LIVE PREVIEW
+│   ├── HeroSection.tsx            # Landing page hero ✅ Production Ready
+│   ├── Footer.tsx                 # Global footer ✅ Production Ready
 │   └── [Other components...]
 ```
 
-### **CV Workflow Architecture** (Updated January 27, 2025)
+### **CV Workflow Architecture**
 **Complete End-to-End CV Creation and Editing Flow**:
 
 ```
@@ -174,7 +174,7 @@ Professional UI    →    Enhanced Auth UI    →    CV Editor UI
   User Drawer        User Management        User Management
 ```
 
-### **User Management Integration** ✅ NEW (January 2025)
+### **User Management Integration** ✅ NEW
 ```
 User Authentication Status → Dynamic Header UI → User Drawer Access
         ↓                           ↓                    ↓
@@ -190,12 +190,10 @@ User Authentication Status → Dynamic Header UI → User Drawer Access
 - **Secure Sign Out**: Logout with confirmation dialog and API integration
 - **Responsive Design**: Mobile and desktop optimized
 
-### **🚨 PAGE RENDERING ARCHITECTURE** (Critical Guidelines - January 2025)
+### **Page Rendering Architecture**
+**Server-Side Rendering (SSR) Requirements**: ✅ **MANDATORY FOR ALL PAGES**
 
-#### **Server-Side Rendering (SSR) Requirements**
-**Status**: ✅ **MANDATORY FOR ALL PAGES**
-
-All OkBuddy pages MUST follow these architectural principles to prevent rendering issues:
+All OkBuddy pages follow these architectural principles:
 
 **1. Direct Component Rendering**:
 ```typescript
@@ -208,13 +206,6 @@ export default function Page() {
       <Footer />
     </div>
   );
-}
-
-// ❌ FORBIDDEN ARCHITECTURE:
-export default function Page() {
-  const [isLoaded, setIsLoaded] = useState(false);
-  useEffect(() => setIsLoaded(true), []);
-  if (!isLoaded) return <div>Loading...</div>; // BLOCKS RENDERING
 }
 ```
 
@@ -239,50 +230,6 @@ export default function RootLayout({ children }) {
 }
 ```
 
-#### **🚫 ANTI-PATTERNS TO PREVENT**
-
-**1. Loading State Gates**:
-```typescript
-// ❌ NEVER USE:
-const [mounted, setMounted] = useState(false);
-const [isLoaded, setIsLoaded] = useState(false);
-const [ready, setReady] = useState(false);
-```
-
-**2. Client-Side Conditional Rendering**:
-```typescript
-// ❌ NEVER USE:
-if (typeof window === 'undefined') return null;
-if (!mounted) return <div>Loading...</div>;
-return mounted ? <Page /> : null;
-```
-
-**3. Service Worker Integration in Components**:
-```typescript
-// ❌ NEVER USE IN PAGE COMPONENTS:
-useEffect(() => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations()...
-  }
-}, []);
-```
-
-#### **✅ MANDATORY CHECKLIST FOR ALL PAGES**
-
-**Before Deploying Any Page:**
-- [ ] Component renders immediately without useState conditions
-- [ ] No client-side mounting logic (`useEffect` for rendering)
-- [ ] Tailwind classes applied and visible in HTML output
-- [ ] `curl localhost:3000/page` shows styled HTML content
-- [ ] `npm run build` succeeds without warnings
-- [ ] Page works with JavaScript disabled (SSR)
-
-**Component Development Rules:**
-- [ ] Use server components by default (`export default function`)
-- [ ] Add `'use client'` only when absolutely necessary
-- [ ] Import text content from `/config/texts/` (no hardcoding)
-- [ ] Test both SSR and client-side hydration
-
 ---
 
 ## 📁 **UNIFIED FILE STRUCTURE**
@@ -290,39 +237,39 @@ useEffect(() => {
 ```
 /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/
 ├── app/                           # Next.js 15 App Router
-│   ├── page.tsx                   # Landing page (✅ Production Ready + UI Restored)
-│   ├── login/page.tsx             # Login page (✅ Production Ready + Enhanced UI)
-│   ├── register/page.tsx          # Registration page (✅ Production Ready + Enhanced UI)
-│   ├── cv-workspace/page.tsx      # CV workspace dashboard (✅ Production Ready)
-│   ├── cv-upload/page.tsx         # CV & JD upload interface (✅ Production Ready)
-│   └── cv-guided-editing/[cvId]/page.tsx  # CV editor (✅ Production Ready)
+│   ├── page.tsx                   # Landing page ✅ Production Ready + UI Restored
+│   ├── login/page.tsx             # Login page ✅ Production Ready + Enhanced UI
+│   ├── register/page.tsx          # Registration page ✅ Production Ready + Enhanced UI
+│   ├── cv-workspace/page.tsx      # CV workspace dashboard ✅ Production Ready
+│   ├── cv-upload/page.tsx         # CV & JD upload interface ✅ Production Ready
+│   └── cv-guided-editing/[cvId]/page.tsx  # CV editor ✅ Production Ready
 │   └── api/                       # API Routes (14 endpoints)
 │       ├── auth/                  # OAuth & authentication
 │       │   ├── google/signin/route.ts      # Google OAuth
 │       │   ├── google/callback/route.ts   # Google OAuth callback
 │       │   ├── linkedin/signin/route.ts   # LinkedIn OAuth
 │       │   ├── linkedin/callback/route.ts # LinkedIn OAuth callback
-│       │   ├── me/route.ts                # Session validation (✅ NEW)
-│       │   └── logout/route.ts            # Session termination (✅ NEW)
+│       │   ├── me/route.ts                # Session validation ✅ NEW
+│       │   └── logout/route.ts            # Session termination ✅ NEW
 │       ├── login/route.ts         # Email/password authentication
 │       ├── register/route.ts      # User registration with validation
 │       ├── captcha/route.ts       # Security CAPTCHA validation
 │       ├── test-accounts/route.ts # Development utilities
-│       ├── cv/[cvId]/route.ts     # CV data operations with ownership (✅ NEW)
-│       └── upload/cv/route.ts     # File upload with processing (✅ NEW)
+│       ├── cv/[cvId]/route.ts     # CV data operations with ownership ✅ NEW
+│       └── upload/cv/route.ts     # File upload with processing ✅ NEW
 ├── components/                    # React components
-│   ├── Header.tsx                 # Landing Page header (✅ RESTORED December 2024)
+│   ├── Header.tsx                 # Landing Page header ✅ RESTORED
 │   ├── HeaderMinimal.tsx          # Workspace/app header
-│   ├── HeaderCVEditor.tsx         # CV Editor specific header (✅ NEW)
+│   ├── HeaderCVEditor.tsx         # CV Editor specific header ✅ NEW
 │   ├── auth/                      # Authentication components
 │   ├── common/                    # Shared UI components
 │   ├── sections/                  # CV section components
 │   └── jdOptimization/           # JD analysis components
-├── middleware.ts                 # Route protection & authorization (✅ Edge Runtime)
+├── middleware.ts                 # Route protection & authorization ✅ Edge Runtime
 ├── lib/                          # Core services
 │   ├── supabase.ts               # Database operations (consolidated)
-│   ├── fileProcessing.ts         # PDF/DOCX text extraction (✅ NEW)
-│   ├── auth.ts                   # Client-side auth utilities (✅ NEW)
+│   ├── fileProcessing.ts         # PDF/DOCX text extraction ✅ NEW
+│   ├── auth.ts                   # Client-side auth utilities ✅ NEW
 │   ├── password.ts               # Security utilities
 │   ├── email.ts                  # Email service
 │   └── rateLimit.ts              # API protection
@@ -334,8 +281,8 @@ useEffect(() => {
 │   ├── texts/vi/                 # Vietnamese localization
 │   └── environment.ts            # Environment config
 ├── utils/                        # Utility functions
-│   └── navigation.ts             # CTA routing utilities (✅ UPDATED)
-├── docs/                         # Production deployment documentation (✅ NEW)
+│   └── navigation.ts             # CTA routing utilities ✅ UPDATED
+├── docs/                         # Production deployment documentation ✅ NEW
 │   ├── database-schema.sql       # Complete Supabase schema
 │   ├── database-readiness-assessment.md # Production DB analysis
 │   └── environment-config.env    # Production environment template
@@ -343,7 +290,8 @@ useEffect(() => {
     ├── system-architecture.md    # This file
     ├── features.yaml             # Feature registry
     ├── security-audit.md         # Security documentation
-    └── tech-debt.md              # Technical debt tracking
+    ├── tech-debt.md              # Technical debt tracking
+    └── biggest-lessons.md        # Critical development lessons
 ```
 
 ---
@@ -364,7 +312,7 @@ useEffect(() => {
 - **Environment**: Production configuration ready
 - **Mock Fallback**: Development support
 
-### **File Storage System** (✅ NEW - January 2025)
+### **File Storage System** ✅ NEW
 - **Primary**: Vercel Blob Storage
 - **Features**: Serverless file storage via Vercel Edge Network
 - **Organization**: User-isolated file structure (`cv-files/{userId}/`)
@@ -383,7 +331,7 @@ useEffect(() => {
 
 ---
 
-## 🎨 **UI RESTORATION STATUS** (December 2024)
+## 🎨 **UI RESTORATION STATUS**
 
 ### **✅ COMPLETED: Landing Page Header Restoration**
 **Component**: `/components/Header.tsx`  
@@ -417,13 +365,13 @@ HeaderCVEditor.tsx  // CV editing interface header
 - **Build Size**: Optimized component structure
 
 ### **🔄 PENDING UI RESTORATION**
-- **Authentication Pages**: Login/Register header improvements ✅ COMPLETED (January 2025)
-- **CV Workspace**: Enhanced dashboard header ✅ COMPLETED (January 2025)
-- **CV Upload**: Professional upload interface header ✅ COMPLETED (January 2025)
-- **CV Guided Editing**: Advanced editing interface (highest priority) ✅ COMPLETED (January 2025)
-- **Terms of Service**: New page with consistent header ✅ COMPLETED (January 2025)
+- **Authentication Pages**: Login/Register header improvements ✅ COMPLETED
+- **CV Workspace**: Enhanced dashboard header ✅ COMPLETED
+- **CV Upload**: Professional upload interface header ✅ COMPLETED
+- **CV Guided Editing**: Advanced editing interface (highest priority) ✅ COMPLETED
+- **Terms of Service**: New page with consistent header ✅ COMPLETED
 
-### **👑 ADMIN SYSTEM ARCHITECTURE** ✅ IMPLEMENTED (January 2025)
+### **👑 ADMIN SYSTEM ARCHITECTURE** ✅ IMPLEMENTED
 
 **Admin Dashboard Components**:
 ```typescript
@@ -466,12 +414,12 @@ Admin Credentials → Role Detection → Session with Admin Role → Dashboard A
 User → OAuth/Email Auth → API Routes → Role Detection → Database → Session Storage → Protected Routes
 ```
 
-### **Admin Authentication Flow** ✅ NEW (January 2025)
+### **Admin Authentication Flow** ✅ NEW
 ```
 Admin Login → Username/Email Mapping → Role Assignment → Admin Session → Dashboard Access
 ```
 
-### **Landing Page User Journey** (✅ RESTORED)
+### **Landing Page User Journey** ✅ RESTORED
 ```
 Landing Page → Professional Header → Auth Buttons → Login/Register → Role-Based Redirect
 ```
@@ -629,16 +577,16 @@ git push origin main → Vercel Build → Production Deploy
 
 ## 🚨 **CRITICAL ALERTS & SYSTEM STATUS**
 
-### **Production Ready Status: ✅ RESOLVED - ALL CRITICAL ISSUES FIXED** (January 27, 2025)
+### **Production Ready Status: ✅ RESOLVED - ALL CRITICAL ISSUES FIXED**
 
 #### **🟢 RESOLVED CRITICAL ISSUES**
-1. **✅ CV Parser TypeError Fixed** (January 27, 2025)
+1. **✅ CV Parser TypeError Fixed**
    - **Issue**: `TypeError: _data_content.trim is not a function` in production
    - **Impact**: Application crash loops prevented CV editing functionality  
    - **Resolution**: Implemented bulletproof type safety in `SummarySection.tsx` and `CVEditor.tsx`
    - **Status**: ✅ PRODUCTION READY - Build successful, type safety ensured
 
-2. **✅ Supabase 400 Error Fixed** (January 27, 2025)
+2. **✅ Supabase 400 Error Fixed**
    - **Issue**: Mock user IDs causing database query failures
    - **Impact**: Console errors and data loading issues  
    - **Resolution**: Smart mock detection in `lib/supabase.ts`
@@ -659,7 +607,7 @@ git push origin main → Vercel Build → Production Deploy
 
 ---
 
-## 🚀 **RECENT PRODUCTION IMPLEMENTATIONS** (December 2024)
+## 🚀 **RECENT PRODUCTION IMPLEMENTATIONS**
 
 ### **✅ Critical Security & Authorization System**
 - **Middleware Protection**: Edge Runtime compatible route protection (`middleware.ts`)
@@ -698,23 +646,7 @@ git push origin main → Vercel Build → Production Deploy
 
 ---
 
-## 📞 **SYSTEM CONTACTS & DOCUMENTATION**
-
-### **Key Documentation**
-- **API Documentation**: `/api` endpoints with TypeScript interfaces
-- **Component Library**: React components with PropTypes
-- **Database Schema**: Supabase table definitions
-- **Environment Setup**: Development environment guide
-
-### **Monitoring & Alerts**
-- **Build Status**: Vercel dashboard
-- **Error Tracking**: Console logs and structured errors
-- **Performance**: Next.js analytics
-- **Security**: Rate limiting and audit logs
-
----
-
-## 📄 **CV PARSING SYSTEM** (Enhanced January 27, 2025)
+## 📄 **CV PARSING SYSTEM**
 
 ### **Enhanced File Processing Architecture**
 ```
@@ -782,7 +714,7 @@ When PDF parsing fails, the system:
 
 ---
 
-### **🤖 LLM-BASED CV PARSER SERVICE** ✅ **PRODUCTION READY** (January 27, 2025)
+### **🤖 LLM-BASED CV PARSER SERVICE** ✅ **PRODUCTION READY**
 
 #### **Service Architecture**
 **Location**: `/shared/services/cvParserService.ts`  
@@ -807,7 +739,7 @@ export const cvParserService = CVParserService.getInstance();
 **Integration**: Direct service import with file processing pipeline
 
 ```typescript
-// LLM CV Parsing Integration Pattern (January 27, 2025)
+// LLM CV Parsing Integration Pattern
 import { cvParserService, type CVParsingResponse } from '@/shared/services/cvParserService';
 
 // Working Parsing Flow
@@ -825,7 +757,7 @@ File Upload → Text Extraction → LLM CV Parser → Confidence Scoring → Nav
    PDF/DOCX      File Text      ChatGPT API      Score >=5?        Success/Error        Data Population
 ```
 
-#### **Bilingual Prompt System (January 27, 2025)**
+#### **Bilingual Prompt System**
 **Language Support**: Vietnamese and English prompts following LLM specification
 
 ```typescript
@@ -859,7 +791,7 @@ if (parsedData.possibility_score >= 5) {
 
 ---
 
-## 🚀 **PORT UNIFICATION & SERVER OPTIMIZATION** ✅ IMPLEMENTED (January 2025)
+## 🚀 **PORT UNIFICATION & SERVER OPTIMIZATION** ✅ IMPLEMENTED
 
 ### **Unified Port 3000 Architecture** ✅ COMPLETED
 **Status**: ✅ **PRODUCTION READY - PORT CONFLICTS ELIMINATED**
@@ -929,7 +861,7 @@ Total Startup Time: ~12-18 seconds
 - **Better Error Handling**: Clear feedback and faster failure detection
 - **Emergency Recovery**: Optimized recovery mode for quick fixes
 
-### **PERSISTENT BACKGROUND SERVER SYSTEM** ✅ IMPLEMENTED (January 2025)
+### **PERSISTENT BACKGROUND SERVER SYSTEM** ✅ IMPLEMENTED
 **Status**: ✅ **BULLETPROOF SERVER PERSISTENCE - NEVER DIES**
 
 The OkBuddy application now features a **completely redesigned server management system** that ensures 100% reliable background operation, eliminating the persistent server death issues.
@@ -1012,7 +944,7 @@ fi
 
 ---
 
-## 🎯 **ARCHITECTURE VALIDATION & TESTING** ✅ PRODUCTION READY (January 2025)
+## 🎯 **ARCHITECTURE VALIDATION & TESTING** ✅ PRODUCTION READY
 
 ### **Comprehensive QA Results** ✅ TENET 5 COMPLIANCE
 **Status**: ✅ **PRODUCTION READY - 72% TEST SUCCESS RATE**
@@ -1059,4 +991,77 @@ curl testing    # ✅ All endpoints responding correctly
 
 ---
 
-*This document serves as the authoritative reference for OkBuddy's unified system architecture. Updated December 2024 with Landing Page UI restoration details.* 
+## 🌐 **LANGUAGE SYSTEM UPGRADE** ✅ ENGLISH DEFAULT IMPLEMENTATION
+
+### **Language System Features** ✅ COMPREHENSIVE UPGRADE
+**System Architecture**:
+- **Default Language**: Changed from Vietnamese to English for international market ✅ IMPLEMENTED
+- **Dynamic Text Loading**: Component-level language imports with fallback system ✅ IMPLEMENTED
+- **AI Prompt Selection**: English-first prompt selection for AI services ✅ IMPLEMENTED
+- **Language Detection**: Enhanced content-based language analysis ✅ IMPLEMENTED
+- **User Preference**: Persistent language selection with localStorage ✅ IMPLEMENTED
+
+**Language Infrastructure**:
+- **English Text Files**: Complete English translation of all UI text (8 new files) ✅ CREATED
+- **Centralized Text System**: Dynamic import system with caching ✅ IMPLEMENTED
+- **Fallback System**: Graceful degradation to Vietnamese if needed ✅ IMPLEMENTED
+- **Component Updates**: All components updated to use dynamic text imports ✅ IMPLEMENTED
+- **AI Service**: Language-aware prompt selection with English default ✅ IMPLEMENTED
+
+**Production Impact**:
+- **International Ready**: System optimized for global users ✅ READY
+- **JD Parser**: English-first job description analysis ✅ OPTIMIZED
+- **CV Guided Editing**: English prompts for AI content generation ✅ OPTIMIZED
+- **Language Toggle**: EN/VI switching in user drawer ✅ FUNCTIONAL
+- **Backward Compatibility**: Vietnamese support maintained ✅ PRESERVED
+
+**Quality Assurance**:
+- **Build Success**: Zero TypeScript errors, zero warnings ✅ VERIFIED
+- **ESLint Clean**: Zero linting errors or warnings ✅ VERIFIED
+- **Bundle Size**: Reasonable (<500KB) for main features ✅ OPTIMIZED
+- **Component Safety**: All dynamic imports working correctly ✅ TESTED
+
+**Files Created**:
+- `/config/texts/en/landingPage.ts` ✅ Landing page English text
+- `/config/texts/en/account.ts` ✅ Authentication English text
+- `/config/texts/en/workspace.ts` ✅ CV workspace English text
+- `/config/texts/en/cvUpload.ts` ✅ CV upload English text
+- `/config/texts/en/userDrawer.ts` ✅ User drawer English text
+- `/config/texts/en/jdAnalysis.ts` ✅ JD analysis English text
+- `/config/texts/en/workExperienceWizard.ts` ✅ Work experience English text
+- `/config/texts/en/jdOptimization.ts` ✅ JD optimization English text
+- `/config/texts/en/aiPrompts.ts` ✅ AI prompts English text
+- `/config/texts/en/mobileBlocking.ts` ✅ Mobile blocking English text
+
+**Technical Implementation**:
+- **Language Config**: Default changed from 'vi' to 'en' in languageConfig.ts ✅ UPDATED
+- **AI Service**: Prompt selection logic updated for English-first ✅ UPDATED
+- **Text Index**: Dynamic loading system with English defaults ✅ UPDATED
+- **Component Imports**: All hardcoded imports replaced with dynamic system ✅ UPDATED
+- **Detection Logic**: English bias in automatic language detection ✅ UPDATED
+
+**Deployment Safety**:
+- **Zero Breaking Changes**: All existing Vietnamese functionality preserved ✅ SAFE
+- **Graceful Fallbacks**: Missing translations fall back appropriately ✅ ROBUST
+- **Build Verification**: Production build succeeds with zero errors ✅ VERIFIED
+- **Type Safety**: All new files properly typed and validated ✅ SAFE
+
+---
+
+## 📞 **SYSTEM CONTACTS & DOCUMENTATION**
+
+### **Key Documentation**
+- **API Documentation**: `/api` endpoints with TypeScript interfaces
+- **Component Library**: React components with PropTypes
+- **Database Schema**: Supabase table definitions
+- **Environment Setup**: Development environment guide
+
+### **Monitoring & Alerts**
+- **Build Status**: Vercel dashboard
+- **Error Tracking**: Console logs and structured errors
+- **Performance**: Next.js analytics
+- **Security**: Rate limiting and audit logs
+
+---
+
+*This document serves as the authoritative reference for OkBuddy's unified system architecture.* 

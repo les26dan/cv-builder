@@ -1,5 +1,3 @@
-# **Popular Commands**
-
 # *Tasks Update*
 Update the Tasks.md file to marking what we have implemented being completed. If an entire task (with all of its subtasks) is completed, move it down to the Completed Tasks section.
 
@@ -216,7 +214,7 @@ Then, ensure what we have implemented passes Heimdall Compliance:
   - New changes in components, features & their use are registered in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/features.yaml`
   - If your implementation touched sensitive flows (PII, auth, input validation ...), update `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/security-audit.md`
   - Any technical debt, skipped test, ad-hoc workaround or quick fix noted in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/tech-debt.md`. This serves as a dictionary/ audit log for all of our accumulated known code smell, TODOs, skipped tests.
-
+  - Carefully check the LESSON INCLUSION CRITERIA in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/biggest-lessons.md` and ONLY IF they pass the criteria, record our biggest, most important, critical lessons, insights we've learned during our entire implementation in this session. If NOT, skip this step. 
 
 # *Project Testing*
 
