@@ -1,41 +1,27 @@
 // Dynamic imports to avoid build issues
-const pdfParse = async () => {
+const loadPDFjs = async () => {
   try {
     // Handle Next.js server environment properly
     if (typeof window === 'undefined') {
-      console.log('🔍 Attempting to load PDF parsing library...');
-      
-      // Try multiple import strategies for better compatibility
-      let pdfParseLib;
+      console.log('🔍 Loading PDF.js library for high-quality text extraction...');
       
       try {
-        // First try: dynamic import
-        const dynamicImport = await import('pdf-parse');
-        pdfParseLib = dynamicImport.default || dynamicImport;
-        console.log('✅ PDF library loaded via dynamic import');
-      } catch (dynamicError) {
-        console.log('⚠️ Dynamic import failed, trying require...');
-        
-        try {
-          // Second try: require (using dynamic require to bypass eslint)
-          pdfParseLib = eval('require')('pdf-parse');
-          console.log('✅ PDF library loaded via require');
-        } catch (requireError) {
-          const errorMessage = requireError instanceof Error ? requireError.message : 'Unknown require error';
-          console.log('❌ Both import methods failed:', errorMessage);
-          return null;
-        }
+                 // Import PDF.js library (using legacy build for Node.js)
+         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+         console.log('✅ PDF.js library loaded successfully');
+         return pdfjsLib;
+      } catch (importError) {
+        const errorMessage = importError instanceof Error ? importError.message : 'Unknown import error';
+        console.log('❌ PDF.js import failed:', errorMessage);
+        return null;
       }
-      
-      console.log('📚 PDF parse library type:', typeof pdfParseLib);
-      return pdfParseLib;
     } else {
       // Client-side (should not be used but fallback)
       throw new Error('PDF parsing only available on server');
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.warn('❌ PDF parsing library not available:', errorMessage);
+    console.warn('❌ PDF.js library not available:', errorMessage);
     return null;
   }
 }
@@ -90,69 +76,140 @@ export interface EnhancedParsingResult {
 }
 
 /**
- * Extract text from PDF files using pdf-parse (primary) or pdf-lib (fallback)
+ * Extract text from PDF files using PDF.js for high-quality text extraction
  */
 async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
   try {
-    // Try primary method: pdf-parse
-    const parse = await pdfParse()
-    if (parse) {
-      console.log('📄 PDF parsing library loaded successfully, extracting text...')
-      try {
-        const data = await parse(buffer)
-        console.log(`✅ PDF text extracted: ${data.text.length} characters from ${data.numpages} pages`)
-        
-        return {
-          success: true,
-          text: data.text,
-          metadata: {
-            pageCount: data.numpages,
-            wordCount: data.text.split(/\s+/).length,
-            fileType: 'pdf'
-          }
-        }
-      } catch (parseError) {
-        const errorMessage = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
-        console.log('⚠️ pdf-parse failed, trying fallback method...', errorMessage);
-        // Continue to fallback method below
-      }
+    // Load PDF.js library
+    const pdfjsLib = await loadPDFjs();
+    if (!pdfjsLib) {
+      console.log('❌ PDF.js not available, falling back to filename analysis');
+      return {
+        success: false,
+        error: 'PDF.js library not available - using enhanced filename analysis'
+      };
     }
 
-    // Fallback method: pdf-lib (better Next.js compatibility)
-    console.log('🔄 Attempting fallback PDF processing with pdf-lib...');
+    console.log('📄 PDF.js loaded successfully, extracting text with high quality...');
+    
     try {
-      const { PDFDocument } = await import('pdf-lib');
-      const pdfDoc = await PDFDocument.load(buffer);
-      const pageCount = pdfDoc.getPageCount();
+      // Load PDF document
+      const pdf = await pdfjsLib.getDocument({ 
+        data: new Uint8Array(buffer),
+        verbosity: 0 // Reduce console noise
+      }).promise;
       
-      // pdf-lib doesn't extract text directly, but we can get basic info
-      console.log(`📋 PDF loaded with pdf-lib: ${pageCount} pages`);
+      console.log(`📋 PDF loaded: ${pdf.numPages} pages`);
       
-      return {
-        success: false, // We couldn't extract text, but we have metadata
-        error: 'Text extraction not available - using enhanced filename analysis',
-        metadata: {
-          pageCount,
-          wordCount: 0,
-          fileType: 'pdf'
+      let fullText = '';
+      
+      // Extract text from each page
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        try {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          
+          // Extract text items with proper positioning and line breaks
+          const textItems = textContent.items
+            .filter((item: any) => item.str && typeof item.str === 'string')
+            .map((item: any) => ({
+              text: item.str.trim(),
+              x: item.transform[4],
+              y: item.transform[5]
+            }))
+            .filter((item: any) => item.text.length > 0);
+          
+          // Sort by Y position (top to bottom) then X position (left to right)
+          textItems.sort((a, b) => {
+            const yDiff = b.y - a.y; // Reverse Y (PDF coordinates are bottom-up)
+            if (Math.abs(yDiff) > 5) return yDiff; // Different lines
+            return a.x - b.x; // Same line, sort by X
+          });
+          
+          // Group text items by approximate line position
+          const lines: string[] = [];
+          let currentLine = '';
+          let lastY = textItems[0]?.y || 0;
+          
+          for (const item of textItems) {
+            // If Y position changed significantly, start new line
+            if (Math.abs(item.y - lastY) > 5) {
+              if (currentLine.trim()) {
+                lines.push(currentLine.trim());
+              }
+              currentLine = item.text;
+            } else {
+              // Same line, add with space
+              currentLine += (currentLine ? ' ' : '') + item.text;
+            }
+            lastY = item.y;
+          }
+          
+          // Add the last line
+          if (currentLine.trim()) {
+            lines.push(currentLine.trim());
+          }
+          
+          // Join lines with proper line breaks
+          const pageText = lines.join('\n');
+          if (pageText.trim()) {
+            fullText += pageText + '\n\n';
+          }
+          
+          console.log(`📄 Page ${pageNum}: Extracted ${pageText.length} characters`);
+        } catch (pageError) {
+          console.warn(`⚠️ Failed to extract text from page ${pageNum}:`, pageError);
+          // Continue with other pages
         }
       }
-    } catch (fallbackError) {
-      const errorMessage = fallbackError instanceof Error ? fallbackError.message : 'Unknown fallback error';
-      console.log('❌ Fallback PDF processing also failed:', errorMessage);
+      
+      // Clean up the extracted text
+      const cleanedText = fullText
+        .replace(/\n{3,}/g, '\n\n') // Remove excessive line breaks
+        .replace(/\s{2,}/g, ' ')    // Replace multiple spaces with single space
+        .trim();
+      
+      console.log(`✅ PDF.js extraction complete: ${cleanedText.length} characters from ${pdf.numPages} pages`);
+      
+      if (cleanedText.length === 0) {
+        return {
+          success: false,
+          error: 'No text content found in PDF - may be image-based',
+          metadata: {
+            pageCount: pdf.numPages,
+            wordCount: 0,
+            fileType: 'pdf'
+          }
+        };
+      }
+      
+      return {
+        success: true,
+        text: cleanedText,
+        metadata: {
+          pageCount: pdf.numPages,
+          wordCount: cleanedText.split(/\s+/).length,
+          fileType: 'pdf'
+        }
+      };
+      
+    } catch (extractError) {
+      const errorMessage = extractError instanceof Error ? extractError.message : 'Unknown extraction error';
+      console.error('❌ PDF.js text extraction failed:', errorMessage);
       
       return {
         success: false,
-        error: `All PDF extraction methods failed - will use enhanced filename analysis instead`
-      }
+        error: `PDF.js extraction failed: ${errorMessage} - will use filename analysis instead`
+      };
     }
+    
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('❌ PDF text extraction failed:', errorMessage)
+    console.error('❌ PDF text extraction failed:', errorMessage);
     return {
       success: false,
       error: `PDF extraction failed: ${errorMessage} - will use filename analysis instead`
-    }
+    };
   }
 }
 

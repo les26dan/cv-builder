@@ -34,15 +34,41 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Local state management
   const [cvData, setCvData] = useState<CVData>(() => {
-    // Priority-based data initialization (enhanced for parsing integration)
+    // Simple initial state - avoid complex computation here
     if (initialData) {
       console.log('🔄 CVEditor: Using provided initialData');
       return initialData;
     }
     
-    // Check for uploaded CV data in localStorage first (for upload flow)
+    // Default empty CV structure
+    console.log('🔄 CVEditor: Using default empty CV structure');
+    return {
+      id: cvId, // Include cvId if provided
+      contact: { fullName: '', email: '', phone: '', location: '', linkedin: '' },
+      summary: { content: '' },
+      experience: { items: [] },
+      skills: { items: [] },
+      education: { items: [] },
+      sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
+      sectionTitles: {
+        contact: 'Thông tin liên hệ',
+        summary: 'Tóm tắt',
+        experience: 'Kinh nghiệm làm việc',
+        skills: 'Kỹ năng',
+        education: 'Học vấn'
+      }
+    };
+  });
+
+  // Load uploaded CV data from localStorage in useEffect
+  useEffect(() => {
+    // Skip if initialData is provided or if we already have data
+    if (initialData || (cvData.contact?.fullName && cvData.experience?.items?.length > 0)) {
+      return;
+    }
+
+    // Check for uploaded CV data in localStorage
     if (cvId && typeof window !== 'undefined') {
-      // Try loading uploaded CV data with cvId key
       const uploadDataKey = `cv_upload_${cvId}`;
       const uploadDataGeneric = 'cv_upload_data';
       
@@ -64,8 +90,8 @@ export const CVEditor: React.FC<CVEditorProps> = ({
             
             // Prioritize LLM-parsed structured CV data over basic extraction
             const structuredCV = parsed.structuredCV;
-            console.log('🔍 CVEditor: Structured CV data:', structuredCV);
-            console.log('🔍 CVEditor: Skills data:', structuredCV.skills);
+            console.log('🔍 CVEditor: Structured CV data:', JSON.stringify(structuredCV, null, 2));
+            console.log('🔍 CVEditor: Skills data:', JSON.stringify(structuredCV.skills, null, 2));
             
             const transformedData: CVData = {
               id: cvId,
@@ -107,7 +133,10 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               }
             };
             
-            console.log('✅ CVEditor: Transformed uploaded CV data for editing:', transformedData);
+            console.log('✅ CVEditor: Transformed uploaded CV data for editing:', JSON.stringify(transformedData, null, 2));
+            
+            // Update state with transformed data
+            setCvData(transformedData);
             
             // Check if this was a successful LLM parsing
             if (parsed.llmParsedData && parsed.llmParsedData.possibility_score >= 5) {
@@ -117,39 +146,19 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               // Auto-hide after 5 seconds
               setTimeout(() => setShowParsingSuccess(false), 6000);
             }
-            
-            return transformedData;
           }
         }
       } catch (error) {
         console.warn('⚠️ CVEditor: Error loading uploaded CV data:', error);
       }
     }
-    
+
+    // Check workflow context data as fallback
     if (state.cvData && Object.keys(state.cvData).length > 0) {
       console.log('🔄 CVEditor: Using CV workflow context data');
-      return state.cvData as CVData;
+      setCvData(state.cvData as CVData);
     }
-    
-    // Default empty CV structure
-    console.log('🔄 CVEditor: Using default empty CV structure');
-    return {
-      id: cvId, // Include cvId if provided
-      contact: { fullName: '', email: '', phone: '', location: '', linkedin: '' },
-      summary: { content: '' },
-      experience: { items: [] },
-      skills: { items: [] },
-      education: { items: [] },
-      sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
-      sectionTitles: {
-        contact: 'Thông tin liên hệ',
-        summary: 'Tóm tắt',
-        experience: 'Kinh nghiệm làm việc',
-        skills: 'Kỹ năng',
-        education: 'Học vấn'
-      }
-    };
-  });
+  }, [cvId, initialData, state.cvData]); // Only re-run when these specific dependencies change
 
   // JD Optimization removed - using new LLM-based CV parser
 

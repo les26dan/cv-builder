@@ -6,8 +6,8 @@
    - CV Upload
    - CV Guided Editing
    - CV Workflow Integration
-- The focus of our initiative is to completely remove the existing JD parser logic and function, which is completely broken and does NOT pass production quality, directly blocking our product launch. Instead, we will use LLM to effectively handle this, similarly to how the CV Guided Editing page walks the users step-by-step, calls ChatGPT API with prompts, receives the results and displays on the system.
-- Review the LLM Specs: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/LLM Prompts Spec.md'
+- The focus of our initiative is to improve the existing JD parser logic and function, which is blocking our product launch. We are using LLM to effectively handle this, similarly to how the CV Guided Editing page walks the users step-by-step, calls ChatGPT API with prompts, receives the results and displays on the system.
+- Review the LLM Specs: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/LLM Prompts Spec.md' - ## *Feature 7: CV Parser* for specific prompts used
 - Project Acceptance criteria:
 Input: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Materials/Documents/Sample CVs/Kien Vu Sr. Product Manager (Jan 2025).pdf'
 Output:
@@ -103,8 +103,6 @@ Output:
 2) Texts output correctly parsed & displayed on CV Editor panel and CV Preview panel of CV Guided Editing Page.
 - Let me know once you have fully understood the context here. Do not proceed to make any change yet.
 
-- You need to:
-+ Completely remove all existing JD parsing logic, component to avoid conflict with new logic. Proceed with extreme care & caution - you must NOT touch any other logic, component & feature.
 + Implement the CV attachment sent to ChatGPT API
 + Implement the prompts sent to ChatGPT API, depending the system's language being used
 + Implement the system's logic to handle the returned JSON. 
@@ -123,6 +121,7 @@ Network Error Handling:
 
 - Important note:
 + System language (user preferral - the langugage users are comfortable updating their CV with) vs user’s content language (Users Uploaded CV, CV Guided Editing content) must be handled separately. For example, a Vietnamese user might be preparing their CV in English for a foreign company must still prefer to do so (preparing CV) in Vietnamese.
+- With that, prepare a comprehensive, accurate to-dos and proceed with implementation
 
 
 *Careful Documentation*

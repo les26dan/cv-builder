@@ -71,6 +71,12 @@ interface OpenAIResponse {
   };
 }
 
+interface ChatGPTResult {
+  content: string;
+  tokens: number;
+  cost: number;
+}
+
 /**
  * CV Parser Service using ChatGPT API
  * Following LLM specification for CV parsing and confidence scoring
@@ -79,8 +85,15 @@ export class CVParserService {
   private static instance: CVParserService;
   private readonly openaiApiKey: string;
   private readonly openaiApiUrl = 'https://api.openai.com/v1/chat/completions';
-  private cache = new Map<string, { data: CVParsingResponse; timestamp: number }>();
+  private cache = new Map<string, { data: CVParsingResponse; timestamp: number; tokens: number }>();
   private readonly cacheTimeout = 10 * 60 * 1000; // 10 minutes
+  private costTracker = {
+    totalRequests: 0,
+    totalTokensUsed: 0,
+    totalCost: 0,
+    sessionsToday: 0,
+    lastResetDate: new Date().toDateString()
+  }
 
   private constructor() {
     // Use the same OpenAI API key configuration as other services
@@ -93,6 +106,39 @@ export class CVParserService {
       CVParserService.instance = new CVParserService();
     }
     return CVParserService.instance;
+  }
+
+  /**
+   * Update cost tracking with daily reset functionality
+   */
+  private updateCostTracking(tokens: number, cost: number): void {
+    const today = new Date().toDateString();
+    
+    // Reset daily counters if it's a new day
+    if (this.costTracker.lastResetDate !== today) {
+      this.costTracker.sessionsToday = 0;
+      this.costTracker.lastResetDate = today;
+    }
+    
+    this.costTracker.totalRequests += 1;
+    this.costTracker.totalTokensUsed += tokens;
+    this.costTracker.totalCost += cost;
+    this.costTracker.sessionsToday += 1;
+  }
+
+  /**
+   * Get current cost tracking statistics
+   */
+  public getCostStats() {
+    return {
+      ...this.costTracker,
+      averageCostPerRequest: this.costTracker.totalRequests > 0 
+        ? this.costTracker.totalCost / this.costTracker.totalRequests 
+        : 0,
+      averageTokensPerRequest: this.costTracker.totalRequests > 0
+        ? this.costTracker.totalTokensUsed / this.costTracker.totalRequests
+        : 0
+    };
   }
 
   /**
@@ -220,9 +266,9 @@ Mandatory requirements for your response:
   }
 
   /**
-   * Make ChatGPT API request with error handling
+   * Make ChatGPT API request with error handling and cost tracking
    */
-  private async callChatGPT(messages: ChatMessage[], retryCount = 0): Promise<string> {
+  private async callChatGPT(messages: ChatMessage[], retryCount = 0): Promise<ChatGPTResult> {
     const maxRetries = 2;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -248,7 +294,7 @@ Mandatory requirements for your response:
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages,
-          max_tokens: 2000, // Reduced from 4000 to 2000 for faster response
+          max_tokens: 3000, // Increased for full CV processing with detailed responses
           temperature: 0.1
         }),
         signal: controller.signal
@@ -268,15 +314,24 @@ Mandatory requirements for your response:
         throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
       }
 
-      const result = await response.json();
+      const result: OpenAIResponse = await response.json();
       const content = result.choices?.[0]?.message?.content || '';
+      const usage = result.usage;
+      const tokens = usage?.total_tokens || 0;
+      const cost = tokens * 0.001; // gpt-4o-mini pricing: ~$0.001 per 1K tokens
+      
+      // Update cost tracking
+      this.updateCostTracking(tokens, cost);
       
       console.log('✅ CV Parser: OpenAI response received', {
         contentLength: content.length,
-        contentPreview: content.substring(0, 100) + '...'
+        contentPreview: content.substring(0, 100) + '...',
+        tokensUsed: tokens,
+        estimatedCost: `$${cost.toFixed(4)}`,
+        totalCostToday: `$${this.costTracker.totalCost.toFixed(4)}`
       });
       
-      return content;
+      return { content, tokens, cost };
 
     } catch (error: any) {
       clearTimeout(timeoutId);
@@ -295,122 +350,37 @@ Mandatory requirements for your response:
     }
   }
 
-  /**
-   * Smart preprocessing to extract key sections and reduce prompt size
-   * Reduces ~6,800 character CV to ~2,000 characters for faster processing
-   */
-  private smartPreprocessCV(cvText: string): string {
-    console.log('🧠 Smart preprocessing CV text:', {
-      originalLength: cvText.length,
-      originalPreview: cvText.substring(0, 100) + '...'
-    });
 
-    // Extract contact information (first 500 chars typically contain contact details)
-    const contactSection = cvText.substring(0, 500);
-    
-    // Extract experience section (look for common patterns)
-    const experiencePatterns = [
-      /experience|work history|employment|professional|career/i,
-      /\d{4}.*?(?:present|current|\d{4})/gi, // Date patterns
-      /(?:manager|engineer|developer|analyst|director|lead|senior)/gi
-    ];
-    
-    let experienceText = '';
-    experiencePatterns.forEach(pattern => {
-      const matches = cvText.match(pattern);
-      if (matches) {
-        const startIndex = cvText.search(pattern);
-        if (startIndex !== -1) {
-          experienceText += cvText.substring(startIndex, Math.min(startIndex + 800, cvText.length)) + '\n';
-        }
-      }
-    });
-    
-    // Extract skills section
-    const skillsPatterns = [
-      /skills|technologies|proficiencies|competencies/i,
-      /(?:javascript|python|react|node|sql|aws|docker|kubernetes)/gi
-    ];
-    
-    let skillsText = '';
-    skillsPatterns.forEach(pattern => {
-      const matches = cvText.match(pattern);
-      if (matches) {
-        const startIndex = cvText.search(pattern);
-        if (startIndex !== -1) {
-          skillsText += cvText.substring(startIndex, Math.min(startIndex + 300, cvText.length)) + '\n';
-        }
-      }
-    });
-    
-    // Extract education section
-    const educationPatterns = [
-      /education|university|college|degree|bachelor|master|phd/i,
-      /\d{4}.*?(?:university|college|institute)/gi
-    ];
-    
-    let educationText = '';
-    educationPatterns.forEach(pattern => {
-      const matches = cvText.match(pattern);
-      if (matches) {
-        const startIndex = cvText.search(pattern);
-        if (startIndex !== -1) {
-          educationText += cvText.substring(startIndex, Math.min(startIndex + 300, cvText.length)) + '\n';
-        }
-      }
-    });
-    
-    // Combine preprocessed sections
-    const processedText = [
-      '=== CONTACT INFO ===',
-      contactSection,
-      '\n=== EXPERIENCE ===',
-      experienceText || 'No specific experience patterns found',
-      '\n=== SKILLS ===', 
-      skillsText || 'No specific skills patterns found',
-      '\n=== EDUCATION ===',
-      educationText || 'No specific education patterns found'
-    ].join('\n').substring(0, 2000); // Hard limit to 2000 chars
-    
-    console.log('✨ Smart preprocessing completed:', {
-      originalLength: cvText.length,
-      processedLength: processedText.length,
-      reductionRatio: Math.round((1 - processedText.length / cvText.length) * 100) + '%',
-      processedPreview: processedText.substring(0, 150) + '...'
-    });
-    
-    return processedText;
-  }
 
   /**
-   * Parse CV text using ChatGPT API
+   * Parse CV text using ChatGPT API with full content processing
+   * Updated to process complete CV text without preprocessing for maximum accuracy
    * Following LLM specification with confidence scoring and language detection
    */
   async parseCV(cvText: string, userLanguage?: SupportedLanguage): Promise<CVParserResult> {
-    console.log('🤖 CV Parser: Starting LLM-based CV parsing');
+    console.log('🤖 CV Parser: Starting full CV processing with LLM');
     
     try {
       // Detect system language (user preference for UI/system)
       const systemLanguage: SupportedLanguage = userLanguage || 'en';
       
-      console.log('🌍 CV Parser: Language configuration', {
+      console.log('🌍 CV Parser: Full processing configuration', {
         systemLanguage,
-        cvTextLength: cvText.length,
+        fullCvTextLength: cvText.length,
+        estimatedTokens: Math.ceil(cvText.length / 1.33),
         cvTextPreview: cvText.substring(0, 200) + '...'
       });
       
-      // Apply smart preprocessing to reduce prompt size and improve speed
-      const processedCvText = this.smartPreprocessCV(cvText);
-      
-      // Generate appropriate prompts based on system language using processed text
+      // Generate appropriate prompts based on system language using full CV text
       const prompts = systemLanguage === 'vi' 
-        ? this.generateVietnamesePrompt(processedCvText)
-        : this.generateEnglishPrompt(processedCvText);
+        ? this.generateVietnamesePrompt(cvText)
+        : this.generateEnglishPrompt(cvText);
 
-      console.log('📝 CV Parser: Generated prompts', {
+      console.log('📝 CV Parser: Generated prompts (full CV processing)', {
         systemPromptLength: prompts.system.length,
         userPromptLength: prompts.user.length,
-        totalPromptLength: prompts.system.length + prompts.user.length
+        totalPromptLength: prompts.system.length + prompts.user.length,
+        fullCvTextLength: cvText.length
       });
 
       const messages: ChatMessage[] = [
@@ -433,13 +403,13 @@ Mandatory requirements for your response:
 
       // Call ChatGPT API
       console.log('📞 CV Parser: Calling ChatGPT API');
-      const response = await this.callChatGPT(messages);
+      const apiResult = await this.callChatGPT(messages);
 
       // Parse JSON response
       let parsedData: CVParsingResponse;
       try {
         // Clean response and extract JSON
-        const cleanedResponse = response.trim();
+        const cleanedResponse = apiResult.content.trim();
         const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           throw new Error('No JSON found in response');
@@ -452,8 +422,12 @@ Mandatory requirements for your response:
         throw new Error('Invalid AI response format');
       }
 
-      // Cache successful result
-      this.cache.set(cacheKey, { data: parsedData, timestamp: Date.now() });
+      // Cache successful result with token information
+      this.cache.set(cacheKey, { 
+        data: parsedData, 
+        timestamp: Date.now(),
+        tokens: apiResult.tokens
+      });
 
       return {
         success: true,

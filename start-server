@@ -21,6 +21,33 @@ LOG_FILE="server-persistent.log"
 MAX_RETRIES=3
 HEALTH_CHECK_TIMEOUT=30
 
+# Parse command line arguments
+FORCE_CLEAN=false
+if [ "$1" = "--clean" ] || [ "$1" = "-c" ]; then
+    FORCE_CLEAN=true
+    echo -e "${YELLOW}🧹 Aggressive cache cleaning requested${NC}"
+elif [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo -e "${BLUE}OkBuddy Server - Usage:${NC}"
+    echo -e "${CYAN}  ./start-server          ${NC}Start server with smart cache management"
+    echo -e "${CYAN}  ./start-server --clean  ${NC}Force aggressive cache clearing before start"
+    echo -e "${CYAN}  ./start-server -c       ${NC}Same as --clean (short form)"
+    echo -e "${CYAN}  ./start-server --help   ${NC}Show this help message"
+    echo ""
+    echo -e "${YELLOW}Cache Cleaning Behavior:${NC}"
+    echo -e "  ${GREEN}Smart (default):${NC} Only cleans cache when issues detected"
+    echo -e "  ${GREEN}Aggressive:${NC}      Always cleans cache (slower but thorough)"
+    echo ""
+    echo -e "${BLUE}Examples:${NC}"
+    echo -e "  ${CYAN}./start-server${NC}           # Fast startup with smart cache management"
+    echo -e "  ${CYAN}./start-server --clean${NC}   # Slow but thorough cache clearing"
+    echo ""
+    exit 0
+elif [ -n "$1" ]; then
+    echo -e "${RED}❌ Unknown option: $1${NC}"
+    echo -e "${BLUE}Use './start-server --help' for usage information${NC}"
+    exit 1
+fi
+
 echo -e "${BLUE}"
 echo "╔════════════════════════════════════════╗"
 echo "║        OkBuddy PERSISTENT Server       ║"
@@ -53,6 +80,30 @@ clean_webpack_cache() {
     echo -e "${GREEN}✅ Deep cache cleanup complete${NC}"
 }
 
+# ENHANCED: Improved cache issue detection
+check_for_cache_issues() {
+    local needs_clean=false
+    
+    # Check for webpack cache artifacts
+    if [ -f ".next/cache/webpack/.gitignore" ] || [ -d "node_modules/.cache/webpack" ]; then
+        needs_clean=true
+    fi
+    
+    # Check for recent error patterns in logs
+    if [ -f "$LOG_FILE" ]; then
+        if grep -q "Cannot find module\|Module not found\|Unexpected token\|webpack.*Error\|TypeError.*trim" "$LOG_FILE"; then
+            needs_clean=true
+        fi
+    fi
+    
+    # Check for corrupted Next.js build
+    if [ -d ".next" ] && [ ! -f ".next/BUILD_ID" ]; then
+        needs_clean=true
+    fi
+    
+    echo $needs_clean
+}
+
 # PERMANENT FIX: Dependency validation
 validate_dependencies() {
     echo -e "${BLUE}🔍 Validating dependencies...${NC}"
@@ -70,22 +121,34 @@ validate_dependencies() {
 if [ -f "$PID_FILE" ]; then
     PID=$(cat "$PID_FILE")
     if kill -0 "$PID" 2>/dev/null; then
-        echo -e "${GREEN}✅ Server already running (PID: $PID)${NC}"
-        echo -e "${CYAN}📊 Server URL: http://localhost:$PORT${NC}"
-        echo -e "${CYAN}📋 Logs: tail -f $LOG_FILE${NC}"
-        echo -e "${CYAN}🛑 Stop: kill $PID && rm $PID_FILE${NC}"
-        exit 0
+        if [ "$FORCE_CLEAN" = true ]; then
+            echo -e "${YELLOW}🛑 Stopping existing server for cache cleaning...${NC}"
+            kill $PID 2>/dev/null || true
+            rm -f "$PID_FILE"
+            sleep 2
+        else
+            echo -e "${GREEN}✅ Server already running (PID: $PID)${NC}"
+            echo -e "${CYAN}📊 Server URL: http://localhost:$PORT${NC}"
+            echo -e "${CYAN}📋 Logs: tail -f $LOG_FILE${NC}"
+            echo -e "${CYAN}🛑 Stop: ./stop-server${NC}"
+            echo -e "${BLUE}💡 Use './start-server --clean' to force cache clearing${NC}"
+            exit 0
+        fi
     else
         echo -e "${YELLOW}⚠️ Stale PID file found, cleaning up...${NC}"
         rm -f "$PID_FILE"
     fi
 fi
 
-# PERMANENT FIX: Pre-startup cleanup and validation
+# ENHANCED: Pre-startup cleanup and validation
 echo -e "${YELLOW}🧹 Performing pre-startup maintenance...${NC}"
 
-# Clean webpack cache if error indicators are present
-if [ -f ".next/cache/webpack/.gitignore" ] || [ -f "node_modules/.cache/webpack" ]; then
+# Smart cache cleaning logic
+if [ "$FORCE_CLEAN" = true ]; then
+    echo -e "${YELLOW}🧹 Force cleaning requested...${NC}"
+    clean_webpack_cache
+elif [ "$(check_for_cache_issues)" = true ]; then
+    echo -e "${YELLOW}🔧 Cache issues detected, cleaning...${NC}"
     clean_webpack_cache
 fi
 
