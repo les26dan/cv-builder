@@ -417,6 +417,8 @@ Mandatory requirements for your response:
         
         parsedData = JSON.parse(jsonMatch[0]);
         console.log('✅ CV Parser: Successfully parsed AI response');
+        console.log('🔍 Raw ChatGPT response content:', apiResult.content);
+        console.log('🔍 Parsed data structure:', JSON.stringify(parsedData, null, 2));
       } catch (parseError) {
         console.error('❌ CV Parser: Failed to parse AI response:', parseError);
         throw new Error('Invalid AI response format');

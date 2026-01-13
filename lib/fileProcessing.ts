@@ -6,10 +6,11 @@ const loadPDFjs = async () => {
       console.log('🔍 Loading PDF.js library for high-quality text extraction...');
       
       try {
-                 // Import PDF.js library (using legacy build for Node.js)
-         const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-         console.log('✅ PDF.js library loaded successfully');
-         return pdfjsLib;
+        // Use require for better Node.js compatibility 
+        const pdfjsLib = await import('pdfjs-dist');
+        console.log('✅ PDF.js library loaded successfully');
+        
+        return pdfjsLib;
       } catch (importError) {
         const errorMessage = importError instanceof Error ? importError.message : 'Unknown import error';
         console.log('❌ PDF.js import failed:', errorMessage);
@@ -83,11 +84,8 @@ async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
     // Load PDF.js library
     const pdfjsLib = await loadPDFjs();
     if (!pdfjsLib) {
-      console.log('❌ PDF.js not available, falling back to filename analysis');
-      return {
-        success: false,
-        error: 'PDF.js library not available - using enhanced filename analysis'
-      };
+      console.log('❌ PDF.js not available, trying pdf-parse fallback...');
+      return await extractPDFTextWithPdfParse(buffer);
     }
 
     console.log('📄 PDF.js loaded successfully, extracting text with high quality...');
@@ -110,7 +108,10 @@ async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
           const textContent = await page.getTextContent();
           
           // Extract text items with proper positioning and line breaks
-          const textItems = textContent.items
+          const allItems = textContent.items;
+          console.log(`🔍 Page ${pageNum}: Found ${allItems.length} total text items`);
+          
+          const textItems = allItems
             .filter((item: any) => item.str && typeof item.str === 'string')
             .map((item: any) => ({
               text: item.str.trim(),
@@ -118,6 +119,9 @@ async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
               y: item.transform[5]
             }))
             .filter((item: any) => item.text.length > 0);
+            
+          console.log(`🔍 Page ${pageNum}: ${textItems.length} valid text items after filtering`);
+          console.log('🔍 First 10 text items:', textItems.slice(0, 10).map(item => `"${item.text}" at (${item.x}, ${item.y})`));
           
           // Sort by Y position (top to bottom) then X position (left to right)
           textItems.sort((a, b) => {
@@ -197,18 +201,60 @@ async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
       const errorMessage = extractError instanceof Error ? extractError.message : 'Unknown extraction error';
       console.error('❌ PDF.js text extraction failed:', errorMessage);
       
-      return {
-        success: false,
-        error: `PDF.js extraction failed: ${errorMessage} - will use filename analysis instead`
-      };
+      // Try pdf-parse as fallback
+      console.log('🔄 PDF.js failed, trying pdf-parse fallback...');
+      return await extractPDFTextWithPdfParse(buffer);
     }
     
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('❌ PDF text extraction failed:', errorMessage);
+    
+    // Try pdf-parse as final fallback
+    console.log('🔄 PDF.js completely failed, trying pdf-parse fallback...');
+    return await extractPDFTextWithPdfParse(buffer);
+  }
+}
+
+/**
+ * Extract text from PDF files using pdf-parse library (fallback method)
+ */
+async function extractPDFTextWithPdfParse(buffer: Buffer): Promise<ProcessedFileResult> {
+  try {
+    console.log('📄 Using pdf-parse library for text extraction...');
+    
+    // Dynamic import of pdf-parse
+    const pdfParse = await import('pdf-parse');
+    const parseFunction = pdfParse.default || pdfParse;
+    
+    const data = await parseFunction(buffer);
+    
+    if (!data.text || data.text.trim().length === 0) {
+      return {
+        success: false,
+        error: 'No text content found in PDF file'
+      };
+    }
+    
+    console.log(`✅ pdf-parse extraction successful: ${data.text.length} characters`);
+    
+    return {
+      success: true,
+      text: data.text,
+      metadata: {
+        pageCount: data.numpages,
+        wordCount: data.text.split(/\s+/).length,
+        fileType: 'pdf'
+      }
+    };
+    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ pdf-parse extraction failed:', errorMessage);
+    
     return {
       success: false,
-      error: `PDF extraction failed: ${errorMessage} - will use filename analysis instead`
+      error: `PDF text extraction failed: ${errorMessage} - will use filename analysis instead`
     };
   }
 }

@@ -6,7 +6,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { EditorPanel } from './EditorPanel';
 import { PreviewPanel } from './PreviewPanel';
 import { calculateCvScore } from '../utils/cvScoring';
@@ -31,6 +31,12 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 }) => {
   // CV Workflow Context for data management
   const { state, updateCVData, saveCVData } = useCVWorkflow();
+  
+  // Mounted ref to prevent state updates after unmount
+  const mountedRef = useRef(true);
+  
+  // Track if we've loaded data to prevent re-loading
+  const hasLoadedDataRef = useRef(false);
 
   // Local state management
   const [cvData, setCvData] = useState<CVData>(() => {
@@ -62,8 +68,8 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Load uploaded CV data from localStorage in useEffect
   useEffect(() => {
-    // Skip if initialData is provided or if we already have data
-    if (initialData || (cvData.contact?.fullName && cvData.experience?.items?.length > 0)) {
+    // Skip if initialData is provided or data already loaded
+    if (initialData || hasLoadedDataRef.current) {
       return;
     }
 
@@ -82,24 +88,22 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         
         if (uploadData) {
           const parsed = JSON.parse(uploadData);
-          console.log('🔄 CVEditor: Found uploaded CV data:', parsed);
-          
-          // Check if this upload data matches our cvId
           if (parsed.cvId === cvId && (parsed.structuredCV || parsed.llmParsedData)) {
             console.log('✅ CVEditor: Loading parsed CV from upload');
             
             // Prioritize LLM-parsed structured CV data over basic extraction
             const structuredCV = parsed.structuredCV;
-            console.log('🔍 CVEditor: Structured CV data:', JSON.stringify(structuredCV, null, 2));
-            console.log('🔍 CVEditor: Skills data:', JSON.stringify(structuredCV.skills, null, 2));
             
             const transformedData: CVData = {
               id: cvId,
               contact: {
-                fullName: structuredCV.contact?.fullName || structuredCV.contact?.name || structuredCV.name || '',
+                fullName: (() => {
+                  const name = structuredCV.contact?.fullName || structuredCV.contact?.full_name || structuredCV.contact?.name || structuredCV.name || '';
+                  return name;
+                })(),
                 email: structuredCV.contact?.email || '',
                 phone: structuredCV.contact?.phone || '',
-                location: structuredCV.contact?.location || '',
+                location: structuredCV.contact?.location || structuredCV.contact?.address || '',
                 linkedin: structuredCV.contact?.linkedin || ''
               },
               summary: {
@@ -112,16 +116,24 @@ export const CVEditor: React.FC<CVEditorProps> = ({
                 })()
               },
               experience: {
-                items: structuredCV.experience?.items || structuredCV.experience || []
+                items: (structuredCV.experience?.items || structuredCV.experience || []).map((exp: any, index: number) => ({
+                  ...exp,
+                  id: exp.id || `experience-${index}-${Date.now()}`, // Ensure unique ID
+                  bullets: exp.bullets || []
+                }))
               },
               skills: {
-                items: (structuredCV.skills?.items || structuredCV.skills || []).map((skill: string) => ({
+                items: (structuredCV.skills?.items || structuredCV.skills || []).map((skill: string, index: number) => ({
+                  id: `skill-${index}-${skill}`, // Add unique ID for React key
                   name: skill,
                   level: 'Intermediate' // Default level for parsed skills
                 }))
               },
               education: {
-                items: structuredCV.education?.items || structuredCV.education || []
+                items: (structuredCV.education?.items || structuredCV.education || []).map((edu: any, index: number) => ({
+                  ...edu,
+                  id: edu.id || `education-${index}-${Date.now()}` // Ensure unique ID
+                }))
               },
               sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
               sectionTitles: {
@@ -133,18 +145,21 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               }
             };
             
-            console.log('✅ CVEditor: Transformed uploaded CV data for editing:', JSON.stringify(transformedData, null, 2));
-            
             // Update state with transformed data
             setCvData(transformedData);
+            hasLoadedDataRef.current = true; // Mark as loaded
             
             // Check if this was a successful LLM parsing
             if (parsed.llmParsedData && parsed.llmParsedData.possibility_score >= 5) {
               console.log('🎉 CVEditor: LLM parsing was successful - will show success notification');
               // Use setTimeout to show notification after component mounts
-              setTimeout(() => setShowParsingSuccess(true), 1000);
+              setTimeout(() => {
+                if (mountedRef.current) setShowParsingSuccess(true);
+              }, 1000);
               // Auto-hide after 5 seconds
-              setTimeout(() => setShowParsingSuccess(false), 6000);
+              setTimeout(() => {
+                if (mountedRef.current) setShowParsingSuccess(false);
+              }, 6000);
             }
           }
         }
@@ -153,12 +168,19 @@ export const CVEditor: React.FC<CVEditorProps> = ({
       }
     }
 
-    // Check workflow context data as fallback
-    if (state.cvData && Object.keys(state.cvData).length > 0) {
-      console.log('🔄 CVEditor: Using CV workflow context data');
-      setCvData(state.cvData as CVData);
+  }, [cvId, initialData]); // Only re-run when these specific dependencies change
+  
+  // Separate useEffect for workflow context data to avoid infinite loops
+  useEffect(() => {
+    // Only use workflow context if we don't have initialData and haven't loaded data yet
+    if (!initialData && !hasLoadedDataRef.current) {
+      if (state.cvData && Object.keys(state.cvData).length > 0) {
+        console.log('🔄 CVEditor: Using CV workflow context data');
+        setCvData(state.cvData as CVData);
+        hasLoadedDataRef.current = true; // Mark as loaded
+      }
     }
-  }, [cvId, initialData, state.cvData]); // Only re-run when these specific dependencies change
+  }, [state.cvData, initialData]); // Separate effect for state.cvData
 
   // JD Optimization removed - using new LLM-based CV parser
 
@@ -181,11 +203,20 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Sync with workflow context when cvData changes
   useEffect(() => {
-    if (updateCVData) {
+    if (updateCVData && mountedRef.current) {
       updateCVData(cvData);
     }
-    onDataChange?.(cvData);
-  }, [cvData, updateCVData, onDataChange]);
+    if (onDataChange && mountedRef.current) {
+      onDataChange(cvData);
+    }
+  }, [cvData]); // Remove updateCVData and onDataChange from dependencies to prevent infinite loops
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Enhanced data update handler with auto-save
   const handleDataUpdate = useCallback((newData: CVData) => {

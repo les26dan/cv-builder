@@ -196,7 +196,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
     
     if (llmParsedData && llmParsedData.possibility_score >= 5) {
       console.log('✨ Using LLM-parsed data for structured CV');
+      console.log('🔍 Raw LLM parsed data:', JSON.stringify(llmParsedData, null, 2));
       structuredCV = cvParserService.convertToGuidedEditingFormat(llmParsedData);
+      console.log('🔍 Converted structured CV:', JSON.stringify(structuredCV, null, 2));
       
       console.log('✅ LLM-based structured CV created:', {
         name: structuredCV.contact.fullName,

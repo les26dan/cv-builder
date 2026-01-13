@@ -42,16 +42,26 @@ export function useMobileDetection(): MobileDetectionResult {
         shouldBlockEditor: width < 1024 // Block mobile and small tablets
       };
       
-      setDetection(newDetection);
+      // Only update and log if detection actually changed
+      const hasChanged = (
+        detection.isMobile !== newDetection.isMobile ||
+        detection.isTablet !== newDetection.isTablet ||
+        detection.isDesktop !== newDetection.isDesktop ||
+        Math.abs(detection.viewportWidth - newDetection.viewportWidth) > 10
+      );
       
-      // Log detection changes for debugging
-      console.log('📱 Mobile detection updated:', {
-        width,
-        isMobile: newDetection.isMobile,
-        isTablet: newDetection.isTablet,
-        isDesktop: newDetection.isDesktop,
-        shouldBlockEditor: newDetection.shouldBlockEditor
-      });
+      if (hasChanged) {
+        setDetection(newDetection);
+        
+        // Log detection changes for debugging
+        console.log('📱 Mobile detection updated:', {
+          width,
+          isMobile: newDetection.isMobile,
+          isTablet: newDetection.isTablet,
+          isDesktop: newDetection.isDesktop,
+          shouldBlockEditor: newDetection.shouldBlockEditor
+        });
+      }
     };
 
     // Initial detection
@@ -61,15 +71,20 @@ export function useMobileDetection(): MobileDetectionResult {
     window.addEventListener('resize', updateDetection);
     
     // Listen for orientation changes (mobile devices)
-    window.addEventListener('orientationchange', () => {
+    const handleOrientationChange = () => {
       // Delay to allow orientation change to complete
-      setTimeout(updateDetection, 100);
-    });
+      setTimeout(() => {
+        if (mountedRef.current) {
+          updateDetection();
+        }
+      }, 100);
+    };
+    window.addEventListener('orientationchange', handleOrientationChange);
 
     return () => {
       mountedRef.current = false; // Mark as unmounted
       window.removeEventListener('resize', updateDetection);
-      window.removeEventListener('orientationchange', updateDetection);
+      window.removeEventListener('orientationchange', handleOrientationChange);
     };
   }, []);
 

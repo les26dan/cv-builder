@@ -875,7 +875,7 @@ export const EditorPanel = ({
                 });
 
                 // JD optimization SuggestionPanel removed - using new LLM-based CV parser
-                return null;
+                return <div key={section}></div>;
               })}
             </div>
           </div>
