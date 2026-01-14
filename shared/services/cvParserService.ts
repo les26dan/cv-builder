@@ -29,9 +29,9 @@ export interface CVParsingResponse {
   education?: Array<{
     degree: string;
     institution: string;
-    start_date: string;
-    end_date: string;
-    details: string;
+    location: string;
+    graduationDate: string;
+    description: string;
   }>;
   skills?: string[];
   error?: string;
@@ -456,15 +456,19 @@ Mandatory requirements for your response:
    */
   convertToGuidedEditingFormat(parsedData: CVParsingResponse): any {
     if (!parsedData.contact && !parsedData.work_experience) {
+      console.error('❌ CV Parser: No contact or work experience data found for conversion');
       return null;
     }
 
-    return {
+    console.log('🔄 CV Parser: Converting ChatGPT JSON to Guided Editing format');
+    console.log('🔍 CV Parser: Input ChatGPT contact data:', JSON.stringify(parsedData.contact, null, 2));
+
+    const result = {
       contact: {
         fullName: parsedData.contact?.full_name || '',
         email: parsedData.contact?.email || '',
         phone: parsedData.contact?.phone || '',
-        address: parsedData.contact?.address || '',
+        location: parsedData.contact?.address || '',  // Fix: map address to location to match API interface
         linkedin: parsedData.contact?.linkedin || ''
       },
       summary: {
@@ -475,28 +479,50 @@ Mandatory requirements for your response:
             : ''
       },
       experience: {
-        items: parsedData.work_experience?.map(exp => ({
-          position: exp.position,
-          company: exp.company,
-          location: exp.location,
-          startDate: exp.start_date,
-          endDate: exp.end_date,
-          bullets: exp.bullets.filter(bullet => bullet.trim().length > 0)
-        })) || []
+        items: parsedData.work_experience?.map((exp, index) => {
+          // Handle "Present" or "hiện tại" end dates
+          const isCurrentJob = exp.end_date && 
+            (exp.end_date.toLowerCase().includes('present') || 
+             exp.end_date.toLowerCase().includes('hiện tại'));
+          
+          console.log(`🔍 CV Parser: Experience ${index + 1} - Position: ${exp.position}, End Date: "${exp.end_date}", Is Current: ${isCurrentJob}`);
+          
+          return {
+            id: `experience-${index}-${Date.now()}`,  // Add unique ID for React keys
+            title: exp.position,  // Fix: map position to title to match WorkExperienceSection interface
+            company: exp.company,
+            location: exp.location,
+            startDate: exp.start_date,
+            endDate: isCurrentJob ? '' : exp.end_date,  // Clear end date if current job
+            current: isCurrentJob,  // Fix: use 'current' instead of 'isCurrentJob' to match WorkExperienceSection interface
+            bullets: exp.bullets.filter(bullet => bullet.trim().length > 0)
+          };
+        }) || []
       },
       education: {
-        items: parsedData.education?.map(edu => ({
-          degree: edu.degree,
-          institution: edu.institution,
-          startDate: edu.start_date,
-          endDate: edu.end_date,
-          details: edu.details
-        })) || []
+        items: parsedData.education?.map((edu, index) => {
+          console.log(`🔍 CV Parser: Education ${index + 1} - Raw data:`, JSON.stringify(edu, null, 2));
+          const mappedEdu = {
+            id: `education-${index}-${Date.now()}`,   // Add unique ID for React keys
+            degree: edu.degree,
+            institution: edu.institution,
+            location: edu.location,
+            graduationDate: edu.graduationDate,
+            description: edu.description
+          };
+          console.log(`🔍 CV Parser: Education ${index + 1} - Mapped data:`, JSON.stringify(mappedEdu, null, 2));
+          return mappedEdu;
+        }) || []
       },
       skills: {
         items: parsedData.skills || []
       }
     };
+
+    console.log('🔍 CV Parser: Converted contact data:', JSON.stringify(result.contact, null, 2));
+    console.log('✅ CV Parser: Conversion completed successfully');
+
+    return result;
   }
 }
 

@@ -88,23 +88,72 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         
         if (uploadData) {
           const parsed = JSON.parse(uploadData);
+          
+          console.log('🔍 CVEditor: Raw localStorage data:', JSON.stringify(parsed, null, 2));
+          
           if (parsed.cvId === cvId && (parsed.structuredCV || parsed.llmParsedData)) {
             console.log('✅ CVEditor: Loading parsed CV from upload');
             
+            // Enhanced debugging for contact data mapping
+            if (parsed.llmParsedData?.contact) {
+              console.log('🔍 CVEditor: Raw ChatGPT contact data:', JSON.stringify(parsed.llmParsedData.contact, null, 2));
+            }
+            if (parsed.structuredCV?.contact) {
+              console.log('🔍 CVEditor: Structured CV contact data:', JSON.stringify(parsed.structuredCV.contact, null, 2));
+            }
+            
             // Prioritize LLM-parsed structured CV data over basic extraction
             const structuredCV = parsed.structuredCV;
+            
+            // Enhanced contact field mapping with direct access to ChatGPT data as fallback
+            const chatGptContact = parsed.llmParsedData?.contact || {};
+            const structuredContact = structuredCV?.contact || {};
+            
+            console.log('🔍 CVEditor: Contact field mapping debug:');
+            console.log('  - ChatGPT full_name:', chatGptContact.full_name);
+            console.log('  - Structured fullName:', structuredContact.fullName);
+            console.log('  - ChatGPT address:', chatGptContact.address);
+            console.log('  - Structured location:', structuredContact.location);
+            console.log('  - ChatGPT linkedin:', chatGptContact.linkedin);
+            console.log('  - Structured linkedin:', structuredContact.linkedin);
             
             const transformedData: CVData = {
               id: cvId,
               contact: {
                 fullName: (() => {
-                  const name = structuredCV.contact?.fullName || structuredCV.contact?.full_name || structuredCV.contact?.name || structuredCV.name || '';
+                  // Enhanced fallback chain: prioritize ChatGPT data if structured conversion failed
+                  const name = structuredContact.fullName || 
+                              chatGptContact.full_name || 
+                              structuredContact.full_name || 
+                              structuredContact.name || 
+                              '';
+                  console.log('🎯 CVEditor: Final mapped fullName:', name);
                   return name;
                 })(),
-                email: structuredCV.contact?.email || '',
-                phone: structuredCV.contact?.phone || '',
-                location: structuredCV.contact?.location || structuredCV.contact?.address || '',
-                linkedin: structuredCV.contact?.linkedin || ''
+                email: (() => {
+                  const email = structuredContact.email || chatGptContact.email || '';
+                  console.log('🎯 CVEditor: Final mapped email:', email);
+                  return email;
+                })(),
+                phone: (() => {
+                  const phone = structuredContact.phone || chatGptContact.phone || '';
+                  console.log('🎯 CVEditor: Final mapped phone:', phone);
+                  return phone;
+                })(),
+                location: (() => {
+                  // Map both address and location fields from ChatGPT
+                  const location = structuredContact.location || 
+                                  chatGptContact.address || 
+                                  structuredContact.address || 
+                                  '';
+                  console.log('🎯 CVEditor: Final mapped location:', location);
+                  return location;
+                })(),
+                linkedin: (() => {
+                  const linkedin = structuredContact.linkedin || chatGptContact.linkedin || '';
+                  console.log('🎯 CVEditor: Final mapped linkedin:', linkedin);
+                  return linkedin;
+                })()
               },
               summary: {
                 content: (() => {
@@ -116,11 +165,43 @@ export const CVEditor: React.FC<CVEditorProps> = ({
                 })()
               },
               experience: {
-                items: (structuredCV.experience?.items || structuredCV.experience || []).map((exp: any, index: number) => ({
-                  ...exp,
-                  id: exp.id || `experience-${index}-${Date.now()}`, // Ensure unique ID
-                  bullets: exp.bullets || []
-                }))
+                items: (() => {
+                  console.log('🔍 CVEditor: Processing work experience data');
+                  
+                  // Enhanced work experience mapping with ChatGPT fallback
+                  const chatGptExperience = parsed.llmParsedData?.work_experience || [];
+                  const structuredExperience = structuredCV.experience?.items || structuredCV.experience || [];
+                  
+                  console.log('🔍 CVEditor: ChatGPT work experience count:', chatGptExperience.length);
+                  console.log('🔍 CVEditor: Structured work experience count:', structuredExperience.length);
+                  
+                  if (structuredExperience.length > 0) {
+                    console.log('✅ CVEditor: Using structured experience data');
+                    return structuredExperience;
+                  }
+                  
+                  // Fallback: Map ChatGPT data directly with Present/hiện tại handling
+                  console.log('⚠️ CVEditor: Falling back to ChatGPT data mapping');
+                  return chatGptExperience.map((exp: any, index: number) => {
+                    // Handle "Present" or "hiện tại" end dates
+                    const isCurrentJob = exp.end_date && 
+                      (exp.end_date.toLowerCase().includes('present') || 
+                       exp.end_date.toLowerCase().includes('hiện tại'));
+                    
+                    console.log(`🔍 CVEditor: Fallback Experience ${index + 1} - Position: ${exp.position}, End Date: "${exp.end_date}", Is Current: ${isCurrentJob}`);
+                    
+                    return {
+                      id: `experience-${index}-${Date.now()}`,
+                      title: exp.position,  // Map position to title
+                      company: exp.company,
+                      location: exp.location,
+                      startDate: exp.start_date,
+                      endDate: isCurrentJob ? '' : exp.end_date,  // Clear end date if current job
+                      current: isCurrentJob,  // Fix: use 'current' instead of 'isCurrentJob' to match WorkExperienceSection interface
+                      bullets: exp.bullets || []
+                    };
+                  });
+                })()
               },
               skills: {
                 items: (structuredCV.skills?.items || structuredCV.skills || []).map((skill: string, index: number) => ({
@@ -130,10 +211,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
                 }))
               },
               education: {
-                items: (structuredCV.education?.items || structuredCV.education || []).map((edu: any, index: number) => ({
-                  ...edu,
-                  id: edu.id || `education-${index}-${Date.now()}` // Ensure unique ID
-                }))
+                items: structuredCV.education?.items || structuredCV.education || []
               },
               sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
               sectionTitles: {
@@ -144,6 +222,8 @@ export const CVEditor: React.FC<CVEditorProps> = ({
                 education: 'Học vấn'
               }
             };
+            
+            console.log('🔍 CVEditor: Final transformed contact data:', JSON.stringify(transformedData.contact, null, 2));
             
             // Update state with transformed data
             setCvData(transformedData);
@@ -164,7 +244,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
           }
         }
       } catch (error) {
-        console.warn('⚠️ CVEditor: Error loading uploaded CV data:', error);
+        console.error('❌ CVEditor: Error loading uploaded CV data:', error);
       }
     }
 

@@ -467,9 +467,9 @@ Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất t
     {
       "degree": "",
       "institution": "",
-      "start_date": "",
-      "end_date": "",
-      "details": ""
+      "location": "",
+      "graduationDate": "",
+      "description": ""
     }
   ],
   "skills": ["", "", "", ""]
@@ -522,9 +522,9 @@ Step 2: ONLY if your score is 5 or higher, extract and structure the CV informat
     {
       "degree": "",
       "institution": "",
-      "start_date": "",
-      "end_date": "",
-      "details": ""
+      "location": "",
+      "graduationDate": "",
+      "description": ""
     }
   ],
   "skills": ["", "", "", ""]
