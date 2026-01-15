@@ -77,7 +77,45 @@ clean_webpack_cache() {
         rm -rf node_modules/.cache/webpack
     fi
     
-    echo -e "${GREEN}✅ Deep cache cleanup complete${NC}"
+    # Enhanced: Clear additional webpack-related caches
+    if [ -d ".next/cache" ]; then
+        rm -rf .next/cache
+    fi
+    
+    # Clear ESLint cache
+    if [ -f ".eslintcache" ]; then
+        rm -f .eslintcache
+    fi
+    
+    # Clear Vercel cache if present
+    if [ -d ".vercel" ]; then
+        rm -rf .vercel/.next
+    fi
+    
+    # ENHANCED: More aggressive webpack artifact removal
+    # Clear webpack hot reload files that can get corrupted
+    find . -maxdepth 2 -name "*.hot-update.*" -delete 2>/dev/null || true
+    
+    # Clear any orphaned webpack chunk files in node_modules
+    find node_modules -name "*webpack-runtime*" -delete 2>/dev/null || true
+    find node_modules -name "*webpack-api-runtime*" -delete 2>/dev/null || true
+    
+    # Clear Next.js server chunks that may be corrupted
+    if [ -d ".next/server" ]; then
+        find .next/server -name "*.js.map" -delete 2>/dev/null || true
+        find .next/server -name "webpack-runtime*" -delete 2>/dev/null || true
+        find .next/server -name "*-webpack*" -delete 2>/dev/null || true
+    fi
+    
+    # Clear any remaining Next.js variant caches
+    rm -rf .next.* 2>/dev/null || true
+    rm -rf tsconfig.tsbuildinfo 2>/dev/null || true
+    
+    # Force NPM cache verification (helps with corrupted module resolution)
+    echo -e "${CYAN}🔍 Verifying npm cache integrity...${NC}"
+    npm cache verify --silent 2>/dev/null || true
+    
+    echo -e "${GREEN}✅ Aggressive cache cleanup complete${NC}"
 }
 
 # ENHANCED: Improved cache issue detection
@@ -91,7 +129,7 @@ check_for_cache_issues() {
     
     # Check for recent error patterns in logs
     if [ -f "$LOG_FILE" ]; then
-        if grep -q "Cannot find module\|Module not found\|Unexpected token\|webpack.*Error\|TypeError.*trim" "$LOG_FILE"; then
+        if grep -q "Cannot find module\|Module not found\|Unexpected token\|webpack.*Error\|TypeError.*trim\|\.\/[0-9]+\.js\|webpack_require.*\.f\.require" "$LOG_FILE"; then
             needs_clean=true
         fi
     fi
@@ -184,16 +222,26 @@ for i in $(seq 1 $HEALTH_CHECK_TIMEOUT); do
         echo -e "${RED}❌ Server process died during startup${NC}"
         
         # Check for webpack errors in logs
-        if grep -q "Cannot find module" "$LOG_FILE" 2>/dev/null; then
+        if grep -q "Cannot find module\|\.\/[0-9]+\.js\|webpack_require.*\.f\.require\|Error.*webpack\|Module not found" "$LOG_FILE" 2>/dev/null; then
             echo -e "${YELLOW}🔧 Webpack module error detected, applying permanent fix...${NC}"
+            echo -e "${CYAN}📋 Error context: $(grep -m1 "Cannot find module\|\.\/[0-9]+\.js\|webpack_require.*\.f\.require" "$LOG_FILE" 2>/dev/null || echo "Webpack build error")${NC}"
+            
+            # Enhanced: Log the recurring pattern for analysis
+            echo -e "${YELLOW}⚠️  RECURRING PATTERN DETECTED - Implementing enhanced prevention${NC}"
+            echo "$(date): Webpack module error pattern detected: $(grep -m1 "Cannot find module\|\.\/[0-9]+\.js" "$LOG_FILE" 2>/dev/null)" >> webpack-error-patterns.log
+            
             clean_webpack_cache
             validate_dependencies
+            
+            # Enhanced: More thorough restart process
+            echo -e "${CYAN}🔄 Implementing enhanced restart with dependency verification...${NC}"
+            sleep 3  # Give system time to clear
             
             # Retry server start
             nohup npm run dev > "$LOG_FILE" 2>&1 &
             SERVER_PID=$!
             echo $SERVER_PID > "$PID_FILE"
-            echo -e "${GREEN}✅ Server restarted with clean cache (PID: $SERVER_PID)${NC}"
+            echo -e "${GREEN}✅ Server restarted with enhanced cache cleaning (PID: $SERVER_PID)${NC}"
             continue
         fi
         

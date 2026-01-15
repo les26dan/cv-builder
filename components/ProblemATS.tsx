@@ -14,15 +14,10 @@ const ProblemATS: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-row justify-center items-center px-4 md:px-[120px] py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
+    <section className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
       {/* Content */}
       <div className="flex flex-col items-start gap-6 w-full md:w-[500px]">
-        {/* Section Label */}
-        <div className="flex flex-row justify-center items-center px-3 h-7 bg-[#0288D1] rounded-[14px]">
-          <span className="font-inter font-semibold text-sm leading-[17px] text-white">
-            {ats.label}
-          </span>
-        </div>
+        {/* Section Label removed per UI polish requirements */}
 
         {/* Problem Title */}
         <h2 className="font-inter font-bold text-2xl md:text-[32px] leading-tight md:leading-[38px] text-[#111827] w-full">
@@ -81,7 +76,7 @@ const ProblemATS: React.FC = () => {
           {/* Fix Button */}
           <button 
             onClick={handleCTAClick}
-            className="flex flex-row justify-center items-center w-full h-12 bg-[#0288D1] rounded-md hover:bg-[#0277BD] transition-colors"
+            className="flex flex-row justify-center items-center w-full h-12 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
           >
             <span className="font-inter font-semibold text-base leading-[19px] text-white">
               {ats.scoreCard.cta}

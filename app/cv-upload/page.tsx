@@ -190,7 +190,7 @@ export default function CVUploadPage() {
       {/* Use CV Workspace Header */}
       <HeaderMinimal showAutosave={false} userInitial="U" />
       
-      <main className="flex-1 flex justify-center items-center px-4 py-8">
+      <main className="flex-1 flex justify-center items-center px-4 sm:px-6 lg:px-10 py-8">
         <div className="w-full max-w-[600px] space-y-8">
           
           {/* Success Message */}

@@ -807,15 +807,16 @@ export const EditorPanel = ({
                   </div>
                 </div>
 
-                {/* Apply All Button - Using Lucide CheckCircle */}
+                {/* Apply All Button - Matching CV Score CTA styling */}
                 <button
-                  className="flex flex-row justify-center items-center px-5 py-3 gap-2.5 bg-violet-500 rounded-lg text-white font-medium hover:bg-violet-600 transition-colors"
+                  className="flex flex-row justify-center items-center w-full h-12 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
                   onClick={handleApplyAll}
                   disabled={isApplyingAll}
                 >
-                  <CheckCircle className="w-4 h-4 text-white" />
-                  <span>Áp dụng tất cả</span>
-                  <span className="bg-yellow-400 text-yellow-900 px-1 py-0.5 text-xs rounded font-bold">
+                  <span className="font-inter font-semibold text-base leading-[19px] text-white">
+                    Áp dụng tất cả
+                  </span>
+                  <span className="bg-yellow-400 text-yellow-900 px-1 py-0.5 text-xs rounded font-bold ml-2">
                     PRO
                   </span>
                 </button>

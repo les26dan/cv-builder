@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
   const { footer } = landingPage;
 
   return (
-    <footer className="flex flex-col justify-center items-center px-4 md:px-[120px] py-10 gap-10 w-full min-h-[285px] bg-[#B2EBF2]">
+    <footer className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-10 gap-10 w-full min-h-[285px] bg-[#B2EBF2]">
       {/* Footer Content */}
       <div className="flex flex-col lg:flex-row justify-between items-start gap-10 w-full max-w-[1200px]">
         {/* Logo and Description */}
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
               {footer.links.product.title}
             </h4>
             {footer.links.product.items.map((item, index) => (
-              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0288D1] transition-colors">
+              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0277BD] transition-colors">
                 {item}
               </a>
             ))}
@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
               {footer.links.company.title}
             </h4>
             {footer.links.company.items.map((item, index) => (
-              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0288D1] transition-colors">
+              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0277BD] transition-colors">
                 {item}
               </a>
             ))}
@@ -50,7 +50,7 @@ const Footer: React.FC = () => {
               {footer.links.legal.title}
             </h4>
             {footer.links.legal.items.map((item, index) => (
-              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0288D1] transition-colors">
+              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0277BD] transition-colors">
                 {item}
               </a>
             ))}

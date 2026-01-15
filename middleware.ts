@@ -11,7 +11,8 @@ const protectedRoutes = [
 // Routes that can be accessed in development without authentication
 const devAllowedRoutes = [
   '/cv-guided-editing',
-  '/cv-workspace'
+  '/cv-workspace',
+  '/cv-uploaded-test'
 ]
 
 // Define admin routes
@@ -93,6 +94,12 @@ export async function middleware(request: NextRequest) {
       }
       
       return response
+    }
+    
+    // Allow CV test routes to pass through without authentication (development tool)
+    if (pathname.startsWith('/cv-uploaded-test')) {
+      console.log(`🧪 Allowing test route access: ${pathname}`)
+      return NextResponse.next()
     }
   } catch (error) {
     console.error('Middleware error for static assets:', error)

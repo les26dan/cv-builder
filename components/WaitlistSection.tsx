@@ -26,7 +26,7 @@ const WaitlistSection: React.FC = () => {
   };
 
   return (
-    <section id="waitlist" className="flex flex-col justify-center items-center px-4 md:px-[120px] py-[40px] gap-6 w-full min-h-[240px] bg-[#F9FAFB]">
+    <section id="waitlist" className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[40px] gap-6 w-full min-h-[240px] bg-[#F9FAFB]">
       {/* Content Container */}
       <div className="flex flex-col justify-center items-center gap-4 w-full max-w-[500px]">
         {/* Waitlist Title - De-emphasized */}

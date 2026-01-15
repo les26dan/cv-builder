@@ -6,14 +6,10 @@
    - CV Upload
    - CV Guided Editing
    - CV Workflow Integration
-- The focus of our initiative is to improve the existing JD parser logic and function, particularly populating the .JSON file (file 2.md below) to the CV Guided Editing page. This is directly blocking our product launch. 
-- Review the LLM Specs: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/LLM Prompts Spec.md' - ## *Feature 7: CV Parser* for specific prompts used
-- Project Acceptance criteria:
-System correctly processes structured .JSON files (from ChatGPT API) and correctly populates on CV Editor panel and CV Preview panel of CV Guided Editing Page.
-- Review the files in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/Manroe'.
-   - The PDF file is the CV input we're using to evaluate the system's CV Parser quality
-   - The 1,2,3 files are the system each step's input/ output
-   - The other files are current progress/ status
+- The focus of our initiative is to improve the existing CV text extracting -> send extracted texts & prompts to ChatGPT -> receive structured .JSON -> populating .JSON into CV Guided Editing page correctly.
+   - Review the files in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/Manroe'.
+      - The PDF file is the sample CV input.
+      - The 1,2,3 files are the system each step's input/ output
 - Let me know once you have fully understood the context here. Do not proceed to make any change yet.
 
 + Implement the CV attachment sent to ChatGPT API

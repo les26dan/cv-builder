@@ -5,7 +5,7 @@ const TestimonialsSection: React.FC = () => {
   const { testimonials } = landingPage;
 
   return (
-    <section className="flex flex-col justify-center items-center px-4 md:px-[120px] py-[60px] gap-12 w-full min-h-[440px] bg-[#E0F7FA]">
+    <section className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] gap-12 w-full min-h-[440px] bg-[#E0F7FA]">
       {/* Testimonials Title */}
       <h2 className="font-inter font-bold text-3xl md:text-4xl leading-tight md:leading-[43px] text-center text-[#111827] w-full max-w-[600px]">
         {testimonials.title}
@@ -19,7 +19,7 @@ const TestimonialsSection: React.FC = () => {
             <div className="flex flex-row items-center gap-3 w-full h-12">
               {/* Avatar */}
               <div className="w-12 h-12 bg-[#B2EBF2] rounded-full flex items-center justify-center">
-                <span className="font-inter font-semibold text-lg text-[#0288D1]">
+                <span className="font-inter font-semibold text-lg text-[#0277BD]">
                   {testimonial.name.charAt(0)}
                 </span>
               </div>

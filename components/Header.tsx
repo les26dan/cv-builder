@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { landingPage } from '../config/texts/index';
 import { handleSecondaryCTA } from '../utils/navigation';
 import { UserDrawer } from './common/UserDrawer';
+import { FeedbackModal } from './common/FeedbackModal';
 import { checkAuthentication } from '../lib/auth';
 
 interface UserSession {
@@ -19,6 +20,7 @@ export default function Header() {
   const [user, setUser] = useState<UserSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi');
 
   useEffect(() => {
@@ -53,6 +55,14 @@ export default function Header() {
     window.location.href = '/register'; // Routes to /register
   };
 
+  const handleFeedbackClick = () => {
+    setShowFeedbackModal(true);
+  };
+
+  const handleCloseFeedback = () => {
+    setShowFeedbackModal(false);
+  };
+
   const handleAvatarClick = () => {
     setShowUserDrawer(true);
   };
@@ -70,14 +80,14 @@ export default function Header() {
   };
 
   return (
-    <header className="flex flex-row justify-between items-center px-4 md:px-[120px] w-full h-20 bg-white border border-[#E2E8F0]">
+    <header className="flex flex-row justify-between items-center px-4 sm:px-6 lg:px-10 w-full h-20 bg-white border border-[#E2E8F0]">
       {/* Logo */}
       <button 
         onClick={() => {
           // Marketing site behavior - reload page or scroll to top
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        className="font-inter font-bold text-2xl leading-[29px] text-[#0277bd] hover:text-[#0288D1] active:text-[#0277BD] transition-colors duration-200 bg-none border-none cursor-pointer px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0288D1] focus:ring-opacity-50"
+        className="font-inter font-bold text-2xl leading-[29px] text-[#0277BD] hover:text-primary-600 active:text-[#0277BD] transition-colors duration-200 bg-none border-none cursor-pointer px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
         title="OkBuddy - Trang chủ"
         aria-label="OkBuddy - Trang chủ"
       >
@@ -86,19 +96,30 @@ export default function Header() {
 
       {/* Navigation Links - Hidden as per task requirements */}
       <nav className="hidden">
-        <a href="#features" className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0288D1] transition-colors">
+        <a href="#features" className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0277BD] transition-colors">
           {header.nav.features}
         </a>
-        <a href="#pricing" className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0288D1] transition-colors">
+        <a href="#pricing" className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0277BD] transition-colors">
           {header.nav.pricing}
         </a>
-        <a href="#about" className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0288D1] transition-colors">
+        <a href="#about" className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0277BD] transition-colors">
           {header.nav.about}
         </a>
       </nav>
 
-      {/* Auth Buttons / User Avatar */}
-      <div className="flex flex-row justify-center items-center gap-4 w-[236px] h-10">
+      {/* Navigation & Auth Section */}
+      <div className="flex flex-row justify-center items-center gap-4">
+        {/* Feedback Button */}
+        <button
+          onClick={handleFeedbackClick}
+          className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0277BD] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
+          aria-label="Gửi feedback"
+        >
+          Feedback
+        </button>
+        
+        {/* Auth Buttons / User Avatar */}
+        <div className="flex flex-row justify-center items-center gap-4">
         {isLoading ? (
           // Loading state
           <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -118,9 +139,9 @@ export default function Header() {
             {/* Login Button */}
             <button 
               onClick={handleLoginClick}
-              className="flex flex-row justify-center items-center w-[100px] h-10 bg-white border border-[#0288D1] rounded-lg hover:bg-[#E1F5FE] transition-colors"
+              className="flex flex-row justify-center items-center w-[100px] h-10 bg-white border border-[#0277BD] rounded-lg hover:bg-[#E1F5FE] transition-colors"
             >
-              <span className="font-inter font-medium text-sm leading-[17px] text-[#0288D1]">
+              <span className="font-inter font-medium text-sm leading-[17px] text-[#0277BD]">
                 {header.auth.login}
               </span>
             </button>
@@ -128,7 +149,7 @@ export default function Header() {
             {/* Signup Button */}
             <button 
               onClick={handleSignupClick}
-              className="flex flex-row justify-center items-center w-[120px] h-10 bg-[#0288D1] rounded-lg hover:bg-[#0277BD] transition-colors"
+              className="flex flex-row justify-center items-center w-[120px] h-10 bg-[#0277BD] rounded-lg hover:bg-primary-600 transition-colors"
             >
               <span className="font-inter font-medium text-sm leading-[17px] text-white">
                 {header.auth.signup}
@@ -136,6 +157,7 @@ export default function Header() {
             </button>
           </>
         )}
+        </div>
       </div>
 
       {/* User Drawer */}
@@ -145,6 +167,14 @@ export default function Header() {
         user={user}
         currentLanguage={currentLanguage}
         onLanguageChange={handleLanguageChange}
+      />
+
+      {/* Feedback Modal */}
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={handleCloseFeedback}
+        userEmail={user?.email}
+        currentLanguage={currentLanguage}
       />
     </header>
   );

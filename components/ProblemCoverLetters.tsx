@@ -14,7 +14,7 @@ const ProblemCoverLetters: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-row justify-center items-center px-4 md:px-[120px] py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
+    <section className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
       {/* Image Container */}
       <div className="flex flex-row justify-center items-center w-full md:w-[500px] h-[360px] bg-white shadow-[0px_4px_20px_rgba(0,0,0,0.063)] rounded-xl">
         {/* Cover Letter UI */}
@@ -57,7 +57,7 @@ const ProblemCoverLetters: React.FC = () => {
           {/* Generate Button */}
           <button 
             onClick={handleCTAClick}
-            className="flex flex-row justify-center items-center w-full h-12 bg-[#0288D1] rounded-md hover:bg-[#0277BD] transition-colors"
+            className="flex flex-row justify-center items-center w-full h-12 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
           >
             <span className="font-inter font-semibold text-base leading-[19px] text-white">
               {coverLetters.coverLetterUI.cta}
@@ -69,7 +69,7 @@ const ProblemCoverLetters: React.FC = () => {
       {/* Content */}
       <div className="flex flex-col items-start gap-6 w-full md:w-[500px]">
         {/* Section Label */}
-        <div className="flex flex-row justify-center items-center px-3 h-7 bg-[#0288D1] rounded-[14px]">
+                    <div className="flex flex-row justify-center items-center px-3 h-7 bg-[#0277BD] rounded-[14px]">
           <span className="font-inter font-semibold text-sm leading-[17px] text-white">
             {coverLetters.label}
           </span>

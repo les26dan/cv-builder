@@ -500,19 +500,14 @@ Mandatory requirements for your response:
         }) || []
       },
       education: {
-        items: parsedData.education?.map((edu, index) => {
-          console.log(`🔍 CV Parser: Education ${index + 1} - Raw data:`, JSON.stringify(edu, null, 2));
-          const mappedEdu = {
-            id: `education-${index}-${Date.now()}`,   // Add unique ID for React keys
-            degree: edu.degree,
-            institution: edu.institution,
-            location: edu.location,
-            graduationDate: edu.graduationDate,
-            description: edu.description
-          };
-          console.log(`🔍 CV Parser: Education ${index + 1} - Mapped data:`, JSON.stringify(mappedEdu, null, 2));
-          return mappedEdu;
-        }) || []
+        items: parsedData.education?.map((edu, index) => ({
+          id: `education-${index}-${Date.now()}`,   // Add unique ID for React keys
+          degree: edu.degree,
+          institution: edu.institution,
+          location: edu.location,
+          graduationDate: edu.graduationDate,
+          description: edu.description
+        })) || []
       },
       skills: {
         items: parsedData.skills || []

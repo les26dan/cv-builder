@@ -14,6 +14,7 @@ const textModules = {
     workspace: () => import('./en/workspace').then(m => m.workspace),
     cvUpload: () => import('./en/cvUpload').then(m => m.cvUpload),
     userDrawer: () => import('./en/userDrawer').then(m => m.userDrawer),
+    feedback: () => import('./en/feedback').then(m => m.feedback),
     jdAnalysis: () => import('./en/jdAnalysis').then(m => m.jdAnalysisTexts),
     jdOptimization: () => import('./en/jdOptimization').then(m => m.enJDOptimizationTexts),
     workExperienceWizard: () => import('./en/workExperienceWizard').then(m => m.default),
@@ -25,6 +26,7 @@ const textModules = {
     workspace: () => import('./vi/workspace').then(m => m.workspace),
     cvUpload: () => import('./vi/cvUpload').then(m => m.cvUpload),
     userDrawer: () => import('./vi/userDrawer').then(m => m.userDrawer),
+    feedback: () => import('./vi/feedback').then(m => m.feedback),
     jdAnalysis: () => import('./vi/jdAnalysis').then(m => m.jdAnalysisTexts),
     jdOptimization: () => import('./vi/jdOptimization').then(m => m.viJDOptimizationTexts),
     workExperienceWizard: () => import('./vi/workExperienceWizard').then(m => m.default),
@@ -98,6 +100,7 @@ export { account } from './en/account';
 export { workspace } from './en/workspace';
 export { cvUpload } from './en/cvUpload';
 export { userDrawer } from './en/userDrawer';
+export { feedback } from './en/feedback';
 export { jdAnalysisTexts } from './en/jdAnalysis';
 export { enJDOptimizationTexts as jdOptimization } from './en/jdOptimization';
 export { default as workExperienceWizard } from './en/workExperienceWizard';

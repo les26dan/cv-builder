@@ -1,11 +1,11 @@
 import { Suspense } from "react";
-import Header from "@/components/auth/Header";
+import SharedHeader from "@/components/SharedHeader";
 import LoginPageContent from "@/components/auth/LoginPageContent";
 
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+      <SharedHeader variant="auth" showFeedback={false} />
       
       <Suspense fallback={
         <main className="flex-1 flex justify-center items-center px-4 py-6 sm:px-6 lg:px-8">

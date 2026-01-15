@@ -17,6 +17,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   totalPages = 1,
   isPreview = false
 }: DennisSchroderTemplateProps) => {
+  
   const getSectionClass = (section: string) => {
     return `p-2 -mx-2 cv-section ${activeSection === section ? 'bg-blue-50 rounded-sm' : ''}`;
   };
@@ -53,29 +54,40 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
 
   // Check if section has content
   const hasContent = (sectionId: string, data: any) => {
-    if (!data) return false;
     
+    if (!data) {
+      return false;
+    }
+    
+    let result = false;
     switch (sectionId) {
       case 'contact':
-        return data.fullName || data.email || data.phone || data.location;
+        result = data.fullName || data.email || data.phone || data.location;
+        break;
       case 'summary':
-        return data.content && typeof data.content === 'string' && data.content.trim();
+        result = data.content && typeof data.content === 'string' && data.content.trim();
+        break;
       case 'experience':
-        return data.items && data.items.length > 0 && data.items.some((item: any) => item.title || item.company);
+        result = data.items && data.items.length > 0 && data.items.some((item: any) => item.title || item.company);
+        break;
       case 'skills':
-        return data.items && data.items.length > 0;
+        result = data.items && data.items.length > 0;
+        break;
       case 'education':
-        return data.items && data.items.length > 0 && data.items.some((item: any) => item.degree || item.institution);
+        result = data.items && data.items.length > 0 && data.items.some((item: any) => item.degree || item.institution);
+        break;
       default:
         // For custom sections
         if (data.items) {
-          return data.items.length > 0;
+          result = data.items.length > 0;
+        } else if (data.content) {
+          result = data.content.trim();
+        } else {
+          result = false;
         }
-        if (data.content) {
-          return data.content.trim();
-        }
-        return false;
     }
+    
+    return result;
   };
 
   // PDF-exact styling constants
@@ -186,7 +198,10 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   // Render experience section - EXACTLY matching PDF
   const renderExperienceSection = (sectionId: string) => {
     const data = cvData[sectionId] || cvData.experience;
-    if (!hasContent(sectionId, data)) return null;
+    
+    if (!hasContent(sectionId, data)) {
+      return null;
+    }
 
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
@@ -225,7 +240,10 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   // Render skills section - EXACTLY matching PDF
   const renderSkillsSection = (sectionId: string) => {
     const data = cvData[sectionId] || cvData.skills;
-    if (!hasContent(sectionId, data)) return null;
+    
+    if (!hasContent(sectionId, data)) {
+      return null;
+    }
 
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
@@ -250,7 +268,10 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   // Render education section - EXACTLY matching PDF
   const renderEducationSection = (sectionId: string) => {
     const data = cvData[sectionId] || cvData.education;
-    if (!hasContent(sectionId, data)) return null;
+    
+    if (!hasContent(sectionId, data)) {
+      return null;
+    }
 
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
@@ -405,23 +426,91 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
       }
     });
 
-    // Distribute sections across pages with proper page breaks
-    const pageHeight = 980; // A4 content height in pixels
+    // Distribute sections across pages with intelligent page break logic
+    const pageHeight = 1100; // More realistic A4 content height for better content distribution
+    const bottomMargin = 76; // 0.75 inch bottom margin in pixels
+    const usablePageHeight = pageHeight - bottomMargin; // Content area before margin
     const pages: string[][] = [];
     let currentPageSections: string[] = [];
     let currentPageHeight = 0;
     
+    // Helper function to check if a section should stay together
+    const shouldKeepTogether = (section: string, sectionHeight: number) => {
+      // Content-Aware Decisions from specifications:
+      
+      // 1. Section Boundaries: Keep headers with following content
+      if (sectionHeight > 0 && sectionHeight < 120) {
+        // Small sections (headers + minimal content) should stay together
+        return true;
+      }
+      
+      // 2. Keep-Together Rules: Allow experience to split but keep individual jobs together
+      if (section === 'experience') {
+        // Allow work experience section to be distributed across pages
+        // Individual job entries will be kept together in rendering logic
+        return false;
+      }
+      
+      // 3. List Management: Bullet lists maintain proper grouping
+      if (section === 'skills') {
+        // Skills section should stay together (typically fits on one page)
+        return sectionHeight < usablePageHeight * 0.3; // If less than 30% of page
+      }
+      
+      return false;
+    };
+    
+    // Helper function to check minimum content requirement
+    const hasMinimumContent = (section: string) => {
+      switch (section) {
+        case 'contact':
+          return cvData.contact?.fullName; // Must have at least a name
+        case 'summary':
+          return cvData.summary?.content && cvData.summary.content.length > 50; // Meaningful summary
+        case 'experience':
+          return cvData.experience?.items && cvData.experience.items.length > 0; // At least one job
+        case 'skills':
+          return cvData.skills?.items && cvData.skills.items.length >= 3; // At least 3 skills
+        case 'education':
+          return cvData.education?.items && cvData.education.items.length > 0; // At least one degree
+        default:
+          return true;
+      }
+    };
+    
     for (const section of allSections) {
       const sectionHeight = sectionHeights[section] || 0;
       
-      if (sectionHeight === 0) continue; // Skip empty sections
+      if (sectionHeight === 0 || !hasMinimumContent(section)) continue; // Skip empty/insufficient sections
       
-      // If adding this section would exceed page height, start new page
-      if (currentPageHeight + sectionHeight > pageHeight && currentPageSections.length > 0) {
-        pages.push(currentPageSections);
-        currentPageSections = [section];
-        currentPageHeight = sectionHeight;
+      // Professional Page Break Logic:
+      // "Content approaching bottom margin triggers new page"
+      const wouldExceedUsableHeight = currentPageHeight + sectionHeight > usablePageHeight;
+      const hasContentOnPage = currentPageSections.length > 0;
+      
+      if (wouldExceedUsableHeight && hasContentOnPage) {
+        // Check if this section should be kept together
+        if (shouldKeepTogether(section, sectionHeight)) {
+          // Move entire section to next page to keep it together
+          pages.push(currentPageSections);
+          currentPageSections = [section];
+          currentPageHeight = sectionHeight;
+        } else {
+          // Section can be split - add it to current page if there's some room
+          const remainingSpace = usablePageHeight - currentPageHeight;
+          
+          if (remainingSpace > 100) { // If at least 100px left, use current page
+            currentPageSections.push(section);
+            currentPageHeight += sectionHeight;
+          } else {
+            // Not enough space, move to next page
+            pages.push(currentPageSections);
+            currentPageSections = [section];
+            currentPageHeight = sectionHeight;
+          }
+        }
       } else {
+        // Section fits on current page
         currentPageSections.push(section);
         currentPageHeight += sectionHeight;
       }
@@ -453,11 +542,14 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
         MozOsxFontSmoothing: 'grayscale'
       }}
     >
-      {sectionsToShow.map((sectionId: string) => (
-        <div key={sectionId}>
-          {renderSection(sectionId)}
-        </div>
-      ))}
+      {sectionsToShow.map((sectionId: string) => {
+        const renderedSection = renderSection(sectionId);
+        return (
+          <div key={sectionId}>
+            {renderedSection}
+          </div>
+        );
+      })}
       
       {/* Page indicator for multi-page documents - matching PDF */}
       {totalPages > 1 && (

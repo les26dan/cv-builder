@@ -32,7 +32,7 @@ export default function Header() {
         <div className="flex items-center gap-2 sm:gap-4">
           <Link 
             href="/login"
-            className="flex items-center justify-center min-w-[70px] sm:min-w-[100px] h-9 sm:h-11 px-3 sm:px-5 bg-white border-2 border-primary text-primary text-xs sm:text-sm font-semibold rounded-lg hover:bg-primary-50 hover:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-all duration-200 whitespace-nowrap"
+            className="flex items-center justify-center min-w-[70px] sm:min-w-[100px] h-9 sm:h-11 px-3 sm:px-5 bg-white border border-primary text-primary text-xs sm:text-sm font-semibold rounded-lg hover:bg-primary-50 hover:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 transition-all duration-200 whitespace-nowrap"
           >
             {account.nav.login}
           </Link>

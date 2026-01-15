@@ -1,6 +1,6 @@
 'use client';
 
-import Header from '../components/Header';
+import SharedHeader from '../components/SharedHeader';
 import HeroSection from '../components/HeroSection';
 import SectionDivider from '../components/SectionDivider';
 import ProblemATS from '../components/ProblemATS';
@@ -13,7 +13,7 @@ import Footer from '../components/Footer';
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <SharedHeader variant="landing" />
       <HeroSection />
       <SectionDivider activeIndex={0} />
       <ProblemATS />
@@ -21,7 +21,10 @@ export default function Home() {
       <ProblemKeywords />
       <SectionDivider activeIndex={2} />
       <ProblemMassCV />
-      <ProblemCoverLetters />
+      {/* ProblemCoverLetters section hidden per UI polish requirements */}
+      <div style={{ display: 'none' }}>
+        <ProblemCoverLetters />
+      </div>
       <SectionDivider activeIndex={0} />
       <TestimonialsSection />
       <Footer />

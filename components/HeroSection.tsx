@@ -5,7 +5,7 @@ import { landingPage } from '../config/texts/index';
 import { handlePrimaryCTA, trackCTAClick } from '../utils/navigation';
 
 const HeroSection: React.FC = () => {
-  const { hero, resume } = landingPage;
+  const { hero, resume, problems } = landingPage;
 
   const handleCTAClick = async () => {
     trackCTAClick('hero_section');
@@ -13,7 +13,7 @@ const HeroSection: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-col justify-center items-center px-4 md:px-[120px] py-[60px] md:py-[60px] pb-[80px] gap-8 w-full min-h-[840px] bg-[#E0F7FA]">
+    <section className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] md:py-[60px] pb-[80px] gap-8 w-full min-h-[840px] bg-[#E0F7FA]">
       {/* Content Container */}
       <div className="flex flex-col justify-center items-center gap-6 w-full max-w-[800px]">
         {/* Main Headline */}
@@ -29,9 +29,9 @@ const HeroSection: React.FC = () => {
         {/* CTA Button */}
         <button 
           onClick={handleCTAClick}
-          className="flex flex-row justify-center items-center w-full sm:w-[240px] h-14 bg-[#0288D1] shadow-[0px_4px_12px_rgba(2,136,209,0.125)] rounded-lg hover:bg-[#0277BD] transition-colors"
+          className="flex flex-row justify-center items-center w-full h-12 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
         >
-          <span className="font-inter font-semibold text-lg leading-[22px] text-white">
+          <span className="font-inter font-semibold text-base leading-[19px] text-white">
             {hero.cta}
           </span>
         </button>
@@ -64,10 +64,10 @@ const HeroSection: React.FC = () => {
               {/* Score Text */}
               <div className="flex flex-col items-start gap-1 flex-1">
                 <span className="font-inter font-semibold text-sm md:text-base leading-[19px] text-[#111827]">
-                  Điểm CV
+                  {problems.ats.scoreCard.title}
                 </span>
                 <span className="font-inter font-normal text-xs md:text-sm leading-[17px] text-[#374151]">
-                  CV của bạn chỉ phù hợp 60% với yêu cầu công việc
+                  {problems.ats.scoreCard.description}
                 </span>
               </div>
             </div>
@@ -94,7 +94,7 @@ const HeroSection: React.FC = () => {
                 <div className="flex flex-row flex-wrap items-center gap-2 w-full">
                   {resume.preview.skillsList.map((skill: any, index) => (
                     <div key={index} className="flex flex-row justify-center items-center px-2 md:px-3 h-7 md:h-8 bg-[#E1F5FE] rounded-2xl">
-                      <span className="font-inter font-medium text-xs md:text-sm leading-[17px] text-[#0288D1]">
+                      <span className="font-inter font-medium text-xs md:text-sm leading-[17px] text-[#0277BD]">
                         {typeof skill === 'object' && skill.name ? skill.name : skill}
                       </span>
                     </div>
@@ -136,9 +136,9 @@ const HeroSection: React.FC = () => {
             {/* Apply Button */}
             <button 
               onClick={handleCTAClick}
-              className="flex flex-row justify-center items-center w-full h-10 bg-[#0288D1] rounded-md hover:bg-[#0277BD] transition-colors"
+              className="flex flex-row justify-center items-center w-full h-12 px-4 py-3 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
             >
-              <span className="font-inter font-semibold text-sm leading-[17px] text-white">
+              <span className="font-inter font-semibold text-base leading-[19px] text-white">
                 {resume.aiSuggestions.cta}
               </span>
             </button>

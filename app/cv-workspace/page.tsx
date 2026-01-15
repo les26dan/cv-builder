@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import HeaderMinimal from '@/components/HeaderMinimal'
+import SharedHeader from '@/components/SharedHeader'
 import CVCard from '@/components/CVCard'
-import { workspace } from '@/config/texts/index'
+import { getTexts } from '@/config/texts/index'
 import { fetchUserCVs, createNewCV, deleteCV, CVData } from '@/lib/supabase'
 
 interface User {
@@ -20,11 +20,30 @@ export default function WorkspacePage() {
   const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [workspace, setWorkspace] = useState<any>(null)
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
   const router = useRouter()
 
   useEffect(() => {
+    loadTexts()
     checkAuthentication()
   }, [])
+
+  const loadTexts = async () => {
+    try {
+      // Check for saved language preference
+      const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en' || 'en'
+      setCurrentLanguage(savedLanguage)
+      
+      const workspaceTexts = await getTexts('workspace', savedLanguage)
+      setWorkspace(workspaceTexts)
+    } catch (error) {
+      console.error('Failed to load texts:', error)
+      // Fallback to English
+      const workspaceTexts = await getTexts('workspace', 'en')
+      setWorkspace(workspaceTexts)
+    }
+  }
 
   const checkAuthentication = async () => {
     try {
@@ -193,13 +212,25 @@ export default function WorkspacePage() {
   //   )
   // }
 
+  // Don't render until workspace texts are loaded
+  if (!workspace) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen" style={{ background: '#E0F7FA' }}>
-      {/* Keep the current header untouched */}
-      <HeaderMinimal />
+      {/* Use SharedHeader for consistency */}
+      <SharedHeader variant="app" showFeedback={false} />
       
       {/* Main Container - Responsive with legacy layout */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6">
         {/* Main Content - Responsive */}
         <div className="mt-6 space-y-5">
           {/* Page Header - Responsive with legacy layout */}
@@ -217,14 +248,14 @@ export default function WorkspacePage() {
               </p>
             </div>
 
-            {/* Create Button - Right Aligned with legacy styling */}
+            {/* Create Button - Right Aligned with new color scheme */}
             <button
               onClick={handleCreateNew}
               disabled={isCreating}
               className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 rounded-lg font-semibold text-sm sm:text-base transition-colors w-full sm:w-auto font-inter ${
                 isCreating 
                   ? 'bg-gray-400 cursor-not-allowed opacity-70' 
-                  : 'bg-cyan-600 hover:bg-cyan-700 cursor-pointer'
+                  : 'bg-[#0277BD] hover:bg-primary-600 cursor-pointer'
               }`}
             >
               {/* Plus Icon */}
@@ -254,7 +285,7 @@ export default function WorkspacePage() {
 
               {/* Button Text */}
               <span className="text-white">
-                {isCreating ? 'Đang tạo...' : workspace.page.createButton}
+                {isCreating ? (currentLanguage === 'en' ? 'Creating...' : 'Đang tạo...') : workspace.page.createButton}
               </span>
             </button>
           </div>
@@ -284,11 +315,11 @@ export default function WorkspacePage() {
                 className={`mt-6 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-base transition-colors w-full sm:w-auto font-inter ${
                   isCreating 
                     ? 'bg-gray-400 cursor-not-allowed opacity-70' 
-                    : 'bg-cyan-600 hover:bg-cyan-700 cursor-pointer'
+                    : 'bg-[#0277BD] hover:bg-primary-600 cursor-pointer'
                 }`}
               >
                 <span className="text-white">
-                  {isCreating ? 'Đang tạo...' : workspace.empty.cta}
+                  {isCreating ? (currentLanguage === 'en' ? 'Creating...' : 'Đang tạo...') : workspace.empty.cta}
                 </span>
               </button>
             </div>

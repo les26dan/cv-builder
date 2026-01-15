@@ -9,8 +9,8 @@ interface PreviewPanelProps {
   setActiveSection: (section: string | null) => void;
 }
 
-// Memoized PreviewPanel for performance optimization
-export const PreviewPanel = memo<PreviewPanelProps>(({
+// PreviewPanel component - removed memo to ensure proper re-rendering on cvData changes
+export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   cvData,
   activeSection,
   setActiveSection
@@ -56,19 +56,13 @@ export const PreviewPanel = memo<PreviewPanelProps>(({
     // Initial scale calculation
     updateScale();
 
-    // Listen for container resize
-    const resizeObserver = new ResizeObserver(updateScale);
-    if (previewContainerRef.current) {
-      resizeObserver.observe(previewContainerRef.current);
-    }
-
-    // Listen for window resize as backup
-    window.addEventListener('resize', updateScale);
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateScale);
+    // Handle window resize
+    const handleResize = () => {
+      updateScale();
     };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [calculateOptimalScale]);
 
   // Calculate total pages based on actual content height
@@ -232,7 +226,7 @@ export const PreviewPanel = memo<PreviewPanelProps>(({
           {/* Download Button */}
           <div className="relative">
             <button 
-              className="flex items-center gap-2 px-4 py-2 bg-[#0288D1] text-white rounded-lg hover:bg-[#0277bd] disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
+              className="flex items-center gap-2 px-4 py-2 bg-[#0277BD] text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" 
               onClick={toggleDropdown}
               onBlur={handleDropdownBlur}
               disabled={downloadLoading !== null}
@@ -294,12 +288,12 @@ export const PreviewPanel = memo<PreviewPanelProps>(({
               fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
             }}
           >
-            <DennisSchroderTemplate 
-              cvData={cvData} 
+            <DennisSchroderTemplate
+              cvData={cvData}
               activeSection={activeSection}
-              onSectionClick={handleSectionClick}
+              onSectionClick={setActiveSection}
               currentPage={currentPage}
-              totalPages={totalPages}
+              totalPages={totalPages}  // Use calculated pagination for true WYSIWYG preview
               isPreview={true}
             />
           </div>
@@ -307,7 +301,7 @@ export const PreviewPanel = memo<PreviewPanelProps>(({
       </div>
     </div>
   );
-});
+};
 
 // Display name for React DevTools
 PreviewPanel.displayName = 'PreviewPanel';

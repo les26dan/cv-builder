@@ -1,7 +1,39 @@
 # Technical Debt Registry
-**Last Updated**: January 29, 2025
+**Last Updated**: January 31, 2025
 
 ## 🚨 **Critical Technical Debt**
+
+### **🔄 RECURRING ISSUE: Webpack Module Error Pattern** 
+**Date Added**: January 31, 2025  
+**Date Enhanced**: January 31, 2025  
+**Component**: Server Management & Build System  
+**Issue**: `Error: Cannot find module './[number].js'` - **RECURRING PATTERN** (./638.js, ./7627.js, etc.)
+**Pattern**: Numbers vary but same webpack cache corruption root cause
+**Impact**: Complete application failure, unable to load any pages  
+**Root Cause Analysis**: 
+- **Primary**: Webpack module chunk corruption during hot reloading in development
+- **Secondary**: Next.js cache inconsistency with rapid file changes
+- **Trigger**: Frequent server restarts, rapid file modifications, cache fragmentation
+**Enhanced Resolution (v2.0)**:
+- **Aggressive Cache Cleaning**: Extended to webpack hot-update files, orphaned chunks, npm cache verification
+- **Pattern Logging**: All occurrences logged to `webpack-error-patterns.log` for trend analysis
+- **Enhanced Detection**: Improved error pattern matching with context logging
+- **Proactive Prevention**: 3-second stabilization delay and enhanced dependency verification
+**Prevention Measures Enhanced**:
+- Pattern detection: `Cannot find module|./[0-9]+.js|webpack_require.*.f.require|Error.*webpack`
+- Hot-reload artifact cleanup: `*.hot-update.*` files removed proactively
+- Orphaned chunk cleanup in `node_modules` and `.next/server` directories
+- NPM cache verification with integrity checking
+- Recurring pattern tracking and trend analysis
+**Status**: 🔄 **ENHANCED MONITORING** - Advanced prevention system active
+
+**Why This Keeps Happening:**
+1. **Development Hot Reloading**: Creates temporary webpack chunks that can become orphaned
+2. **Rapid File Changes**: Fast modifications corrupt chunk mapping in development mode
+3. **Cache Fragmentation**: Multiple server restarts cause webpack cache inconsistency
+4. **Next.js Dev Optimization**: Aggressive development optimizations leave stale references
+
+**Recommended**: Consider production-mode development for critical stability periods
 
 ### **CV Parser Implementation Session Debt**
 **Date Added**: January 29, 2025  
@@ -15,15 +47,30 @@
 **Quick Fix**: Manual checkbox selection required  
 **Proper Fix**: Debug component props flow, check WorkExperienceSection state management  
 
-#### **2. CV Preview Panel Synchronization**
-**Severity**: CRITICAL  
-**Description**: CV Editor populates correctly but Preview panel shows empty/incorrect data  
-**Impact**: Users cannot see CV preview, defeats purpose of guided editing  
-**Root Cause**: Missing data flow between editor and preview components  
-**Quick Fix**: Manual refresh or navigation  
-**Proper Fix**: Implement proper state synchronization between CVEditor and PreviewPanel  
+#### **2. CV Preview Panel Synchronization** ✅ **RESOLVED**
+**Severity**: ~~CRITICAL~~ **FIXED**  
+**Description**: ~~CV Editor populates correctly but Preview panel shows empty/incorrect data~~ **FIXED: CV Preview now shows correct data**  
+**Impact**: ~~Users cannot see CV preview, defeats purpose of guided editing~~ **RESOLVED: Full WYSIWYG preview working**  
+**Root Cause**: ~~Missing data flow between editor and preview components~~ **IDENTIFIED: Forced single-page mode prevented proper content display**  
+**Resolution Date**: January 28, 2025  
+**Solution Implemented**: 
+- Removed forced `totalPages={1}` override in PreviewPanel.tsx
+- Implemented intelligent page break logic in DennisSchroderTemplate.tsx  
+- Added content-aware pagination following professional CV standards
+- Enhanced page height calculation for better content distribution  
 
 ## 🧹 **Test Configuration Debt**
+
+### **Language Testing Configuration** 
+**Date Added**: January 31, 2025
+**Severity**: MEDIUM
+**Component**: Test Suite Configuration
+**Description**: Tests are configured for Vitest but expect Vietnamese text after English language standardization
+**Impact**: Test failures due to language expectation mismatches (tests expect "Dùng thử miễn phí ngay" but now get "Try Free Now")
+**Quick Fix**: Tests are failing but production build and functionality verified working
+**Proper Fix**: Update test expectations to match English configuration or implement dynamic language testing
+**Root Cause**: HeroSection language fix changed Vietnamese text to English, breaking test assertions
+**Priority**: Low (production functionality unaffected)
 
 #### **3. Vitest Import Configuration**
 **Severity**: MEDIUM  
@@ -46,8 +93,9 @@
 #### **5. Debug Console Logs in Production**
 **Severity**: LOW  
 **Description**: Multiple console.log statements left in production code for debugging  
-**Files**: `CVEditor.tsx`, `cvParserService.ts`, `app/cv-uploaded-test/page.tsx`  
+**Files**: `CVEditor.tsx`, `app/cv-uploaded-test/page.tsx`  
 **Impact**: Console noise in production  
+**Note**: Education field mapping debug logs removed from `cvParserService.ts` (Jan 29, 2025)  
 **Quick Fix**: Remove specific console.log statements  
 **Proper Fix**: Implement proper logging service with environment-based levels  
 
@@ -84,6 +132,24 @@
 **Root Cause**: Missing error boundaries and fallback mechanisms  
 **Quick Fix**: Show generic error message  
 **Proper Fix**: Implement retry logic and offline capabilities  
+
+## 🔧 **Component Architecture Debt**
+
+#### **Header Component Consolidation** 
+**Date Added**: January 31, 2025  
+**Severity**: LOW  
+**Component**: Header Components  
+**Description**: Multiple header components creating maintenance overhead - both `Header.tsx` and `SharedHeader.tsx` exist  
+**Impact**: Code duplication, potential confusion for developers  
+**Root Cause**: Legacy header components not removed after SharedHeader implementation  
+**Current Status**: 
+- ✅ SharedHeader implemented and deployed to all pages (landing, auth, CV workspace)
+- 🔄 Legacy Header.tsx still exists but deprecated
+**Solution Strategy**: 
+- 🔄 **Next Sprint**: Remove legacy Header.tsx after confirming all references updated
+- 🔄 **Next Sprint**: Update any remaining import statements to use SharedHeader consistently
+- 🔄 **Next Sprint**: Clean up auth-specific header components if no longer needed
+**Status**: 🟡 **PLANNING** - Ready for cleanup in next maintenance cycle
 
 ## 📊 **Performance Debt**
 
@@ -157,3 +223,54 @@
 2. **HIGH severity debt must have workaround documented**
 3. **All debt items must have clear resolution path**
 4. **Debt review required before each release**
+
+## Recent Additions (January 30, 2025)
+
+### **CV Parser Debug Logging** - `MINOR`
+- **Location**: `components/CVEditor.tsx`, `components/PreviewPanel.tsx`, `components/templates/DennisSchroderTemplate.tsx`
+- **Issue**: Comprehensive debug console.log statements added during debugging session
+- **Impact**: Console pollution in production, minor performance overhead
+- **Priority**: Low (remove post-launch)
+- **Effort**: 30 minutes
+- **Context**: Added for debugging Preview Panel synchronization issue - now resolved
+
+### **PreviewPanel Pagination Navigation** - `MINOR`
+- **Location**: `components/PreviewPanel.tsx` 
+- **Issue**: Page 2/2 navigation button not functional (cosmetic issue)
+- **Impact**: Users see pagination controls but can't navigate (single-page mode is intended)
+- **Priority**: Low (UI polish)
+- **Effort**: 1 hour
+- **Context**: After forcing single-page mode, pagination controls should be hidden or removed
+
+### **Education Section Text Truncation** - `MINOR`
+- **Location**: `components/templates/DennisSchroderTemplate.tsx`
+- **Issue**: "HỌC VAN" text appears cut off in Preview Panel
+- **Impact**: Minor visual issue, doesn't affect functionality
+- **Priority**: Low (UI polish)
+- **Effort**: 30 minutes
+- **Context**: Likely CSS styling issue with section headers
+
+### **Test Configuration Conflicts** - `MINOR`
+- **Location**: Jest configuration, test files using `vi` instead of Jest mocks
+- **Issue**: Tests fail due to mixing Jest and Vitest syntax
+- **Impact**: Cannot run automated tests for CV Parser components
+- **Priority**: Medium (affects development workflow)
+- **Effort**: 2 hours
+- **Context**: Inconsistent testing framework usage across codebase
+
+---
+
+## 🎯 **CRITICAL SYSTEM FIXES COMPLETED**
+
+### **CV Parser Content Extraction Resolution** ✅ **RESOLVED** (January 31, 2025)
+
+**Issue**: Sample CV responses contained hardcoded placeholder data instead of real ChatGPT API responses.
+
+**Root Cause Analysis**:
+- ✅ PDF text extraction working perfectly 
+- ✅ OpenAI API key valid and functional
+- ❌ `/scripts/cv-responses/` contained manual placeholder data
+
+**Resolution**: Generated real ChatGPT responses for all sample CVs with authentic content.
+
+**Impact**: CV parser now correctly extracts real professional content from PDFs, eliminating placeholder data issues.

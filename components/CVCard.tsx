@@ -1,6 +1,7 @@
 'use client'
 
-import { workspace } from '@/config/texts/index'
+import { useState, useEffect } from 'react'
+import { getTexts } from '@/config/texts/index'
 import { formatTimeAgo } from '@/lib/timeUtils'
 import { CVData } from '@/lib/supabase'
 
@@ -19,6 +20,39 @@ export default function CVCard({
   onDownload, 
   onDelete 
 }: CVCardProps) {
+  const [workspace, setWorkspace] = useState<any>(null)
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  
+  useEffect(() => {
+    loadTexts()
+  }, [])
+
+  const loadTexts = async () => {
+    try {
+      // Check for saved language preference
+      const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en' || 'en'
+      setCurrentLanguage(savedLanguage)
+      
+      const workspaceTexts = await getTexts('workspace', savedLanguage)
+      setWorkspace(workspaceTexts)
+    } catch (error) {
+      console.error('Failed to load texts:', error)
+      // Fallback to English
+      const workspaceTexts = await getTexts('workspace', 'en')
+      setWorkspace(workspaceTexts)
+    }
+  }
+
+  // Don't render until texts are loaded
+  if (!workspace) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    )
+  }
+
   const isHighScore = cv.score >= 90
   const isCompleted = cv.status === 'completed'
 
@@ -41,16 +75,21 @@ export default function CVCard({
   const cardBorder = isHighScore ? '2px solid #4CAF50' : '1px solid #E5E7EB'
 
   const getProgressText = () => {
-    switch (cv.status) {
-      case 'new':
-        return 'Bước 1/4: Upload CV & Mô tả công việc'
-      case 'in_progress':
-        return 'Bước 2/4: Phân tích CV'
-      case 'completed':
-        return 'Bước 4/4: Hoàn tất!'
-      default:
-        return 'Bước 1/4: Upload CV & Mô tả công việc'
+    const steps = {
+      en: {
+        new: 'Step 1/4: Upload CV & Job Description',
+        in_progress: 'Step 2/4: CV Analysis',
+        completed: 'Step 4/4: Complete!',
+      },
+      vi: {
+        new: 'Bước 1/4: Upload CV & Mô tả công việc',
+        in_progress: 'Bước 2/4: Phân tích CV',
+        completed: 'Bước 4/4: Hoàn tất!',
+      }
     }
+    
+    const statusText = steps[currentLanguage]?.[cv.status] || steps[currentLanguage]?.new
+    return statusText || steps.en.new
   }
 
   // Handle card click - navigate to editing based on CV status
@@ -380,7 +419,7 @@ export default function CVCard({
                 fontWeight: 500,
                 fontSize: '14px',
                 lineHeight: '17px',
-                color: '#0288D1',
+                color: '#0277BD',
                 whiteSpace: 'nowrap',
               }}>
                 {workspace.cvCard.actions.edit}
@@ -398,7 +437,7 @@ export default function CVCard({
                 padding: '12px 16px',
                 width: '87px',
                 height: '36px',
-                background: '#0288D1',
+                background: '#0277BD',
                 borderRadius: '6px',
                 border: 'none',
                 cursor: 'pointer',
@@ -408,10 +447,10 @@ export default function CVCard({
                 transition: 'all 0.2s ease-in-out',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#0277BD'
+                e.currentTarget.style.background = '#025596'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0288D1'
+                e.currentTarget.style.background = '#0277BD'
               }}
             >
               <span style={{
