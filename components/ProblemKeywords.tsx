@@ -65,22 +65,22 @@ const ProblemKeywords: React.FC = () => {
           </div>
 
           {/* Missing Keywords */}
-          <div className="flex flex-col items-start gap-2 w-full flex-1">
+          <div className="flex flex-col items-start gap-2 w-full">
             <h3 className="font-inter font-semibold text-base leading-[19px] text-[#111827] w-full">
               {keywords.analysis.missingTitle}
             </h3>
             
-            {/* Keywords List */}
-            <div className="flex flex-col items-start gap-2 w-full">
+            {/* Missing Keywords as horizontal tags with plus icons */}
+            <div className="flex flex-row flex-wrap items-center gap-2 w-full">
               {keywords.analysis.missingList.map((item, index) => (
-                <div key={index} className="flex flex-row items-center gap-2 w-full">
+                <div key={index} className="flex flex-row items-center gap-1 px-3 h-8 bg-[#FEF2F2] rounded-2xl">
                   {/* Plus Icon */}
-                  <div className="w-5 h-5 flex-shrink-0">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <div className="w-4 h-4 flex-shrink-0">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                       <path d="M10 4V16M4 10H16" stroke="#0277BD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <span className="font-inter font-normal text-sm leading-[17px] text-[#111827] flex-1">
+                  <span className="font-inter font-medium text-sm leading-[17px] text-[#EF4444]">
                     {item}
                   </span>
                 </div>

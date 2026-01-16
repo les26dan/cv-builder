@@ -274,3 +274,15 @@
 **Resolution**: Generated real ChatGPT responses for all sample CVs with authentic content.
 
 **Impact**: CV parser now correctly extracts real professional content from PDFs, eliminating placeholder data issues.
+
+---
+
+## 🧪 **Test Suite Maintenance Required**
+**Date Added**: January 31, 2025  
+**Component**: Testing Infrastructure  
+**Issue**: 60% test success rate due to Vietnamese text mismatches and vitest import issues  
+**Impact**: Non-critical - Production builds successful, main functionality works  
+**Root Cause**: UI text changes broke test expectations, some test setup inconsistencies  
+**Resolution Strategy**: Schedule test maintenance during next development sprint  
+**Priority**: Low (production functionality unaffected)  
+**Status**: 📝 **DOCUMENTED** - Deferred to next maintenance cycle

@@ -32,7 +32,7 @@ const ProblemMassCV: React.FC = () => {
         {/* CTA Button */}
         <button 
           onClick={handleCTAClick}
-          className="flex flex-row justify-center items-center w-full h-12 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
+          className="flex flex-row justify-center items-center w-full h-12 px-4 py-3 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
         >
           <span className="font-inter font-semibold text-base leading-[19px] text-white">
             {massCV.cta}

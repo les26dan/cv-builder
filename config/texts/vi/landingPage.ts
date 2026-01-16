@@ -13,7 +13,7 @@ export const landingPage = {
   },
   hero: {
     title: "75% CV bị loại tự động trước khi đến tay nhà tuyển dụng. CV của bạn thì sao?",
-    subtitle: "OkBuddy giúp bạn tiết kiệm hàng giờ viết CV và thư xin việc nổi bật, giúp bạn apply nhanh chóng và tăng đáng kể cơ hội phỏng vấn",
+    subtitle: "Chỉ 2% CV chiến thắng. CV của bạn sẽ là một trong số đó.",
     cta: "Dùng thử miễn phí ngay"
   },
   problems: {

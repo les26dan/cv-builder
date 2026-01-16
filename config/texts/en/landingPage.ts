@@ -13,7 +13,7 @@ export const landingPage = {
   },
   hero: {
     title: "75% of CVs are automatically rejected before reaching recruiters. What about yours?",
-    subtitle: "OkBuddy helps you save hours writing outstanding CVs and cover letters, helping you apply quickly and significantly increase your interview chances",
+    subtitle: "Only 2% of resumes win. Yours will be one of them.",
     cta: "Try Free Now"
   },
   problems: {
