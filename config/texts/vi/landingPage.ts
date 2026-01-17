@@ -1,4 +1,8 @@
 export const landingPage = {
+  seo: {
+    title: "OkBuddy - CV Chiến Thắng Nhà Tuyển Dụng",
+    description: "Tạo CV và thư xin việc tối ưu ATS với AI. Tăng 75% cơ hội phỏng vấn."
+  },
   header: {
     logo: "OkBuddy",
     nav: {
@@ -105,16 +109,19 @@ export const landingPage = {
       {
         name: "Nguyễn Văn A",
         role: "Kỹ sư phần mềm",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format&q=80",
         content: "OkBuddy giúp tôi có được phỏng vấn tại 3 công ty công nghệ hàng đầu bằng cách tối ưu hóa CV cho hệ thống ATS. Công cụ tạo thư xin việc đã tiết kiệm cho tôi hàng giờ làm việc!"
       },
       {
         name: "Trần Thị B", 
         role: "Frontend Developer",
+        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format&q=80",
         content: "Tôi đã bỏ sót các từ khóa quan trọng trong CV khiến hồ sơ bị từ chối tự động. OkBuddy đã xác định chúng và giúp tôi điều chỉnh hồ sơ một cách hoàn hảo."
       },
       {
         name: "Lê Văn C",
         role: "Sinh viên mới tốt nghiệp", 
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80",
         content: "Là sinh viên mới ra trường, tôi đã gặp khó khăn trong việc có được phỏng vấn. OkBuddy giúp tôi ứng tuyển hơn 30 vị trí với CV tùy chỉnh chỉ trong một ngày. Tôi nhận được 5 cuộc gọi phản hồi!"
       }
     ]

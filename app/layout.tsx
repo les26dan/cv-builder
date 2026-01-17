@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OkBuddy - CV & Thư xin việc tự động",
-  description: "Tối ưu CV và tạo thư xin việc nhanh chóng với AI. Tăng 75% cơ hội phỏng vấn.",
+  title: "OkBuddy - Resumes That Win Jobs",
+  description: "Create ATS-optimized resumes and cover letters with AI. Increase your interview chances by 75%.",
 };
 
 export const viewport = {

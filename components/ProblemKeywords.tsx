@@ -43,24 +43,28 @@ const ProblemKeywords: React.FC = () => {
             </h3>
             
             {/* Keywords Container */}
-            <div className="flex flex-row flex-wrap items-center gap-2 w-full">
-              {/* Present Keywords */}
-              {keywords.analysis.presentKeywords.map((keyword, index) => (
-                <div key={`present-${index}`} className="flex flex-row justify-center items-center px-3 h-8 bg-[#E1F5FE] rounded-2xl">
-                                      <span className="font-inter font-medium text-sm leading-[17px] text-[#0277BD]">
-                    {keyword}
-                  </span>
-                </div>
-              ))}
+            <div className="flex flex-col items-start gap-2 w-full">
+              {/* Present Keywords Row */}
+              <div className="flex flex-row flex-wrap items-center gap-2 w-full">
+                {keywords.analysis.presentKeywords.map((keyword, index) => (
+                  <div key={`present-${index}`} className="flex flex-row justify-center items-center px-3 h-8 bg-[#E1F5FE] rounded-2xl">
+                    <span className="font-inter font-medium text-sm leading-[17px] text-[#0277BD]">
+                      {keyword}
+                    </span>
+                  </div>
+                ))}
+              </div>
               
-              {/* Missing Keywords */}
-              {keywords.analysis.missingKeywords.map((keyword, index) => (
-                <div key={`missing-${index}`} className="flex flex-row justify-center items-center px-3 h-8 bg-[#FEF2F2] rounded-2xl">
-                  <span className="font-inter font-medium text-sm leading-[17px] text-[#EF4444]">
-                    {keyword}
-                  </span>
-                </div>
-              ))}
+              {/* Missing Keywords Row */}
+              <div className="flex flex-row flex-wrap items-center gap-2 w-full">
+                {keywords.analysis.missingKeywords.map((keyword, index) => (
+                  <div key={`missing-${index}`} className="flex flex-row justify-center items-center px-3 h-8 bg-[#FEF2F2] rounded-2xl">
+                    <span className="font-inter font-medium text-sm leading-[17px] text-[#EF4444]">
+                      {keyword}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

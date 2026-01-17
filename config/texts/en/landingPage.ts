@@ -1,4 +1,8 @@
 export const landingPage = {
+  seo: {
+    title: "OkBuddy - Resumes That Win Jobs",
+    description: "Create ATS-optimized resumes and cover letters with AI. Increase your interview chances by 75%."
+  },
   header: {
     logo: "OkBuddy",
     nav: {
@@ -12,9 +16,9 @@ export const landingPage = {
     }
   },
   hero: {
-    title: "75% of CVs are automatically rejected before reaching recruiters. What about yours?",
+    title: "75% of resumes are rejected before reaching recruiters.",
     subtitle: "Only 2% of resumes win. Yours will be one of them.",
-    cta: "Try Free Now"
+    cta: "Create My Resume"
   },
   problems: {
     ats: {
@@ -31,7 +35,7 @@ export const landingPage = {
           "Missing job-specific keywords", 
           "Font and spelling errors detected"
         ],
-        cta: "Fix all issues now"
+        cta: "Fix all issues"
       }
     },
     keywords: {
@@ -39,7 +43,7 @@ export const landingPage = {
       title: "60% of CVs are rejected for missing important keywords that jobs require",
       description: "Each job requires specific keywords. OkBuddy quickly analyzes and clearly shows which keywords your CV is missing, greatly increasing your interview chances.",
       analysis: {
-        title: "Keyword comparison",
+        title: "Keyword Comparison",
         matchIndicator: "Weak - 2/5",
         jobRequirements: "Job requirements",
         presentKeywords: ["React", "JavaScript"],
@@ -50,16 +54,16 @@ export const landingPage = {
           "AWS",
           "Docker"
         ],
-        cta: "Add missing keywords now"
+        cta: "Add missing keywords"
       }
     },
     massCV: {
       label: "APPLY QUICKLY",
       title: "Apply to 50+ jobs daily, no more manual CV editing hassle!",
       description: "Stop wasting time editing each CV individually. OkBuddy automatically customizes CVs to match each position, helping you apply faster and smarter.",
-      cta: "Start mass applications",
+      cta: "Start Mass Applications",
       massApplication: {
-        title: "Mass applications",
+        title: "Mass Applications",
         subtitle: "Apply to multiple positions quickly with optimized CVs",
         jobs: [
           {
@@ -105,16 +109,19 @@ export const landingPage = {
       {
         name: "John Smith",
         role: "Software Engineer",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format&q=80",
         content: "OkBuddy helped me get interviews at 3 top tech companies by optimizing my CV for ATS systems. The cover letter generator saved me hours of work!"
       },
       {
         name: "Sarah Johnson", 
         role: "Frontend Developer",
+        avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format&q=80",
         content: "I was missing important keywords in my CV that caused automatic rejections. OkBuddy identified them and helped me perfectly adjust my profile."
       },
       {
         name: "Michael Brown",
         role: "Recent Graduate", 
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80",
         content: "As a fresh graduate, I struggled to get interviews. OkBuddy helped me apply to 30+ positions with customized CVs in just one day. I received 5 callback responses!"
       }
     ]

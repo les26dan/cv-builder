@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { landingPage } from '../config/texts/index';
 
 const TestimonialsSection: React.FC = () => {
@@ -18,10 +19,14 @@ const TestimonialsSection: React.FC = () => {
             {/* User Info */}
             <div className="flex flex-row items-center gap-3 w-full h-12">
               {/* Avatar */}
-              <div className="w-12 h-12 bg-[#B2EBF2] rounded-full flex items-center justify-center">
-                <span className="font-inter font-semibold text-lg text-[#0277BD]">
-                  {testimonial.name.charAt(0)}
-                </span>
+              <div className="w-12 h-12 rounded-full overflow-hidden">
+                <Image 
+                  src={testimonial.avatar} 
+                  alt={`${testimonial.name} avatar`}
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* User Details */}
