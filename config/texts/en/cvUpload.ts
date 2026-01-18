@@ -1,31 +1,31 @@
 export const cvUpload = {
   header: {
-    title: "Optimize CV in 5 minutes",
-    subtitle: "OkBuddy will analyze and help you improve your CV, increasing interview chances",
+    title: "Optimize Resume in 5 minutes",
+    subtitle: "OkBuddy will analyze and help you improve your resume, increasing interview chances",
     exitButton: "Exit",
     autoSaveStatus: "Auto-saved",
     userAvatar: "U",
     backToWorkspace: "← Back to Workspace"
   },
   progress: {
-    step1: "Upload CV & Job Description",
-    step2: "Analyze & Evaluate CV", 
+    step1: "Upload Resume & Job Description",
+    step2: "Analyze & Evaluate Resume", 
     step3: "Apply Changes"
   },
   upload: {
-    title: "Drag & drop CV or click to select",
+    title: "Drag & drop resume or click to select",
     supportedFormats: "Supports PDF, DOCX • Max 10MB",
-    uploadButton: "Upload your CV",
-    privacyNote: "Data is secure and only used to analyze & optimize your CV",
+    uploadButton: "Upload your resume",
+    privacyNote: "Data is secure and only used to analyze & optimize your resume",
     uploadSuccess: "✅ Upload successful",
-    fileName: "CV_JohnDoe_Frontend.pdf",
+    fileName: "Resume_JohnDoe_Frontend.pdf",
     fileSize: "2.3 MB",
     removeFile: "×"
   },
   jobDescription: {
     title: "Job Description",
     subtitle: "Applying for a specific position?",
-    description: "Add job description to improve & optimize CV, gain advantage over other candidates",
+    description: "Add job description to improve & optimize resume, gain advantage over other candidates",
     urlPlaceholder: "Paste JD link here",
     textPlaceholder: "Copy paste job description here...",
     characterCount: "247/2000",
@@ -33,8 +33,8 @@ export const cvUpload = {
   },
   actions: {
     startAnalysis: "Start Analysis",
-    createNewCV: "Create New CV",
-    analyzeDisabled: "Please upload your CV first"
+    createNewResume: "Create New Resume",
+    analyzeDisabled: "Please upload your resume first"
   },
   errors: {
     unsupportedFormat: "Unsupported file format. Please upload PDF or DOCX file.",
@@ -44,16 +44,16 @@ export const cvUpload = {
     invalidUrl: "Invalid URL"
   },
   loading: {
-    analyzing: "Analyzing CV…",
+    analyzing: "Analyzing resume…",
     comparing: "Comparing with JD…", 
     applying: "Applying suggested changes…",
-    loadingMessage: "Your CV is being analyzed by OkBuddy's most advanced AI",
-    processingMessage: "We are comparing your CV with the job description and optimizing every detail"
+    loadingMessage: "Your resume is being analyzed by OkBuddy's most advanced AI",
+    processingMessage: "We are comparing your resume with the job description and optimizing every detail"
   },
   freshGraduate: {
     title: "Fresh graduate?",
-    subtitle: "Create professional CV from scratch with step-by-step guidance",
-    createButton: "Create CV from scratch",
+    subtitle: "Create professional resume from scratch with step-by-step guidance",
+    createButton: "Create resume from scratch",
     icon: "🎓"
   }
 } as const 

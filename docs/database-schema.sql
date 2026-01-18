@@ -64,6 +64,52 @@ CREATE TABLE cvs (
 );
 
 -- ====================
+-- CV WORKFLOW TABLE (Enhanced CV Records with Full Workflow Support)
+-- ====================
+CREATE TABLE cv_workflow (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'analyzing', 'completed')),
+    score INTEGER DEFAULT 0 CHECK (score >= 0 AND score <= 100),
+    cv_data JSONB NOT NULL, -- Full WorkflowCVData structure
+    
+    -- File Upload Information
+    uploaded_file_url TEXT,
+    uploaded_file_name VARCHAR(255),
+    uploaded_file_size INTEGER,
+    uploaded_file_type VARCHAR(100),
+    uploaded_file_text TEXT, -- Extracted text from uploaded file
+    
+    -- Job Description Information
+    job_description_text TEXT,
+    job_description_url TEXT,
+    job_description_keywords TEXT[], -- Array of keywords
+    
+    -- Analysis Results
+    analysis_results JSONB, -- AI analysis results
+    
+    -- Workflow State
+    workflow_current_step VARCHAR(50) DEFAULT 'upload',
+    workflow_steps_completed TEXT[] DEFAULT '{}', -- Array of completed steps
+    workflow_last_active_step VARCHAR(50),
+    workflow_time_spent INTEGER DEFAULT 0, -- Time spent in seconds
+    
+    -- Settings
+    auto_save_enabled BOOLEAN DEFAULT true,
+    ai_assistance_enabled BOOLEAN DEFAULT true,
+    template_name VARCHAR(100) DEFAULT 'default',
+    language VARCHAR(10) DEFAULT 'en',
+    
+    -- Metadata
+    version INTEGER DEFAULT 1,
+    source VARCHAR(50) DEFAULT 'upload',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    last_saved_at TIMESTAMP WITH TIME ZONE
+);
+
+-- ====================
 -- USER SESSIONS TABLE
 -- ====================
 CREATE TABLE user_sessions (
@@ -111,6 +157,12 @@ CREATE INDEX idx_cvs_user_id ON cvs(user_id);
 CREATE INDEX idx_cvs_status ON cvs(status);
 CREATE INDEX idx_cvs_last_updated ON cvs(last_updated DESC);
 
+-- CV Workflow table indexes
+CREATE INDEX idx_cv_workflow_user_id ON cv_workflow(user_id);
+CREATE INDEX idx_cv_workflow_status ON cv_workflow(status);
+CREATE INDEX idx_cv_workflow_updated_at ON cv_workflow(updated_at DESC);
+CREATE INDEX idx_cv_workflow_workflow_step ON cv_workflow(workflow_current_step);
+
 -- Sessions table indexes
 CREATE INDEX idx_user_sessions_token ON user_sessions(session_token);
 CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
@@ -129,6 +181,7 @@ CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cv_drafts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cvs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cv_workflow ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
@@ -144,6 +197,11 @@ CREATE POLICY cv_drafts_own_data ON cv_drafts
 
 -- Users can only access their own CVs
 CREATE POLICY cvs_own_data ON cvs
+    FOR ALL
+    USING (auth.uid()::text = user_id::text);
+
+-- Users can only access their own CV workflow data
+CREATE POLICY cv_workflow_own_data ON cv_workflow
     FOR ALL
     USING (auth.uid()::text = user_id::text);
 
@@ -178,6 +236,11 @@ CREATE TRIGGER update_users_updated_at
 
 CREATE TRIGGER update_cv_drafts_updated_at
     BEFORE UPDATE ON cv_drafts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_cv_workflow_updated_at
+    BEFORE UPDATE ON cv_workflow
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 

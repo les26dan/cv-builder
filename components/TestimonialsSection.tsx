@@ -19,13 +19,22 @@ const TestimonialsSection: React.FC = () => {
             {/* User Info */}
             <div className="flex flex-row items-center gap-3 w-full h-12">
               {/* Avatar */}
-              <div className="w-12 h-12 rounded-full overflow-hidden">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-[#B2EBF2] flex items-center justify-center">
                 <Image 
                   src={testimonial.avatar} 
                   alt={`${testimonial.name} avatar`}
                   width={48}
                   height={48}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to initial-based avatar on image load error
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const fallback = target.parentElement;
+                    if (fallback) {
+                      fallback.innerHTML = `<span class="font-inter font-semibold text-lg text-[#0277BD]">${testimonial.name.charAt(0)}</span>`;
+                    }
+                  }}
                 />
               </div>
 

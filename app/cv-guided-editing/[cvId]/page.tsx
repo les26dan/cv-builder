@@ -83,6 +83,34 @@ export default function CVGuidedEditingPage() {
   const router = useRouter()
   const cvId = params.cvId as string
   const mobileDetection = useMobileDetection()
+  const [userId, setUserId] = useState<string | null>(null)
+
+  // Get real authenticated user using the proper auth system
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        console.log('🔧 CV Guided Editing: Starting authentication check...')
+        
+        // Use the same authentication system as other components
+        const { checkAuthentication: checkAuth } = await import('@/lib/auth')
+        const authResult = await checkAuth()
+        
+        if (!authResult.isAuthenticated || !authResult.user) {
+          console.log('🔧 CV Guided Editing: No authenticated user found - redirecting to login')
+          router.push(`/login?redirect=/cv-guided-editing/${cvId}`)
+          return
+        }
+        
+        console.log('🔧 CV Guided Editing: Authenticated user:', authResult.user.email)
+        setUserId(authResult.user.id)
+      } catch (error) {
+        console.error('🚨 CV Guided Editing: Authentication failed:', error)
+        router.push(`/login?redirect=/cv-guided-editing/${cvId}`)
+      }
+    }
+    
+    checkAuthentication()
+  }, [cvId, router])
 
   const handleBackToWorkspace = () => {
     router.push('/cv-workspace')
@@ -98,8 +126,20 @@ export default function CVGuidedEditingPage() {
     )
   }
 
+  // Wait for userId to be loaded before rendering
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang xác thực người dùng...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <CVWorkflowProvider>
+    <CVWorkflowProvider userId={userId} cvId={cvId}>
       <CVEditorErrorBoundary>
         <Suspense fallback={
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">

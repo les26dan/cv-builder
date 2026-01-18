@@ -8,13 +8,13 @@ export const workspace = {
     userAvatar: 'U', // Will be dynamically set based on user's first name
   },
   page: {
-    title: 'My CVs',
-    subtitle: 'Manage and optimize CVs for each job application',
-    createButton: 'Create New CV',
+    title: 'My Resumes',
+    subtitle: 'Manage and optimize resumes for each job application',
+    createButton: 'Create New Resume',
   },
   empty: {
-    title: 'You don\'t have any CVs yet!',
-    subtitle: 'Get started by creating your first CV right now.',
+    title: 'You don\'t have any resumes yet!',
+    subtitle: 'Get started by creating your first resume right now.',
     cta: 'Get Started',
   },
   cvCard: {
@@ -30,6 +30,7 @@ export const workspace = {
       delete: 'Delete',
     },
     lastUpdated: {
+      prefix: 'Last updated:',
       minutes: (n: number) => `${n} minutes ago`,
       hours: (n: number) => `${n} hours ago`,
       days: (n: number) => `${n} days ago`,
@@ -40,8 +41,8 @@ export const workspace = {
   },
   modals: {
     deleteConfirm: {
-      title: 'Confirm CV Deletion',
-      message: 'Are you sure you want to delete this CV?',
+      title: 'Confirm Resume Deletion',
+      message: 'Are you sure you want to delete this resume?',
       cancel: 'Cancel',
       confirm: 'Delete',
     },

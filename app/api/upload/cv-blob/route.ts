@@ -268,25 +268,103 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
         // Check if we're in development mode with mock user
         const isDevelopmentMode = userSession.email === 'demo@okbuddy.ai' || userSession.id === 'user-123';
         
+        // Create cv_workflow record for the new workflow system
+        const cvWorkflowRecord = {
+          id: cvId,
+          user_id: userId,
+          title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
+          status: 'draft' as const,
+          score: Math.round(llmParsedData.possibility_score),
+          cv_data: {
+            id: cvId,
+            userId: userId,
+            title: file.name.replace(/\.[^/.]+$/, ''),
+            status: 'new',
+            score: Math.round(llmParsedData.possibility_score),
+            contact: structuredCV.contact,
+            summary: structuredCV.summary,
+            experience: structuredCV.experience,
+            education: structuredCV.education,
+            skills: structuredCV.skills,
+            uploadedFile: {
+              url: blobInfo.url,
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              originalText: extractedText
+            },
+            analysisResults: llmParsedData,
+            workflow: {
+              currentStep: 'analysis',
+              stepsCompleted: ['upload'],
+              lastActiveStep: 'upload',
+              timeSpent: 0
+            },
+            settings: {
+              autoSave: true,
+              aiAssistance: true,
+              template: 'dennis-schroder',
+              language: 'en'
+            },
+            metadata: {
+              version: 1,
+              source: 'upload',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              lastSavedAt: new Date().toISOString()
+            }
+          },
+          uploaded_file_url: blobInfo.url,
+          uploaded_file_name: file.name,
+          uploaded_file_size: file.size,
+          uploaded_file_type: file.type,
+          uploaded_file_text: extractedText,
+          analysis_results: llmParsedData,
+          workflow_current_step: 'analysis',
+          workflow_steps_completed: ['upload'],
+          workflow_last_active_step: 'upload',
+          workflow_time_spent: 0,
+          auto_save_enabled: true,
+          ai_assistance_enabled: true,
+          template_name: 'dennis-schroder',
+          language: 'en',
+          version: 1,
+          source: 'upload',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_saved_at: new Date().toISOString()
+        };
+        
         let insertResult;
+        let workflowInsertResult;
+        
         if (isDevelopmentMode) {
           console.log('🔧 Development mode detected, using service role for database access');
           // In development, we'll proceed with local storage since RLS blocks mock users
           console.log('💾 Skipping database insert in development mode, using local storage');
           insertResult = { data: null, error: null };
+          workflowInsertResult = { data: null, error: null };
         } else {
           // Production mode - use regular user context
+          // Insert into both tables
           insertResult = await supabase
             .from('cvs')
             .insert(cvRecord)
             .select()
             .single();
+            
+          workflowInsertResult = await supabase
+            .from('cv_workflow')
+            .insert(cvWorkflowRecord)
+            .select()
+            .single();
         }
 
         const { data, error } = insertResult;
+        const { data: workflowData, error: workflowError } = workflowInsertResult;
 
-        if (error) {
-          console.error('❌ Database error:', error);
+        if (error || workflowError) {
+          console.error('❌ Database error:', error || workflowError);
           console.log('🔧 Database not available, proceeding with local development mode');
           
           // Return success for development workflow
@@ -334,18 +412,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
         });
       }
     } else {
-      console.log('⚠️ Supabase not configured - using mock response');
-      
-      // Return success for development (when Supabase is not configured)
-      return NextResponse.json({
-        success: true,
-        cvId,
-        blobInfo,
-        extractedText: extractedText.substring(0, 500),
-        llmParsedData: llmParsedData || undefined,
-        structuredCV,
-        parsingQuality: llmParsedData.possibility_score,
-      });
+      console.error('❌ Supabase not configured - cannot save CV data');
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Database not configured' 
+        },
+        { status: 500 }
+      );
     }
 
   } catch (error) {

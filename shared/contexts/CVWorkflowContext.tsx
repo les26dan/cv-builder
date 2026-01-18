@@ -109,6 +109,7 @@ const CVWorkflowContext = createContext<CVWorkflowContextType | undefined>(undef
 interface CVWorkflowProviderProps {
   children: ReactNode
   userId?: string
+  cvId?: string // Specific CV to load
   autoSaveInterval?: number
   offlineSupport?: boolean
 }
@@ -117,6 +118,7 @@ interface CVWorkflowProviderProps {
 export function CVWorkflowProvider({ 
   children, 
   userId = 'mock-user-1',
+  cvId,
   autoSaveInterval = 2000,
   offlineSupport = true
 }: CVWorkflowProviderProps) {
@@ -126,6 +128,28 @@ export function CVWorkflowProvider({
   // Auto-save timer reference
   const autoSaveTimer = React.useRef<NodeJS.Timeout | null>(null)
   const lastSavedData = React.useRef<WorkflowCVData | null>(null)
+  const retryCount = React.useRef<number>(0)
+
+  // Retry helper with exponential backoff
+  const retryWithBackoff = async (
+    operation: () => Promise<any>,
+    maxRetries: number = 3,
+    baseDelay: number = 1000
+  ): Promise<any> => {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation()
+      } catch (error) {
+        if (attempt === maxRetries) {
+          throw error
+        }
+        
+        const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+        console.log(`🔄 Retry attempt ${attempt + 1}/${maxRetries + 1} in ${Math.round(delay)}ms`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+  }
 
   // Check if data has unsaved changes
   const hasUnsavedChanges = useCallback((): boolean => {
@@ -199,12 +223,28 @@ export function CVWorkflowProvider({
         }
       }
       
-      const result = await dataService.saveDraft(updatedData)
+      const result = await retryWithBackoff(() => dataService.saveDraft(updatedData))
       
       if (result.success && result.data) {
+        // Check for version conflicts
+        if (result.data.metadata.version > updatedData.metadata.version + 1) {
+          console.warn('🚨 Version conflict detected - data may have been updated by another session')
+          dispatch({ type: 'SET_ERROR', payload: 'Version conflict: Data updated in another session. Refreshing...' })
+          
+          // Auto-refresh to get latest data
+          setTimeout(() => {
+            if (cvId) {
+              loadCVData(cvId)
+            }
+          }, 2000)
+          
+          return
+        }
+        
         dispatch({ type: 'SET_CV_DATA', payload: result.data })
         lastSavedData.current = result.data
         dispatch({ type: 'SET_LAST_SAVED', payload: new Date().toISOString() })
+        retryCount.current = 0 // Reset retry count on success
         
         // Cache in localStorage for offline support
         if (offlineSupport) {
@@ -315,6 +355,76 @@ export function CVWorkflowProvider({
       }
     }
   }, [])
+
+  // Load specific CV when cvId is provided
+  useEffect(() => {
+    if (cvId) {
+      console.log('🔄 CVWorkflowProvider: Loading CV data for ID:', cvId)
+      loadCVData(cvId)
+    }
+  }, [cvId, loadCVData])
+
+  // Periodic sync check for conflict detection
+  useEffect(() => {
+    if (!cvId || !state.cvData) return
+
+    const checkForUpdates = async () => {
+      try {
+        const result = await dataService.loadDraft(userId, cvId)
+        if (result.success && result.data) {
+          const remoteVersion = result.data.metadata.version
+          const localVersion = state.cvData?.metadata.version || 0
+          
+          if (remoteVersion > localVersion && !hasUnsavedChanges()) {
+            console.log('🔄 Remote changes detected, updating local data')
+            dispatch({ type: 'SET_CV_DATA', payload: result.data })
+            lastSavedData.current = result.data
+          } else if (remoteVersion > localVersion && hasUnsavedChanges()) {
+            console.warn('🚨 Conflict: Remote changes detected but local changes exist')
+            dispatch({ 
+              type: 'SET_ERROR', 
+              payload: 'Document updated by another session. Your changes will override when saved.' 
+            })
+          }
+        }
+      } catch (error) {
+        // Silently fail - don't disrupt user experience
+        console.warn('🔍 Sync check failed:', error)
+      }
+    }
+
+    // Check for updates every 30 seconds when not actively editing
+    const interval = setInterval(checkForUpdates, 30000)
+    
+    return () => clearInterval(interval)
+  }, [cvId, userId, state.cvData, hasUnsavedChanges, dataService])
+
+  // Prevent data loss on page close/reload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges()) {
+        const message = 'You have unsaved changes. Are you sure you want to leave?'
+        e.preventDefault()
+        e.returnValue = message
+        return message
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && hasUnsavedChanges()) {
+        // Force save when page becomes hidden (user switching tabs, etc.)
+        forceSave()
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [hasUnsavedChanges, forceSave])
 
   // Context value
   const contextValue: CVWorkflowContextType = {

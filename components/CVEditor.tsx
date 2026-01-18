@@ -9,6 +9,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { EditorPanel } from './EditorPanel';
 import { PreviewPanel } from './PreviewPanel';
+import { HeaderCVEditor } from './HeaderCVEditor';
 import { calculateCvScore } from '../utils/cvScoring';
 import { useCVWorkflow } from '../shared/contexts/CVWorkflowContext';
 import { type CVData } from '../shared/types/workflow';
@@ -345,10 +346,19 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   // Suggestion handling removed - using new LLM-based CV parser instead
 
   return (
-    <div className={`flex h-screen bg-gray-50 ${className}`}>
+    <div className={`h-screen flex flex-col overflow-hidden ${className}`}>
+      {/* Fixed Header - Full Width */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 z-10 px-6">
+        <HeaderCVEditor 
+          cvScore={cvScore} 
+          cvData={cvData}
+          onUpdateCvData={setCvData}
+        />
+      </div>
+      
       {/* Success Notification for LLM Parsing */}
       {showParsingSuccess && (
-        <div className="fixed top-4 right-4 z-50 bg-green-50 border border-green-200 rounded-lg p-4 shadow-lg transition-all duration-300">
+        <div className="fixed top-20 right-4 z-50 bg-green-50 border border-green-200 rounded-lg p-4 shadow-lg transition-all duration-300">
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
               <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,25 +385,30 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         </div>
       )}
       
-      {/* Left Panel: Editor */}
-      <div className="w-3/5 bg-[#E0F7FA] overflow-y-auto">
-        <EditorPanel
-          cvData={cvData}
-          onUpdateSection={handleUpdateSection}
-          onSectionOrderChange={handleSectionOrderChange}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-          cvScore={cvScore}
-        />
-      </div>
+      {/* Two-Panel Layout System */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Panel (CV Editor) - 60% width, scrollable */}
+        <div className="w-3/5 overflow-y-auto bg-blue-50">
+          <div className="p-6">
+            <EditorPanel
+              cvData={cvData}
+              onUpdateSection={handleUpdateSection}
+              onSectionOrderChange={handleSectionOrderChange}
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              cvScore={cvScore}
+            />
+          </div>
+        </div>
 
-      {/* Right Panel: Preview */}
-      <div className="w-2/5 bg-white">
-        <PreviewPanel
-          cvData={cvData}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-        />
+        {/* Right Panel (CV Preview) - 40% width, fixed position */}
+        <div className="w-2/5 bg-white border-l border-gray-200 flex flex-col overflow-hidden">
+          <PreviewPanel
+            cvData={cvData}
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          />
+        </div>
       </div>
     </div>
   );

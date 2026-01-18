@@ -75,31 +75,54 @@ export default function CVCard({
   const cardBorder = isHighScore ? '2px solid #4CAF50' : '1px solid #E5E7EB'
 
   const getProgressText = () => {
+    // Use actual workflow step if available, otherwise fall back to status-based mapping
+    const workflowStep = cv.workflowStep || cv.status
+    const stepsCompleted = cv.workflowStepsCompleted || []
+    
+    // Calculate current step number based on workflow
+    const getStepNumber = () => {
+      if (cv.status === 'completed') return '4/4'
+      if (workflowStep === 'analysis' || workflowStep === 'analyzing') return '2/4'
+      if (workflowStep === 'editing') return '3/4'
+      return '1/4' // upload or new
+    }
+    
+    const stepNumber = getStepNumber()
+    
     const steps = {
       en: {
-        new: 'Step 1/4: Upload CV & Job Description',
-        in_progress: 'Step 2/4: CV Analysis',
+        upload: `Step ${stepNumber}: Upload Resume & Job Description`,
+        analysis: `Step ${stepNumber}: Resume Analysis`,
+        analyzing: `Step ${stepNumber}: Resume Analysis`,
+        editing: `Step ${stepNumber}: Resume Editing`,
         completed: 'Step 4/4: Complete!',
       },
       vi: {
-        new: 'Bước 1/4: Upload CV & Mô tả công việc',
-        in_progress: 'Bước 2/4: Phân tích CV',
+        upload: `Bước ${stepNumber}: Upload CV & Mô tả công việc`,
+        analysis: `Bước ${stepNumber}: Phân tích CV`,
+        analyzing: `Bước ${stepNumber}: Phân tích CV`,
+        editing: `Bước ${stepNumber}: Chỉnh sửa CV`,
         completed: 'Bước 4/4: Hoàn tất!',
       }
     }
     
-    const statusText = steps[currentLanguage]?.[cv.status] || steps[currentLanguage]?.new
-    return statusText || steps.en.new
+    // First try to get text by workflow step, then by status
+    const langSteps = steps[currentLanguage]
+    const stepText = (langSteps as any)?.[workflowStep] || 
+                    (langSteps as any)?.[cv.status] || 
+                    langSteps?.upload
+                    
+    return stepText || steps.en.upload
   }
 
-  // Handle card click - navigate to editing based on CV status
+  // Handle card click - navigate to editing based on resume status
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't trigger card click if clicking on action buttons
     if ((e.target as HTMLElement).closest('button')) {
       return
     }
 
-    // Navigate based on CV status
+    // Navigate based on resume status
     if (isCompleted) {
       onEdit?.(cv.id)
     } else {
@@ -116,62 +139,15 @@ export default function CVCard({
   return (
     <div 
       onClick={handleCardClick}
+      className="flex flex-row items-start p-5 gap-4 w-full max-w-[1152px] h-[180px] bg-white rounded-xl cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 font-inter"
       style={{
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        padding: '20px',
-        gap: '16px',
-        width: '100%',
-        maxWidth: '1152px',
-        height: '173px',
-        background: '#FFFFFF',
         border: cardBorder,
-        borderRadius: '12px',
-        flex: 'none',
-        order: 0,
-        alignSelf: 'stretch',
-        flexGrow: 0,
-        cursor: 'pointer',
-        transition: 'all 0.2s ease-in-out',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'
-        e.currentTarget.style.transform = 'translateY(-1px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = 'none'
-        e.currentTarget.style.transform = 'translateY(0)'
       }}
     >
-      {/* CV Preview */}
-      <div style={{
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '0px',
-        width: '80px',
-        height: '100px',
-        background: '#F8FAFC',
-        border: '1px solid #E5E7EB',
-        borderRadius: '8px',
-        flex: 'none',
-        order: 0,
-        flexGrow: 0,
-      }}>
+      {/* Resume Preview */}
+      <div className="flex flex-row justify-center items-center w-20 h-[100px] bg-slate-50 border border-gray-200 rounded-lg flex-none">
         {/* File Icon */}
-        <div style={{
-          width: '32px',
-          height: '32px',
-          borderRadius: '0px',
-          flex: 'none',
-          order: 0,
-          flexGrow: 0,
-          position: 'relative',
-        }}>
+        <div className="w-8 h-8 flex-none relative">
           <svg
             width="32"
             height="32"
@@ -217,176 +193,52 @@ export default function CVCard({
         </div>
       </div>
 
-      {/* CV Details */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        padding: '0px',
-        gap: '12px',
-        width: 'calc(100% - 96px)',
-        height: '133px',
-        borderRadius: '0px',
-        flex: 'none',
-        order: 1,
-        flexGrow: 0,
-        maxWidth: 'calc(100% - 96px)',
-      }}>
-        {/* CV Header */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          padding: '0px',
-          gap: '8px',
-          width: '100%',
-          height: '43px',
-          borderRadius: '0px',
-          flex: 'none',
-          order: 0,
-          alignSelf: 'stretch',
-          flexGrow: 0,
-        }}>
-          {/* CV Info */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            padding: '0px',
-            gap: '4px',
-            width: '100%',
-            height: '43px',
-            borderRadius: '0px',
-            flex: 'none',
-            order: 0,
-            flexGrow: 0,
-          }}>
+      {/* Resume Details */}
+      <div className="flex flex-col items-start gap-3 flex-1 h-[140px]">
+        {/* Resume Header */}
+        <div className="flex flex-row justify-between items-start gap-2 w-full h-[46px] flex-none self-stretch">
+          {/* Resume Info */}
+          <div className="flex flex-col items-start gap-1 w-full h-[46px] flex-none">
             {/* Title Row */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding: '0px',
-              gap: '8px',
-              width: '100%',
-              height: '22px',
-              borderRadius: '0px',
-              flex: 'none',
-              order: 0,
-              alignSelf: 'stretch',
-              flexGrow: 0,
-            }}>
-              {/* CV Title */}
-              <div style={{
-                height: '22px',
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: 600,
-                fontSize: '18px',
-                lineHeight: '22px',
-                color: '#111827',
-                flex: 'none',
-                order: 0,
-                flexGrow: 1,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}>
-                {cv.title}
+            <div className="flex flex-row items-center justify-between w-full h-[26px] flex-none self-stretch">
+              {/* Resume Title */}
+              <div className="h-[26px] font-inter font-semibold text-xl leading-[26px] text-gray-900 flex-none overflow-hidden text-ellipsis whitespace-nowrap flex-1 mr-2">
+                {cv.title.replace(/^CV\s+/i, '')}
               </div>
 
               {/* Score */}
-              <div style={{
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: 600,
-                fontSize: '16px',
-                lineHeight: '20px',
-                color: isHighScore ? '#4CAF50' : cv.score >= 70 ? '#F59E0B' : '#6B7280',
-                flex: 'none',
-                marginRight: '0px',
-                minWidth: 'fit-content',
-              }}>
+              <div className={`font-inter font-semibold text-lg leading-6 flex-none ${
+                isHighScore ? 'text-green-500' : cv.score >= 70 ? 'text-amber-500' : 'text-gray-500'
+              }`}>
                 {workspace.cvCard.score(cv.score)}
               </div>
             </div>
 
-            {/* CV Subtitle */}
-            <div style={{
-              width: '100%',
-              height: '17px',
-              fontFamily: 'Inter',
-              fontStyle: 'normal',
-              fontWeight: 400,
-              fontSize: '14px',
-              lineHeight: '17px',
-              color: '#6B7280',
-              flex: 'none',
-              order: 1,
-              alignSelf: 'stretch',
-              flexGrow: 0,
-            }}>
-              Cập nhật lần cuối: {formatTimeAgo(cv.lastUpdated)}
+            {/* Resume Subtitle */}
+            <div className="w-full h-[20px] font-inter font-normal text-base leading-[20px] text-gray-500 flex-none self-stretch">
+              {workspace.cvCard.lastUpdated.prefix} {formatTimeAgo(cv.lastUpdated, currentLanguage)}
             </div>
           </div>
         </div>
 
         {/* Progress Info */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          padding: '8px 12px',
-          gap: '4px',
-          width: '100%',
-          minHeight: '30px',
-          background: progressBgColor,
-          borderRadius: '6px',
-          flex: 'none',
-          order: 1,
-          alignSelf: 'stretch',
-          flexGrow: 0,
-          boxSizing: 'border-box',
-        }}>
-          <div style={{
-            width: '100%',
-            fontFamily: 'Inter',
-            fontStyle: 'normal',
-            fontWeight: 400,
-            fontSize: '11px',
-            lineHeight: '14px',
-            color: progressTextColor,
-            flex: 'none',
-            order: 0,
-            alignSelf: 'stretch',
-            flexGrow: 0,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
+        <div 
+          className="flex flex-col items-start px-3 py-2 gap-1 w-full min-h-[30px] rounded-md flex-none self-stretch"
+          style={{ backgroundColor: progressBgColor }}
+        >
+          <div 
+            className="w-full font-inter font-normal text-sm leading-[16px] flex-none self-stretch whitespace-nowrap overflow-hidden text-ellipsis"
+            style={{ color: progressTextColor }}
+          >
             {getProgressText()}
           </div>
         </div>
 
-        {/* CV Actions */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: '0px',
-          gap: '8px',
-          width: '100%',
-          height: '36px',
-          borderRadius: '0px',
-          flex: 'none',
-          order: 2,
-          alignSelf: 'stretch',
-          flexGrow: 0,
-        }}>
+        {/* Resume Actions */}
+        <div className="flex flex-row items-center gap-2 w-full h-9 flex-none self-stretch">
           {/* Primary Action Button */}
           {isCompleted ? (
-            /* Edit Button for completed CVs */
+            /* Edit Button for completed resumes */
             <button
               onClick={(e) => handleActionClick(e, () => onEdit?.(cv.id))}
               style={{
@@ -413,20 +265,12 @@ export default function CVCard({
                 e.currentTarget.style.background = '#E3F2FD'
               }}
             >
-              <span style={{
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '17px',
-                color: '#0277BD',
-                whiteSpace: 'nowrap',
-              }}>
+              <span className="font-inter font-medium text-base leading-[19px] text-[#0277BD] whitespace-nowrap">
                 {workspace.cvCard.actions.edit}
               </span>
             </button>
           ) : (
-            /* Continue Button for in-progress CVs */
+            /* Continue Button for in-progress resumes - Main CTA Style */
             <button
               onClick={(e) => handleActionClick(e, () => onContinue?.(cv.id))}
               style={{
@@ -435,7 +279,7 @@ export default function CVCard({
                 justifyContent: 'center',
                 alignItems: 'center',
                 padding: '12px 16px',
-                width: '87px',
+                width: '110px',
                 height: '36px',
                 background: '#0277BD',
                 borderRadius: '6px',
@@ -453,21 +297,13 @@ export default function CVCard({
                 e.currentTarget.style.background = '#0277BD'
               }}
             >
-              <span style={{
-                fontFamily: 'Inter',
-                fontStyle: 'normal',
-                fontWeight: 500,
-                fontSize: '14px',
-                lineHeight: '17px',
-                color: '#FFFFFF',
-                whiteSpace: 'nowrap',
-              }}>
+              <span className="font-inter font-medium text-base leading-[19px] text-white whitespace-nowrap">
                 {workspace.cvCard.actions.continue}
               </span>
             </button>
           )}
 
-          {/* Download Button */}
+          {/* Download Button - Apply Sub CTA style for incomplete CVs */}
           <button
             onClick={(e) => handleActionClick(e, () => onDownload?.(cv.id))}
             style={{
@@ -478,9 +314,9 @@ export default function CVCard({
               padding: '12px 16px',
               width: '110px',
               height: '36px',
-              background: isCompleted ? '#4CAF50' : '#F8FAFC',
+              background: isCompleted ? '#4CAF50' : '#FFFFFF',
               borderRadius: '6px',
-              border: 'none',
+              border: isCompleted ? 'none' : '1px solid #0277BD',
               cursor: 'pointer',
               flex: 'none',
               order: 1,
@@ -488,21 +324,23 @@ export default function CVCard({
               transition: 'all 0.2s ease-in-out',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = isCompleted ? '#45A049' : '#F1F5F9'
+              if (isCompleted) {
+                e.currentTarget.style.background = '#45A049'
+              } else {
+                e.currentTarget.style.background = '#F8FAFC'
+              }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = isCompleted ? '#4CAF50' : '#F8FAFC'
+              if (isCompleted) {
+                e.currentTarget.style.background = '#4CAF50'
+              } else {
+                e.currentTarget.style.background = '#FFFFFF'
+              }
             }}
           >
-            <span style={{
-              fontFamily: 'Inter',
-              fontStyle: 'normal',
-              fontWeight: 500,
-              fontSize: '14px',
-              lineHeight: '17px',
-              color: isCompleted ? '#FFFFFF' : '#6B7280',
-              whiteSpace: 'nowrap',
-            }}>
+            <span className={`font-inter font-medium text-base leading-[19px] whitespace-nowrap ${
+              isCompleted ? 'text-white' : 'text-[#0277BD]'
+            }`}>
               {workspace.cvCard.actions.download}
             </span>
           </button>

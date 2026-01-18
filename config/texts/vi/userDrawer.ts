@@ -37,12 +37,19 @@ export const userDrawer = {
   // Confirmation messages
   confirmations: {
     signOut: "Bạn có chắc chắn muốn đăng xuất?",
-    languageChange: "Ngôn ngữ sẽ được thay đổi sau khi tải lại trang"
+    languageChange: "Ngôn ngữ sẽ được thay đổi sau khi tải lại trang",
+    cancel: "Hủy"
   },
   
   // Status messages
   status: {
     signingOut: "Đang đăng xuất...",
     changingLanguage: "Đang thay đổi ngôn ngữ..."
+  },
+  
+  // Error messages
+  errors: {
+    logoutFailed: "Đăng xuất thất bại. Vui lòng thử lại.",
+    logoutError: "Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại."
   }
 } as const 

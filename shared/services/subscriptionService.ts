@@ -58,8 +58,8 @@ export class SubscriptionService {
   private currentUser: UserSubscription | null = null;
 
   private constructor() {
-    // Initialize with mock data - in production this would connect to backend
-    this.initializeMockSubscription();
+    // Initialize with empty state - will load on first use with real user
+    this.currentUser = null;
   }
 
   public static getInstance(): SubscriptionService {
@@ -69,32 +69,26 @@ export class SubscriptionService {
     return SubscriptionService.instance;
   }
 
-  private initializeMockSubscription() {
-    // Mock data for development - replace with actual API calls
-    const mockSubscription: UserSubscription = {
-      id: 'sub_mock_123',
-      userId: 'user_mock_456',
-      plan: 'free', // Default to free for testing
-      status: 'active',
-      features: [],
-      creditsRemaining: 3,
-      creditsTotal: 3,
-      expiresAt: undefined,
-      trialEndsAt: undefined
-    };
-
-    // Check localStorage for test subscription override
-    const testSubscription = localStorage.getItem('okbuddy_test_subscription');
-    if (testSubscription) {
-      try {
-        const parsed = JSON.parse(testSubscription);
-        this.currentUser = { ...mockSubscription, ...parsed };
-      } catch (error) {
-        console.warn('Invalid test subscription data in localStorage');
-        this.currentUser = mockSubscription;
-      }
-    } else {
-      this.currentUser = mockSubscription;
+  private async loadUserSubscription(userId: string) {
+    // Load real subscription data from database
+    try {
+      // TODO: Implement real subscription API calls
+      // For now, default to basic free plan
+      this.currentUser = {
+        id: `sub_${userId}`,
+        userId: userId,
+        plan: 'free',
+        status: 'active',
+        features: [],
+        creditsRemaining: 3,
+        creditsTotal: 3,
+        expiresAt: undefined,
+        trialEndsAt: undefined
+      };
+    } catch (error) {
+      console.error('Failed to load user subscription:', error);
+      // Set default free plan on error
+      this.currentUser = null;
     }
   }
 

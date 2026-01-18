@@ -30,6 +30,7 @@ export const workspace = {
       delete: 'Xóa',
     },
     lastUpdated: {
+      prefix: 'Cập nhật lần cuối:',
       minutes: (n: number) => `${n} phút trước`,
       hours: (n: number) => `${n} giờ trước`,
       days: (n: number) => `${n} ngày trước`,

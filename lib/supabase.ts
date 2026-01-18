@@ -3,33 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
-// Mock CV data for development/testing when Supabase is not configured
-export const mockCVs = [
-  {
-    id: '1',
-    title: 'CV Marketing Manager',
-    status: 'completed' as const,
-    score: 92,
-    lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    userId: 'user-123',
-  },
-  {
-    id: '2', 
-    title: 'CV Software Engineer',
-    status: 'in_progress' as const,
-    score: 75,
-    lastUpdated: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-    userId: 'user-123',
-  },
-  {
-    id: '3',
-    title: 'CV Project Manager',
-    status: 'new' as const,
-    score: 45,
-    lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    userId: 'user-123',
-  },
-]
+// Mock data completely removed - using real database only
 
 // Create Supabase client if credentials are available
 let supabase: ReturnType<typeof createClient> | null = null
@@ -48,8 +22,10 @@ export interface CVData {
   score: number
   lastUpdated: Date
   userId: string
-  content?: string
+  content?: any
   jobDescription?: string
+  workflowStep?: string
+  workflowStepsCompleted?: string[]
 }
 
 // Supabase database row type
@@ -66,41 +42,75 @@ interface CVRow {
 
 // Service functions with fallback to mock data
 export async function fetchUserCVs(userId: string): Promise<CVData[]> {
-  // Check if we're using mock data (development mode)
-  if (!supabase || userId.startsWith('user-') || userId.startsWith('mock-')) {
-    console.log('🔧 Supabase not configured or using mock user ID, using mock data for userId:', userId)
-    return mockCVs.filter(cv => cv.userId === userId)
+  // Import mock data check
+  const { shouldUseMockMode } = await import('../config/environment')
+  
+  // ALWAYS try real database first - no more mock data fallbacks
+  if (shouldUseMockMode()) {
+    console.log('🔧 Mock data explicitly enabled - returning empty array for real testing')
+    return []
+  }
+  
+  // Force create Supabase client if not already created
+  if (!supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (url && key) {
+      supabase = createClient(url, key)
+      console.log('🔧 Supabase client force-initialized')
+    } else {
+      console.error('❌ Supabase credentials missing - cannot proceed')
+      return []
+    }
   }
 
   try {
-    console.log('🔍 Fetching CVs from Supabase for user:', userId)
+    console.log('🔍 Fetching CVs from cv_workflow table for user:', userId)
     const { data, error } = await supabase
-      .from('cvs')
+      .from('cv_workflow')
       .select('*')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
 
     if (error) {
-      console.error('❌ Supabase error fetching CVs:', error)
-      console.log('🔄 Falling back to mock data for user:', userId)
-      return mockCVs.filter(cv => cv.userId === userId)
+      console.error('❌ Supabase error fetching CVs from cv_workflow:', error)
+      console.log('🔄 Database error - returning empty array (this is normal for new users)')
+      return []
     }
 
-    console.log('✅ Successfully fetched CVs from Supabase:', data?.length || 0)
-    return (data as unknown as CVRow[])?.map(cv => ({
+    console.log('✅ Successfully fetched CVs from cv_workflow table:', data?.length || 0)
+    
+    // Map cv_workflow data to CVData format
+    return (data as any[])?.map(cv => ({
       id: cv.id,
-      title: cv.title || 'Untitled CV',
-      status: (cv.status as CVData['status']) || 'new',
+      title: cv.title || 'Untitled Resume',
+      // Map workflow status to display status
+      status: mapWorkflowStatusToDisplayStatus(cv.status),
       score: cv.score || 0,
       lastUpdated: new Date(cv.updated_at),
       userId: cv.user_id,
-      content: cv.content || undefined,
-      jobDescription: cv.job_description || undefined,
+      content: cv.cv_data || undefined,
+      workflowStep: cv.workflow_current_step || 'upload',
+      workflowStepsCompleted: cv.workflow_steps_completed || [],
     })) || []
   } catch (error) {
     console.error('❌ Database connection error:', error)
-    console.log('🔄 Falling back to mock data for user:', userId)
-    return mockCVs.filter(cv => cv.userId === userId)
+    console.log('🔄 Database connection failed - returning empty array')
+    return []
+  }
+}
+
+// Helper function to map workflow status to display status
+function mapWorkflowStatusToDisplayStatus(workflowStatus: string): CVData['status'] {
+  switch (workflowStatus) {
+    case 'draft':
+      return 'new'
+    case 'analyzing':
+      return 'in_progress'
+    case 'completed':
+      return 'completed'
+    default:
+      return 'new'
   }
 }
 
@@ -115,11 +125,8 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
   }
 
   if (!supabase) {
-    // Add to mock data for development and return the new CV
-    console.log('🔧 Supabase not configured, creating mock CV:', { id: newCV.id, title, userId })
-    mockCVs.push(newCV)
-    console.log('✅ Mock CV created successfully:', newCV)
-    return newCV
+    console.error('❌ Supabase not configured - cannot create CV')
+    return null
   }
 
   try {
@@ -137,10 +144,7 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
 
     if (error) {
       console.error('Error creating CV:', error)
-      // Fallback to mock data if database fails
-      console.log('🔧 Database failed, falling back to mock CV creation')
-      mockCVs.push(newCV)
-      return newCV
+      return null
     }
 
     const cvRow = data as unknown as CVRow
@@ -150,10 +154,7 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
     }
   } catch (error) {
     console.error('Database connection error:', error)
-    // Fallback to mock data if database connection fails
-    console.log('🔧 Database connection failed, falling back to mock CV creation')
-    mockCVs.push(newCV)
-    return newCV
+    return null
   }
 }
 
@@ -375,13 +376,7 @@ export async function createUser(userData: CreateUserData): Promise<UserResult> 
 
 export async function deleteCV(cvId: string): Promise<boolean> {
   if (!supabase) {
-    // Remove from mock data for development
-    console.log('Supabase not configured, removing from mock data')
-    const index = mockCVs.findIndex(cv => cv.id === cvId)
-    if (index > -1) {
-      mockCVs.splice(index, 1)
-      return true
-    }
+    console.error('❌ Supabase not configured - cannot delete CV')
     return false
   }
 
@@ -406,10 +401,8 @@ export async function deleteCV(cvId: string): Promise<boolean> {
 // Validate CV ownership - critical security function
 export async function validateCVOwnership(cvId: string, userId: string): Promise<boolean> {
   if (!supabase) {
-    // In development with mock data, check mock CVs
-    console.log('Supabase not configured, checking mock data for CV ownership')
-    const cv = mockCVs.find(cv => cv.id === cvId)
-    return cv?.userId === userId || false
+    console.error('❌ Supabase not configured - cannot validate CV ownership')
+    return false
   }
 
   try {
@@ -441,10 +434,8 @@ export async function getCVWithOwnership(cvId: string, userId: string): Promise<
   }
 
   if (!supabase) {
-    // Return mock data for development
-    console.log('Supabase not configured, returning mock CV data')
-    const cv = mockCVs.find(cv => cv.id === cvId)
-    return cv || null
+    console.error('❌ Supabase not configured - cannot fetch CV data')
+    return null
   }
 
   try {

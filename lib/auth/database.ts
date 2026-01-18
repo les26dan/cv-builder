@@ -11,9 +11,7 @@ export interface User {
   updated_at?: string;
 }
 
-// Mock database for development/testing
-const mockDatabase = new Map<string, User>();
-let mockIdCounter = 1;
+// Mock database removed - using real database only
 
 // Lazy initialization of Supabase client
 let supabaseClient: any = null;
@@ -62,32 +60,12 @@ export class DatabaseService {
     try {
       initializeDatabase();
 
-      // If no valid credentials, use mock database
+      // Require valid database credentials - no mock fallback
       if (!hasValidCredentials) {
-        // Check for duplicate email in mock database
-        for (const user of Array.from(mockDatabase.values())) {
-          if (user.email === userData.email) {
-            return {
-              success: false,
-              error: 'Email đã được sử dụng. Vui lòng sử dụng email khác.'
-            };
-          }
-        }
-
-        // Create mock user
-        const mockUser: User = {
-          id: `mock_${mockIdCounter++}`,
-          ...userData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-
-        mockDatabase.set(mockUser.id!, mockUser);
-        console.log('✅ Mock user created successfully:', { id: mockUser.id, email: mockUser.email });
-        
+        console.error('❌ Database credentials not configured - cannot create user');
         return {
-          success: true,
-          user: mockUser
+          success: false,
+          error: 'Database not configured'
         };
       }
 
@@ -146,20 +124,12 @@ export class DatabaseService {
     try {
       initializeDatabase();
 
-      // If no valid credentials, use mock database
+      // Require valid database credentials - no mock fallback
       if (!hasValidCredentials) {
-        for (const user of Array.from(mockDatabase.values())) {
-          if (user.email === email) {
-            return {
-              success: true,
-              user: user
-            };
-          }
-        }
-        
+        console.error('❌ Database credentials not configured - cannot lookup user');
         return {
           success: false,
-          error: 'Không tìm thấy tài khoản với email này.'
+          error: 'Database not configured'
         };
       }
 
@@ -211,18 +181,10 @@ export class DatabaseService {
 
       // If no valid credentials, use mock database
       if (!hasValidCredentials) {
-        for (const user of Array.from(mockDatabase.values())) {
-          if (user.email === email) {
-            user.email_verified = true;
-            user.updated_at = new Date().toISOString();
-            console.log('✅ Mock email verified successfully for:', email);
-            return { success: true };
-          }
-        }
-        
+        console.error('❌ Database credentials not configured - cannot verify email');
         return {
           success: false,
-          error: 'Không tìm thấy tài khoản với email này.'
+          error: 'Database not configured'
         };
       }
 

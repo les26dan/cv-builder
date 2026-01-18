@@ -57,23 +57,8 @@ export const isUserLoggedIn = (): boolean => {
 };
 
 /**
- * Development helper: simulate user login for testing
+ * Development helper removed - use real authentication only
  */
-export const simulateTestLogin = (customData?: Partial<UserData>): void => {
-  if (process.env.NODE_ENV === 'development') {
-    const mockUser: UserData = {
-      id: 'dev-user-1',
-      fullName: 'Nguyễn Văn A',
-      email: 'admin@example.com',
-      emailVerified: true,
-      createdAt: new Date().toISOString(),
-      ...customData
-    };
-    
-    storeUserData(mockUser);
-    console.log('🔧 Development: Simulated user login:', mockUser);
-  }
-};
 
 /**
  * Handle login response from authentication API

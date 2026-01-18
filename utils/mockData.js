@@ -11,24 +11,7 @@ const getUserData = () => {
   return null;
 };
 
-// Development helper: simulate user login (for testing)
-const simulateUserLogin = () => {
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    // Only simulate in development
-    const existingUser = localStorage.getItem('okbuddy_user');
-    if (!existingUser) {
-      // Simulate a logged-in user for development
-      const mockUser = {
-        id: 'dev-user-1',
-        fullName: 'Nguyễn Văn A',
-        email: 'admin@example.com',
-        emailVerified: true
-      };
-      localStorage.setItem('okbuddy_user', JSON.stringify(mockUser));
-      console.log('🔧 Development: Simulated user login:', mockUser);
-    }
-  }
-};
+// Development user simulation removed - use real authentication only
 
 // Function to prefill contact data with user info
 const getContactDataWithUserInfo = (baseContact) => {

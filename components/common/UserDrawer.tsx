@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { userDrawer } from '../../config/texts/index'
+import { getTexts } from '../../config/texts/index'
 
 interface UserSession {
   id: string
@@ -28,6 +28,24 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
 }) => {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false)
+  const [userDrawer, setUserDrawer] = useState<any>(null)
+
+  // Load texts when language changes
+  useEffect(() => {
+    const loadTexts = async () => {
+      try {
+        const texts = await getTexts('userDrawer', currentLanguage)
+        setUserDrawer(texts)
+      } catch (error) {
+        console.error('Failed to load userDrawer texts:', error)
+        // Fallback to English
+        const fallbackTexts = await getTexts('userDrawer', 'en')
+        setUserDrawer(fallbackTexts)
+      }
+    }
+    
+    loadTexts()
+  }, [currentLanguage])
 
   // Close drawer when clicking outside
   useEffect(() => {
@@ -66,11 +84,11 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
         window.location.href = '/'
       } else {
         console.error('Logout failed')
-        alert('Đăng xuất thất bại. Vui lòng thử lại.')
+        alert(userDrawer?.errors?.logoutFailed || 'Logout failed. Please try again.')
       }
     } catch (error) {
       console.error('Logout error:', error)
-      alert('Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.')
+      alert(userDrawer?.errors?.logoutError || 'An error occurred during logout. Please try again.')
     } finally {
       setIsSigningOut(false)
       setShowSignOutConfirm(false)
@@ -84,7 +102,7 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
     }
     // For now, just store in localStorage
     localStorage.setItem('okbuddy_language', newLanguage)
-    alert(userDrawer.confirmations.languageChange)
+            alert(userDrawer?.confirmations?.languageChange || 'Language will be changed after page reload')
   }
 
   const getUserInitial = () => {
@@ -95,6 +113,9 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
   const isAdmin = user?.role === 'admin'
 
   if (!isOpen) return null
+  
+  // Don't render until texts are loaded
+  if (!userDrawer) return null
 
   return (
     <div 
@@ -114,7 +135,7 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-            aria-label="Đóng"
+            aria-label={currentLanguage === 'en' ? 'Close' : 'Đóng'}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -239,14 +260,14 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
                   onClick={() => setShowSignOutConfirm(false)}
                   className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  Hủy
+                  {userDrawer?.confirmations?.cancel || 'Cancel'}
                 </button>
                 <button
                   onClick={handleSignOut}
                   disabled={isSigningOut}
                   className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                 >
-                  {isSigningOut ? 'Đang xử lý...' : 'Đăng xuất'}
+                  {isSigningOut ? userDrawer?.status?.signingOut || 'Signing out...' : userDrawer?.actions?.signOut || 'Sign Out'}
                 </button>
               </div>
             </div>

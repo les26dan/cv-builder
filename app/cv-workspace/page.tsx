@@ -49,34 +49,29 @@ export default function WorkspacePage() {
     try {
       console.log('🔧 CV Workspace: Starting authentication check...')
       setIsLoading(true)
-      const mockUser: User = {
-        id: 'user-123',
-        fullName: 'Người dùng Demo',
-        email: 'demo@okbuddy.ai',
+      
+      // Use the same authentication system as other components
+      const { checkAuthentication: checkAuth } = await import('@/lib/auth')
+      const authResult = await checkAuth()
+      
+      if (!authResult.isAuthenticated || !authResult.user) {
+        console.log('🔧 No authenticated user found - redirecting to login')
+        router.push('/login?redirect=/cv-workspace')
+        return
+      }
+      
+      const realUser: User = {
+        id: authResult.user.id,
+        fullName: authResult.user.name || authResult.user.email || 'User',
+        email: authResult.user.email,
         emailVerified: true
       }
       
-      console.log('🔧 CV Workspace: Mock user created:', mockUser)
-      
-      // Create mock session cookie for development
-      if (typeof window !== 'undefined') {
-        const mockSession = {
-          id: mockUser.id,
-          email: mockUser.email,
-          name: mockUser.fullName,
-          provider: 'mock'
-        }
-        
-        // Set session cookie for middleware
-        document.cookie = `user_session=${JSON.stringify(mockSession)}; path=/; max-age=86400`
-        console.log('🔧 Mock session cookie created for development')
-      }
-      
-      console.log('🔧 CV Workspace: Setting user state...')
-      setUser(mockUser)
+      console.log('🔧 CV Workspace: Authenticated user:', realUser.email)
+      setUser(realUser)
       
       console.log('🔧 CV Workspace: Loading user CVs...')
-      await loadUserCVs(mockUser.id)
+      await loadUserCVs(realUser.id)
       console.log('🔧 CV Workspace: CVs loaded successfully')
     } catch (error) {
       console.error('Authentication failed:', error)
@@ -234,7 +229,7 @@ export default function WorkspacePage() {
         {/* Main Content - Responsive */}
         <div className="mt-6 space-y-5">
           {/* Page Header - Responsive with legacy layout */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-4 max-w-[1152px]">
             {/* Title Section - Left Aligned */}
             <div className="flex-1">
               {/* Page Title */}

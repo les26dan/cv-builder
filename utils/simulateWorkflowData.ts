@@ -140,15 +140,5 @@ export function injectTestData() {
   })
 }
 
-// Auto-inject test data in development
-if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-  // Add global functions for manual testing
-  ;(window as any).simulateWorkspaceNavigation = simulateWorkspaceNavigation
-  ;(window as any).simulateUploadCompletion = simulateUploadCompletion
-  ;(window as any).injectTestData = injectTestData
-  
-  console.log('🔧 Development utilities available:')
-  console.log('   simulateWorkspaceNavigation() - Simulate clicking CV in workspace')
-  console.log('   simulateUploadCompletion() - Simulate completing CV upload')
-  console.log('   injectTestData() - Inject test CV data for manual testing')
-} 
+// Development utilities disabled - using real data only
+console.log('✅ Development mode: Using real data flow only') 

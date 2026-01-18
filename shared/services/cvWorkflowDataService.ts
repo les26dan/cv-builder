@@ -18,79 +18,9 @@ import {
 } from '../types/workflow'
 import { databaseService } from './database'
 import { environmentConfig } from '../../config/environment'
+import { compressCVData, decompressCVData } from '../../utils/compression'
 
-/**
- * Mock data for development and testing
- */
-const mockWorkflowCVs: WorkflowCVData[] = [
-  {
-    id: 'mock-cv-1',
-    userId: 'mock-user-1',
-    title: 'CV Marketing Manager',
-    status: 'completed',
-    score: 92,
-    contact: {
-      fullName: 'Nguyễn Văn A',
-      email: 'nguyenvana@email.com',
-      phone: '0901234567',
-      location: 'Hồ Chí Minh, Việt Nam',
-      linkedin: 'linkedin.com/in/nguyenvana'
-    },
-    summary: {
-      content: 'Marketing professional với 5 năm kinh nghiệm trong digital marketing và brand management.'
-    },
-    experience: {
-      items: [
-        {
-          id: 'exp-1',
-          title: 'Marketing Manager',
-          company: 'ABC Company',
-          location: 'Hồ Chí Minh',
-          startDate: '2022-01',
-          endDate: '2024-12',
-          current: true,
-          bullets: [
-            'Quản lý chiến lược marketing cho 3 sản phẩm chính',
-            'Tăng 40% brand awareness thông qua digital campaigns',
-            'Lãnh đạo team 5 người và phối hợp với các phòng ban khác'
-          ]
-        }
-      ]
-    },
-    skills: {
-      items: ['Digital Marketing', 'Brand Management', 'Google Analytics', 'Facebook Ads', 'Content Strategy']
-    },
-    education: {
-      items: [
-        {
-          id: 'edu-1',
-          degree: 'Cử nhân Kinh tế',
-          institution: 'Đại học Kinh tế TP.HCM',
-          location: 'Hồ Chí Minh',
-          graduationDate: '2019-06'
-        }
-      ]
-    },
-    workflow: {
-      currentStep: 'completed',
-      stepsCompleted: ['upload', 'analysis', 'editing'],
-      lastActiveStep: 'completed',
-      timeSpent: 1800 // 30 minutes
-    },
-    metadata: {
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-      updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-      version: 1,
-      source: 'upload'
-    },
-    settings: {
-      autoSave: true,
-      aiAssistance: true,
-      template: 'dennis-schroder',
-      language: 'vi'
-    }
-  }
-]
+// Mock data completely removed - using real database only
 
 /**
  * CV Workflow Data Service Class
@@ -129,8 +59,10 @@ export class CVWorkflowDataService {
 
       const client = await databaseService.getClient()
       if (!client) {
-        // Use mock mode
-        return this.saveDraftMock(cvData)
+        return {
+          success: false,
+          error: 'Database not available'
+        }
       }
 
       // Update timestamps
@@ -199,8 +131,10 @@ export class CVWorkflowDataService {
 
       const client = await databaseService.getClient()
       if (!client) {
-        // Use mock mode
-        return this.loadDraftMock(userId, cvId)
+        return {
+          success: false,
+          error: 'Database not available'
+        }
       }
 
       let query = client
@@ -270,8 +204,10 @@ export class CVWorkflowDataService {
     try {
       const client = await databaseService.getClient()
       if (!client) {
-        // Use mock mode
-        return this.updateStatusMock(cvId, status, step)
+        return {
+          success: false,
+          error: 'Database not available'
+        }
       }
 
       const updateData: Partial<CVWorkflowTable> = {
@@ -321,10 +257,10 @@ export class CVWorkflowDataService {
     try {
       const client = await databaseService.getClient()
       if (!client) {
-        // Use mock mode
+        // No database client available
         return {
           success: true,
-          data: mockWorkflowCVs.filter(cv => cv.userId === userId)
+          data: []
         }
       }
 
@@ -369,13 +305,8 @@ export class CVWorkflowDataService {
     try {
       const client = await databaseService.getClient()
       if (!client) {
-        // Use mock mode
-        const index = mockWorkflowCVs.findIndex(cv => cv.id === cvId && cv.userId === userId)
-        if (index > -1) {
-          mockWorkflowCVs.splice(index, 1)
-          return { success: true, data: true }
-        }
-        return { success: false, error: 'CV not found' }
+        // No database client available
+        return { success: false, error: 'Database not available' }
       }
 
       const { error } = await client
@@ -622,19 +553,31 @@ export class CVWorkflowDataService {
    * Map CV data to database table row
    */
   private mapCVDataToTableRow(cvData: WorkflowCVData): Partial<CVWorkflowTable> {
+    // Compress large text content before storing
+    const { data: compressedData, compressionMap } = compressCVData(cvData)
+    
+    // Store compression map in metadata for decompression
+    const cvDataWithCompression = {
+      ...compressedData,
+      metadata: {
+        ...compressedData.metadata,
+        compressionMap
+      }
+    }
+
     return {
       id: cvData.id,
       user_id: cvData.userId,
       title: cvData.title,
       status: cvData.status,
       score: cvData.score,
-      cv_data: cvData as any, // Store full CV data as JSON
+      cv_data: cvDataWithCompression as any, // Store compressed CV data as JSON
       uploaded_file_url: cvData.uploadedFile?.url,
       uploaded_file_name: cvData.uploadedFile?.name,
       uploaded_file_size: cvData.uploadedFile?.size,
       uploaded_file_type: cvData.uploadedFile?.type,
-      uploaded_file_text: cvData.uploadedFile?.originalText,
-      job_description_text: cvData.jobDescription?.text,
+      uploaded_file_text: compressedData.uploadedFile?.originalText,
+      job_description_text: compressedData.jobDescription?.text,
       job_description_url: cvData.jobDescription?.url,
       job_description_keywords: cvData.jobDescription?.keywords,
       analysis_results: cvData.analysisResults as any,
@@ -659,10 +602,16 @@ export class CVWorkflowDataService {
    */
   private mapTableRowToCVData(row: CVWorkflowTable): WorkflowCVData {
     const cvData = row.cv_data as WorkflowCVData
+    
+    // Extract compression map from metadata
+    const compressionMap = (cvData.metadata as any)?.compressionMap || {}
+    
+    // Decompress the CV data
+    const decompressedData = decompressCVData(cvData, compressionMap)
 
     // Ensure all required fields are present
     return {
-      ...cvData,
+      ...decompressedData,
       id: row.id,
       userId: row.user_id,
       title: row.title,
@@ -721,74 +670,7 @@ export class CVWorkflowDataService {
     this.cacheExpiry.delete(cvId)
   }
 
-  /**
-   * Mock mode methods for development
-   */
-  private async saveDraftMock(cvData: WorkflowCVData): Promise<DatabaseResult<WorkflowCVData>> {
-    const index = mockWorkflowCVs.findIndex(cv => cv.id === cvData.id)
-    const updatedCVData = {
-      ...cvData,
-      metadata: {
-        ...cvData.metadata,
-        updatedAt: new Date().toISOString(),
-        lastSavedAt: new Date().toISOString()
-      }
-    }
-
-    if (index >= 0) {
-      mockWorkflowCVs[index] = updatedCVData
-    } else {
-      mockWorkflowCVs.push(updatedCVData)
-    }
-
-    console.log('Mock: Saved CV draft', updatedCVData.id)
-    return { success: true, data: updatedCVData }
-  }
-
-  private async loadDraftMock(userId: string, cvId?: string): Promise<DatabaseResult<WorkflowCVData>> {
-    const userCVs = mockWorkflowCVs.filter(cv => cv.userId === userId)
-    
-    if (cvId) {
-      const cv = userCVs.find(cv => cv.id === cvId)
-      return cv 
-        ? { success: true, data: cv }
-        : { success: false, error: 'CV not found' }
-    }
-
-    // Get latest draft
-    const drafts = userCVs.filter(cv => cv.status === 'draft' || cv.status === 'analyzing')
-    if (drafts.length === 0) {
-      return { success: false, error: 'No draft found' }
-    }
-
-    const latest = drafts.sort((a, b) => 
-      new Date(b.metadata.updatedAt).getTime() - new Date(a.metadata.updatedAt).getTime()
-    )[0]
-
-    return { success: true, data: latest }
-  }
-
-  private async updateStatusMock(
-    cvId: string, 
-    status: WorkflowStatus, 
-    step?: WorkflowStep
-  ): Promise<DatabaseResult<boolean>> {
-    const cv = mockWorkflowCVs.find(cv => cv.id === cvId)
-    if (!cv) {
-      return { success: false, error: 'CV not found' }
-    }
-
-    cv.status = status
-    cv.metadata.updatedAt = new Date().toISOString()
-    
-    if (step) {
-      cv.workflow.currentStep = step
-      cv.workflow.lastActiveStep = step
-    }
-
-    console.log('Mock: Updated CV status', cvId, status)
-    return { success: true, data: true }
-  }
+  // Mock methods completely removed - using real database only
 }
 
 /**
