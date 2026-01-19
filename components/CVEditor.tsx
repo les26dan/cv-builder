@@ -9,17 +9,19 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { EditorPanel } from './EditorPanel';
 import { PreviewPanel } from './PreviewPanel';
-import { HeaderCVEditor } from './HeaderCVEditor';
+import SharedHeader from './SharedHeader';
 import { calculateCvScore } from '../utils/cvScoring';
 import { useCVWorkflow } from '../shared/contexts/CVWorkflowContext';
 import { type CVData } from '../shared/types/workflow';
+import { getTexts } from '../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 // JD optimization service removed - using new LLM-based CV parser instead
 
 interface CVEditorProps {
   className?: string;
   initialData?: CVData;
   onDataChange?: (data: CVData) => void;
-  language?: 'vi' | 'en';
+  language?: SupportedLanguage;
   cvId?: string; // Added to support guided editing page integration
 }
 
@@ -27,7 +29,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   className = '',
   initialData,
   onDataChange,
-  language = 'vi',
+  language,
   cvId // Accept cvId prop for integration with guided editing workflow
 }) => {
   // CV Workflow Context for data management
@@ -38,6 +40,10 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   
   // Track if we've loaded data to prevent re-loading
   const hasLoadedDataRef = useRef(false);
+  
+  // Language and text configuration state
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [cvEditorTexts, setCvEditorTexts] = useState<any>(null);
 
   // Local state management
   const [cvData, setCvData] = useState<CVData>(() => {
@@ -58,15 +64,42 @@ export const CVEditor: React.FC<CVEditorProps> = ({
       education: { items: [] },
       sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
       sectionTitles: {
-        contact: 'Thông tin liên hệ',
-        summary: 'Tóm tắt',
-        experience: 'Kinh nghiệm làm việc',
-        skills: 'Kỹ năng',
-        education: 'Học vấn'
+                        contact: cvEditorTexts?.sectionTitles?.contact || 'Contact Information',
+                summary: cvEditorTexts?.sectionTitles?.summary || 'Professional Summary',
+                experience: cvEditorTexts?.sectionTitles?.experience || 'Work Experience',
+                skills: cvEditorTexts?.sectionTitles?.skills || 'Skills',
+                education: cvEditorTexts?.sectionTitles?.education || 'Education'
       }
     };
   });
 
+  // Load language and text configuration
+  useEffect(() => {
+    const loadLanguageAndTexts = async () => {
+      try {
+        // Get user's language preference or detect from browser
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const detectedLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(detectedLanguage);
+        
+        // Load CV Editor text configuration
+        const texts = await getTexts('cvEditor', detectedLanguage);
+        setCvEditorTexts(texts);
+        
+        console.log('🌐 CVEditor: Language loaded:', detectedLanguage);
+      } catch (error) {
+        console.error('Failed to load language configuration:', error);
+        // Fallback to English
+        setCurrentLanguage('en');
+        const fallbackTexts = await getTexts('cvEditor', 'en');
+        setCvEditorTexts(fallbackTexts);
+      }
+    };
+    
+    loadLanguageAndTexts();
+  }, [language]);
+  
   // Load uploaded CV data from localStorage in useEffect
   useEffect(() => {
     // Skip if initialData is provided or data already loaded
@@ -216,11 +249,11 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               },
               sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
               sectionTitles: {
-                contact: 'Thông tin liên hệ',
-                summary: 'Tóm tắt',
-                experience: 'Kinh nghiệm làm việc',
-                skills: 'Kỹ năng',
-                education: 'Học vấn'
+                contact: cvEditorTexts?.sectionTitles?.contact || 'Contact Information',
+                summary: cvEditorTexts?.sectionTitles?.summary || 'Professional Summary',
+                experience: cvEditorTexts?.sectionTitles?.experience || 'Work Experience',
+                skills: cvEditorTexts?.sectionTitles?.skills || 'Skills',
+                education: cvEditorTexts?.sectionTitles?.education || 'Education'
               }
             };
             
@@ -345,16 +378,38 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Suggestion handling removed - using new LLM-based CV parser instead
 
+  // Get auto-save status from CV workflow context
+  const getAutoSaveStatus = () => {
+    if (state.isSaving) return 'saving';
+    if (state.error) return 'error';
+    if (state.syncStatus === 'offline') return 'offline';
+    return 'saved';
+  };
+
+  // Handle back navigation
+  const handleBackToWorkspace = () => {
+    // Auto-save current CV data before navigation
+    if (cvData) {
+      updateCVData(cvData);
+    }
+    // Navigate to workspace
+    window.location.href = '/cv-workspace';
+  };
+
   return (
     <div className={`h-screen flex flex-col overflow-hidden ${className}`}>
-      {/* Fixed Header - Full Width */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200 z-10 px-6">
-        <HeaderCVEditor 
-          cvScore={cvScore} 
-          cvData={cvData}
-          onUpdateCvData={setCvData}
-        />
-      </div>
+      {/* Unified Header */}
+      <SharedHeader 
+        variant="editor"
+        showFeedback={false}
+        showBackButton={true}
+        onBackClick={handleBackToWorkspace}
+        backButtonTitle={cvEditorTexts?.header?.backToWorkspace || 'Back to CV Workspace'}
+        showAutoSave={true}
+        autoSaveStatus={getAutoSaveStatus()}
+        cvData={cvData}
+        onUpdateCvData={updateCVData}
+      />
       
       {/* Success Notification for LLM Parsing */}
       {showParsingSuccess && (
@@ -397,6 +452,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               activeSection={activeSection}
               setActiveSection={setActiveSection}
               cvScore={cvScore}
+              language={currentLanguage}
             />
           </div>
         </div>

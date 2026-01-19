@@ -10,7 +10,8 @@ import { DraggableSection } from './common/DraggableSection';
 import { ScoreIndicator } from './common/ScoreIndicator';
 import { XIcon, Sparkles, CheckCircle } from 'lucide-react';
 import { CVWorkflowDataService } from '../shared/services/cvWorkflowDataService';
-import { jdAnalysisTexts } from '../config/texts/index';
+import { jdAnalysisTexts, getTexts } from '../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 import { UpgradeModal } from './common/UpgradeModal';
 // JD optimization components removed - using new LLM-based CV parser
 // Mock services for build compatibility
@@ -51,6 +52,7 @@ interface EditorPanelProps {
   };
   onApplySuggestion?: (sectionId: string, suggestion: any) => void;
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
+  language?: SupportedLanguage;
 }
 
 // Available section types that can be added
@@ -72,9 +74,33 @@ export const EditorPanel = ({
   cvScore,
   suggestions = {},
   onApplySuggestion,
-  onDismissSuggestion
+  onDismissSuggestion,
+  language
 }: EditorPanelProps) => {
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [editorTexts, setEditorTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setEditorTexts(texts);
+      } catch (error) {
+        console.error('Failed to load editor texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
   
   // JD Analysis state
   const [jdInput, setJdInput] = useState('');
@@ -179,12 +205,12 @@ export const EditorPanel = ({
     console.log('🔍 Full CV Data Structure:', JSON.stringify(cvData, null, 2));
     
     if (!jdInput.trim()) {
-      setAnalysisError('Vui lòng nhập mô tả công việc để phân tích');
+      setAnalysisError(editorTexts?.editorPanel?.jobAnalysis?.errors?.required || 'Please enter job description to analyze');
       return;
     }
 
     if (jdInput.length > 5000) {
-      setAnalysisError('Mô tả công việc quá dài (tối đa 5000 ký tự)');
+      setAnalysisError(editorTexts?.editorPanel?.jobAnalysis?.errors?.tooLong || 'Job description too long (maximum 5000 characters)');
       return;
     }
 
@@ -922,7 +948,7 @@ export const EditorPanel = ({
             className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors"
             onClick={() => setShowAddSectionModal(true)}
           >
-            + Thêm phần mới
+            {editorTexts?.editorPanel?.addSection || '+ Add New Section'}
           </button>
         </div>
       </div>
@@ -932,7 +958,7 @@ export const EditorPanel = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Thêm phần mới</h3>
+              <h3 className="text-lg font-medium">{editorTexts?.editorPanel?.addSection || 'Add New Section'}</h3>
               <button 
                 onClick={() => setShowAddSectionModal(false)}
                 className="text-gray-500 hover:text-gray-700"

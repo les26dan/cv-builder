@@ -229,7 +229,12 @@ export default function CVUploadPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Use SharedHeader for consistency */}
-      <SharedHeader variant="app" />
+      <SharedHeader 
+        variant="app" 
+        showBackButton={true}
+        onBackClick={() => window.location.href = '/cv-workspace'}
+        backButtonTitle="Quay lại CV Workspace"
+      />
       
       <main className="flex-1 flex justify-center items-center px-4 sm:px-6 lg:px-10 py-8">
         <div className="w-full max-w-[600px] space-y-8">

@@ -16,12 +16,14 @@ interface DraggableSectionProps {
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
 }
 
+// Section labels are now passed as props from parent components with dynamic language loading
+// This object serves as fallback only
 const sectionLabels: Record<string, string> = {
-  contact: 'Thông tin liên hệ',
-  summary: 'Tóm tắt chuyên môn',
-  experience: 'Kinh nghiệm làm việc',
-  skills: 'Kỹ năng',
-  education: 'Học vấn'
+  contact: 'Contact Information',
+  summary: 'Professional Summary',
+  experience: 'Work Experience',
+  skills: 'Skills',
+  education: 'Education'
 };
 
 // Core sections that cannot be deleted

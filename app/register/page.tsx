@@ -1,3 +1,5 @@
+'use client';
+
 import { Suspense } from "react";
 import SharedHeader from "@/components/SharedHeader";
 import RegisterPageContent from "@/components/auth/RegisterPageContent";
@@ -5,7 +7,13 @@ import RegisterPageContent from "@/components/auth/RegisterPageContent";
 export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SharedHeader variant="auth" showFeedback={false} />
+      <SharedHeader 
+        variant="auth" 
+        showFeedback={false} 
+        showBackButton={true}
+        onBackClick={() => window.location.href = '/'}
+        backButtonTitle="Quay lại trang chủ"
+      />
       
       <Suspense fallback={
         <main className="flex-1 flex justify-center items-center px-4 py-6 sm:px-6 lg:px-8">

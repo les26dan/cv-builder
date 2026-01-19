@@ -22,6 +22,8 @@ export default function WorkspacePage() {
   const [isCreating, setIsCreating] = useState(false)
   const [workspace, setWorkspace] = useState<any>(null)
   const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  const [isUpdating, setIsUpdating] = useState(false) // For auto-save status
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -85,14 +87,24 @@ export default function WorkspacePage() {
   const loadUserCVs = async (userId: string) => {
     try {
       console.log('🔧 CV Workspace: Fetching CVs for user:', userId)
+      setIsUpdating(true)
       const userCVs = await fetchUserCVs(userId)
       console.log('🔧 CV Workspace: Fetched CVs:', userCVs)
       setCvs(userCVs)
       console.log('🔧 CV Workspace: CVs state updated, count:', userCVs.length)
+      setLastUpdate(new Date().toISOString())
     } catch (error) {
       console.error('Failed to load CVs:', error)
       setCvs([])
+    } finally {
+      setIsUpdating(false)
     }
+  }
+
+  // Get auto-save status for workspace operations
+  const getAutoSaveStatus = () => {
+    if (isUpdating || isCreating) return 'saving'
+    return 'saved'
   }
 
   const handleCreateNew = async () => {
@@ -140,11 +152,14 @@ export default function WorkspacePage() {
     if (!showDeleteModal) return
     
     try {
+      setIsUpdating(true)
       await deleteCV(showDeleteModal)
       setCvs(prev => prev.filter(cv => cv.id !== showDeleteModal))
+      setLastUpdate(new Date().toISOString())
     } catch (error) {
       console.error('Error deleting CV:', error)
     } finally {
+      setIsUpdating(false)
       setShowDeleteModal(null)
     }
   }
@@ -222,7 +237,15 @@ export default function WorkspacePage() {
   return (
     <div className="min-h-screen" style={{ background: '#E0F7FA' }}>
       {/* Use SharedHeader for consistency */}
-      <SharedHeader variant="app" showFeedback={false} />
+      <SharedHeader 
+        variant="app" 
+        showFeedback={false} 
+        showBackButton={true}
+        onBackClick={() => window.location.href = '/'}
+        backButtonTitle="Quay lại trang chủ"
+        showAutoSave={true}
+        autoSaveStatus={getAutoSaveStatus()}
+      />
       
       {/* Main Container - Responsive with legacy layout */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-6">

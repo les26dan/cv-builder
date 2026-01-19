@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { checkAuthentication } from '../lib/auth';
 import { UserDrawer } from './common/UserDrawer';
 import { FeedbackModal } from './common/FeedbackModal';
+import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
+import { getTexts } from '../config/texts/index';
 
 interface UserSession {
   id: string;
@@ -20,23 +22,43 @@ interface SharedHeaderProps {
   // Show/hide feedback button
   showFeedback?: boolean;
   // Page-specific styling
-  variant?: 'landing' | 'auth' | 'app';
+  variant?: 'landing' | 'auth' | 'app' | 'editor';
   // Custom navigation elements
   children?: React.ReactNode;
+  // Back navigation
+  showBackButton?: boolean;
+  onBackClick?: () => void;
+  backButtonTitle?: string;
+  // Auto-save status (for CV Editor)
+  showAutoSave?: boolean;
+  autoSaveStatus?: 'saving' | 'saved' | 'error' | 'offline';
+  // CV Editor specific props
+  cvScore?: number;
+  cvData?: any;
+  onUpdateCvData?: (data: any) => void;
 }
 
 export default function SharedHeader({ 
   logoText = 'OkBuddy',
   showFeedback = true,
   variant = 'landing',
-  children 
+  children,
+  showBackButton = false,
+  onBackClick,
+  backButtonTitle = 'Quay lại',
+  showAutoSave = false,
+  autoSaveStatus = 'saved',
+  cvScore,
+  cvData,
+  onUpdateCvData
 }: SharedHeaderProps) {
   // Authentication state
   const [user, setUser] = useState<UserSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi');
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en');
+  const [workspaceTexts, setWorkspaceTexts] = useState<any>(null);
 
   useEffect(() => {
     // Check authentication status on component mount
@@ -55,11 +77,35 @@ export default function SharedHeader({
 
     checkAuthStatus();
 
-    // Check for saved language preference
-    const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en';
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
-    }
+    // Initialize language configuration using the detection system
+    const initLanguage = async () => {
+      const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+      let language: SupportedLanguage;
+      
+      if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
+        language = savedLanguage;
+      } else {
+        // Use language detection system
+        const detectedLanguage = detectLanguage();
+        language = detectedLanguage.language;
+        localStorage.setItem('okbuddy_language', language);
+      }
+      
+      setCurrentLanguage(language);
+      
+      // Load workspace texts for the detected language
+      try {
+        const texts = await getTexts('workspace', language);
+        setWorkspaceTexts(texts);
+      } catch (error) {
+        console.error('Failed to load workspace texts:', error);
+        // Fallback to English
+        const fallbackTexts = await getTexts('workspace', 'en');
+        setWorkspaceTexts(fallbackTexts);
+      }
+    };
+    
+    initLanguage();
   }, []);
 
   // Event handlers
@@ -93,6 +139,61 @@ export default function SharedHeader({
     localStorage.setItem('okbuddy_language', language);
   };
 
+  // Back navigation handler
+  const handleBackClick = () => {
+    // Auto-save current CV data before navigation (for CV Editor)
+    if (cvData && onUpdateCvData) {
+      onUpdateCvData(cvData);
+    }
+    
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      // Default back behavior
+      window.history.back();
+    }
+  };
+
+  // Get auto-save status display
+  const getAutoSaveDisplay = () => {
+    // Use dynamic texts if available, otherwise fallback to English
+    const autosaveTexts = workspaceTexts?.autosave || {
+      saving: 'Saving...',
+      saved: 'Auto-saved',
+      error: 'Save error',
+      offline: 'Offline mode'
+    };
+    
+    switch (autoSaveStatus) {
+      case 'saving':
+        return `⏳ ${autosaveTexts.saving}`;
+      case 'saved':
+        return `✓ ${autosaveTexts.saved}`;
+      case 'error':
+        return `❌ ${autosaveTexts.error}`;
+      case 'offline':
+        return `📴 ${autosaveTexts.offline}`;
+      default:
+        return `✓ ${autosaveTexts.saved}`;
+    }
+  };
+
+  // Get auto-save status color
+  const getAutoSaveStyle = () => {
+    switch (autoSaveStatus) {
+      case 'saving':
+        return 'bg-blue-50 text-blue-600 border-blue-500/20';
+      case 'saved':
+        return 'bg-green-50 text-green-600 border-green-500/20';
+      case 'error':
+        return 'bg-red-50 text-red-600 border-red-500/20';
+      case 'offline':
+        return 'bg-yellow-50 text-yellow-600 border-yellow-500/20';
+      default:
+        return 'bg-green-50 text-green-600 border-green-500/20';
+    }
+  };
+
   const handleLogoClick = () => {
     if (variant === 'landing') {
       // Marketing site behavior - scroll to top
@@ -114,6 +215,8 @@ export default function SharedHeader({
         return `${baseClasses} h-16 sm:h-20 px-4 sm:px-6 lg:px-10 border-b border-gray-100 shadow-sm`;
       case 'app':
         return `${baseClasses} px-4 sm:px-6 h-16 border-b border-gray-200`;
+      case 'editor':
+        return `${baseClasses} px-6 py-4 border-b border-gray-200`;
       default:
         return `${baseClasses} px-4 sm:px-6 lg:px-10 h-20 border border-[#E2E8F0]`;
     }
@@ -129,6 +232,8 @@ export default function SharedHeader({
         return `${baseClasses} text-xl sm:text-2xl`;
       case 'app':
         return `${baseClasses} text-xl`;
+      case 'editor':
+        return `${baseClasses} text-2xl`;
       default:
         return `${baseClasses} text-2xl leading-[29px]`;
     }
@@ -136,21 +241,61 @@ export default function SharedHeader({
 
   return (
     <header className={getHeaderClasses()}>
-      {/* Logo */}
-      <button 
-        onClick={handleLogoClick}
-        className={getLogoClasses()}
-        title="OkBuddy - Trang chủ"
-        aria-label="OkBuddy - Trang chủ"
-      >
-        {logoText}
-      </button>
+      {/* Left Section - Back button and Logo */}
+      <div className="flex items-center gap-6">
+        {/* Back Button */}
+        {showBackButton && (
+          <button
+            onClick={handleBackClick}
+            className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+            title={backButtonTitle}
+            aria-label={backButtonTitle}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="flex-shrink-0"
+            >
+              <path
+                d="M19 12H5M5 12L12 19M5 12L12 5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+        
+        {/* Logo */}
+        <button 
+          onClick={handleLogoClick}
+          className={getLogoClasses()}
+          title="OkBuddy - Trang chủ"
+          aria-label="OkBuddy - Trang chủ"
+        >
+          {logoText}
+        </button>
+      </div>
 
-      {/* Custom content or default navigation */}
+      {/* Center Section - Spacer */}
+      <div className="flex-1"></div>
+
+      {/* Right Section - Auto-save, Feedback, Auth */}
       {children ? (
         children
       ) : (
         <div className="flex flex-row justify-center items-center gap-4">
+          {/* Auto-save Status (for editor/app pages) */}
+          {showAutoSave && (
+            <div className={`px-3 py-1 text-sm rounded-full border font-inter ${getAutoSaveStyle()}`}>
+              {getAutoSaveDisplay()}
+            </div>
+          )}
+
           {/* Feedback Button */}
           {showFeedback && (
             <button

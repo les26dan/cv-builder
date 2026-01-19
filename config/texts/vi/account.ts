@@ -43,7 +43,13 @@ export const account = {
         placeholder: "Nhập lại mật khẩu"
       },
       tosCheckbox: "Tôi đồng ý với",
-      submitButton: "Đăng ký"
+      tosLink: "điều khoản dịch vụ",
+      submitButton: "Đăng ký",
+      loading: "Đang xử lý...",
+      signupLink: {
+        text: "Đã có tài khoản?",
+        link: "Đăng nhập ngay"
+      }
     }
   },
 
@@ -73,7 +79,12 @@ export const account = {
       },
       rememberMe: "Ghi nhớ đăng nhập",
       forgotPassword: "Quên mật khẩu?",
-      submitButton: "Đăng nhập"
+      submitButton: "Đăng nhập",
+      loading: "Đang xử lý...",
+      signupLink: {
+        text: "Chưa có tài khoản?",
+        link: "Đăng ký ngay"
+      }
     }
   },
 
@@ -81,8 +92,15 @@ export const account = {
   captcha: {
     title: "Xác thực bảo mật",
     answerLabel: "Đáp án:",
+    placeholder: "Nhập đáp án",
+    loading: "Đang tải CAPTCHA...",
+    refreshTooltip: "Làm mới câu hỏi",
+    retryButton: "Thử lại",
     successMessage: "Xác thực thành công",
-    refreshTooltip: "Làm mới"
+    errors: {
+      loadFailed: "Không thể tải CAPTCHA. Vui lòng thử lại.",
+      networkError: "Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại."
+    }
   },
 
   // Terms of Service page

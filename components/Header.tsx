@@ -6,6 +6,7 @@ import { handleSecondaryCTA } from '../utils/navigation';
 import { UserDrawer } from './common/UserDrawer';
 import { FeedbackModal } from './common/FeedbackModal';
 import { checkAuthentication } from '../lib/auth';
+import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 
 interface UserSession {
   id: string;
@@ -21,7 +22,7 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi');
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en');
 
   useEffect(() => {
     // Check authentication status on component mount
@@ -40,10 +41,15 @@ export default function Header() {
 
     checkAuthStatus();
 
-    // Check for saved language preference
-    const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en';
-    if (savedLanguage) {
+    // Initialize language configuration using the detection system
+    const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+    if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
       setCurrentLanguage(savedLanguage);
+    } else {
+      // Use language detection system
+      const detectedLanguage = detectLanguage();
+      setCurrentLanguage(detectedLanguage.language);
+      localStorage.setItem('okbuddy_language', detectedLanguage.language);
     }
   }, []);
 

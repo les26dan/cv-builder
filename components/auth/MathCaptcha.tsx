@@ -38,11 +38,11 @@ export default function MathCaptcha({ onValidation, value, onChange, error }: Ma
       } else {
         const errorData = await response.json();
         console.error("Failed to generate CAPTCHA:", errorData);
-        setApiError("Không thể tải CAPTCHA. Vui lòng thử lại.");
+        setApiError(account.captcha.errors.loadFailed);
       }
     } catch (error) {
       console.error("Error generating CAPTCHA:", error);
-      setApiError("Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.");
+      setApiError(account.captcha.errors.networkError);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +99,7 @@ export default function MathCaptcha({ onValidation, value, onChange, error }: Ma
               disabled={isLoading}
               className="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 disabled:opacity-50"
             >
-              {isLoading ? "Đang tải..." : "Thử lại"}
+              {isLoading ? account.captcha.loading : account.captcha.retryButton}
             </button>
           </div>
         </div>
@@ -114,7 +114,7 @@ export default function MathCaptcha({ onValidation, value, onChange, error }: Ma
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 mb-3">
           <div className="flex items-center justify-center">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-            <span className="text-sm text-gray-500">Đang tải CAPTCHA...</span>
+            <span className="text-sm text-gray-500">{account.captcha.loading}</span>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function MathCaptcha({ onValidation, value, onChange, error }: Ma
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className="flex-1 h-9 sm:h-10 px-2 sm:px-3 bg-white border border-gray-300 rounded text-sm sm:text-base text-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Nhập đáp án"
+            placeholder={account.captcha.placeholder}
             disabled={isLoading}
           />
           <button
@@ -147,7 +147,7 @@ export default function MathCaptcha({ onValidation, value, onChange, error }: Ma
             onClick={generateNewProblem}
             disabled={isLoading}
             className="flex items-center justify-center w-9 sm:w-10 h-9 sm:h-10 bg-gray-200 hover:bg-gray-300 rounded transition-colors disabled:opacity-50"
-            title="Làm mới câu hỏi"
+            title={account.captcha.refreshTooltip}
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>

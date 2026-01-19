@@ -224,7 +224,7 @@ export default function LoginPageContent() {
             aria-describedby={errors.root ? "form-error" : undefined}
             className="w-full h-11 sm:h-12 bg-primary text-white font-semibold rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base mt-6"
           >
-            {isSubmitting ? "Đang xử lý..." : account.login.form.submitButton}
+            {isSubmitting ? account.login.form.loading : account.login.form.submitButton}
           </button>
 
           {/* Error Message */}
@@ -238,9 +238,9 @@ export default function LoginPageContent() {
         {/* Register Link */}
         <div className="text-center mt-4 sm:mt-6">
           <p className="text-xs sm:text-sm text-gray-400">
-            Chưa có tài khoản?{" "}
+            {account.login.form.signupLink.text}{" "}
             <Link href="/register" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded font-medium">
-              Đăng ký ngay
+              {account.login.form.signupLink.link}
             </Link>
           </p>
         </div>

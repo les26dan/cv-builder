@@ -274,7 +274,7 @@ export default function RegisterPageContent() {
                 className="text-primary hover:underline"
                 target="_blank"
               >
-                điều khoản dịch vụ
+{account.register.form.tosLink}
               </Link>
             </label>
           </div>
@@ -288,7 +288,7 @@ export default function RegisterPageContent() {
             disabled={isSubmitting || !captchaValid}
             className="w-full h-11 sm:h-12 bg-primary text-white font-semibold rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base mt-6"
           >
-            {isSubmitting ? "Đang xử lý..." : account.register.form.submitButton}
+            {isSubmitting ? account.register.form.loading : account.register.form.submitButton}
           </button>
 
           {/* Error Message */}
@@ -300,9 +300,9 @@ export default function RegisterPageContent() {
         {/* Login Link */}
         <div className="text-center mt-4 sm:mt-6">
           <p className="text-xs sm:text-sm text-gray-400">
-            Đã có tài khoản?{" "}
+            {account.register.form.signupLink.text}{" "}
             <Link href="/login" className="text-primary hover:underline font-medium">
-              Đăng nhập ngay
+              {account.register.form.signupLink.link}
             </Link>
           </p>
         </div>

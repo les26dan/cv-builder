@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { UserDrawer } from './common/UserDrawer'
 import { checkAuthentication } from '../lib/auth'
+import { detectLanguage, type SupportedLanguage } from '../config/languageConfig'
+import { getTexts } from '../config/texts/index'
 
 interface UserSession {
   id: string
@@ -25,7 +27,8 @@ export default function HeaderMinimal({
 }: HeaderMinimalProps) {
   const [user, setUser] = useState<UserSession | null>(null)
   const [showUserDrawer, setShowUserDrawer] = useState(false)
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi')
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  const [workspaceTexts, setWorkspaceTexts] = useState<any>(null)
 
   useEffect(() => {
     // Check authentication status on component mount
@@ -42,47 +45,68 @@ export default function HeaderMinimal({
 
     checkAuthStatus()
 
-    // Check for saved language preference
-    const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en'
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage)
+    // Initialize language configuration using the detection system
+    const initLanguage = async () => {
+      const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage
+      let language: SupportedLanguage
+      
+      if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
+        language = savedLanguage
+      } else {
+        // Use language detection system
+        const detectedLanguage = detectLanguage()
+        language = detectedLanguage.language
+        localStorage.setItem('okbuddy_language', language)
+      }
+      
+      setCurrentLanguage(language)
+      
+      // Load workspace texts for the detected language
+      try {
+        const texts = await getTexts('workspace', language)
+        setWorkspaceTexts(texts)
+      } catch (error) {
+        console.error('Failed to load workspace texts:', error)
+        // Fallback to English
+        const fallbackTexts = await getTexts('workspace', 'en')
+        setWorkspaceTexts(fallbackTexts)
+      }
     }
+    
+    initLanguage()
   }, [])
-
-  // Inline workspace text to avoid import issues
-  const workspaceText = {
-    logo: 'OkBuddy',
-    autosave: {
-      saving: 'Đang lưu...',
-      saved: 'Đã lưu tự động',
-    }
-  }
 
   // Determine autosave display properties based on status
   const getAutosaveDisplay = () => {
+    // Use dynamic texts if available, otherwise fallback to English
+    const autosaveTexts = workspaceTexts?.autosave || {
+      saving: 'Saving...',
+      saved: 'Auto-saved'
+    }
+    
     switch (autosaveStatus) {
       case 'saving':
         return {
-          text: workspaceText.autosave.saving,
+          text: autosaveTexts.saving,
           statusClass: 'bg-orange-50 text-orange-600 border-orange-200',
           showSpinner: true,
         }
       case 'saved':
         return {
-          text: workspaceText.autosave.saved,
+          text: `✓ ${autosaveTexts.saved}`,
           statusClass: 'bg-green-50 text-green-600 border-green-200',
           showSpinner: false,
         }
       case 'error':
         return {
-          text: 'Lỗi lưu tự động',
+          text: autosaveTexts.error || 'Save error',
           statusClass: 'bg-red-50 text-red-600 border-red-200',
           showSpinner: false,
         }
       case 'idle':
       default:
         return {
-          text: workspaceText.autosave.saved,
+          text: `✓ ${autosaveTexts.saved}`,
           statusClass: 'bg-gray-50 text-gray-600 border-gray-200',
           showSpinner: false,
         }
@@ -119,7 +143,7 @@ export default function HeaderMinimal({
           title="Trang chủ CV Workspace"
           aria-label="Trang chủ CV Workspace"
         >
-          {workspaceText.logo}
+          OkBuddy
         </button>
       </div>
 

@@ -43,7 +43,13 @@ export const account = {
         placeholder: "Re-enter password"
       },
       tosCheckbox: "I agree to the",
-      submitButton: "Sign Up"
+      tosLink: "terms of service",
+      submitButton: "Sign Up",
+      loading: "Processing...",
+      signupLink: {
+        text: "Already have an account?",
+        link: "Sign in now"
+      }
     }
   },
 
@@ -73,7 +79,12 @@ export const account = {
       },
       rememberMe: "Remember me",
       forgotPassword: "Forgot password?",
-      submitButton: "Log In"
+      submitButton: "Log In",
+      loading: "Processing...",
+      signupLink: {
+        text: "Don't have an account?",
+        link: "Sign up now"
+      }
     }
   },
 
@@ -81,8 +92,15 @@ export const account = {
   captcha: {
     title: "Security Verification",
     answerLabel: "Answer:",
+    placeholder: "Enter answer",
+    loading: "Loading CAPTCHA...",
+    refreshTooltip: "Refresh question",
+    retryButton: "Try again",
     successMessage: "Verification successful",
-    refreshTooltip: "Refresh"
+    errors: {
+      loadFailed: "Unable to load CAPTCHA. Please try again.",
+      networkError: "Connection error. Please check your network and try again."
+    }
   },
 
   // Terms of Service page

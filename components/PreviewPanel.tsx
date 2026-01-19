@@ -268,7 +268,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
       {/* Preview Content - Fixed Scale WYSIWYG */}
       <div 
         ref={previewContainerRef}
-        className="flex-1 bg-gray-100 p-3 flex flex-col items-center justify-center overflow-hidden" 
+        className="flex-1 bg-[#f3f4f6] p-3 flex flex-col items-center justify-center overflow-hidden" 
         onClick={handlePreviewClick}
       >
         {/* CV Preview Container - Zoom-Resistant Scaling */}
