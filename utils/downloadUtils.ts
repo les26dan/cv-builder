@@ -235,16 +235,210 @@ export const downloadFile = (content: string, filename: string, mimeType: string
 };
 
 // Generate filename based on CV data
-export const generateFilename = (cvData: CVData, extension: string): string => {
+export const generateFilename = (cvData: CVData, format: string): string => {
   const name = cvData.contact?.fullName || 'CV';
   const sanitizedName = name.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
   const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  const extension = format === 'latex' ? 'tex' : format;
   
   return `${sanitizedName}_CV_${timestamp}.${extension}`;
 };
 
+// Generate LaTeX content that EXACTLY matches the preview
+export const generateLatexContent = (cvData: CVData): string => {
+  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
+  
+  // LaTeX document structure with modern formatting
+  let latex = `\\documentclass[11pt,a4paper,sans]{moderncv}
+\\moderncvstyle{classic}
+\\moderncvcolor{blue}
+
+% Character encoding
+\\usepackage[utf8]{inputenc}
+
+% Page geometry
+\\usepackage[scale=0.85]{geometry}
+
+% Adjust the page margins if needed
+\\setlength{\\hintscolumnwidth}{3cm}
+
+% Personal data`;
+
+  // Add contact information
+  if (cvData.contact) {
+    const contact = cvData.contact;
+    
+    if (contact.fullName) {
+      latex += `\n\\name{${escapeLatex(contact.fullName.split(' ')[0] || '')}}{${escapeLatex(contact.fullName.split(' ').slice(1).join(' ') || '')}}`;
+    }
+    
+    if (contact.email) {
+      latex += `\n\\email{${escapeLatex(contact.email)}}`;
+    }
+    
+    if (contact.phone) {
+      latex += `\n\\phone[mobile]{${escapeLatex(contact.phone)}}`;
+    }
+    
+    if (contact.location) {
+      latex += `\n\\address{${escapeLatex(contact.location)}}`;
+    }
+    
+    if (contact.linkedin) {
+      latex += `\n\\social[linkedin]{${escapeLatex(contact.linkedin.replace('https://linkedin.com/in/', '').replace('https://www.linkedin.com/in/', ''))}}`;
+    }
+  }
+
+  latex += `\n\n\\begin{document}
+\\makecvtitle\n`;
+
+  // Process each section in order to match preview
+  for (const sectionId of sectionOrder) {
+    const sectionTitle = getSectionTitle(sectionId, cvData.sectionTitles);
+    
+    switch (sectionId) {
+      case 'summary':
+        if (cvData.summary?.content) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}
+${escapeLatex(cvData.summary.content)}\n`;
+        }
+        break;
+        
+      case 'experience':
+        if (cvData.experience?.items && cvData.experience.items.length > 0) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}`;
+          
+          cvData.experience.items.forEach((job: any) => {
+            const startDate = job.startDate || '';
+            const endDate = job.endDate || 'Present';
+            const dateRange = startDate && endDate ? `${startDate} -- ${endDate}` : '';
+            
+            latex += `\n\\cventry{${escapeLatex(dateRange)}}{${escapeLatex(job.title || '')}}{${escapeLatex(job.company || '')}}{${escapeLatex(job.location || '')}}{}{`;
+            
+            if (job.bullets && job.bullets.length > 0) {
+              latex += `\\begin{itemize}`;
+              job.bullets.forEach((bullet: string) => {
+                if (bullet.trim()) {
+                  latex += `\n\\item ${escapeLatex(bullet)}`;
+                }
+              });
+              latex += `\n\\end{itemize}`;
+            }
+            
+            latex += `}\n`;
+          });
+        }
+        break;
+        
+      case 'skills':
+        if (cvData.skills?.items && cvData.skills.items.length > 0) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}
+\\cvitem{}{${escapeLatex(cvData.skills.items.join(', '))}}\n`;
+        }
+        break;
+        
+      case 'education':
+        if (cvData.education?.items && cvData.education.items.length > 0) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}`;
+          
+          cvData.education.items.forEach((edu: any) => {
+            const startDate = edu.startDate || '';
+            const endDate = edu.endDate || '';
+            const dateRange = startDate && endDate ? `${startDate} -- ${endDate}` : endDate || startDate;
+            
+            latex += `\n\\cventry{${escapeLatex(dateRange)}}{${escapeLatex(edu.degree || '')}}{${escapeLatex(edu.school || '')}}{${escapeLatex(edu.location || '')}}{`;
+            
+            if (edu.gpa) {
+              latex += `GPA: ${escapeLatex(edu.gpa)}`;
+            }
+            
+            latex += `}{`;
+            
+            if (edu.description) {
+              latex += escapeLatex(edu.description);
+            }
+            
+            latex += `}\n`;
+          });
+        }
+        break;
+        
+      case 'projects':
+        if (cvData.projects?.items && cvData.projects.items.length > 0) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}`;
+          
+          cvData.projects.items.forEach((project: any) => {
+            latex += `\n\\cventry{${escapeLatex(project.date || '')}}{${escapeLatex(project.name || '')}}{${escapeLatex(project.technologies || '')}}{}{}{`;
+            
+            if (project.description) {
+              latex += escapeLatex(project.description);
+            }
+            
+            if (project.link) {
+              latex += ` \\\\\\url{${escapeLatex(project.link)}}`;
+            }
+            
+            latex += `}\n`;
+          });
+        }
+        break;
+        
+      case 'certifications':
+        if (cvData.certifications?.items && cvData.certifications.items.length > 0) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}`;
+          
+          cvData.certifications.items.forEach((cert: any) => {
+            latex += `\n\\cventry{${escapeLatex(cert.date || '')}}{${escapeLatex(cert.name || '')}}{${escapeLatex(cert.issuer || '')}}{}{}{`;
+            
+            if (cert.description) {
+              latex += escapeLatex(cert.description);
+            }
+            
+            latex += `}\n`;
+          });
+        }
+        break;
+        
+      case 'languages':
+        if (cvData.languages?.items && cvData.languages.items.length > 0) {
+          latex += `\n\\section{${escapeLatex(sectionTitle)}}`;
+          
+          cvData.languages.items.forEach((lang: any) => {
+            latex += `\n\\cvitemwithcomment{${escapeLatex(lang.name || '')}}{${escapeLatex(lang.proficiency || '')}}{}\n`;
+          });
+        }
+        break;
+    }
+  }
+
+  latex += `\n\\end{document}`;
+  
+  return latex;
+};
+
+// Helper function to escape LaTeX special characters
+const escapeLatex = (text: string): string => {
+  if (!text) return '';
+  
+  return text
+    .replace(/\\/g, '\\textbackslash{}')
+    .replace(/\{/g, '\\{')
+    .replace(/\}/g, '\\}')
+    .replace(/\$/g, '\\$')
+    .replace(/&/g, '\\&')
+    .replace(/%/g, '\\%')
+    .replace(/#/g, '\\#')
+    .replace(/\^/g, '\\textasciicircum{}')
+    .replace(/_/g, '\\_')
+    .replace(/~/g, '\\textasciitilde{}')
+    .replace(/"/g, "''")
+    .replace(/'/g, "'");
+};
+
+
+
 // Main download function
-export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt') => {
+export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' | 'latex') => {
   const filename = generateFilename(cvData, format);
   
   switch (format) {
@@ -278,6 +472,12 @@ export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt')
       // For now, we'll download as RTF which can be opened by Word
       const rtfContent = generateRTFContent(cvData);
       downloadFile(rtfContent, filename.replace('.docx', '.rtf'), 'application/rtf');
+      break;
+    }
+
+    case 'latex': {
+      const latexContent = generateLatexContent(cvData);
+      downloadFile(latexContent, filename, 'text/x-tex;charset=utf-8');
       break;
     }
       

@@ -59,6 +59,8 @@ export default function SharedHeader({
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en');
   const [workspaceTexts, setWorkspaceTexts] = useState<any>(null);
+  const [feedbackTexts, setFeedbackTexts] = useState<any>(null);
+  const [accountTexts, setAccountTexts] = useState<any>(null);
 
   useEffect(() => {
     // Check authentication status on component mount
@@ -103,6 +105,28 @@ export default function SharedHeader({
         const fallbackTexts = await getTexts('workspace', 'en');
         setWorkspaceTexts(fallbackTexts);
       }
+      
+      // Load feedback texts for the detected language
+      try {
+        const feedbackTexts = await getTexts('feedback', language);
+        setFeedbackTexts(feedbackTexts);
+      } catch (error) {
+        console.error('Failed to load feedback texts:', error);
+        // Fallback to English
+        const fallbackFeedbackTexts = await getTexts('feedback', 'en');
+        setFeedbackTexts(fallbackFeedbackTexts);
+      }
+      
+      // Load account texts for the detected language
+      try {
+        const accountTexts = await getTexts('account', language);
+        setAccountTexts(accountTexts);
+      } catch (error) {
+        console.error('Failed to load account texts:', error);
+        // Fallback to English
+        const fallbackAccountTexts = await getTexts('account', 'en');
+        setAccountTexts(fallbackAccountTexts);
+      }
     };
     
     initLanguage();
@@ -134,9 +158,31 @@ export default function SharedHeader({
     return user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
   };
 
-  const handleLanguageChange = (language: 'vi' | 'en') => {
+  const handleLanguageChange = async (language: 'vi' | 'en') => {
     setCurrentLanguage(language);
     localStorage.setItem('okbuddy_language', language);
+    
+    // Reload texts for the new language
+    try {
+      const texts = await getTexts('workspace', language);
+      setWorkspaceTexts(texts);
+    } catch (error) {
+      console.error('Failed to load workspace texts:', error);
+    }
+    
+    try {
+      const feedbackTexts = await getTexts('feedback', language);
+      setFeedbackTexts(feedbackTexts);
+    } catch (error) {
+      console.error('Failed to load feedback texts:', error);
+    }
+    
+    try {
+      const accountTexts = await getTexts('account', language);
+      setAccountTexts(accountTexts);
+    } catch (error) {
+      console.error('Failed to load account texts:', error);
+    }
   };
 
   // Back navigation handler
@@ -301,9 +347,9 @@ export default function SharedHeader({
             <button
               onClick={handleFeedbackClick}
               className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-              aria-label="Gửi feedback"
+              aria-label={feedbackTexts?.aria?.feedbackButton || "Send feedback"}
             >
-              Feedback
+              {feedbackTexts?.buttonLabel || 'Feedback'}
             </button>
           )}
 
@@ -331,7 +377,7 @@ export default function SharedHeader({
                   className="flex flex-row justify-center items-center w-[100px] h-10 bg-white border border-[#0277BD] rounded-lg hover:bg-[#E1F5FE] transition-colors"
                 >
                   <span className="font-inter font-medium text-sm leading-[17px] text-[#0277BD]">
-                    Log In
+                    {accountTexts?.nav?.login || 'Log In'}
                   </span>
                 </button>
 
@@ -341,7 +387,7 @@ export default function SharedHeader({
                   className="flex flex-row justify-center items-center w-[120px] h-10 bg-[#0277BD] rounded-lg hover:bg-primary-600 transition-colors"
                 >
                   <span className="font-inter font-medium text-sm leading-[17px] text-white">
-                    Sign Up
+                    {accountTexts?.nav?.signup || 'Sign Up'}
                   </span>
                 </button>
               </>

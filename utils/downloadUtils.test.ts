@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { generateTxtContent, downloadFile, generateFilename, downloadCV } from './downloadUtils';
+import { generateTxtContent, downloadFile, generateFilename, downloadCV, generateLatexContent } from './downloadUtils';
 
 // Mock window.open for PDF testing
 const mockWindowOpen = vi.fn();
@@ -28,7 +28,12 @@ const mockLink = {
 };
 
 // Setup global mocks
-Object.defineProperty(window, 'open', { value: mockWindowOpen });
+Object.defineProperty(globalThis, 'window', {
+  value: {
+    open: mockWindowOpen
+  },
+  writable: true
+});
 Object.defineProperty(global, 'URL', { value: mockURL });
 
 // Mock document methods without redefining the entire document object
@@ -371,6 +376,7 @@ describe('downloadUtils', () => {
       expect(generateFilename(mockCvData, 'pdf')).toContain('.pdf');
       expect(generateFilename(mockCvData, 'docx')).toContain('.docx');
       expect(generateFilename(mockCvData, 'txt')).toContain('.txt');
+      expect(generateFilename(mockCvData, 'latex')).toContain('.tex');
     });
   });
 
@@ -405,6 +411,14 @@ describe('downloadUtils', () => {
       expect(mockURL.createObjectURL).toHaveBeenCalled();
       expect(mockLink.click).toHaveBeenCalled();
       expect(mockLink.download).toContain('.rtf');
+    });
+
+    it('downloads LaTeX format correctly', async () => {
+      await downloadCV(mockCvData, 'latex');
+
+      expect(mockURL.createObjectURL).toHaveBeenCalled();
+      expect(mockLink.click).toHaveBeenCalled();
+      expect(mockLink.download).toContain('.tex');
     });
 
     it('handles unsupported format gracefully', async () => {
@@ -642,6 +656,97 @@ describe('downloadUtils', () => {
       ];
 
       await expect(Promise.all(promises)).resolves.not.toThrow();
+    });
+  });
+
+  describe('generateLatexContent', () => {
+    it('generates valid LaTeX document structure', () => {
+      const latex = generateLatexContent(mockCvData);
+
+      expect(latex).toContain('\\documentclass[11pt,a4paper,sans]{moderncv}');
+      expect(latex).toContain('\\begin{document}');
+      expect(latex).toContain('\\end{document}');
+      expect(latex).toContain('\\makecvtitle');
+    });
+
+    it('includes contact information correctly', () => {
+      const latex = generateLatexContent(mockCvData);
+
+      expect(latex).toContain('\\name{John}{Doe}');
+      expect(latex).toContain('\\email{john.doe@example.com}');
+      expect(latex).toContain('\\phone[mobile]{+1-555-0123}');
+    });
+
+    it('escapes LaTeX special characters', () => {
+      const dataWithSpecialChars = {
+        ...mockCvData,
+        contact: {
+          ...mockCvData.contact,
+          fullName: 'John & Jane Doe'
+        },
+        summary: {
+          content: 'Expert in C++ & Python with $100k+ revenue impact'
+        }
+      };
+
+      const latex = generateLatexContent(dataWithSpecialChars);
+
+      expect(latex).toContain('John \\& Jane');
+      expect(latex).toContain('C++ \\& Python');
+      expect(latex).toContain('\\$100k+');
+    });
+
+    it('handles experience section correctly', () => {
+      const latex = generateLatexContent(mockCvData);
+
+      expect(latex).toContain('\\section{Professional Experience}');
+      expect(latex).toContain('\\cventry{2020 -- Present}{Senior Software Engineer}');
+      expect(latex).toContain('\\begin{itemize}');
+      expect(latex).toContain('\\item Led development of scalable web applications');
+    });
+
+    it('handles education section correctly', () => {
+      const latex = generateLatexContent(mockCvData);
+
+      expect(latex).toContain('\\section{Education}');
+      expect(latex).toContain('\\cventry{2014 -- 2018}{Bachelor of Science in Computer Science}');
+    });
+
+    it('handles skills section correctly', () => {
+      const latex = generateLatexContent(mockCvData);
+
+      expect(latex).toContain('\\section{Technical Skills}');
+      expect(latex).toContain('\\cvitem{}{JavaScript, TypeScript, React, Node.js, Python, SQL}');
+    });
+
+    it('handles empty sections gracefully', () => {
+      const emptyData = {
+        contact: { fullName: 'Test User' },
+        sectionOrder: ['contact', 'summary', 'experience']
+      };
+
+      const latex = generateLatexContent(emptyData);
+
+      expect(latex).toContain('\\name{Test}{User}');
+      expect(latex).not.toContain('\\section{Professional Summary}');
+      expect(latex).not.toContain('\\section{Professional Experience}');
+    });
+
+    it('maintains section order from CV data', () => {
+      const customOrderData = {
+        ...mockCvData,
+        sectionOrder: ['contact', 'skills', 'experience', 'education']
+      };
+
+      const latex = generateLatexContent(customOrderData);
+
+      // Check that skills section appears before experience
+      const skillsIndex = latex.indexOf('\\section{Technical Skills}');
+      const experienceIndex = latex.indexOf('\\section{Professional Experience}');
+      
+      expect(skillsIndex).toBeGreaterThan(-1);
+      expect(experienceIndex).toBeGreaterThan(-1);
+      expect(skillsIndex).toBeLessThan(experienceIndex);
     });
   });
 }); 

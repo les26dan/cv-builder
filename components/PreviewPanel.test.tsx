@@ -411,6 +411,7 @@ describe('PreviewPanel Component', () => {
       
       expect(screen.getByText('PDF')).toBeInTheDocument();
       expect(screen.getByText('Word (.docx)')).toBeInTheDocument();
+      expect(screen.getByText('LaTeX (.tex)')).toBeInTheDocument();
     });
 
     it('handles download format selection', async () => {

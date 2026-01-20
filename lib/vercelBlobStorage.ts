@@ -75,19 +75,24 @@ export class VercelBlobStorageService {
    * @param cvBlob - Generated CV as Blob
    * @param userId - User ID
    * @param cvId - CV ID
-   * @param format - File format (pdf or docx)
+   * @param format - File format (pdf, docx, or latex)
    * @returns Storage result
    */
   static async storeGeneratedCV(
     cvBlob: Blob,
     userId: string,
     cvId: string,
-    format: 'pdf' | 'docx' = 'pdf'
+    format: 'pdf' | 'docx' | 'latex' = 'pdf'
   ): Promise<BlobUploadResult> {
     try {
-      const fileName = `generated-cv-${cvId}-${Date.now()}.${format}`;
+      const fileExtension = format === 'latex' ? 'tex' : format;
+      const fileName = `generated-cv-${cvId}-${Date.now()}.${fileExtension}`;
       const filePath = `${this.CV_FOLDER}/${userId}/generated/${fileName}`;
-      const contentType = format === 'pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      const contentType = format === 'pdf' 
+        ? 'application/pdf' 
+        : format === 'latex' 
+          ? 'text/x-tex' 
+          : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
       console.log(`💾 Storing generated CV: ${filePath}`);
 

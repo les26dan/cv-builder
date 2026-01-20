@@ -5,6 +5,7 @@
 
 export const feedback = {
   title: 'Feedback',
+  buttonLabel: 'Feedback',
   description: 'Share your thoughts, suggestions, or report bugs to help us make OkBuddy better.',
   
   form: {

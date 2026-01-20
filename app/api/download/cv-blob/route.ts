@@ -51,9 +51,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVDownloa
       );
     }
 
-    if (!['pdf', 'docx'].includes(format)) {
+    if (!['pdf', 'docx', 'latex'].includes(format)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid format. Only pdf and docx are supported' },
+        { success: false, error: 'Invalid format. Only pdf, docx, and latex are supported' },
         { status: 400 }
       );
     }
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVDownloa
       cvBlob,
       userSession.id,
       cvId,
-      format as 'pdf' | 'docx'
+      format as 'pdf' | 'docx' | 'latex'
     );
 
     console.log(`✅ Generated CV stored: ${blobInfo.url}`);
@@ -162,6 +162,8 @@ async function generateCVFile(cvData: any, format: string): Promise<Blob | null>
       return await generatePDFCV(cvData);
     } else if (format === 'docx') {
       return await generateDOCXCV(cvData);
+    } else if (format === 'latex') {
+      return await generateLatexCV(cvData);
     }
     
     return null;
@@ -249,6 +251,20 @@ Generated on: ${new Date().toLocaleString()}
 
   return new Blob([content], { 
     type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+  });
+}
+
+/**
+ * Generate LaTeX CV
+ */
+async function generateLatexCV(cvData: any): Promise<Blob> {
+  // Import the LaTeX generation function from utils
+  const { generateLatexContent } = await import('@/utils/downloadUtils');
+  
+  const latexContent = generateLatexContent(cvData);
+  
+  return new Blob([latexContent], { 
+    type: 'text/x-tex' 
   });
 }
 
