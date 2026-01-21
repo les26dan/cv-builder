@@ -3,18 +3,39 @@
 import React from 'react';
 import { landingPage } from '../config/texts/index';
 import { handlePrimaryCTA, trackCTAClick } from '../utils/navigation';
+import { useSectionTracking, useCTATracking } from '../hooks/useAnalytics';
 
 const ProblemATS: React.FC = () => {
   const { problems } = landingPage;
   const { ats } = problems;
+  
+  // Track section visibility
+  const sectionRef = useSectionTracking('Problem ATS', 0.5, {
+    section_position: 2,
+    problem_type: 'ats_optimization'
+  });
+  
+  // Track CTA clicks
+  const trackCTA = useCTATracking();
 
-  const handleCTAClick = async () => {
+  const handleCTAClick = async (event: React.MouseEvent) => {
+    // Track with new analytics system
+    trackCTA('Fix all issues now', 'problem_ats_section', {
+      clickEvent: event,
+      section_name: 'Problem ATS',
+      problem_category: 'ats_optimization'
+    });
+    
+    // Keep existing tracking for backward compatibility
     trackCTAClick('problem_ats');
     await handlePrimaryCTA();
   };
 
   return (
-    <section className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
+    <section 
+      ref={sectionRef}
+      className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]"
+    >
       {/* Content */}
       <div className="flex flex-col items-start gap-6 w-full md:w-[500px]">
         {/* Section Label removed per UI polish requirements */}

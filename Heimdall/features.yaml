@@ -1,18 +1,52 @@
 # OkBuddy Unified Application - Features Registry
 
-# Status: Production Ready - Database Integration Complete + Real Data Persistence + Auto-Save System + LaTeX Download Support
+# Status: Production Ready - CV Rename + Database Persistence + Auto-Save System + LaTeX Download Support
 # Build: ✅ 29 pages, 19 API routes successfully building
 # Security: ✅ Complete authorization system + All vulnerabilities fixed (Next.js 15.4.5, DOMPurify 3.2.4+)
-# Database: ✅ Real Supabase integration with cv_workflow table + Data compression + Auto-save
-# Data Persistence: ✅ Bulletproof auto-save system + Cross-session continuity + Offline fallback
+# Database: ✅ Real Supabase integration with cv_workflow table + Data compression + Auto-save + CV CRUD operations
+# Data Management: ✅ Inline CV rename functionality + Real-time database updates + Data persistence
 # File Processing: ✅ Enhanced CV Parser with immediate database persistence + Structured data storage
-# UI Restoration: ✅ All pages functional with real data loading from database
+# UI Polish: ✅ All pages functional with real data loading + Vietnamese localization + Hover interactions
 # Design System: ✅ Centralized color scheme and component styling maintained
 # Admin System: ✅ Role-Based Authentication & Management Dashboard
-# CV Workspace: ✅ Real user data loading + Progress tracking + Empty state for new users
+# CV Workspace: ✅ Real user data loading + Progress tracking + CV rename functionality + Empty state for new users
 # CV Guided Editing: ✅ Real-time auto-save + Conflict resolution + Cross-session data persistence
 # Performance: ✅ Production build optimized + Data compression + Bundle sizes <177KB
 # Downloads: ✅ LaTeX download support + WYSIWYG compliance for all formats (PDF, Word, LaTeX)
+
+## 🏷️ **CV RENAME & DATABASE PERSISTENCE** ✅ IMPLEMENTED (Feb 4, 2025)
+location: /components/CVCard.tsx, /lib/supabase.ts, /app/cv-workspace/page.tsx
+status: production_ready_inline_editing_with_database_persistence
+
+core_implementation:
+  - **Inline Editing UI**: Hover-to-edit CV titles with smooth UX transitions and edit icon ✅ NEW
+  - **Database Operations**: Complete CRUD operations on cv_workflow table with security validation ✅ NEW
+  - **Real-time Updates**: Immediate local state updates with database synchronization ✅ NEW
+  - **Error Handling**: Graceful fallbacks, rollback on failure, and user feedback mechanisms ✅ NEW
+  - **Keyboard Shortcuts**: Enter to save, Escape to cancel, blur auto-save functionality ✅ NEW
+  - **Integration Testing**: End-to-end validation with real database operations ✅ NEW
+
+features:
+  - **updateCVTitle()**: Secure database update function with user validation in lib/supabase.ts ✅ NEW
+  - **Hover Edit Icon**: Smooth opacity transition edit icon appears on CV title hover ✅ NEW
+  - **Inline Input Field**: Auto-focus input with border styling and loading spinner ✅ NEW
+  - **State Management**: Real-time local state updates for immediate UX feedback ✅ NEW
+  - **Database Sync**: Robust database persistence with proper error handling ✅ NEW
+  - **User Security**: User ID validation prevents unauthorized CV title modifications ✅ NEW
+
+ui_interactions:
+  - **Hover State**: Edit icon appears with opacity transition on CV card title hover ✅ VALIDATED
+  - **Click to Edit**: Single click on edit icon enables inline editing mode ✅ VALIDATED
+  - **Keyboard Control**: Enter saves, Escape cancels, blur auto-saves changes ✅ VALIDATED
+  - **Loading Feedback**: Spinner animation during database update operations ✅ VALIDATED
+  - **Error Recovery**: Failed updates restore original title with user notification ✅ VALIDATED
+
+technical_architecture:
+  - **Component Integration**: CVCard component with edit state management and event handlers
+  - **Database Security**: User ID validation in SQL queries prevents cross-user modifications
+  - **State Synchronization**: Immediate local updates followed by database persistence
+  - **Error Boundaries**: Comprehensive error handling with rollback and user feedback
+  - **Performance**: Optimistic updates provide instant feedback while background sync occurs
 
 ## 📄 **LATEX DOWNLOAD SYSTEM & WYSIWYG COMPLIANCE** ✅ IMPLEMENTED (Jan 15, 2025)
 location: /utils/downloadUtils.ts, /components/PreviewPanel.tsx, /app/api/download/cv-blob/route.ts

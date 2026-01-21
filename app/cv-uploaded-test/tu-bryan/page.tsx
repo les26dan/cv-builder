@@ -21,44 +21,63 @@ function CVUploadTestComponenttubryan() {
 
   // Test data from Tu Bryan CV ChatGPT response
   const testLLMData = {
-    "possibility_score": 9,
+    "possibility_score": [
+        10
+    ],
     "contact": {
-        "full_name": "Tu Bryan",
-        "address": "San Francisco, USA",
-        "email": "tu.bryan@email.com",
-        "phone": "+1 555 123 4567",
-        "linkedin": "linkedin.com/in/tubryan"
+        "full_name": "TU (BRYAN) LE",
+        "address": "Ho Chi Minh, Vietnam",
+        "email": "ledinhtu20@gmail.com",
+        "phone": "(+84) (0) 83 94 777 28",
+        "linkedin": "linkedin.com/in/ledinhtu/"
     },
-    "summary": "Technical Product Manager with experience in agile development and product strategy.",
+    "summary": "Technical Product Manager with 5+ years of experience in the banking and fintech industries, specializing in SaaS platforms, API payment solutions, and B2C microservice products. Led API integrations with bank partners and experiences in supported developer communities with Microsoft and Googles. Skilled in Agile methodologies, I collaborate with multinational teams to deliver product roadmaps and innovative solutions that meet end-user needs. Now, I’m eager to bring my technical and business expertise help company create impactful products.",
     "work_experience": [
         {
             "position": "Senior Technical Product Manager",
-            "company": "Tech Startup",
-            "location": "San Francisco",
-            "start_date": "Jan 2020",
-            "end_date": "Present",
+            "company": "SeaMoney & ShopeePay",
+            "location": "",
+            "start_date": "2022",
+            "end_date": "now",
             "bullets": [
-                "Led product development for mobile app",
-                "Coordinated cross-functional teams",
-                "Defined product roadmap and strategy"
+                "Country responsible for managing 3 digital lending products (buy now pay later, cash loan)"
+            ]
+        },
+        {
+            "position": "Product Owner",
+            "company": "MTI Technology",
+            "location": "",
+            "start_date": "2020",
+            "end_date": "2022",
+            "bullets": [
+                "Successfully delivered 2 fintech products (payment app, eKYC solution)"
+            ]
+        },
+        {
+            "position": "Onsite Business Analyst",
+            "company": "FPT Software, Fintech Dept.",
+            "location": "",
+            "start_date": "2016",
+            "end_date": "2020",
+            "bullets": [
+                "Contributed to 10 software development projects with customer NPS>90"
             ]
         }
     ],
     "education": [
         {
-            "degree": "Master of Science in Computer Science",
-            "institution": "Stanford University",
-            "location": "Stanford, CA",
-            "graduationDate": "2018",
-            "description": "Focus: Human-Computer Interaction"
+            "degree": "Bachelor of Science in Engineering",
+            "institution": "Da Nang University of Science and Technology",
+            "location": "",
+            "graduationDate": "",
+            "description": "Information System Management | 3.1/4 | Ranked 15th/300 | Head of 25 events, 4 workshops, 1 club, 2 contests | Vietnam's Representative of The 46th Ship of Southeast Asian and Japanese Program (SSEAYP) 2019"
         }
     ],
     "skills": [
         "Product Management",
-        "Agile",
-        "Scrum",
-        "Technical Strategy",
-        "Data Analysis"
+        "Data Analysis",
+        "Interpersonal skill",
+        "Language"
     ]
 };
 

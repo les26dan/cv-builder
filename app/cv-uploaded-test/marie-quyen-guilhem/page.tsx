@@ -21,45 +21,90 @@ function CVUploadTestComponentmariequyenguilhem() {
 
   // Test data from Marie Quyen Guilhem CV ChatGPT response
   const testLLMData = {
-    "possibility_score": 9,
+    "possibility_score": [
+        10
+    ],
     "contact": {
-        "full_name": "Marie Quyen Guilhem",
-        "address": "Paris, France",
-        "email": "marie.guilhem@email.com",
-        "phone": "+33 1 23 45 67 89",
-        "linkedin": "linkedin.com/in/mariequyenguilhem"
+        "full_name": "MARIE QUYEN GUILHEM",
+        "address": "",
+        "email": "mguilhem19@gmail.com",
+        "phone": "+84 388934808",
+        "linkedin": "www.linkedin.com/in/marie-guilhem-8ab6b888/"
     },
-    "summary": "International marketing professional with expertise in digital marketing and brand management.",
+    "summary": "Marie has 8 years of international experience with proven track record in product management, remote build, agile capability building, and digital transformation across banking, manufacturing and consumer industries in Asia, Europe, and the US.",
     "work_experience": [
         {
-            "position": "Marketing Manager",
-            "company": "International Brand",
-            "location": "Paris",
-            "start_date": "Jun 2018",
+            "position": "Product Manager (Product Specialist)",
+            "company": "McKinsey & Company",
+            "location": "Global",
+            "start_date": "Apr 2021",
             "end_date": "Present",
             "bullets": [
-                "Developed global marketing strategies",
-                "Managed digital marketing campaigns",
-                "Increased brand awareness by 40%"
+                "Launched a Gen-AI chatbot for a pharmaceutical company (United States) to provide tailored recommendations to Sales staff.",
+                "Launched a Carbon Management System (Taiwan) to track, streamline reporting and reduce carbon emission in factories.",
+                "Re-launched the 4th biggest utility mobile app globally (Indonesia)",
+                "Launched a secured digital lending app (Indonesia) within 12 weeks as part of a new venture."
+            ]
+        },
+        {
+            "position": "Marketplace Product Manager",
+            "company": "Global Fashion Group",
+            "location": "Ho Chi Minh City, Vietnam",
+            "start_date": "Oct 2020",
+            "end_date": "Apr 2021",
+            "bullets": [
+                "Led projects across Asia, South America, and Australia on increasing stock availability, pricing compliance and gift with purchase.",
+                "Partnered with Product teams in Germany and Vietnam to create product roadmaps based on global and regional market strategy."
+            ]
+        },
+        {
+            "position": "Proxy Product Owner",
+            "company": "NashTech",
+            "location": "Ho Chi Minh City, Vietnam",
+            "start_date": "Mar 2018",
+            "end_date": "Aug 2020",
+            "bullets": [
+                "Managed product backlogs for 3 web-based applications to streamline audit reporting for a British HR consulting firm.",
+                "Partnered with 3 POs in London to define requirements."
+            ]
+        },
+        {
+            "position": "UX/UI Business Analyst",
+            "company": "Cisco",
+            "location": "San Jose, United States",
+            "start_date": "Aug 2016",
+            "end_date": "Aug 2017",
+            "bullets": [
+                "Conducted user research and usability testing for Cisco Cloud Collaboration products (Cisco WebEx and Spark) and presented insights for product improvements.",
+                "Built Tableau dashboards to analyze usage trends."
+            ]
+        },
+        {
+            "position": "Business Analyst",
+            "company": "Nestlé",
+            "location": "London, United Kingdom",
+            "start_date": "Sep 2014",
+            "end_date": "Sep 2015",
+            "bullets": [
+                "Built a suite of visualization dashboards to understand seasonal trend of sales and profit in UK&I, Asia, and Central Europe.",
+                "Implemented a new management system to coordinate information sharing of 18 reports."
             ]
         }
     ],
     "education": [
         {
-            "degree": "Master in Marketing",
-            "institution": "ESSEC Business School",
-            "location": "Paris",
-            "graduationDate": "2018",
-            "description": "Specialization: Digital Marketing"
+            "degree": "BSc Information Management for Business (First Class)",
+            "institution": "University College London",
+            "location": "London, United Kingdom",
+            "graduationDate": "June 2016",
+            "description": "Relevant Course: Interaction Design, Business in a Competitive Environment, Programming"
         }
     ],
     "skills": [
-        "Digital Marketing",
-        "Brand Management",
-        "SEO",
-        "Analytics",
-        "French",
-        "English"
+        "Fluent in English and Vietnamese",
+        "Conversational in French",
+        "Wireframes (Zeplin, Visio, Balsamiq, Pencil, Invision) and workflow (Miro)",
+        "Software development tools (Jira, Confluence, Asana)"
     ]
 };
 

@@ -21,45 +21,107 @@ function CVUploadTestComponentkienvu() {
 
   // Test data from Kien Vu CV ChatGPT response
   const testLLMData = {
-    "possibility_score": 9,
+    "possibility_score": [
+        10
+    ],
     "contact": {
-        "full_name": "Kien Vu",
+        "full_name": "KIEN (JONATHAN) VU VIET",
         "address": "Ho Chi Minh City, Vietnam",
-        "email": "kien.vu@email.com",
-        "phone": "+84 901 234 567",
-        "linkedin": "linkedin.com/in/kienvu"
+        "email": "vuvietkien.ptithcm@gmail.com",
+        "phone": "+84 972 947 523",
+        "linkedin": "Linkedin"
     },
-    "summary": "Senior Product Manager with extensive experience in fintech and mobile applications.",
+    "summary": "",
     "work_experience": [
         {
-            "position": "Senior Product Manager",
-            "company": "Fintech Company",
-            "location": "Ho Chi Minh City",
-            "start_date": "Apr 2019",
-            "end_date": "Present",
+            "position": "Technical Product Manager",
+            "company": "DHF Platforms",
+            "location": "Vietnam, Singapore",
+            "start_date": "Jul 2024",
+            "end_date": "Now",
             "bullets": [
-                "Managed fintech product portfolio",
-                "Launched mobile payment solutions",
-                "Achieved 200% user growth"
+                "Optimized supply chain operations and production workflows, achieving 3x improvement in inventory update and a 90% reduction in reporting errors, by designing and implementing an ERP system tailored to operational needs.",
+                "Centralized fragmented data from ERP, CRM, and B2B reports into a unified data warehouse, enabling real-time tracking of north-star metrics and KPIs through scalable ETL processes and comprehensive data mapping.",
+                "Defined and prioritized the 2025 product roadmap to achieve 200% GMV growth, focusing on scaling operational workflows and launching a farm application for suppliers to enhance crop quality, productivity, and traceability.",
+                "Developed a cohesive UI/UX design system in Figma, enhancing usability and platform consistency, measured by improved stakeholder satisfaction through iterative feedback loops."
+            ]
+        },
+        {
+            "position": "Product Manager",
+            "company": "Peeba (YC23)",
+            "location": "Indonesia, Vietnam",
+            "start_date": "May 2023",
+            "end_date": "Nov 2023",
+            "bullets": [
+                "Enhanced UI/UX of products by conducting experiments such as implementing a new sign-up flow that increased conversion rates by 26%.",
+                "Led the development of pivotal features, encompassing inventory management, a tiered pricing system, tailored to the business structures of brands, flexible payment methods for local markets, and the integration of a buy-now-pay-later scheme with third-party services.",
+                "Accomplished 3 comprehensive market research initiatives in Indonesia, gathering insights through on-field talking, surveys, and in-depth interviews. Informed business decisions and shaped product directions based on collected feedback.",
+                "Collaborated with the business team to test and refine key strategies, introducing a wholesale subscription model, one-year free shipping, and a Direct Sales App (SaaS) for brands to enhance sales efficiency. Achieved a remarkable $17,000 in GMV for one brand within just 3 weeks through the implementation of the Direct Sales App."
+            ]
+        },
+        {
+            "position": "Product Lead, Growth",
+            "company": "MoMo",
+            "location": "Ho Chi Minh (Vietnam)",
+            "start_date": "Mar 2020",
+            "end_date": "Apr 2023",
+            "bullets": [
+                "Achieved a 1.7x increase in daily transaction numbers through the implementation of multi-source funds. Post-campaign, daily transaction volume was 1.5x higher than pre-campaign average volume.",
+                "Successfully educated the financial hub to 12 million users by providing multiple sources of funds and flexible payment choices.",
+                "Coordinated with the engineering manager to develop a cloud platform for the game that can manage 10,000 connections during a room battle, utilizing the Google Cloud Platform.",
+                "Established a document about LAWs of UX applied to build gamification features in Fintech to enhance user engagement."
+            ]
+        },
+        {
+            "position": "Engineering Manager",
+            "company": "SaveMoney (Insurance Startup)",
+            "location": "Vietnam",
+            "start_date": "Oct 2018",
+            "end_date": "Feb 2020",
+            "bullets": [
+                "Increased product quality and execution speed by 50%, measured by faster deployment and improved team efficiency, by establishing cross-functional workflows with Scrum and ensuring clear communication across a team of 11.",
+                "Improved team cohesion and adaptability to feedback, resulting in reduced development timelines and increased stakeholder satisfaction, by implementing agile practices.",
+                "Delivered new microinsurance products successfully, measured by meeting project deadlines and launching on schedule, by leading a team of product owners, engineers, and designers, and holding regular workshops to foster collaboration."
+            ]
+        },
+        {
+            "position": "Senior Fullstack Software Engineer",
+            "company": "",
+            "location": "Vietnam and the Philippines",
+            "start_date": "Feb 2015",
+            "end_date": "Feb 2020",
+            "bullets": [
+                "Collaborated with a global team across the Philippines, US (Florida, and other regions) to enhance the Disney Cruise Line reservation tracking system, ensuring real-time updates and operational accuracy while adapting to US working styles and overnight schedules to meet deadlines.",
+                "Designed and implemented scalable web-based solutions, including Warehouse Management, CRM systems, and cloud-based insurance platforms, using AngularJS, ReactJS, Node.js, GCP, and aligning technical solutions with business goals to optimize performance and reliability.",
+                "Improved full-stack application scalability and efficiency, leveraging CI/CD pipelines, Kubernetes, and SQL databases, reducing downtime and enhancing deployment speed.",
+                "Translated business requirements into technical solutions by coordinating with business analysts and product owners, ensuring alignment with client needs and user expectations."
             ]
         }
     ],
     "education": [
         {
-            "degree": "MBA",
-            "institution": "RMIT University Vietnam",
-            "location": "Ho Chi Minh City",
-            "graduationDate": "2019",
-            "description": "Concentration: Technology Management"
+            "degree": "Business Intelligence Program",
+            "institution": "Mastering Data Analytics, VN",
+            "location": "",
+            "graduationDate": "Nov 2024 – 2025",
+            "description": "Analytics techniques, Dashboard insights, Storytelling, Business statistics and Analytical thinking."
+        },
+        {
+            "degree": "Leadership & Management",
+            "institution": "Master in Public Policy, Fulbright University VN",
+            "location": "",
+            "graduationDate": "Oct 2022 – 2024",
+            "description": "Subjects included leadership and management, negotiation, data science, quantitative methods, microeconomics, macroeconomics, public policy, law, budgeting and financial management."
+        },
+        {
+            "degree": "Software Engineer",
+            "institution": "Posts and Telecommunication Institute of Technology",
+            "location": "",
+            "graduationDate": "Oct 2010 - Jan 2015",
+            "description": ""
         }
     ],
-    "skills": [
-        "Product Management",
-        "Fintech",
-        "Mobile Apps",
-        "Strategy",
-        "Analytics"
-    ]
+    "skills": []
 };
 
   const handleStartAnalysis = async () => {

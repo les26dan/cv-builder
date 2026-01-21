@@ -21,7 +21,9 @@ function CVUploadTestComponenthonguyenhainam() {
 
   // REAL data from Ho Nguyen Hai Nam CV ChatGPT response (Updated with actual extraction)
   const testLLMData = {
-    "possibility_score": 10,
+    "possibility_score": [
+        10
+    ],
     "contact": {
         "full_name": "Ho Nguyen Hai Nam",
         "address": "237/18 Hoang Dieu Road, Ward 8, District 4, TP. Ho Chi Minh",
@@ -29,7 +31,7 @@ function CVUploadTestComponenthonguyenhainam() {
         "phone": "+84 908 406 514",
         "linkedin": ""
     },
-    "summary": "Results-oriented quality assurance tester with 4+ years of expertise in ensuring long-term product quality with high stability and quick application development life cycles. Ability to learn quickly, often in high-pressure situations in order to fully understand a new product.",
+    "summary": "Results-oriented quality assurance tester with 4+ years of expertise in ensuring long-term product quality with high stability and quick application development life cycles. Ability to learn quickly, often in high-pressure situations in order to fully understand a new product Help to Participate in many crucial projects that brought the company's name and success to the current company.",
     "work_experience": [
         {
             "position": "QA/QC Trainee",
@@ -38,27 +40,62 @@ function CVUploadTestComponenthonguyenhainam() {
             "start_date": "2018",
             "end_date": "2019",
             "bullets": [
-                "Participated in many crucial projects that brought the company's name and success",
-                "Proficiency in SQL, Postman, Confluence, TestRail, IntelliJ and Google Office"
+                "Work with the internal and Sell tool",
+                "Apply Scrum and Agile to the work process",
+                "Do Test according to four criteria, including: Client requirement clarification, Production requirement, Under requirement, User experiences",
+                "Suggest the enhancement idea for the product",
+                "Make the weekly Bugs/Enchantments report",
+                "Make the release note for each release time",
+                "Make the user guide for the current product version",
+                "Research new tools and methodologies in case of testing",
+                "Make the document and the demo section about the research result"
+            ]
+        },
+        {
+            "position": "Middle-Quality Control",
+            "company": "MoMo E-Wallet",
+            "location": "",
+            "start_date": "2019",
+            "end_date": "Present",
+            "bullets": [
+                "Check and analyze the PO requirements",
+                "Define the project features by Xmind diagram",
+                "Define test cases/ Checklist",
+                "Check manually on four main parts, including: UI, API, Database, Performance",
+                "Report bugs for the development team through Confluence Board",
+                "Write automation test script with Selenium by Python and Java language",
+                "Weekly report for the work process and bug found summarize",
+                "Write release notes and user guide",
+                "Customer support after project release",
+                "Write Automation for overall product checklist",
+                "Define Document for member",
+                "Define Automation test for released task in detail level"
             ]
         }
     ],
     "education": [
         {
-            "degree": "Professional Bachelor of Computer Technology",
-            "institution": "ITA, Asia E University",
-            "location": "Kuala Lumpur, Malaysia",
-            "graduationDate": "2013",
-            "description": "GPA 3.67"
+            "degree": "Bachelor Of Information Technologies (BITS)",
+            "institution": "RMIT University VietNam",
+            "location": "",
+            "graduationDate": "2018",
+            "description": "Graduated"
         }
     ],
     "skills": [
         "Quality Control",
-        "Quality Assurance", 
+        "Quality Assurance",
         "Documentation Analyst",
         "Database query",
         "Performance manual test",
-        "Emulator Testing"
+        "Emulator Testing",
+        "Automation with Selenium (Java, Python)",
+        "Familiar API tool",
+        "Product risk analysis",
+        "Fluently English communication",
+        "Quickly and Effectively Problem solving",
+        "Team Collaboration",
+        "Created Documentation Re"
     ]
 };
 

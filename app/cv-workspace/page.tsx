@@ -168,6 +168,16 @@ export default function WorkspacePage() {
     setShowDeleteModal(null)
   }
 
+  const handleTitleUpdate = async (cvId: string, newTitle: string) => {
+    // Update the CV in the local state immediately for better UX
+    setCvs(prev => prev.map(cv => 
+      cv.id === cvId 
+        ? { ...cv, title: newTitle, lastUpdated: new Date() }
+        : cv
+    ))
+    setLastUpdate(new Date().toISOString())
+  }
+
   // Temporary: Remove SSR loading to debug client-side mounting
   // if (isLoading) {
   //   return (
@@ -352,6 +362,7 @@ export default function WorkspacePage() {
                   onEdit={handleEdit}
                   onDownload={handleDownload}
                   onDelete={handleDeleteClick}
+                  onTitleUpdate={handleTitleUpdate}
                 />
               ))}
             </div>

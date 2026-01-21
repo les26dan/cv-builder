@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { getTexts } from '@/config/texts/index'
 import { formatTimeAgo } from '@/lib/timeUtils'
-import { CVData } from '@/lib/supabase'
+import { CVData, updateCVTitle } from '@/lib/supabase'
 
 interface CVCardProps {
   cv: CVData
@@ -11,6 +11,7 @@ interface CVCardProps {
   onEdit?: (cvId: string) => void | Promise<void>
   onDownload?: (cvId: string) => void
   onDelete?: (cvId: string) => void
+  onTitleUpdate?: (cvId: string, newTitle: string) => void
 }
 
 export default function CVCard({ 
@@ -18,10 +19,14 @@ export default function CVCard({
   onContinue, 
   onEdit, 
   onDownload, 
-  onDelete 
+  onDelete,
+  onTitleUpdate 
 }: CVCardProps) {
   const [workspace, setWorkspace] = useState<any>(null)
   const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [editedTitle, setEditedTitle] = useState(cv.title)
+  const [isUpdatingTitle, setIsUpdatingTitle] = useState(false)
   
   useEffect(() => {
     loadTexts()
@@ -136,6 +141,54 @@ export default function CVCard({
     action()
   }
 
+  // Handle title editing
+  const handleEditTitle = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsEditingTitle(true)
+    setEditedTitle(cv.title.replace(/^CV\s+/i, ''))
+  }
+
+  const handleSaveTitle = async () => {
+    if (editedTitle.trim() === '' || editedTitle.trim() === cv.title.replace(/^CV\s+/i, '')) {
+      setIsEditingTitle(false)
+      return
+    }
+
+    try {
+      setIsUpdatingTitle(true)
+      const success = await updateCVTitle(cv.id, editedTitle.trim(), cv.userId)
+      
+      if (success) {
+        onTitleUpdate?.(cv.id, editedTitle.trim())
+        setIsEditingTitle(false)
+      } else {
+        console.error('Failed to update CV title')
+        // Reset to original title on error
+        setEditedTitle(cv.title.replace(/^CV\s+/i, ''))
+      }
+    } catch (error) {
+      console.error('Error updating CV title:', error)
+      setEditedTitle(cv.title.replace(/^CV\s+/i, ''))
+    } finally {
+      setIsUpdatingTitle(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditingTitle(false)
+    setEditedTitle(cv.title.replace(/^CV\s+/i, ''))
+  }
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveTitle()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleCancelEdit()
+    }
+  }
+
   return (
     <div 
       onClick={handleCardClick}
@@ -202,8 +255,51 @@ export default function CVCard({
             {/* Title Row */}
             <div className="flex flex-row items-center justify-between w-full h-[26px] flex-none self-stretch">
               {/* Resume Title */}
-              <div className="h-[26px] font-inter font-semibold text-xl leading-[26px] text-gray-900 flex-none overflow-hidden text-ellipsis whitespace-nowrap flex-1 mr-2">
-                {cv.title.replace(/^CV\s+/i, '')}
+              <div className="h-[26px] flex-1 mr-2 group relative">
+                {isEditingTitle ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      onKeyDown={handleTitleKeyDown}
+                      onBlur={handleSaveTitle}
+                      className="font-inter font-semibold text-xl leading-[26px] text-gray-900 bg-white border border-blue-500 rounded px-2 py-0 focus:outline-none focus:ring-2 focus:ring-blue-200 flex-1"
+                      autoFocus
+                      disabled={isUpdatingTitle}
+                    />
+                    {isUpdatingTitle && (
+                      <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <div className="font-inter font-semibold text-xl leading-[26px] text-gray-900 overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                      {cv.title.replace(/^CV\s+/i, '')}
+                    </div>
+                    <button
+                      onClick={handleEditTitle}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 hover:bg-gray-100 rounded"
+                      title="Edit CV name"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M11.3333 2.00002C11.5101 1.82321 11.7497 1.72424 12 1.72424C12.2503 1.72424 12.4899 1.82321 12.6667 2.00002C12.8435 2.17683 12.9424 2.41646 12.9424 2.66669C12.9424 2.91692 12.8435 3.15655 12.6667 3.33335L4.66667 11.3334L1.33333 12L2 8.66669L11.3333 2.00002Z"
+                          stroke="#6B7280"
+                          strokeWidth="1.33333"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Score */}

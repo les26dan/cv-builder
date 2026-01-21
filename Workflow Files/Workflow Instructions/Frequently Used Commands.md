@@ -2,11 +2,11 @@
 Update the Tasks.md file to marking what we have implemented being completed. If an entire task (with all of its subtasks) is completed, move it down to the Completed Tasks section.
 
 # *Restart server*
-Restart server using the start-server script in the project.
+Restart server using the start-server /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/start-server script in the project.
 
 # *Task Testing*
 
-Then, enter **Focused QA & Testing Mode** and perform the following **high-value, low-maintenance** actions to validate implementation following tenet 5. Relentless, Rigorous Testing & Code Health.
+Then, enter **Focused QA & Testing Mode** and perform the following **high-value, low-maintenance** actions to validate we we have implemented so far in this entire session, following tenet 5. Relentless, Rigorous Testing & Code Health.
 
 **🎯 Focus**: Quality over quantity, stability over perfection, practical over theoretical.
 

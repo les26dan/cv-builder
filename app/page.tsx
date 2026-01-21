@@ -9,8 +9,20 @@ import ProblemMassCV from '../components/ProblemMassCV';
 import ProblemCoverLetters from '../components/ProblemCoverLetters';
 import TestimonialsSection from '../components/TestimonialsSection';
 import Footer from '../components/Footer';
+import { usePageView, useScrollTracking, useExitIntentTracking } from '../hooks/useAnalytics';
 
 export default function Home() {
+  // Track page view
+  usePageView('landing', {
+    page_name: 'Landing Page',
+    page_section: 'home'
+  });
+
+  // Track scroll depth milestones
+  useScrollTracking();
+
+  // Track exit intent
+  useExitIntentTracking();
   return (
     <div className="min-h-screen bg-white">
       <SharedHeader variant="landing" />

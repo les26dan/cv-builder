@@ -3,8 +3,14 @@
 import { Suspense } from "react";
 import SharedHeader from "@/components/SharedHeader";
 import LoginPageContent from "@/components/auth/LoginPageContent";
+import { usePageView } from "@/hooks/useAnalytics";
 
 export default function LoginPage() {
+  // Track page view
+  usePageView('login', {
+    page_name: 'Login Page',
+    referrer_page: typeof window !== 'undefined' ? document.referrer : undefined
+  });
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SharedHeader 

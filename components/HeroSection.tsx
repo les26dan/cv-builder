@@ -3,17 +3,37 @@
 import React from 'react';
 import { landingPage } from '../config/texts/index';
 import { handlePrimaryCTA, trackCTAClick } from '../utils/navigation';
+import { useSectionTracking, useCTATracking } from '../hooks/useAnalytics';
 
 const HeroSection: React.FC = () => {
   const { hero, resume, problems } = landingPage;
+  
+  // Track section visibility
+  const sectionRef = useSectionTracking('Hero Section', 0.5, {
+    section_position: 1,
+    contains_cta: true
+  });
+  
+  // Track CTA clicks
+  const trackCTA = useCTATracking();
 
-  const handleCTAClick = async () => {
+  const handleCTAClick = async (event: React.MouseEvent) => {
+    // Track with new analytics system
+    trackCTA(hero.cta, 'hero_section', {
+      clickEvent: event,
+      time_on_page: Date.now() - performance.timeOrigin
+    });
+    
+    // Keep existing tracking for backward compatibility
     trackCTAClick('hero_section');
     await handlePrimaryCTA();
   };
 
   return (
-    <section className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] md:py-[60px] pb-[80px] gap-8 w-full min-h-[840px] bg-[#E0F7FA]">
+    <section 
+      ref={sectionRef}
+      className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] md:py-[60px] pb-[80px] gap-8 w-full min-h-[840px] bg-[#E0F7FA]"
+    >
       {/* Content Container */}
       <div className="flex flex-col justify-center items-center gap-6 w-full max-w-[800px]">
         {/* Main Headline */}

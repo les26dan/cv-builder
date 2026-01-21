@@ -374,6 +374,38 @@ export async function createUser(userData: CreateUserData): Promise<UserResult> 
   }
 }
 
+export async function updateCVTitle(cvId: string, newTitle: string, userId: string): Promise<boolean> {
+  if (!supabase) {
+    console.error('❌ Supabase not configured - cannot update CV title')
+    return false
+  }
+
+  try {
+    console.log(`🔄 Updating CV title: ${cvId} → "${newTitle}"`)
+    
+    // Update in cv_workflow table (the active table)
+    const { error } = await supabase
+      .from('cv_workflow')
+      .update({ 
+        title: newTitle,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', cvId)
+      .eq('user_id', userId) // Security check
+
+    if (error) {
+      console.error('❌ Error updating CV title:', error)
+      return false
+    }
+
+    console.log('✅ CV title updated successfully')
+    return true
+  } catch (error) {
+    console.error('❌ Database connection error during CV title update:', error)
+    return false
+  }
+}
+
 export async function deleteCV(cvId: string): Promise<boolean> {
   if (!supabase) {
     console.error('❌ Supabase not configured - cannot delete CV')
@@ -382,7 +414,7 @@ export async function deleteCV(cvId: string): Promise<boolean> {
 
   try {
     const { error } = await supabase
-      .from('cvs')
+      .from('cv_workflow')
       .delete()
       .eq('id', cvId)
 
