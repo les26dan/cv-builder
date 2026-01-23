@@ -59,8 +59,8 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
       supabase = createClient(url, key)
       console.log('🔧 Supabase client force-initialized')
     } else {
-      console.error('❌ Supabase credentials missing - cannot proceed')
-      return []
+      console.error('❌ Supabase credentials missing - trying localStorage fallback')
+      return await fetchUserCVsFromLocalStorage(userId)
     }
   }
 
@@ -74,8 +74,8 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
 
     if (error) {
       console.error('❌ Supabase error fetching CVs from cv_workflow:', error)
-      console.log('🔄 Database error - returning empty array (this is normal for new users)')
-      return []
+      console.log('🔄 Database error - trying localStorage fallback')
+      return await fetchUserCVsFromLocalStorage(userId)
     }
 
     console.log('✅ Successfully fetched CVs from cv_workflow table:', data?.length || 0)
@@ -95,7 +95,88 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
     })) || []
   } catch (error) {
     console.error('❌ Database connection error:', error)
-    console.log('🔄 Database connection failed - returning empty array')
+    console.log('🔄 Database connection failed - trying localStorage fallback')
+    
+    // Fallback to localStorage for development/launch
+    return await fetchUserCVsFromLocalStorage(userId)
+  }
+}
+
+/**
+ * Fallback function to fetch CVs from localStorage when database is unavailable
+ */
+async function fetchUserCVsFromLocalStorage(userId: string): Promise<CVData[]> {
+  if (typeof window === 'undefined') {
+    console.log('🔧 Server-side: cannot access localStorage')
+    return []
+  }
+  
+  try {
+    console.log('🔍 Checking localStorage for CVs (user:', userId, ')')
+    const cvs: CVData[] = []
+    
+    // Check for user-specific CV list
+    const userCVsKey = `user_cvs_${userId}`
+    const userCVsList = localStorage.getItem(userCVsKey)
+    
+    if (userCVsList) {
+      const parsedList = JSON.parse(userCVsList)
+      console.log('📋 Found user CV list in localStorage:', parsedList.length, 'CVs')
+      
+      // Map localStorage format to CVData format
+      const mappedCVs = parsedList.map((cv: any) => ({
+        id: cv.id,
+        title: cv.title || 'Untitled Resume',
+        status: cv.status || 'new',
+        score: cv.score || 0,
+        lastUpdated: new Date(cv.updated_at || cv.created_at || Date.now()),
+        userId: userId,
+        content: cv.cv_data || undefined,
+        workflowStep: cv.workflow_current_step || 'upload',
+        workflowStepsCompleted: cv.workflow_steps_completed || [],
+      }))
+      
+      cvs.push(...mappedCVs)
+    }
+    
+    // Also check for individual CV uploads (cv_upload_* keys)
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && key.startsWith('cv_upload_')) {
+        try {
+          const cvUploadData = JSON.parse(localStorage.getItem(key) || '{}')
+          if (cvUploadData.cvId && cvUploadData.processed) {
+            // Check if this CV is already in the list
+            const existingCV = cvs.find(cv => cv.id === cvUploadData.cvId)
+            if (!existingCV) {
+              const cv: CVData = {
+                id: cvUploadData.cvId,
+                title: cvUploadData.file?.name?.replace(/\.[^/.]+$/, '') || 'Untitled Resume',
+                status: 'new',
+                score: cvUploadData.llmParsedData?.possibility_score || 0,
+                lastUpdated: new Date(cvUploadData.timestamp || Date.now()),
+                userId: userId,
+                content: cvUploadData.structuredCV || undefined,
+                workflowStep: 'analysis',
+                workflowStepsCompleted: ['upload'],
+              }
+              cvs.push(cv)
+            }
+          }
+        } catch (parseError) {
+          console.warn('⚠️ Failed to parse CV upload data for key:', key)
+        }
+      }
+    }
+    
+    // Sort by last updated (newest first)
+    cvs.sort((a, b) => b.lastUpdated.getTime() - a.lastUpdated.getTime())
+    
+    console.log('✅ localStorage fallback found', cvs.length, 'CVs')
+    return cvs
+    
+  } catch (error) {
+    console.error('❌ localStorage fallback failed:', error)
     return []
   }
 }
