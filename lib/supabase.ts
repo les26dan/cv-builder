@@ -140,6 +140,9 @@ async function fetchUserCVsFromLocalStorage(userId: string): Promise<CVData[]> {
     }
     
     // Also check for individual CV uploads (cv_upload_* keys)
+    // In development mode, show ALL cv_upload_* entries regardless of user ID
+    const isDevelopmentMode = userId === 'admin-dev-123' || !process.env.NEXT_PUBLIC_SUPABASE_URL
+    
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       if (key && key.startsWith('cv_upload_')) {
@@ -161,10 +164,54 @@ async function fetchUserCVsFromLocalStorage(userId: string): Promise<CVData[]> {
                 workflowStepsCompleted: ['upload'],
               }
               cvs.push(cv)
+              
+              if (isDevelopmentMode) {
+                console.log('🔧 Development mode: Found CV from any user:', cv.title)
+              }
             }
           }
         } catch (parseError) {
           console.warn('⚠️ Failed to parse CV upload data for key:', key)
+        }
+      }
+    }
+    
+    // In development mode, also check for CVs from other user IDs
+    if (isDevelopmentMode) {
+      console.log('🔧 Development mode: Checking for CVs from all user IDs...')
+      
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && key.startsWith('user_cvs_')) {
+          try {
+            const userCVsList = localStorage.getItem(key)
+            if (userCVsList) {
+              const parsedList = JSON.parse(userCVsList)
+              console.log(`🔧 Found ${parsedList.length} CVs from ${key}`)
+              
+              const mappedCVs = parsedList.map((cv: any) => ({
+                id: cv.id,
+                title: cv.title || 'Untitled Resume',
+                status: cv.status || 'new',
+                score: cv.score || 0,
+                lastUpdated: new Date(cv.updated_at || cv.created_at || Date.now()),
+                userId: userId, // Use current user ID
+                content: cv.cv_data || undefined,
+                workflowStep: cv.workflow_current_step || 'upload',
+                workflowStepsCompleted: cv.workflow_steps_completed || [],
+              }))
+              
+              // Add CVs that don't already exist
+              mappedCVs.forEach((cv: CVData) => {
+                const existingCV = cvs.find(existing => existing.id === cv.id)
+                if (!existingCV) {
+                  cvs.push(cv)
+                }
+              })
+            }
+          } catch (parseError) {
+            console.warn('⚠️ Failed to parse user CV list for key:', key)
+          }
         }
       }
     }
