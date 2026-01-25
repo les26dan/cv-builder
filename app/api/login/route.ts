@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { DatabaseService } from '@/lib/database';
 import { verifyPassword } from '@/lib/password';
 import { checkRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rateLimit';
+import { getTexts } from '@/config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '@/config/languageConfig';
 
 // Explicitly use Node.js runtime to avoid Edge Runtime warnings
 export const runtime = 'nodejs'
@@ -11,7 +13,37 @@ interface LoginRequest {
   password: string;
 }
 
+// Helper function to detect language from request
+async function getRequestLanguage(request: NextRequest): Promise<SupportedLanguage> {
+  try {
+    // Check for language preference in headers
+    const acceptLanguage = request.headers.get('accept-language') || '';
+    const detectedLanguage = detectLanguage({
+      browserLocale: acceptLanguage
+    });
+    return detectedLanguage.language;
+  } catch {
+    return 'en'; // Default to English
+  }
+}
+
+// Helper function to get localized texts
+async function getLocalizedTexts(language: SupportedLanguage) {
+  try {
+    const texts = await getTexts('account', language);
+    return texts;
+  } catch {
+    // Fallback to default texts
+    const { account } = await import('@/config/texts/en/account');
+    return account;
+  }
+}
+
 export async function POST(request: NextRequest) {
+  // Get localized texts
+  const language = await getRequestLanguage(request);
+  const texts = await getLocalizedTexts(language);
+
   // Apply rate limiting
   const rateLimitResult = checkRateLimit(request, 'login');
   
@@ -23,7 +55,7 @@ export async function POST(request: NextRequest) {
     });
     
     return createRateLimitResponse(
-      `Quá nhiều yêu cầu đăng nhập. Vui lòng thử lại sau ${rateLimitResult.retryAfter} giây.`,
+      texts.errors.rateLimitExceeded,
       rateLimitResult.retryAfter!
     );
   }
@@ -39,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!body.email || !body.password) {
       return addHeaders(NextResponse.json(
-        { error: "Email và mật khẩu là bắt buộc" },
+        { error: texts.errors.emailPasswordRequired },
         { status: 400 }
       ));
     }
@@ -56,14 +88,17 @@ export async function POST(request: NextRequest) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(body.email)) {
         return addHeaders(NextResponse.json(
-          { error: "Email không hợp lệ" },
+          { error: texts.errors.invalidEmailFormat },
           { status: 400 }
         ));
       }
     }
 
+    // Initialize userResult variable
+    let userResult;
+    
     // Find user in database
-    let userResult = await DatabaseService.getUserByEmail(emailToLookup);
+    userResult = await DatabaseService.getUserByEmail(emailToLookup);
     
     // Auto-create admin account if using adminbuddy credentials or Gmail email
     if (!userResult.success || !userResult.user) {
@@ -119,7 +154,7 @@ export async function POST(request: NextRequest) {
       if (!userResult.success || !userResult.user) {
         console.log('❌ Login failed - user not found:', body.email);
         return addHeaders(NextResponse.json(
-          { error: "Email hoặc mật khẩu không chính xác" },
+          { error: texts.errors.loginFailed },
           { status: 401 }
         ));
       }
@@ -130,7 +165,7 @@ export async function POST(request: NextRequest) {
     if (!passwordVerification.success || !passwordVerification.isValid) {
       console.log('❌ Login failed - invalid password for:', body.email);
       return addHeaders(NextResponse.json(
-        { error: "Email hoặc mật khẩu không chính xác" },
+        { error: texts.errors.incorrectPassword },
         { status: 401 }
       ));
     }
@@ -157,7 +192,7 @@ export async function POST(request: NextRequest) {
     // Return success with user information (excluding sensitive data)
     const successResponse = NextResponse.json({
       success: true,
-      message: "Đăng nhập thành công!",
+      message: texts.success.loginComplete,
       user: {
         id: userResult.user.id,
         fullName: userResult.user.full_name,
@@ -183,7 +218,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("💥 Login error:", error);
     const errorResponse = NextResponse.json(
-      { error: "Đăng nhập thất bại. Vui lòng kiểm tra thông tin." },
+      { error: texts.errors.loginError },
       { status: 500 }
     );
     
