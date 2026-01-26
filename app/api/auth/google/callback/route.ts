@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
       
       // Redirect based on user role and account status
       if (userRole === 'admin') {
-        // Admin users go to admin dashboard
-        return NextResponse.redirect(new URL('/admin', request.url));
+        // Admin users go to CV Workspace
+        return NextResponse.redirect(new URL('/cv-workspace', request.url));
       } else if (result.isNewAccount) {
         // New users go to CV Upload page (unified app)
         return NextResponse.redirect(new URL('/cv-upload', request.url));

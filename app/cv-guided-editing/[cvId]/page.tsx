@@ -13,7 +13,7 @@ const CVEditor = dynamic(() => import('@/components/CVEditor').then(mod => ({ de
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Đang tải trình chỉnh sửa CV...</p>
+        <p className="text-gray-600">Loading CV editor...</p>
       </div>
     </div>
   ),
@@ -47,7 +47,7 @@ class CVEditorErrorBoundary extends Component<
           <div className="bg-white rounded-lg shadow-sm p-8 max-w-2xl w-full">
             <h1 className="text-2xl font-bold text-red-600 mb-4">🚨 Có lỗi xảy ra</h1>
             <p className="text-gray-600 mb-4">
-              Trình chỉnh sửa CV gặp sự cố. Vui lòng thử lại sau.
+              CV editor encountered an issue. Please try again later.
             </p>
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <strong className="block text-red-800 mb-2">Chi tiết lỗi:</strong>
@@ -145,7 +145,7 @@ export default function CVGuidedEditingPage() {
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Đang tải trình chỉnh sửa CV...</p>
+              <p className="text-gray-600">Loading CV editor...</p>
             </div>
           </div>
         }>

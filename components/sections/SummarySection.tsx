@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AIAssistButton } from '../common/AIAssistButton';
 import { aiService, EnhancedSummaryGenerationRequest } from '../../utils/aiService';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface SummarySectionProps {
   data: {
@@ -10,15 +12,40 @@ interface SummarySectionProps {
   isActive: boolean;
   cvData?: any; // Access to full CV data to check work experience
   onNavigateToSection?: (sectionId: string) => void;
+  language?: SupportedLanguage;
 }
 
 export const SummarySection = ({
   data,
   onUpdate,
   cvData,
-  onNavigateToSection
+  onNavigateToSection,
+  language
 }: SummarySectionProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [summaryTexts, setSummaryTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setSummaryTexts(texts.sections.summary);
+      } catch (error) {
+        console.error('Failed to load summary texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
   
   // Bulletproof type checking for summary content - moved to top for all uses
   const safeContent = (() => {
@@ -87,11 +114,11 @@ export const SummarySection = ({
         // markAIUsed('summary');
       } else {
         console.error('Failed to improve summary:', result.error);
-        alert('Không thể cải thiện tóm tắt. Vui lòng thử lại.');
+        alert(summaryTexts?.improveError || 'Unable to improve summary. Please try again.');
       }
     } catch (error) {
       console.error('Error improving summary:', error);
-      alert('Không thể cải thiện tóm tắt. Vui lòng thử lại.');
+      alert(summaryTexts?.improveError || 'Unable to improve summary. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -150,9 +177,7 @@ export const SummarySection = ({
     <div className="space-y-4">
       {/* Simplified guidance text */}
       <p className="text-sm text-gray-600">
-        Viết 2-4 câu ngắn gọn & đầy năng lượng để thu hút sự quan tâm! Trình bày 
-        vai trò, kinh nghiệm & quan trọng nhất là - thành tựu lớn nhất, kỹ 
-        năng và phẩm chất tốt nhất của bạn.
+        {summaryTexts?.guidance || 'Write 2-4 concise & energetic sentences to capture attention! Present your role, experience & most importantly - biggest achievements, best skills and qualities.'}
       </p>
 
       {/* Summary textarea */}
@@ -161,14 +186,14 @@ export const SummarySection = ({
           className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] resize-none transition-colors focus:border-primary-500 focus:ring-primary-500"
           value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
-          placeholder="Tóm tắt ngắn gọn về kinh nghiệm và mục tiêu nghề nghiệp của bạn..."
+          placeholder={summaryTexts?.placeholder || 'Brief summary of your experience and career objectives...'}
           disabled={isGenerating}
         />
         {isGenerating && (
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-md">
             <div className="flex items-center gap-2 text-primary-500">
               <div className="animate-spin w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full"></div>
-              <span className="text-sm">Đang tạo nội dung...</span>
+              <span className="text-sm">{summaryTexts?.generating || 'Generating content...'}</span>
             </div>
           </div>
         )}
@@ -178,13 +203,13 @@ export const SummarySection = ({
       <div className="flex gap-2">
         {isEmpty ? (
           <AIAssistButton 
-            label="Tạo tóm tắt với AI" 
+            label={summaryTexts?.generateWithAI || 'Generate Summary with AI'} 
             onClick={handleGenerateSummary}
             disabled={isGenerating}
           />
         ) : (
           <AIAssistButton 
-            label="Cải thiện tóm tắt" 
+            label={summaryTexts?.aiImprove || 'Improve Summary'} 
             onClick={handleImproveSummary}
             disabled={isGenerating}
           />

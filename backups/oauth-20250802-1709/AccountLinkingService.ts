@@ -16,91 +16,33 @@ export class AccountLinkingService {
   }
 
   /**
-   * Resolve account by email - either find existing or create new (production schema)
+   * Resolve account by email - either find existing or create new
    */
   public async resolveAccount(profile: OAuthUserProfile): Promise<AccountLinkingResult> {
     try {
-      // Check if user already exists with this email
-      const { data: existingUser, error: findError } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('email', profile.email)
-        .single();
+      // Use conflict resolver to handle complex scenarios
+      const conflictResult = await this.conflictResolver.resolveAccountConflict(profile.email, profile);
 
-      if (findError && findError.code !== 'PGRST116') {
-        throw findError;
-      }
+      switch (conflictResult.action) {
+        case 'link':
+          if (conflictResult.user) {
+            return await this.conflictResolver.handleExistingAccount(conflictResult.user, profile);
+          }
+          throw new Error('User data missing for link action');
 
-      if (existingUser) {
-        // User exists - update their OAuth info and return login result
-        const { error: updateError } = await this.supabase
-          .from('users')
-          .update({
-            oauth_provider: profile.provider,
-            oauth_id: profile.id,
-            email_verified: profile.emailVerified || true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingUser.id);
+        case 'create':
+          return await this.conflictResolver.handleNewAccount(profile);
 
-        if (updateError) {
-          throw updateError;
-        }
-
-        SecurityService.logSecurityEvent('oauth_account_linked', {
-          userId: existingUser.id,
-          provider: profile.provider,
-          email: profile.email
-        });
-
-        return {
-          action: 'login',
-          user: {
-            id: existingUser.id,
-            email: existingUser.email,
-            fullName: existingUser.full_name,
-            emailVerified: existingUser.email_verified
-          },
-          isNewAccount: false,
-          linkedProviders: [profile.provider]
-        };
-      } else {
-        // User doesn't exist - create new OAuth account
-        const { data: newUser, error: createError } = await this.supabase
-          .from('users')
-          .insert({
+        case 'reject':
+          SecurityService.logSecurityEvent('account_linking_rejected', {
+            provider: profile.provider,
             email: profile.email,
-            full_name: profile.name,
-            oauth_provider: profile.provider,
-            oauth_id: profile.id,
-            email_verified: profile.emailVerified || true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single();
+            reason: conflictResult.resolution
+          });
+          throw new Error(`Account linking rejected: ${conflictResult.resolution}`);
 
-        if (createError) {
-          throw createError;
-        }
-
-        SecurityService.logSecurityEvent('oauth_new_account_created', {
-          userId: newUser.id,
-          provider: profile.provider,
-          email: profile.email
-        });
-
-        return {
-          action: 'register',
-          user: {
-            id: newUser.id,
-            email: newUser.email,
-            fullName: newUser.full_name,
-            emailVerified: newUser.email_verified
-          },
-          isNewAccount: true,
-          linkedProviders: [profile.provider]
-        };
+        default:
+          throw new Error(`Unknown conflict resolution action: ${conflictResult.action}`);
       }
     } catch (error) {
       console.error('❌ Error resolving account:', error);

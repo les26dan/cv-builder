@@ -40,16 +40,16 @@ export const SkillsSection = ({
     );
     
     if (isDuplicate) {
-      return { error: 'Kỹ năng này đã được thêm', warning: '' };
+      return { error: 'This skill has already been added', warning: '' };
     }
 
     // Check length (warn if too long)
     if (trimmedSkill.length > 50) {
-      return { error: 'Kỹ năng quá dài, vui lòng rút gọn (tối đa 50 ký tự)', warning: '' };
+      return { error: 'Skill too long, please shorten (max 50 characters)', warning: '' };
     }
 
     if (trimmedSkill.length > 30) {
-      return { error: '', warning: 'Kỹ năng này hơi dài, hãy cân nhắc rút gọn' };
+      return { error: '', warning: 'This skill is a bit long, consider shortening' };
     }
 
     return { error: '', warning: '' };
@@ -93,6 +93,15 @@ export const SkillsSection = ({
       ...data,
       items: updatedItems
     });
+  };
+
+  const handleClearAllSkills = () => {
+    if (window.confirm('Are you sure you want to remove all skills? This action cannot be undone.')) {
+      onUpdate({
+        ...data,
+        items: []
+      });
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -161,7 +170,7 @@ export const SkillsSection = ({
       
       // If already at max skills, show warning
       if (maxSkills === 0) {
-        setValidation({ error: '', warning: 'Đã đạt giới hạn 8 kỹ năng. Vui lòng xóa bớt kỹ năng ít quan trọng trước khi thêm mới.' });
+        setValidation({ error: '', warning: 'Reached limit of 8 skills. Please remove less important skills before adding new ones.' });
         setTimeout(() => setValidation({ error: '', warning: '' }), 5000);
         return;
       }
@@ -186,7 +195,7 @@ export const SkillsSection = ({
         );
         
         if (newSkills.length === 0) {
-          setValidation({ error: '', warning: 'Tất cả kỹ năng gợi ý đã có trong danh sách' });
+          setValidation({ error: '', warning: 'All suggested skills are already in the list' });
           setTimeout(() => setValidation({ error: '', warning: '' }), 3000);
           return;
         }
@@ -222,9 +231,24 @@ export const SkillsSection = ({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
-        Chọn 5-10 kỹ năng phù hợp nhất với vị trí ứng tuyển.
-      </p>
+      {/* Header with instruction and clear all button */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-600">
+          Chọn 5-10 kỹ năng phù hợp nhất với vị trí ứng tuyển.
+        </p>
+        
+        {/* Clear All Button - positioned at top right */}
+        {data?.items && data.items.length > 0 && (
+          <button
+            onClick={handleClearAllSkills}
+            className="px-3 py-1 text-sm bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 rounded-md border border-red-300 transition-colors duration-200 flex items-center gap-1 shrink-0"
+            title="Xóa tất cả kỹ năng"
+          >
+            <XIcon size={14} />
+            Xóa tất cả ({data.items.length})
+          </button>
+        )}
+      </div>
       
       {/* Skills Display */}
       <div className="flex flex-wrap gap-2 mb-4">

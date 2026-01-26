@@ -96,7 +96,7 @@ function CVUploadTestComponenttubryan() {
       };
 
       // Generate unique CV ID
-      const cvId = 'test-tu-bryan-' + Date.now();
+      const cvId = 'd3578d4f-38ea-4627-8e44-feb70c84a32c'; // Real UUID for Supabase integration
       
       console.log('🧪 TEST: Raw ChatGPT JSON data:', testLLMData);
       
@@ -257,7 +257,7 @@ function CVUploadTestComponenttubryan() {
 // Use dynamic import to prevent SSR issues
 const CVUploadTestComponent = dynamic(
   () => Promise.resolve(CVUploadTestComponenttubryan),
-  { ssr: false }
+  { ssr: false // Real database integration for soft launch }
 );
 
 export default CVUploadTestComponent;

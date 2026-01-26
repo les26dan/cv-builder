@@ -2,10 +2,15 @@
  * LLM-Based CV Parser Service
  * Following Product Spec: CV Parser with ChatGPT Integration
  * Replaces broken JD optimization service with functional CV parsing
+ * 
+ * Updated with Hybrid Parser approach for optimal token efficiency:
+ * - Uses HybridCVParserService as primary parser
+ * - Falls back to full ChatGPT parsing if hybrid fails
  */
 
 import { type SupportedLanguage } from '../../utils/languageDetection';
 import { languageConfig } from '../../config/languageConfig';
+import { HybridCVParserService, type HybridCVParserResult } from './hybridCVParserService';
 
 // Response interfaces following LLM specification
 export interface CVParsingResponse {
@@ -145,14 +150,20 @@ export class CVParserService {
    * Generate Vietnamese CV parsing prompt following LLM specification
    */
   private generateVietnamesePrompt(cvText: string): { system: string; user: string } {
-    const system = `Bạn là chuyên gia hàng đầu về tuyển dụng, xử lý CV và trích xuất dữ liệu có cấu trúc từ file với hơn 15 năm kinh nghiệm tại Việt Nam. Bạn luôn trích xuất thông tin một cách chính xác, tuyệt đối trung thực từ tài liệu được cung cấp. Bạn KHÔNG suy đoán, tạo mới hay thêm vào bất kỳ thông tin nào không rõ ràng trong file đính kèm. Thông tin được trích xuất sẽ theo đúng cấu trúc JSON định sẵn.`;
+    const system = `Bạn là chuyên gia hàng đầu về tuyển dụng, xử lý CV và trích xuất dữ liệu có cấu trúc từ file với hơn 15 năm kinh nghiệm tại Việt Nam. Bạn CHỈ TRÍCH XUẤT thông tin một cách chính xác và trung thực từ tài liệu được cung cấp. Bạn TUYỆT ĐỐI KHÔNG được suy đoán, tạo mới, viết lại, hay thêm vào bất kỳ thông tin nào không có sẵn rõ ràng trong văn bản gốc. Bạn chỉ sao chép và cấu trúc lại thông tin đã có. Nhiệm vụ của bạn là TRÍCH XUẤT HOÀN TOÀN và BẢO TỒN TẤT CẢ chi tiết, trách nhiệm, thành tích và số liệu từ CV gốc.`;
 
     const user = `Vui lòng kiểm tra kỹ văn bản CV dưới đây và thực hiện chính xác theo các bước sau:
 
 Bước 1: Đánh giá khả năng (1-10) văn bản này có phải là một CV/hồ sơ ứng tuyển hay không.  
 - (1 = chắc chắn KHÔNG phải CV, 10 = chắc chắn là CV).
 
-Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất thông tin CV và điền đầy đủ vào JSON dưới đây:
+Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy TRÍCH XUẤT HOÀN TOÀN tất cả thông tin CV và điền đầy đủ vào JSON dưới đây:
+
+QUAN TRỌNG: Đối với "work_experience" và "bullets":
+- TRÍCH XUẤT TẤT CẢ bullet points, trách nhiệm, thành tích và số liệu từ CV gốc
+- KHÔNG giới hạn số lượng bullets - thêm nhiều bullets tùy theo nội dung thực tế
+- BẢO TỒN TẤT CẢ chi tiết, con số, phần trăm và thông tin cụ thể
+- CHỈ sao chép nội dung gốc, KHÔNG viết lại hay tóm tắt
 
 {
   "possibility_score": [điểm đánh giá],
@@ -171,7 +182,7 @@ Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất t
       "location": "",
       "start_date": "",
       "end_date": "",
-      "bullets": ["", "", "", ""]
+      "bullets": ["trích xuất TẤT CẢ bullets từ CV gốc", "bảo tồn TẤT CẢ chi tiết", "thêm bullets theo nội dung thực tế", "không giới hạn số lượng"]
     }
   ],
   "education": [
@@ -183,7 +194,7 @@ Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất t
       "details": ""
     }
   ],
-  "skills": ["", "", "", ""]
+  "skills": ["trích xuất TẤT CẢ skills từ CV gốc"]
 }
 
 Bước 3: Nếu điểm đánh giá DƯỚI 5, hãy trả về ĐÚNG nội dung JSON này (không thêm bất kỳ nội dung nào khác):
@@ -197,7 +208,9 @@ Văn bản CV cần phân tích:
 ${cvText}
 
 Yêu cầu bắt buộc khi trả lời:
-- Tuyệt đối KHÔNG suy đoán, tạo mới hoặc thêm vào thông tin không rõ ràng từ văn bản.
+- CHỈ TRÍCH XUẤT: Tuyệt đối KHÔNG suy đoán, tạo mới, viết lại, tóm tắt hoặc thêm vào thông tin không có sẵn trong văn bản gốc.
+- BẢO TỒN TẤT CẢ: Trích xuất HOÀN TOÀN tất cả trách nhiệm, thành tích, metrics và chi tiết từ mỗi công việc.
+- KHÔNG GIỚI HẠN: Thêm tất cả bullets cần thiết để phản ánh đầy đủ nội dung CV gốc.
 - Chỉ sử dụng đúng cấu trúc JSON như trên. KHÔNG thêm nội dung giải thích hay thông tin phụ nào khác ngoài JSON đã yêu cầu.`;
 
     return { system, user };
@@ -207,14 +220,20 @@ Yêu cầu bắt buộc khi trả lời:
    * Generate English CV parsing prompt following LLM specification
    */
   private generateEnglishPrompt(cvText: string): { system: string; user: string } {
-    const system = `You are a top-tier expert in global recruitment, CV parsing, and structured data extraction, with over 15 years of experience. You accurately and quickly parse CV or resume documents provided by users. You NEVER fabricate, infer, or add any information that is not explicitly available in the provided document. Extracted data is structured exactly as requested. If certain data is not explicitly available, leave the corresponding fields empty ("") or as empty arrays ([]).`;
+    const system = `You are a top-tier expert in global recruitment, CV parsing, and structured data extraction, with over 15 years of experience. You ONLY EXTRACT information that is explicitly available in the provided document. You NEVER fabricate, infer, rewrite, summarize, or add any information that is not clearly present in the original text. Your role is to EXTRACT COMPLETELY and PRESERVE ALL details, responsibilities, achievements, and metrics from the original CV content. You simply copy and restructure existing information.`;
 
     const user = `Review the CV text below carefully. Then:
 
 Step 1: Rate the likelihood (1-10) that the text is a CV or Resume.  
 - (1 = definitely NOT a CV, 10 = definitely a CV).
 
-Step 2: ONLY if your score is 5 or higher, extract and structure the CV information precisely into the following JSON format:
+Step 2: ONLY if your score is 5 or higher, EXTRACT COMPLETELY all CV information and structure it precisely into the following JSON format:
+
+CRITICAL: For "work_experience" and "bullets":
+- EXTRACT ALL bullet points, responsibilities, achievements, and metrics from the original CV
+- DO NOT limit the number of bullets - add as many bullets as needed to reflect actual content
+- PRESERVE ALL details, numbers, percentages, and specific information
+- ONLY copy original content - DO NOT rewrite or summarize
 
 {
   "possibility_score": [score],
@@ -233,7 +252,7 @@ Step 2: ONLY if your score is 5 or higher, extract and structure the CV informat
       "location": "",
       "start_date": "",
       "end_date": "",
-      "bullets": ["", "", "", ""]
+      "bullets": ["extract ALL bullets from original CV", "preserve ALL details", "add bullets as needed for actual content", "no limit on number"]
     }
   ],
   "education": [
@@ -245,7 +264,7 @@ Step 2: ONLY if your score is 5 or higher, extract and structure the CV informat
       "details": ""
     }
   ],
-  "skills": ["", "", "", ""]
+  "skills": ["extract ALL skills from original CV"]
 }
 
 Step 3: If your score is BELOW 5, return EXACTLY this JSON (no other content):
@@ -259,7 +278,9 @@ CV text to analyze:
 ${cvText}
 
 Mandatory requirements for your response:
-- Do NOT fabricate, infer, or add any data not explicitly stated in the text.
+- ONLY EXTRACT: Do NOT fabricate, infer, rewrite, summarize, or add any data not explicitly stated in the original text.
+- PRESERVE ALL: Extract COMPLETELY all responsibilities, achievements, metrics, and details from each job.
+- NO LIMITS: Add all bullets necessary to fully reflect the original CV content.
 - Use ONLY the provided JSON structures. Do NOT add explanations or any additional content beyond the JSON.`;
 
     return { system, user };
@@ -294,7 +315,7 @@ Mandatory requirements for your response:
         body: JSON.stringify({
           model: 'gpt-4o-mini',
           messages,
-          max_tokens: 3000, // Increased for full CV processing with detailed responses
+          max_tokens: 6000, // Increased for comprehensive CV processing with all details preserved
           temperature: 0.1
         }),
         signal: controller.signal
@@ -353,16 +374,46 @@ Mandatory requirements for your response:
 
 
   /**
-   * Parse CV text using ChatGPT API with full content processing
-   * Updated to process complete CV text without preprocessing for maximum accuracy
+   * Parse CV text using Hybrid approach for optimal token efficiency
+   * Primary: HybridCVParserService (direct parsing + ChatGPT for work experience only)
+   * Fallback: Full ChatGPT processing if hybrid fails
    * Following LLM specification with confidence scoring and language detection
    */
   async parseCV(cvText: string, userLanguage?: SupportedLanguage): Promise<CVParserResult> {
-    console.log('🤖 CV Parser: Starting full CV processing with LLM');
+    console.log('🚀 CV Parser: Starting optimized hybrid parsing');
     
     try {
-      // Detect system language (user preference for UI/system)
       const systemLanguage: SupportedLanguage = userLanguage || 'en';
+      
+      // Step 1: Try Hybrid Parser (Primary approach)
+      console.log('🔄 Step 1: Attempting hybrid parsing for token efficiency');
+      
+      const hybridParser = HybridCVParserService.getInstance();
+      const hybridResult: HybridCVParserResult = await hybridParser.parseCV(cvText, systemLanguage);
+      
+      if (hybridResult.success && hybridResult.data) {
+        console.log('✅ CV Parser: Hybrid parsing successful!', {
+          processingTime: hybridResult.processingTime,
+          tokensSaved: hybridResult.tokensSaved,
+          source: hybridResult.source,
+          possibility_score: hybridResult.data.possibility_score,
+          hasContact: !!hybridResult.data.contact,
+          hasWorkExperience: !!hybridResult.data.work_experience,
+          hasEducation: !!hybridResult.data.education,
+          hasSkills: !!hybridResult.data.skills
+        });
+
+        return {
+          success: true,
+          data: hybridResult.data,
+          language: systemLanguage,
+          source: hybridResult.source as 'api' | 'fallback' | 'cache'
+        };
+      }
+      
+      // Step 2: Fallback to Full ChatGPT Processing
+      console.log('⚠️ Step 2: Hybrid parsing failed, falling back to full ChatGPT processing');
+      console.log('🤖 CV Parser: Starting full CV processing with LLM');
       
       console.log('🌍 CV Parser: Full processing configuration', {
         systemLanguage,
@@ -388,11 +439,11 @@ Mandatory requirements for your response:
         { role: 'user', content: prompts.user }
       ];
 
-      // Check cache
-      const cacheKey = `cv_parse_${systemLanguage}_${btoa(cvText.substring(0, 100))}`;
+      // Check cache for full parsing
+      const cacheKey = `cv_parse_full_${systemLanguage}_${btoa(cvText.substring(0, 100))}`;
       const cached = this.cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
-        console.log('🎯 CV Parser: Using cached result');
+        console.log('🎯 CV Parser: Using cached full parsing result');
         return {
           success: true,
           data: cached.data,
@@ -401,8 +452,8 @@ Mandatory requirements for your response:
         };
       }
 
-      // Call ChatGPT API
-      console.log('📞 CV Parser: Calling ChatGPT API');
+      // Call ChatGPT API for full parsing
+      console.log('📞 CV Parser: Calling ChatGPT API for full parsing');
       const apiResult = await this.callChatGPT(messages);
 
       // Parse JSON response
@@ -416,7 +467,7 @@ Mandatory requirements for your response:
         }
         
         parsedData = JSON.parse(jsonMatch[0]);
-        console.log('✅ CV Parser: Successfully parsed AI response');
+        console.log('✅ CV Parser: Successfully parsed AI response with full ChatGPT');
         console.log('🔍 Raw ChatGPT response content:', apiResult.content);
         console.log('🔍 Parsed data structure:', JSON.stringify(parsedData, null, 2));
       } catch (parseError) {
@@ -435,11 +486,11 @@ Mandatory requirements for your response:
         success: true,
         data: parsedData,
         language: systemLanguage,
-        source: 'api'
+        source: 'fallback'
       };
 
     } catch (error) {
-      console.error('❌ CV Parser: Parsing failed:', error);
+      console.error('❌ CV Parser: Unexpected error in hybrid/fallback parsing', error);
       
       return {
         success: false,

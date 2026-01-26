@@ -55,15 +55,28 @@ interface EditorPanelProps {
   language?: SupportedLanguage;
 }
 
-// Available section types that can be added
-const availableSectionTypes = [
-  { id: 'projects', name: 'Dự án', description: 'Các dự án đã thực hiện' },
-  { id: 'volunteer', name: 'Hoạt động tình nguyện', description: 'Kinh nghiệm tình nguyện và xã hội' },
-  { id: 'certifications', name: 'Chứng chỉ', description: 'Các chứng chỉ chuyên môn' },
-  { id: 'languages', name: 'Ngôn ngữ', description: 'Các ngôn ngữ biết sử dụng' },
-  { id: 'hobbies', name: 'Sở thích', description: 'Sở thích cá nhân' },
-  { id: 'custom', name: 'Phần tùy chỉnh', description: 'Tạo phần mới với nội dung tùy ý' }
-];
+// Available section types that can be added - will be populated with dynamic text
+const getAvailableSectionTypes = (editorTexts: any) => {
+  if (!editorTexts?.availableSections) {
+    return [
+      { id: 'projects', name: 'Projects', description: 'Completed projects' },
+      { id: 'volunteer', name: 'Volunteer Work', description: 'Volunteer and social experience' },
+      { id: 'certifications', name: 'Certifications', description: 'Professional certifications' },
+      { id: 'languages', name: 'Languages', description: 'Languages known' },
+      { id: 'hobbies', name: 'Hobbies', description: 'Personal interests' },
+      { id: 'custom', name: 'Custom Section', description: 'Create new section with custom content' }
+    ];
+  }
+  
+  return [
+    { id: 'projects', name: editorTexts.availableSections.projects.name, description: editorTexts.availableSections.projects.description },
+    { id: 'volunteer', name: editorTexts.availableSections.volunteer.name, description: editorTexts.availableSections.volunteer.description },
+    { id: 'certifications', name: editorTexts.availableSections.certifications.name, description: editorTexts.availableSections.certifications.description },
+    { id: 'languages', name: editorTexts.availableSections.languages.name, description: editorTexts.availableSections.languages.description },
+    { id: 'hobbies', name: editorTexts.availableSections.hobbies.name, description: editorTexts.availableSections.hobbies.description },
+    { id: 'custom', name: editorTexts.availableSections.custom.name, description: editorTexts.availableSections.custom.description }
+  ];
+};
 
 export const EditorPanel = ({
   cvData,
@@ -283,8 +296,8 @@ export const EditorPanel = ({
       
       setAnalysisError(
         error instanceof Error 
-          ? `Lỗi phân tích: ${error.message}` 
-          : 'Đã xảy ra lỗi khi phân tích JD. Vui lòng thử lại.'
+          ? `${currentLanguage === 'en' ? 'Analysis error' : 'Lỗi phân tích'}: ${error.message}` 
+          : editorTexts?.editorPanel?.jobAnalysis?.errors?.analysisFailed || 'An error occurred while analyzing the job description. Please try again.'
       );
     } finally {
       setIsAnalyzing(false);
@@ -710,10 +723,10 @@ export const EditorPanel = ({
       <div className="bg-white rounded-lg shadow-sm mb-6">
         <div className="p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium">Chỉnh sửa CV</h2>
+            <h2 className="text-lg font-medium">{editorTexts?.editorPanel?.title || 'Edit CV'}</h2>
             {/* Inline CV Score */}
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">Độ hoàn thiện CV</span>
+              <span className="text-sm text-gray-500">{editorTexts?.editorPanel?.cvScore?.title || 'CV Completeness'}</span>
               <ScoreIndicator score={cvScore} />
             </div>
           </div>
@@ -742,10 +755,10 @@ export const EditorPanel = ({
                              {/* Title Text */}
                <div className="flex flex-col items-start gap-1.5 flex-1">
                  <h3 className="text-lg font-semibold leading-6 text-slate-800">
-                   Phân tích JD
+                   {editorTexts?.editorPanel?.jobAnalysis?.title || 'Job Description Analysis'}
                  </h3>
                  <p className="text-sm font-normal leading-5 text-slate-500">
-                   OkBuddy giúp bạn phân tích mô tả công việc và đưa ra gợi ý tối ưu CV của bạn
+                   {editorTexts?.editorPanel?.jobAnalysis?.subtitle || 'OkBuddy helps you analyze job descriptions and provides optimization suggestions for your CV'}
                  </p>
                </div>
               <button 

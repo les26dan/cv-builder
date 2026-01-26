@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AIAssistButton } from '../common/AIAssistButton';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface ContactSectionProps {
   data: {
@@ -11,6 +13,7 @@ interface ContactSectionProps {
   };
   onUpdate: (data: any) => void;
   isActive: boolean;
+  language?: SupportedLanguage;
 }
 
 interface ValidationErrors {
@@ -29,10 +32,34 @@ interface EmailSuggestion {
 export const ContactSection = ({
   data,
   onUpdate,
-  isActive
+  isActive,
+  language
 }: ContactSectionProps) => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [emailSuggestion, setEmailSuggestion] = useState<EmailSuggestion | null>(null);
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [contactTexts, setContactTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setContactTexts(texts.sections.contact);
+      } catch (error) {
+        console.error('Failed to load contact texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
 
   // Common email domain typos
   const emailTypos: Record<string, string> = {
@@ -112,7 +139,9 @@ export const ContactSection = ({
 
   const validateRequired = (value: string, fieldName: string): string => {
     if (!value.trim()) {
-      return `Vui lòng điền ${fieldName.toLowerCase()}`;
+      return contactTexts?.validation?.requiredField 
+        ? `${contactTexts.validation.requiredField} ${fieldName.toLowerCase()}`
+        : `Please enter ${fieldName.toLowerCase()}`;
     }
     return '';
   };
@@ -122,7 +151,7 @@ export const ContactSection = ({
 
     switch (field) {
       case 'fullName':
-        error = validateRequired(value, 'Họ và tên');
+        error = validateRequired(value, contactTexts?.fields?.fullName || 'Full Name');
         break;
       case 'email':
         error = validateEmail(value);
@@ -138,7 +167,7 @@ export const ContactSection = ({
         }
         break;
       case 'location':
-        error = validateRequired(value, 'Địa chỉ');
+        error = validateRequired(value, contactTexts?.fields?.location || 'Location');
         break;
       case 'linkedin':
         // LinkedIn is optional, no validation needed
@@ -175,7 +204,7 @@ export const ContactSection = ({
       {/* Full Name */}
       <div>
         <label className="block text-sm font-medium mb-1" htmlFor="fullName">
-          Họ và tên <span className="text-red-500 text-xs">*</span>
+          {contactTexts?.fields?.fullName || 'Full Name'} <span className="text-red-500 text-xs">*</span>
         </label>
         <input 
           type="text" 
@@ -184,7 +213,7 @@ export const ContactSection = ({
           value={data.fullName} 
           onChange={e => handleChange('fullName', e.target.value)}
           onBlur={e => handleBlur('fullName', e.target.value)}
-          placeholder="Nguyễn Văn A"
+          placeholder={contactTexts?.placeholders?.fullName || 'John Doe'}
           aria-invalid={!!errors.fullName}
         />
         {errors.fullName && (

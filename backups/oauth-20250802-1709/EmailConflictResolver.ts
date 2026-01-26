@@ -140,13 +140,13 @@ export class EmailConflictResolver {
     providerId: string
   ): Promise<boolean> {
     try {
-      // Check if provider is already linked to another account (production schema)
+      // Check if provider is already linked to another account
       const { data: existingLink, error } = await this.supabase
-        .from('users')
-        .select('id')
-        .eq('oauth_provider', provider)
-        .eq('oauth_id', providerId)
-        .neq('id', userId)
+        .from('user_oauth_providers')
+        .select('user_id')
+        .eq('provider', provider)
+        .eq('provider_user_id', providerId)
+        .neq('user_id', userId)
         .single();
 
       if (error && error.code !== 'PGRST116') {
@@ -254,32 +254,29 @@ export class EmailConflictResolver {
   // Private helper methods
 
   private async checkExistingProvider(userId: string, provider: string): Promise<any> {
-    // Check if user already has this OAuth provider linked (production schema)
     const { data, error } = await this.supabase
-      .from('users')
-      .select('oauth_provider, oauth_id')
-      .eq('id', userId)
+      .from('user_oauth_providers')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('provider', provider)
       .single();
 
-    if (error) {
+    if (error && error.code !== 'PGRST116') {
       throw error;
     }
 
-    // Return provider data if it matches, null otherwise
-    return (data?.oauth_provider === provider) ? data : null;
+    return data;
   }
 
   private async updateProviderData(userId: string, profile: OAuthUserProfile): Promise<void> {
-    // Update user's OAuth data in users table (production schema)
     const { error } = await this.supabase
-      .from('users')
+      .from('user_oauth_providers')
       .update({
-        oauth_id: profile.id,
-        email_verified: profile.emailVerified || true,
-        updated_at: new Date().toISOString()
+        provider_data: profile.providerData,
+        last_used_at: new Date().toISOString()
       })
-      .eq('id', userId)
-      .eq('oauth_provider', profile.provider);
+      .eq('user_id', userId)
+      .eq('provider', profile.provider);
 
     if (error) {
       throw error;
@@ -332,16 +329,22 @@ export class EmailConflictResolver {
   }
 
   private async linkProviderToAccount(userId: string, profile: OAuthUserProfile): Promise<void> {
-    // Update users table directly with OAuth provider info (production schema)
+    const providerData = {
+      user_id: userId,
+      provider: profile.provider,
+      provider_user_id: profile.id,
+      provider_email: profile.email,
+      provider_data: profile.providerData,
+      linked_at: new Date().toISOString(),
+      last_used_at: new Date().toISOString()
+    };
+
     const { error } = await this.supabase
-      .from('users')
-      .update({
-        oauth_provider: profile.provider,
-        oauth_id: profile.id,
-        email_verified: profile.emailVerified || true, // OAuth emails are typically verified
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId);
+      .from('user_oauth_providers')
+      .upsert(providerData, {
+        onConflict: 'user_id,provider',
+        ignoreDuplicates: false
+      });
 
     if (error) {
       throw error;
@@ -421,18 +424,16 @@ export class EmailConflictResolver {
   }
 
   private async getLinkedProviders(userId: string): Promise<string[]> {
-    // Get OAuth provider from users table (production schema)
     const { data, error } = await this.supabase
-      .from('users')
-      .select('oauth_provider')
-      .eq('id', userId)
-      .single();
+      .from('user_oauth_providers')
+      .select('provider')
+      .eq('user_id', userId);
 
     if (error) {
       throw error;
     }
 
-    return data?.oauth_provider ? [data.oauth_provider] : [];
+    return (data || []).map(p => p.provider);
   }
 
   private async getUserById(userId: string): Promise<any> {

@@ -79,7 +79,7 @@ export default function LoginPageContent() {
         
         // Check if user is admin and redirect accordingly
         const isAdmin = result.user?.email === 'admin@example.com';
-        const redirectPath = isAdmin ? '/admin' : '/cv-workspace';
+        const redirectPath = '/cv-workspace'; // All users go to CV Workspace
         
         console.log(`🔄 Redirecting ${isAdmin ? 'admin' : 'user'} to ${redirectPath}...`);
         

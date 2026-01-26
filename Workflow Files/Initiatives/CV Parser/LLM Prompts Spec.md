@@ -429,19 +429,106 @@ Business Process Optimization
 
 ## *Feature 7: CV Parser*
 
+### Overview
+The CV Parser converts uploaded CV files (PDF, DOCX) into structured JSON data for the CV Guided Editing system, using a **Hybrid approach** combining direct parsing with ChatGPT for optimal token efficiency and processing speed.
+
+### Technical Implementation
+- **File Support**: PDF, DOCX formats
+- **Processing**: Hybrid approach for optimal efficiency
+  - **Contact Info, Summary, Education, Skills**: Direct parsing from extracted text
+  - **Work Experience**: ChatGPT API processing for complex experience extraction
+- **Integration**: Seamless with CV Guided Editing workflow
+- **Language Support**: Vietnamese and English
+- **Token Optimization**: Significant token savings (50-80% reduction) through hybrid approach
+- **Error Handling**: Graceful fallbacks and user feedback
+
+### Hybrid Parser Architecture
+1. **Primary Approach**: HybridCVParserService
+   - Direct text parsing for Contact, Summary, Education, Skills
+   - ChatGPT-only processing for Work Experience section
+   - ~2000 tokens instead of ~6000 tokens for full processing
+2. **Fallback Approach**: Full ChatGPT processing if hybrid fails
+   - 6000 tokens for comprehensive CV processing
+   - Complete ChatGPT analysis of entire CV text
 
 ### ChatGPT Integration
 
+#### Work Experience Parsing Only (Hybrid Approach)
+
+**ChatGPT Prompt for Work Experience (Vietnamese)**
+```
+System: "Bạn là chuyên gia trích xuất kinh nghiệm làm việc từ CV. Bạn CHỈ TRÍCH XUẤT thông tin có sẵn, KHÔNG tạo mới hay suy đoán. Bạn TUYỆT ĐỐI KHÔNG được sửa đổi, viết lại hay tóm tắt nội dung gốc."
+
+User: "Trích xuất TOÀN BỘ thông tin kinh nghiệm làm việc từ văn bản sau và cấu trúc theo JSON:
+
+{
+  "work_experience": [
+    {
+      "position": "",
+      "company": "",
+      "location": "",
+      "start_date": "",
+      "end_date": "",
+      "bullets": ["trích xuất TẤT CẢ bullet points từ CV gốc", "giữ nguyên TẤT CẢ chi tiết", "thêm bullets theo nội dung thực tế", "không giới hạn số lượng"]
+    }
+  ]
+}
+
+YÊU CẦU BẮT BUỘC:
+- CHỈ TRÍCH XUẤT: Không được sửa đổi, viết lại hay tóm tắt
+- GIỮ NGUYÊN TẤT CẢ: Trách nhiệm, thành tích, số liệu từ CV gốc
+- KHÔNG GIỚI HẠN: Thêm tất cả bullets cần thiết để phản ánh đầy đủ nội dung
+
+Văn bản kinh nghiệm làm việc:
+[EXPERIENCE_TEXT]"
+```
+
+**ChatGPT Prompt for Work Experience (English)**
+```
+System: "You are a work experience extraction expert. You ONLY EXTRACT information that is explicitly available. You NEVER fabricate, infer, rewrite, summarize, or modify the original content."
+
+User: "Extract ALL work experience information from the text below and structure it in JSON format:
+
+{
+  "work_experience": [
+    {
+      "position": "",
+      "company": "",
+      "location": "",
+      "start_date": "",
+      "end_date": "",
+      "bullets": ["extract ALL bullet points from original CV", "preserve ALL details", "add bullets as needed for actual content", "no limit on number"]
+    }
+  ]
+}
+
+MANDATORY REQUIREMENTS:
+- ONLY EXTRACT: Do NOT modify, rewrite, summarize, or alter original content
+- PRESERVE ALL: Responsibilities, achievements, metrics, and details from original CV
+- NO LIMITS: Add all bullets necessary to fully reflect the original CV content
+
+Work experience text:
+[EXPERIENCE_TEXT]"
+```
+
+#### Full CV Parsing (Fallback Approach)
+
 #### ChatGPT Prompt (Vietnamese)
 ```
-System: "Bạn là chuyên gia hàng đầu về tuyển dụng, xử lý CV và trích xuất dữ liệu có cấu trúc từ file với hơn 15 năm kinh nghiệm tại Việt Nam. Bạn luôn trích xuất thông tin một cách chính xác, tuyệt đối trung thực từ tài liệu được cung cấp. Bạn KHÔNG suy đoán, tạo mới hay thêm vào bất kỳ thông tin nào không rõ ràng trong file đính kèm. Thông tin được trích xuất sẽ theo đúng cấu trúc JSON định sẵn."
+System: "Bạn là chuyên gia hàng đầu về tuyển dụng, xử lý CV và trích xuất dữ liệu có cấu trúc từ file với hơn 15 năm kinh nghiệm tại Việt Nam. Bạn CHỈ TRÍCH XUẤT thông tin một cách chính xác và trung thực từ tài liệu được cung cấp. Bạn TUYỆT ĐỐI KHÔNG được suy đoán, tạo mới, viết lại, hay thêm vào bất kỳ thông tin nào không có sẵn rõ ràng trong văn bản gốc. Bạn chỉ sao chép và cấu trúc lại thông tin đã có. Nhiệm vụ của bạn là TRÍCH XUẤT HOÀN TOÀN và BẢO TỒN TẤT CẢ chi tiết, trách nhiệm, thành tích và số liệu từ CV gốc."
 
-User: "Vui lòng kiểm tra kỹ file đính kèm và thực hiện chính xác theo các bước sau:
+User: "Vui lòng kiểm tra kỹ văn bản CV dưới đây và thực hiện chính xác theo các bước sau:
 
-Bước 1: Đánh giá khả năng (1-10) file đính kèm có phải là một CV/hồ sơ ứng tuyển hay không.  
+Bước 1: Đánh giá khả năng (1-10) văn bản này có phải là một CV/hồ sơ ứng tuyển hay không.  
 - (1 = chắc chắn KHÔNG phải CV, 10 = chắc chắn là CV).
 
-Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất thông tin CV và điền đầy đủ vào JSON dưới đây:
+Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy TRÍCH XUẤT HOÀN TOÀN tất cả thông tin CV và điền đầy đủ vào JSON dưới đây:
+
+QUAN TRỌNG: Đối với "work_experience" và "bullets":
+- TRÍCH XUẤT TẤT CẢ bullet points, trách nhiệm, thành tích và số liệu từ CV gốc
+- KHÔNG giới hạn số lượng bullets - thêm nhiều bullets tùy theo nội dung thực tế
+- BẢO TỒN TẤT CẢ chi tiết, con số, phần trăm và thông tin cụ thể
+- CHỈ sao chép nội dung gốc, KHÔNG viết lại hay tóm tắt
 
 {
   "possibility_score": [điểm đánh giá],
@@ -460,7 +547,7 @@ Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất t
       "location": "",
       "start_date": "",
       "end_date": "", // dùng "Now" nếu là công việc hiện tại
-      "bullets": ["", "", "", ""]
+      "bullets": ["trích xuất TẤT CẢ bullets từ CV gốc", "bảo tồn TẤT CẢ chi tiết", "thêm bullets theo nội dung thực tế", "không giới hạn số lượng"]
     }
   ],
   "education": [
@@ -472,7 +559,7 @@ Bước 2: CHỈ khi điểm đánh giá từ 5 trở lên, hãy trích xuất t
       "description": ""
     }
   ],
-  "skills": ["", "", "", ""]
+  "skills": ["trích xuất TẤT CẢ skills từ CV gốc"]
 }
 
 Bước 3: Nếu điểm đánh giá DƯỚI 5, hãy trả về ĐÚNG nội dung JSON này (không thêm bất kỳ nội dung nào khác):
@@ -482,21 +569,32 @@ Bước 3: Nếu điểm đánh giá DƯỚI 5, hãy trả về ĐÚNG nội dun
   "error": "Tài liệu bạn vừa tải lên dường như không phải là CV hoặc hồ sơ ứng tuyển. Vui lòng tải lên đúng file CV hợp lệ để tiếp tục."
 }
 
+Văn bản CV cần phân tích:
+${cvText}
+
 Yêu cầu bắt buộc khi trả lời:
-- Tuyệt đối KHÔNG suy đoán, tạo mới hoặc thêm vào thông tin không rõ ràng từ file đính kèm.
+- CHỈ TRÍCH XUẤT: Tuyệt đối KHÔNG suy đoán, tạo mới, viết lại, tóm tắt hoặc thêm vào thông tin không có sẵn trong văn bản gốc.
+- BẢO TỒN TẤT CẢ: Trích xuất HOÀN TOÀN tất cả trách nhiệm, thành tích, metrics và chi tiết từ mỗi công việc.
+- KHÔNG GIỚI HẠN: Thêm tất cả bullets cần thiết để phản ánh đầy đủ nội dung CV gốc.
 - Chỉ sử dụng đúng cấu trúc JSON như trên. KHÔNG thêm nội dung giải thích hay thông tin phụ nào khác ngoài JSON đã yêu cầu."
 ```
 
 #### ChatGPT Prompt (English)
 ```
-"System: "You are a top-tier expert in global recruitment, CV parsing, and structured data extraction, with over 15 years of experience. You accurately and quickly parse CV or resume documents provided by users. You NEVER fabricate, infer, or add any information that is not explicitly available in the provided document. Extracted data is structured exactly as requested. If certain data is not explicitly available, leave the corresponding fields empty ("") or as empty arrays ([])."
+System: "You are a top-tier expert in global recruitment, CV parsing, and structured data extraction, with over 15 years of experience. You ONLY EXTRACT information that is explicitly available in the provided document. You NEVER fabricate, infer, rewrite, summarize, or add any information that is not clearly present in the original text. Your role is to EXTRACT COMPLETELY and PRESERVE ALL details, responsibilities, achievements, and metrics from the original CV content. You simply copy and restructure existing information."
 
-User: "Review the attached file carefully. Then:
+User: "Review the CV text below carefully. Then:
 
-Step 1: Rate the likelihood (1-10) that the attached file is a CV or Resume.  
+Step 1: Rate the likelihood (1-10) that the text is a CV or Resume.  
 - (1 = definitely NOT a CV, 10 = definitely a CV).
 
-Step 2: ONLY if your score is 5 or higher, extract and structure the CV information precisely into the following JSON format:
+Step 2: ONLY if your score is 5 or higher, EXTRACT COMPLETELY all CV information and structure it precisely into the following JSON format:
+
+CRITICAL: For "work_experience" and "bullets":
+- EXTRACT ALL bullet points, responsibilities, achievements, and metrics from the original CV
+- DO NOT limit the number of bullets - add as many bullets as needed to reflect actual content
+- PRESERVE ALL details, numbers, percentages, and specific information
+- ONLY copy original content - DO NOT rewrite or summarize
 
 {
   "possibility_score": [score],
@@ -515,7 +613,7 @@ Step 2: ONLY if your score is 5 or higher, extract and structure the CV informat
       "location": "",
       "start_date": "",
       "end_date": "", // use "Now" if it's the current role
-      "bullets": ["", "", "", ""]
+      "bullets": ["extract ALL bullets from original CV", "preserve ALL details", "add bullets as needed for actual content", "no limit on number"]
     }
   ],
   "education": [
@@ -527,7 +625,7 @@ Step 2: ONLY if your score is 5 or higher, extract and structure the CV informat
       "description": ""
     }
   ],
-  "skills": ["", "", "", ""]
+  "skills": ["extract ALL skills from original CV"]
 }
 
 Step 3: If your score is BELOW 5, return EXACTLY this JSON (no other content):
@@ -537,7 +635,12 @@ Step 3: If your score is BELOW 5, return EXACTLY this JSON (no other content):
   "error": "The uploaded document does not appear to be a CV or Resume. Please upload a valid CV to continue."
 }
 
+CV text to analyze:
+${cvText}
+
 Mandatory requirements for your response:
-- Do NOT fabricate, infer, or add any data not explicitly stated in the attached file.
+- ONLY EXTRACT: Do NOT fabricate, infer, rewrite, summarize, or add any data not explicitly stated in the original text.
+- PRESERVE ALL: Extract COMPLETELY all responsibilities, achievements, metrics, and details from each job.
+- NO LIMITS: Add all bullets necessary to fully reflect the original CV content.
 - Use ONLY the provided JSON structures. Do NOT add explanations or any additional content beyond the JSON."
 ```
