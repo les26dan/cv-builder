@@ -99,7 +99,7 @@ export const ContactSection = ({
     // Basic email format validation
     const emailRegex = /^\S+@\S+\.\S+$/;
     if (!emailRegex.test(email)) {
-      return 'Địa chỉ email không hợp lệ';
+      return contactTexts?.validation?.invalidEmail || 'Please enter a valid email address';
     }
 
     // Check for common typos
@@ -125,13 +125,13 @@ export const ContactSection = ({
     // Check if only digits (and possibly leading +)
     const phoneRegex = /^\+?\d+$/;
     if (!phoneRegex.test(cleanPhone)) {
-      return 'Số điện thoại không hợp lệ';
+      return contactTexts?.validation?.invalidPhone || 'Please enter a valid phone number';
     }
 
     // Check reasonable length (9-15 digits)
     const digitCount = cleanPhone.replace(/\+/, '').length;
     if (digitCount < 9 || digitCount > 15) {
-      return 'Số điện thoại phải có từ 9-15 chữ số';
+      return contactTexts?.validation?.invalidPhone || 'Phone number must have 9-15 digits';
     }
 
     return '';
@@ -265,7 +265,7 @@ export const ContactSection = ({
         {/* Phone */}
         <div>
           <label className="block text-sm font-medium mb-1" htmlFor="phone">
-            Số điện thoại <span className="text-red-500 text-xs">*</span>
+            {contactTexts?.fields?.phone || 'Phone'} <span className="text-red-500 text-xs">*</span>
           </label>
           <input 
             type="tel" 
@@ -274,7 +274,7 @@ export const ContactSection = ({
             value={data.phone} 
             onChange={e => handleChange('phone', e.target.value)}
             onBlur={e => handleBlur('phone', e.target.value)}
-            placeholder="0123456789"
+            placeholder={contactTexts?.placeholders?.phone || '+1 (555) 123-4567'}
             aria-invalid={!!errors.phone}
           />
           {errors.phone && (
@@ -284,7 +284,7 @@ export const ContactSection = ({
             </p>
           )}
           <p className="text-gray-500 text-xs mt-1">
-            Ví dụ: 0123456789 hoặc +84123456789
+            {currentLanguage === 'vi' ? 'Ví dụ: 0123456789 hoặc +84123456789' : 'Example: +1 (555) 123-4567'}
           </p>
         </div>
       </div>
@@ -292,7 +292,7 @@ export const ContactSection = ({
       {/* Location */}
       <div>
         <label className="block text-sm font-medium mb-1" htmlFor="location">
-          Địa chỉ <span className="text-red-500 text-xs">*</span>
+          {contactTexts?.fields?.location || 'Location'} <span className="text-red-500 text-xs">*</span>
         </label>
         <input 
           type="text" 
@@ -301,7 +301,7 @@ export const ContactSection = ({
           value={data.location} 
           onChange={e => handleChange('location', e.target.value)}
           onBlur={e => handleBlur('location', e.target.value)}
-          placeholder="Hà Nội, Việt Nam"
+          placeholder={contactTexts?.placeholders?.location || 'City, State/Country'}
           aria-invalid={!!errors.location}
         />
         {errors.location && (
@@ -315,7 +315,7 @@ export const ContactSection = ({
       {/* LinkedIn (Optional) */}
       <div>
         <label className="block text-sm font-medium mb-1" htmlFor="linkedin">
-          LinkedIn
+          {contactTexts?.fields?.linkedin || 'LinkedIn'}
         </label>
         <input 
           type="text" 
@@ -323,10 +323,10 @@ export const ContactSection = ({
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
           value={data.linkedin || ''} 
           onChange={e => handleChange('linkedin', e.target.value)}
-          placeholder="linkedin.com/in/username"
+          placeholder={contactTexts?.placeholders?.linkedin || 'linkedin.com/in/yourprofile'}
         />
         <p className="text-gray-500 text-xs mt-1">
-          Bao gồm URL đầy đủ hoặc chỉ username
+          {currentLanguage === 'vi' ? 'Bao gồm URL đầy đủ hoặc chỉ username' : 'Include full URL or just username'}
         </p>
       </div>
     </div>

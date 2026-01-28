@@ -6,7 +6,7 @@ Restart server using the start-server /Users/tomnguyen/Documents/Cursor/Projects
 
 # *Task Testing*
 
-Then, enter **Focused QA & Testing Mode** and perform the following **high-value, low-maintenance** actions to validate we we have implemented so far in this entire session, following tenet 5. Relentless, Rigorous Testing & Code Health.
+Then, carefully & thoroughly review what we have implemented so far in this entire session and enter **Focused QA & Testing Mode** and perform the following **high-value, low-maintenance** actions to validate our implementations, following tenet 5. Relentless, Rigorous Testing & Code Health.
 
 **🎯 Focus**: Quality over quantity, stability over perfection, practical over theoretical.
 

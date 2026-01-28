@@ -300,7 +300,7 @@ function CVUploadTestComponentkienvu() {
 // Use dynamic import to prevent SSR issues
 const CVUploadTestComponent = dynamic(
   () => Promise.resolve(CVUploadTestComponentkienvu),
-  { ssr: false // Real database integration for soft launch }
+  { ssr: false } // Real database integration for soft launch
 );
 
 export default CVUploadTestComponent;

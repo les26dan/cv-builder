@@ -284,7 +284,7 @@ function CVUploadTestComponentmariequyenguilhem() {
 // Use dynamic import to prevent SSR issues
 const CVUploadTestComponent = dynamic(
   () => Promise.resolve(CVUploadTestComponentmariequyenguilhem),
-  { ssr: false // Real database integration for soft launch }
+  { ssr: false } // Real database integration for soft launch
 );
 
 export default CVUploadTestComponent;

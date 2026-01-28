@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { detectLanguage } from '../../config/languageConfig';
 
 interface DennisSchroderTemplateProps {
   cvData: any;
@@ -7,6 +8,7 @@ interface DennisSchroderTemplateProps {
   currentPage?: number;
   totalPages?: number;
   isPreview?: boolean; // New prop to distinguish preview from PDF generation
+  language?: string;
 }
 
 export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
@@ -15,8 +17,11 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   onSectionClick,
   currentPage = 1,
   totalPages = 1,
-  isPreview = false
+  isPreview = false,
+  language
 }: DennisSchroderTemplateProps) => {
+  // Get current language
+  const currentLanguage = language || (typeof window !== 'undefined' ? localStorage.getItem('okbuddy_language') : null) || detectLanguage().language;
   
   const getSectionClass = (section: string) => {
     return `p-2 -mx-2 cv-section ${activeSection === section ? 'bg-blue-50 rounded-sm' : ''}`;
@@ -217,7 +222,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
                 {exp.location && <span> – {exp.location}</span>}
               </div>
               <div style={styles.jobDates}>
-                {exp.startDate} – {exp.current ? 'Hiện tại' : exp.endDate}
+                {exp.startDate} – {exp.current ? (currentLanguage === 'vi' ? 'Hiện tại' : 'Current') : exp.endDate}
               </div>
             </div>
             {exp.bullets?.length > 0 && (

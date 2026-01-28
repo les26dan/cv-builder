@@ -59,7 +59,8 @@ export class AccountLinkingService {
             id: existingUser.id,
             email: existingUser.email,
             fullName: existingUser.full_name,
-            emailVerified: existingUser.email_verified
+            signupMethod: 'oauth',
+            linkedProviders: [profile.provider]
           },
           isNewAccount: false,
           linkedProviders: [profile.provider]
@@ -96,7 +97,8 @@ export class AccountLinkingService {
             id: newUser.id,
             email: newUser.email,
             fullName: newUser.full_name,
-            emailVerified: newUser.email_verified
+            signupMethod: 'oauth',
+            linkedProviders: [profile.provider]
           },
           isNewAccount: true,
           linkedProviders: [profile.provider]

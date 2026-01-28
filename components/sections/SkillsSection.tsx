@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AIAssistButton } from '../common/AIAssistButton';
 import { XIcon } from 'lucide-react';
 import { aiService } from '../../utils/aiService';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface SkillsSectionProps {
   data: {
@@ -10,6 +12,7 @@ interface SkillsSectionProps {
   onUpdate: (data: any) => void;
   isActive: boolean;
   cvData?: any;
+  language?: SupportedLanguage;
 }
 
 interface ValidationState {
@@ -21,11 +24,35 @@ export const SkillsSection = ({
   data,
   onUpdate,
   isActive: _isActive,
-  cvData
+  cvData,
+  language
 }: SkillsSectionProps) => {
   const [newSkill, setNewSkill] = useState('');
   const [validation, setValidation] = useState<ValidationState>({ error: '', warning: '' });
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [skillsTexts, setSkillsTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setSkillsTexts(texts.sections.skills);
+      } catch (error) {
+        console.error('Failed to load skills texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
 
   const validateSkill = (skill: string): ValidationState => {
     const trimmedSkill = skill.trim();
@@ -209,11 +236,11 @@ export const SkillsSection = ({
         // markAIUsed('skills');
       } else {
         console.error('Failed to generate skills:', result.error);
-        alert('Không thể tạo gợi ý kỹ năng. Vui lòng thử lại.');
+        alert(skillsTexts?.validation?.generateError || 'Unable to generate skill suggestions. Please try again.');
       }
     } catch (error) {
       console.error('Error generating skills:', error);
-      alert('Có lỗi xảy ra khi tạo gợi ý kỹ năng. Vui lòng thử lại.');
+      alert(skillsTexts?.validation?.generalError || 'An error occurred while generating skill suggestions. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -234,7 +261,7 @@ export const SkillsSection = ({
       {/* Header with instruction and clear all button */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Chọn 5-10 kỹ năng phù hợp nhất với vị trí ứng tuyển.
+          {skillsTexts?.guidance || 'Choose 5-10 skills most relevant to the position you\'re applying for.'}
         </p>
         
         {/* Clear All Button - positioned at top right */}
@@ -242,10 +269,10 @@ export const SkillsSection = ({
           <button
             onClick={handleClearAllSkills}
             className="px-3 py-1 text-sm bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 rounded-md border border-red-300 transition-colors duration-200 flex items-center gap-1 shrink-0"
-            title="Xóa tất cả kỹ năng"
+            title={skillsTexts?.clearAllTitle || 'Remove all skills'}
           >
             <XIcon size={14} />
-            Xóa tất cả ({data.items.length})
+            {skillsTexts?.clearAll || 'Clear All'} ({data.items.length})
           </button>
         )}
       </div>
@@ -280,7 +307,7 @@ export const SkillsSection = ({
             onChange={e => handleSkillChange(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            placeholder="Thêm kỹ năng... (ví dụ: Python, Kỹ năng quản lý thời gian, Adobe Photoshop)"
+            placeholder={skillsTexts?.placeholder || 'Add skills... (e.g., Python, Time Management, Adobe Photoshop)'}
             aria-invalid={!!validation.error}
             maxLength={60} // Prevent extremely long input
           />
@@ -289,7 +316,7 @@ export const SkillsSection = ({
             onClick={handleAddSkill}
             disabled={!!validation.error || !newSkill.trim()}
           >
-            Thêm
+            {skillsTexts?.addSkill || 'Add'}
           </button>
         </div>
         
@@ -318,7 +345,7 @@ export const SkillsSection = ({
       {/* AI Button - Only the skill suggestion feature remains */}
       <div className="flex gap-2">
         <AIAssistButton 
-          label="Gợi ý kỹ năng" 
+          label={skillsTexts?.aiSuggestions || 'Skill Suggestions'} 
           onClick={handleGenerateSkills}
           disabled={isGenerating}
         />

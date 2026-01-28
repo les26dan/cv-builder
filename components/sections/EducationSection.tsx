@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AIAssistButton } from '../common/AIAssistButton';
 import { PlusIcon, GripVerticalIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface EducationSectionProps {
   data: {
@@ -15,14 +17,39 @@ interface EducationSectionProps {
   };
   onUpdate: (data: any) => void;
   isActive: boolean;
+  language?: SupportedLanguage;
 }
 
 export const EducationSection = ({
   data,
   onUpdate,
-  isActive
+  isActive,
+  language
 }: EducationSectionProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [educationTexts, setEducationTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setEducationTexts(texts.sections.education);
+      } catch (error) {
+        console.error('Failed to load education texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const toggleExpanded = (id: string) => {
@@ -143,7 +170,7 @@ export const EducationSection = ({
                     </p>
                   </div>
                 ) : (
-                  <h4 className="font-medium text-gray-600">Học vấn #{index + 1}</h4>
+                  <h4 className="font-medium text-gray-600">{educationTexts?.itemTitle || 'Education'} #{index + 1}</h4>
                 )}
               </div>
               
@@ -164,7 +191,7 @@ export const EducationSection = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor={`degree-${index}`}>
-                Bằng cấp và chuyên ngành <span className="text-red-500 text-xs">*</span>
+                {educationTexts?.fields?.degree || 'Degree and Major'} <span className="text-red-500 text-xs">*</span>
               </label>
               <input 
                 type="text" 
@@ -186,7 +213,7 @@ export const EducationSection = ({
 
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor={`institution-${index}`}>
-                Trường học <span className="text-red-500 text-xs">*</span>
+                {educationTexts?.fields?.institution || 'Institution'} <span className="text-red-500 text-xs">*</span>
               </label>
               <input 
                 type="text" 
@@ -195,7 +222,7 @@ export const EducationSection = ({
                 value={education.institution} 
                 onChange={e => handleUpdateEducation(index, 'institution', e.target.value)}
                 onBlur={e => validateField(index, 'institution', e.target.value)}
-                placeholder="Đại học Bách Khoa Hà Nội"
+                placeholder={educationTexts?.placeholders?.institution || 'e.g., University of California'}
                 aria-invalid={!!errors[`${index}-institution`]}
               />
               {errors[`${index}-institution`] && (
@@ -210,7 +237,7 @@ export const EducationSection = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor={`location-${index}`}>
-                Địa điểm
+                {educationTexts?.fields?.location || 'Location'}
               </label>
               <input 
                 type="text" 
@@ -218,13 +245,13 @@ export const EducationSection = ({
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
                 value={education.location || ''} 
                 onChange={e => handleUpdateEducation(index, 'location', e.target.value)}
-                placeholder="Hà Nội"
+                placeholder={educationTexts?.placeholders?.location || 'e.g., Berkeley, CA'}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor={`graduationDate-${index}`}>
-                Năm tốt nghiệp
+                {educationTexts?.fields?.graduationDate || 'Graduation Date'}
               </label>
               <input 
                 type="text" 
@@ -233,7 +260,7 @@ export const EducationSection = ({
                 value={education.graduationDate} 
                 onChange={e => handleUpdateEducation(index, 'graduationDate', e.target.value)}
                 onBlur={e => validateField(index, 'graduationDate', e.target.value)}
-                placeholder="2020"
+                placeholder={educationTexts?.placeholders?.graduationDate || 'MM/YYYY'}
                 aria-invalid={!!errors[`${index}-graduationDate`]}
               />
               {errors[`${index}-graduationDate`] && (
@@ -243,24 +270,24 @@ export const EducationSection = ({
                 </p>
               )}
               <p className="text-gray-500 text-xs mt-1">
-                Ví dụ: 2020 hoặc 12/2020
+                {currentLanguage === 'vi' ? 'Ví dụ: 2020 hoặc 12/2020' : 'Example: 2020 or 12/2020'}
               </p>
             </div>
           </div>
 
                 <div className="mb-2">
                   <label className="block text-sm font-medium mb-1" htmlFor={`description-${index}`}>
-                    Mô tả
+                    {educationTexts?.fields?.description || 'Description'}
                   </label>
                   <textarea 
                     id={`description-${index}`}
                     className="w-full p-2 border border-gray-300 rounded-md min-h-[60px] focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-colors"
                     value={education.description || ''} 
                     onChange={e => handleUpdateEducation(index, 'description', e.target.value)}
-                    placeholder="Thành tích học tập, luận văn, hoạt động ngoại khóa..."
+                    placeholder={educationTexts?.placeholders?.description || 'Relevant coursework, honors, activities...'}
                   />
                   <p className="text-gray-500 text-xs mt-1">
-                    Ví dụ: GPA 3.8/4.0, Học bổng xuất sắc, Luận văn về Machine Learning
+                    {currentLanguage === 'vi' ? 'Ví dụ: GPA 3.8/4.0, Học bổng xuất sắc, Luận văn về Machine Learning' : 'Example: GPA 3.8/4.0, Honors scholarship, Thesis on Machine Learning'}
                   </p>
                 </div>
               </div>
@@ -274,7 +301,7 @@ export const EducationSection = ({
         onClick={handleAddEducation}
       >
         <PlusIcon size={16} className="mr-2" />
-        Thêm học vấn
+        {educationTexts?.addEducation || 'Add Education'}
       </button>
     </div>
   );

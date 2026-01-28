@@ -133,6 +133,9 @@ export const EditorPanel = ({
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const [userCredits, setUserCredits] = useState(3);
 
+  // Add work experience function from WorkExperienceSection
+  const [addWorkExperienceFunction, setAddWorkExperienceFunction] = useState<(() => void) | null>(null);
+
   // Initialize data service
   const dataService = CVWorkflowDataService.getInstance();
 
@@ -679,6 +682,7 @@ export const EditorPanel = ({
           <WorkExperienceSection 
             data={cvData.experience} 
             onUpdate={(data: any) => onUpdateSection('experience', data)} 
+            onProvideAddFunction={setAddWorkExperienceFunction}
             {...commonProps}
           />
         );
@@ -772,7 +776,7 @@ export const EditorPanel = ({
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 )}
-                {isAnalyzing ? 'Đang phân tích...' : 'Phân tích'}
+                {isAnalyzing ? (editorTexts?.editorPanel?.jobAnalysis?.analyzing || 'Analyzing...') : (editorTexts?.editorPanel?.jobAnalysis?.analyzeButton || 'Analyze')}
               </button>
             </div>
             
@@ -788,7 +792,7 @@ export const EditorPanel = ({
                   className={`w-full h-32 p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs leading-relaxed ${
                     analysisError ? 'border-red-300' : 'border-gray-300'
                   }`}
-                  placeholder="Dán mô tả công việc vào đây để nhận được gợi ý tối ưu hóa CV từ AI..."
+                  placeholder={editorTexts?.editorPanel?.jobAnalysis?.placeholder || 'Paste the job description here to receive CV optimization suggestions...'}
                   maxLength={3000}
                 />
                 
@@ -946,6 +950,7 @@ export const EditorPanel = ({
                     suggestions={suggestions[sectionId] || []}
                     onApplySuggestion={handleApplySuggestionInternal}
                     onDismissSuggestion={handleDismissSuggestionInternal}
+                    onAddItem={sectionId === 'experience' ? addWorkExperienceFunction : undefined}
                   >
                     {renderSection(sectionId)}
                   </DraggableSection>
@@ -985,7 +990,7 @@ export const EditorPanel = ({
             </p>
             
             <div className="space-y-3">
-              {availableSectionTypes.map((sectionType) => (
+              {getAvailableSectionTypes(editorTexts).map((sectionType) => (
                 <button
                   key={sectionType.id}
                   onClick={() => handleAddSection(sectionType.id)}

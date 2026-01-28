@@ -4,6 +4,7 @@ import { SecurityService } from './security';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export interface ConflictResolutionResult {
   action: 'merge' | 'link' | 'create' | 'reject';
@@ -15,9 +16,12 @@ export interface ConflictResolutionResult {
 
 export class EmailConflictResolver {
   private supabase;
+  private supabaseService;
 
   constructor() {
     this.supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Service client for operations that need to bypass RLS (like user creation)
+    this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
   }
 
   /**
@@ -158,7 +162,7 @@ export class EmailConflictResolver {
           userId,
           provider,
           providerId,
-          conflictUserId: existingLink.user_id
+          conflictUserId: existingLink.id
         });
         return false;
       }
@@ -399,7 +403,7 @@ export class EmailConflictResolver {
       updated_at: new Date().toISOString()
     };
 
-    const { data: user, error } = await this.supabase
+    const { data: user, error } = await this.supabaseService
       .from('users')
       .insert(userData)
       .select()

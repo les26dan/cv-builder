@@ -7,11 +7,12 @@
  * Formats a date range for work experience display
  * Handles Vietnamese language and current job indication
  */
-export const formatDateRange = (startDate: string, endDate: string, current: boolean = false): string => {
+export const formatDateRange = (startDate: string, endDate: string, current: boolean = false, language?: string): string => {
   if (!startDate) return '';
   
   const start = startDate;
-  const end = current ? 'Hiện tại' : endDate || 'Hiện tại';
+  const currentText = language === 'vi' ? 'Hiện tại' : 'Current';
+  const end = current ? currentText : endDate || currentText;
   
   return `${start} - ${end}`;
 };
@@ -34,5 +35,6 @@ export const isCurrentJob = (experience: { current?: boolean }): boolean => {
  * Gets the display label for current job status
  */
 export const getCurrentJobLabel = (): string => {
-  return 'Hiện tại';
+  const language = typeof window !== 'undefined' ? localStorage.getItem('okbuddy_language') : null;
+  return language === 'vi' ? 'Hiện tại' : 'Current';
 }; 

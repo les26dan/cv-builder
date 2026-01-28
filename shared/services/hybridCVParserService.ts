@@ -142,6 +142,7 @@ class SectionParsers {
     const email = emails[0] || '';
     
     // Extract phone with improved pattern handling scattered numbers
+    const phonePattern = /(\+?84|0)?[\s\-\.]?[0-9]{2,3}[\s\-\.]?[0-9]{3,4}[\s\-\.]?[0-9]{3,4}/g;
     const phonePatterns = [
       /(\+\s*\d{1,3}[- ]?)?\(?\d{3}\)?[- ]?\d{3,4}[- ]?\d{4}/g,
       /\(\+\d{2}\)\s*\(\d+\)\s*\d+\s*\d+\s*\d+\s*\d+/g, // (+84) (0) 83 94 777 28
@@ -722,10 +723,10 @@ ${experienceText}`;
       const skills = SectionParsers.parseSkills(cleanedCvText);
       
       console.log('✅ Direct parsing completed:', {
-        contactFound: !!contact.full_name,
-        summaryLength: summary.length,
-        educationEntries: education.length,
-        skillsCount: skills.length
+        contactFound: !!contact?.full_name,
+        summaryLength: summary?.length || 0,
+        educationEntries: education?.length || 0,
+        skillsCount: skills?.length || 0
       });
 
       // Step 2: Extract work experience text and send to ChatGPT
@@ -745,7 +746,7 @@ ${experienceText}`;
         if (chatGPTResult.success && chatGPTResult.data?.work_experience) {
           work_experience = chatGPTResult.data.work_experience;
           console.log('✅ ChatGPT work experience parsing completed:', {
-            experienceEntries: work_experience.length,
+            experienceEntries: work_experience?.length || 0,
             tokensUsed: chatGPTResult.usage?.total_tokens || 0
           });
         } else {
@@ -762,8 +763,8 @@ ${experienceText}`;
         possibility_score: 10, // High confidence for hybrid parsing
         contact,
         summary: summary || undefined,
-        work_experience: work_experience.length > 0 ? work_experience : undefined,
-        education: education.length > 0 ? education : undefined,
+        work_experience: work_experience && work_experience.length > 0 ? work_experience : undefined,
+        education: education && education.length > 0 ? education : undefined,
         skills: skills.length > 0 ? skills : undefined
       };
 

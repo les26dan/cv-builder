@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { TrashIcon, ChevronDownIcon, ChevronUpIcon, GripVerticalIcon } from 'lucide-react';
 import { formatDateRange, isCurrentJob } from '../../utils/dateUtils';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface SortableWorkExperienceProps {
   experience: {
@@ -20,6 +21,7 @@ interface SortableWorkExperienceProps {
   onToggleExpanded: (id: string) => void;
   isExpanded: boolean;
   onRemove: (index: number) => void;
+  language?: SupportedLanguage;
 }
 
 export const SortableWorkExperience: React.FC<SortableWorkExperienceProps> = ({
@@ -28,11 +30,21 @@ export const SortableWorkExperience: React.FC<SortableWorkExperienceProps> = ({
   children,
   onToggleExpanded,
   isExpanded,
-  onRemove
+  onRemove,
+  language
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const [isExpandIconHovered, setIsExpandIconHovered] = useState(false);
+  
+  // Language configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+    const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+    setCurrentLanguage(effectiveLanguage);
+  }, [language]);
 
   const {
     attributes,
@@ -77,7 +89,7 @@ export const SortableWorkExperience: React.FC<SortableWorkExperienceProps> = ({
       ref={setNodeRef}
       style={style}
       className={`rounded-lg mb-4 bg-white border-2 border-gray-200 transition-all duration-200 ${
-        isDragging ? 'opacity-90 scale-102 shadow-xl ring-2 ring-blue-200 border-blue-300' : 'hover:shadow-md hover:border-gray-300'
+        isDragging ? 'opacity-90 scale-102 shadow-xl ring-2 ring-blue-200 border-blue-300' : 'hover:shadow-md hover:border-gray-200'
       } ${
         isSelected ? 'ring-2 ring-blue-500 shadow-lg border-blue-400' : ''
       }`}
@@ -117,16 +129,16 @@ export const SortableWorkExperience: React.FC<SortableWorkExperienceProps> = ({
                         backgroundColor: '#DCFCE7' 
                       }}
                     >
-                      Hiện tại
+                      {currentLanguage === 'vi' ? 'Hiện tại' : 'Current'}
                     </span>
                   )}
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  {formatDateRange(experience.startDate, experience.endDate, experience.current || false)}
+                  {formatDateRange(experience.startDate, experience.endDate, experience.current || false, currentLanguage)}
                 </p>
               </div>
             ) : (
-              <h4 className="font-medium text-gray-600">Kinh nghiệm #{index + 1}</h4>
+              <h4 className="font-medium text-gray-600">{currentLanguage === 'vi' ? 'Kinh nghiệm' : 'Experience'} #{index + 1}</h4>
             )}
           </div>
         </div>

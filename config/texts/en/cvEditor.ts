@@ -37,7 +37,7 @@ export const cvEditor = {
     jobAnalysis: {
       title: 'Job Description Analysis',
       subtitle: 'OkBuddy helps you analyze job descriptions and provides optimization suggestions for your CV',
-      placeholder: 'Paste job description here to get optimization suggestions...',
+      placeholder: 'Paste the job description here to receive CV optimization suggestions...',
       analyzeButton: 'Analyze',
       analyzing: 'Analyzing...',
       maxLength: 'Maximum 5000 characters',

@@ -9,6 +9,8 @@ import { SortableWorkExperience } from '../common/SortableWorkExperience';
 import { PlusIcon, GripVerticalIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, FileTextIcon } from 'lucide-react';
 import { aiService, WizardBulletGenerationRequest } from '../../utils/aiService';
 import { formatDateRange } from '../../utils/dateUtils';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface WorkExperienceSectionProps {
   data: {
@@ -27,6 +29,8 @@ interface WorkExperienceSectionProps {
   isActive: boolean;
   cvData?: any;
   onNavigateToSection?: (sectionId: string) => void;
+  language?: SupportedLanguage;
+  onProvideAddFunction?: (addFunction: () => void) => void;
 }
 
 export const WorkExperienceSection = ({
@@ -34,10 +38,42 @@ export const WorkExperienceSection = ({
   onUpdate,
   isActive,
   cvData,
-  onNavigateToSection
+  onNavigateToSection,
+  language,
+  onProvideAddFunction
 }: WorkExperienceSectionProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [experienceTexts, setExperienceTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setExperienceTexts(texts.sections.experience);
+      } catch (error) {
+        console.error('Failed to load experience texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
+
+  // Provide the add function to parent component
+  useEffect(() => {
+    if (onProvideAddFunction) {
+      onProvideAddFunction(handleAddExperience);
+    }
+  }, [onProvideAddFunction]);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [wizardModal, setWizardModal] = useState<{isOpen: boolean, experienceIndex: number}>({
     isOpen: false,
@@ -447,11 +483,11 @@ export const WorkExperienceSection = ({
         // markAIUsed('workExperience');
       } else {
         console.error('Failed to generate bullets:', result.error);
-        alert('Không thể tạo mô tả công việc. Vui lòng thử lại.');
+        alert(experienceTexts?.validation?.generateError || 'Unable to generate job description. Please try again.');
       }
     } catch (error) {
       console.error('Error generating bullets:', error);
-      alert('Có lỗi xảy ra khi tạo mô tả. Vui lòng thử lại.');
+      alert(experienceTexts?.validation?.generateError || 'An error occurred while generating description. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -462,7 +498,7 @@ export const WorkExperienceSection = ({
     const existingBullets = experience.bullets.filter(b => b.trim());
     
     if (existingBullets.length === 0) {
-      alert('Vui lòng thêm ít nhất một mô tả công việc trước khi cải thiện');
+      alert('Please add at least one job description before improving');
       return;
     }
 
@@ -508,22 +544,22 @@ export const WorkExperienceSection = ({
 
     // Only validate required fields when they are actually empty, don't cross-validate
     if (field === 'title' && !value.trim()) {
-      error = 'Vui lòng nhập chức danh công việc';
+              error = experienceTexts?.validation?.titleRequired || 'Please enter job title';
     } else if (field === 'company' && !value.trim()) {
-      error = 'Vui lòng nhập tên công ty';
+      error = experienceTexts?.validation?.companyRequired || 'Please enter company name';
     } else if (field === 'endDate' && value && experience.startDate) {
       // Enhanced date validation
       const startYear = parseInt(experience.startDate.split('/').pop() || experience.startDate);
       const endYear = parseInt(value.split('/').pop() || value);
       
       if (!isNaN(startYear) && !isNaN(endYear) && endYear < startYear) {
-        error = 'Ngày kết thúc phải sau ngày bắt đầu';
+        error = experienceTexts?.validation?.endBeforeStart || 'End date must be after start date';
       }
       
       // Check for future dates that are too far
       const currentYear = new Date().getFullYear();
       if (!isNaN(endYear) && endYear > currentYear + 5) {
-        error = 'Ngày kết thúc có vẻ không hợp lý';
+        error = 'End date seems unrealistic';
       }
     } else if (field === 'startDate' && value && experience.endDate && !experience.current) {
       // Validate start date against end date
@@ -531,7 +567,7 @@ export const WorkExperienceSection = ({
       const endYear = parseInt(experience.endDate.split('/').pop() || experience.endDate);
       
       if (!isNaN(startYear) && !isNaN(endYear) && startYear > endYear) {
-        error = 'Ngày bắt đầu phải trước ngày kết thúc';
+        error = experienceTexts?.validation?.startAfterEnd || 'Start date must be before end date';
       }
     }
 
@@ -662,7 +698,7 @@ export const WorkExperienceSection = ({
         >
           {(data?.items || []).map((experience, index) => {
             const buttonStates = getAIButtonStates(experience);
-            const isExpanded = expandedItems[experience.id] !== false; // Default to expanded
+            const isExpanded = expandedItems[experience.id] === true; // Default to collapsed
             
             return (
               <SortableWorkExperience
@@ -672,11 +708,12 @@ export const WorkExperienceSection = ({
                 onToggleExpanded={toggleExpanded}
                 isExpanded={isExpanded}
                 onRemove={handleRemoveExperience}
+                language={currentLanguage}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Chức danh công việc <span className="text-red-500 text-xs">*</span>
+                  {experienceTexts?.fields?.title || 'Job Title'} <span className="text-red-500 text-xs">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -686,7 +723,7 @@ export const WorkExperienceSection = ({
                   value={experience.title} 
                   onChange={(e) => handleUpdateExperience(index, 'title', e.target.value)}
                   onBlur={(e) => validateField(index, 'title', e.target.value)}
-                  placeholder="Chuyên viên kinh doanh" 
+                  placeholder={experienceTexts?.placeholders?.title || 'e.g., Software Engineer'} 
                 />
                 {errors[`${index}-title`] && (
                   <p className="text-error-500 text-xs mt-1">{errors[`${index}-title`]}</p>
@@ -695,7 +732,7 @@ export const WorkExperienceSection = ({
               
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Công ty tuyển dụng <span className="text-red-500 text-xs">*</span>
+                  {experienceTexts?.fields?.company || 'Company'} <span className="text-red-500 text-xs">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -705,7 +742,7 @@ export const WorkExperienceSection = ({
                   value={experience.company} 
                   onChange={(e) => handleUpdateExperience(index, 'company', e.target.value)}
                   onBlur={(e) => validateField(index, 'company', e.target.value)}
-                  placeholder="Công ty cổ phần ABC" 
+                  placeholder={experienceTexts?.placeholders?.company || 'e.g., ABC Corporation'} 
                 />
                 {errors[`${index}-company`] && (
                   <p className="text-error-500 text-xs mt-1">{errors[`${index}-company`]}</p>
@@ -716,20 +753,20 @@ export const WorkExperienceSection = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Ngày bắt đầu <span className="text-red-500 text-xs">*</span>
+                  {experienceTexts?.fields?.startDate || 'Start Date'} <span className="text-red-500 text-xs">*</span>
                 </label>
                 <input 
                   type="text" 
                   className="w-full p-2 border border-gray-200 rounded-md transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
                   value={experience.startDate} 
                   onChange={(e) => handleUpdateExperience(index, 'startDate', e.target.value)}
-                  placeholder="12/2023 hoặc 2023" 
+                  placeholder={experienceTexts?.placeholders?.startDate || 'MM/YYYY'} 
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Ngày kết thúc <span className="text-red-500 text-xs">*</span>
+                  {experienceTexts?.fields?.endDate || 'End Date'} <span className="text-red-500 text-xs">*</span>
                 </label>
                 <div className="flex items-center gap-2">
                   <input 
@@ -740,7 +777,7 @@ export const WorkExperienceSection = ({
                     value={experience.endDate} 
                     onChange={(e) => handleUpdateExperience(index, 'endDate', e.target.value)}
                     onBlur={(e) => validateField(index, 'endDate', e.target.value)}
-                    placeholder="12/2024 hoặc 2024" 
+                    placeholder={experienceTexts?.placeholders?.endDate || 'MM/YYYY'} 
                     disabled={experience.current}
                   />
                   <label className="flex items-center text-sm">
@@ -750,7 +787,7 @@ export const WorkExperienceSection = ({
                       onChange={() => handleCurrentJobToggle(index)}
                       className="mr-1"
                     />
-                    Công việc hiện tại
+                    {experienceTexts?.fields?.current || 'I currently work here'}
                   </label>
                 </div>
                 {errors[`${index}-endDate`] && (
@@ -760,19 +797,19 @@ export const WorkExperienceSection = ({
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">Địa điểm</label>
+              <label className="block text-sm font-medium mb-1">{experienceTexts?.fields?.location || 'Location'}</label>
               <input 
                 type="text" 
                 className="w-full p-2 border border-gray-200 rounded-md transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
                 value={experience.location || ''} 
                 onChange={(e) => handleUpdateExperience(index, 'location', e.target.value)}
-                placeholder="Hồ Chí Minh" 
+                placeholder={experienceTexts?.placeholders?.location || 'e.g., San Francisco, CA'} 
               />
             </div>
 
             <div className="mb-4">
               <div className="flex items-center gap-3 mb-3">
-                <label className="block text-sm font-medium">Mô tả công việc <span className="text-red-500 text-xs">*</span></label>
+                <label className="block text-sm font-medium">{experienceTexts?.fields?.description || 'Job Description'} <span className="text-red-500 text-xs">*</span></label>
                 {/* AI Generate Options Dropdown */}
                 <div className="flex items-center gap-2">
                   <button
@@ -781,7 +818,7 @@ export const WorkExperienceSection = ({
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
                   >
                     <FileTextIcon size={16} />
-                    Dùng mẫu
+                    {currentLanguage === 'vi' ? 'Dùng mẫu' : 'Use template'}
                   </button>
                 </div>
               </div>
@@ -790,10 +827,10 @@ export const WorkExperienceSection = ({
               {(!experience.title || !experience.company) && (
                 <div className="bg-warning-500/10 border border-warning-500/20 rounded-lg p-3 mb-3">
                   <p className="text-sm text-warning-500 font-medium">
-                    💡 Bắt đầu với thông tin cơ bản
+                    💡 {currentLanguage === 'vi' ? 'Bắt đầu với thông tin cơ bản' : 'Start with basic information'}
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
-                    Điền chức danh và tên công ty để AI có thể hỗ trợ tạo mô tả công việc hoàn hảo cho bạn.
+                    {experienceTexts?.aiGuidance || 'Fill in job title and company name so AI can help create the perfect job description for you.'}
                   </p>
                 </div>
               )}
@@ -808,7 +845,7 @@ export const WorkExperienceSection = ({
                       onChange={(e) => handleUpdateBullet(index, bulletIndex, e.target.value)}
                       onBlur={(e) => handleBulletBlur(index, bulletIndex, e.target.value)}
                       onKeyDown={(e) => handleBulletKeyDown(index, bulletIndex, e)}
-                      placeholder="Mô tả thành tựu hoặc trách nhiệm... (ví dụ: 'Tăng 15% hiệu suất hệ thống bằng cách...')"
+                      placeholder={experienceTexts?.bullets?.placeholder || 'Describe a specific achievement or responsibility...'}
                       rows={2}
                       data-experience-index={index}
                       data-bullet-index={bulletIndex}
@@ -817,7 +854,7 @@ export const WorkExperienceSection = ({
                       <button 
                         className="flex-shrink-0 mt-3 text-error-500 hover:text-error-600 hover:bg-red-50 p-1.5 rounded transition-all duration-200"
                         onClick={() => handleRemoveBullet(index, bulletIndex)}
-                        title="Xóa gạch đầu dòng"
+                        title={experienceTexts?.bullets?.remove || 'Remove'}
                       >
                         <TrashIcon size={14} />
                       </button>
@@ -832,13 +869,13 @@ export const WorkExperienceSection = ({
                 onClick={() => handleOpenWizard(index)}
               >
                 <PlusIcon size={14} className="mr-1" />
-                Thêm mô tả
+                {experienceTexts?.bullets?.add || 'Add Achievement'}
               </button>
               
               {/* Bottom AI Button - Remove horizontal line */}
               <div className="mt-4">
                 <AIAssistButton 
-                  label="Cải thiện với OkBuddy AI" 
+                  label={experienceTexts?.bullets?.aiGenerate || 'Generate with AI'} 
                   onClick={() => handleImproveBullets(index)}
                   disabled={buttonStates.improveButton.disabled}
                   variant={buttonStates.improveButton.variant}
@@ -891,7 +928,7 @@ export const WorkExperienceSection = ({
         onClick={handleAddExperience}
       >
         <PlusIcon size={16} className="mr-2" />
-        Thêm kinh nghiệm làm việc
+        {experienceTexts?.addExperience || 'Add Work Experience'}
       </button>
 
       {/* AI Wizard Modal */}

@@ -2,18 +2,22 @@ import React, { useState, useCallback, memo, useEffect, useRef } from 'react';
 import { DennisSchroderTemplate } from './templates/DennisSchroderTemplate';
 import { ChevronDownIcon, EyeIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { downloadCV } from '../utils/downloadUtils';
+import { getTexts } from '../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 
 interface PreviewPanelProps {
   cvData: any;
   activeSection: string | null;
   setActiveSection: (section: string | null) => void;
+  language?: SupportedLanguage;
 }
 
 // PreviewPanel component - removed memo to ensure proper re-rendering on cvData changes
 export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   cvData,
   activeSection,
-  setActiveSection
+  setActiveSection,
+  language
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState<string | null>(null);
@@ -21,6 +25,29 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   const [totalPages, setTotalPages] = useState(1);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const cvPreviewRef = useRef<HTMLDivElement>(null);
+  
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [previewTexts, setPreviewTexts] = useState<any>(null);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setPreviewTexts(texts.preview);
+      } catch (error) {
+        console.error('Failed to load preview texts:', error);
+        setCurrentLanguage('en');
+      }
+    };
+    
+    loadLanguage();
+  }, [language]);
   
   // Calculate optimal scale to fit A4 in container while maintaining exact aspect ratio
   const calculateOptimalScale = useCallback(() => {
@@ -195,7 +222,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
     <div className="h-full flex flex-col">
       {/* Header Section - Fixed */}
       <div className="flex-shrink-0 p-4 border-b border-gray-200 flex items-center justify-between bg-white">
-        <h2 className="text-lg font-medium">Xem trước</h2>
+        <h2 className="text-lg font-medium">{previewTexts?.title || 'CV Preview'}</h2>
         
         <div className="flex items-center gap-4">
           {/* Pagination Controls - Subtle */}
@@ -239,7 +266,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
               ) : (
                 <>
                   <DownloadIcon size={16} />
-                  <span>Tải xuống</span>
+                  <span>{previewTexts?.actions?.download || 'Download PDF'}</span>
                   <ChevronDownIcon size={16} />
                 </>
               )}
@@ -295,6 +322,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
               currentPage={currentPage}
               totalPages={totalPages}  // Use calculated pagination for true WYSIWYG preview
               isPreview={true}
+              language={currentLanguage}
             />
           </div>
         </div>

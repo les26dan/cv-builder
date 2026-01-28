@@ -14,6 +14,7 @@ interface DraggableSectionProps {
   suggestions?: any[]; // Job description suggestions for this section
   onApplySuggestion?: (sectionId: string, suggestion: any) => void;
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
+  onAddItem?: () => void; // Optional function to add new items to the section
 }
 
 // Section labels are now passed as props from parent components with dynamic language loading
@@ -47,7 +48,8 @@ export const DraggableSection = ({
   onTitleChange,
   suggestions = [],
   onApplySuggestion,
-  onDismissSuggestion
+  onDismissSuggestion,
+  onAddItem
 }: DraggableSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
@@ -475,6 +477,21 @@ export const DraggableSection = ({
               aria-label="Xóa phần này"
             >
               <Trash2Icon size={16} />
+            </button>
+          )}
+
+          {/* Add Work Experience button - only for experience section */}
+          {id === 'experience' && onAddItem && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddItem();
+              }}
+              className="px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              title="Add Work Experience"
+              aria-label="Add Work Experience"
+            >
+              Add Work Experience
             </button>
           )}
 
