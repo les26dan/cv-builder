@@ -1,5 +1,5 @@
 # Technical Debt Registry
-**Last Updated**: February 4, 2025
+**Last Updated**: August 2, 2025 (OAuth Session)
 
 ## 🎉 **MAJOR TECHNICAL DEBT RESOLUTION** (February 3, 2025)
 
@@ -32,22 +32,48 @@
 
 ## 🔄 **NON-CRITICAL TECHNICAL DEBT** (Future Iterations)
 
+### **🚨 CRITICAL: OAuth Implementation Failing at RLS Policy**
+**Date Added**: August 2, 2025  
+**Component**: OAuth Authentication System
+**Issue**: Row Level Security (RLS) policy blocking OAuth user creation despite service role key implementation
+**Impact**: 
+- Google OAuth completely non-functional (fails at user creation step)
+- Users cannot register/login via OAuth
+- 401 errors on /api/auth/me after "successful" OAuth flow
+**Severity**: **HIGH** - Core authentication feature broken
+**Root Cause**: 
+- RLS policy `users_own_data` requires `auth.uid()` but it's NULL during OAuth signup
+- Service role key implementation (attempted fix) not properly bypassing RLS
+- Possible Supabase client configuration issue or insufficient privileges
+**Technical Details**:
+- Error: `'new row violates row-level security policy for table "users"'`
+- Service role key added to EmailConflictResolver but still failing
+- OAuth initiation works perfectly, failure occurs at database user creation
+**Next Session Priority**: 
+- Verify service role key configuration in Supabase dashboard
+- Debug service client usage vs anon client  
+- Test service key privileges directly
+- Consider alternative RLS bypass strategies
+
 ### **⚠️ UPDATED: Test Infrastructure Mismatch & Build Issues**
 **Date Added**: February 3, 2025  
-**Date Updated**: January 15, 2025 (Post-LaTeX implementation validation)
+**Date Updated**: February 8, 2025 (Production QA session - partially improved)
 **Component**: Testing System & TypeScript Configuration
-**Issue**: Tests written for Vitest but Jest configured in package.json + Language consistency test conflicts
+**Issue**: Tests written for Vitest but Jest configured in package.json + 199 vitest import errors across test files
 **Impact**: 
-- 188 TypeScript strict errors in test files (vitest syntax in jest environment)
-- Tests failing due to language consistency changes (Vietnamese → English, expected behavior)
-- Some test files reference outdated component interfaces
-**Severity**: LOW (Production build successful, tests confirm language fixes work correctly)  
+- 199 TypeScript strict errors in test files (improved from 210 - critical production errors fixed)
+- Test infrastructure completely non-functional due to vitest import errors
+- Production code: STABLE (critical errors resolved)
+- Test files reference vitest but project configured for Jest
+**Severity**: **MEDIUM** (Production code stable, test infrastructure needs attention)  
 **Root Cause**: 
 - Configuration mismatch between test runner (Jest) and test syntax (Vitest)
-- Test expectations written for Vietnamese UI, now correctly showing English
-- Tests validate that language consistency implementation is working as intended
+- Test infrastructure completely unreliable
+- TypeScript strict mode catching more issues
 **Working Status**: 
-- ✅ Production build successful (npm run build ✅)
+- ✅ Production code stable (critical TypeScript errors fixed)
+- ❌ Tests completely non-functional (199 vitest import errors)
+- 🔧 Production build: Ready for testing (critical blocking errors resolved)
 - ✅ ESLint validation passing (npm run lint ✅)
 - ✅ Server running successfully with persistent background mode (PID 82875)
 - ✅ LaTeX download implementation fully functional and tested
