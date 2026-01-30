@@ -950,7 +950,7 @@ export const EditorPanel = ({
                     suggestions={suggestions[sectionId] || []}
                     onApplySuggestion={handleApplySuggestionInternal}
                     onDismissSuggestion={handleDismissSuggestionInternal}
-                    onAddItem={sectionId === 'experience' ? addWorkExperienceFunction : undefined}
+                    onAddItem={sectionId === 'experience' ? addWorkExperienceFunction || undefined : undefined}
                   >
                     {renderSection(sectionId)}
                   </DraggableSection>

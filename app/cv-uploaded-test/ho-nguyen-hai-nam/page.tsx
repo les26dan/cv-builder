@@ -21,9 +21,7 @@ function CVUploadTestComponenthonguyenhainam() {
 
   // REAL data from Ho Nguyen Hai Nam CV ChatGPT response (Updated with actual extraction)
   const testLLMData = {
-    "possibility_score": [
-        10
-    ],
+    "possibility_score": 10,
     "contact": {
         "full_name": "Ho Nguyen Hai Nam",
         "address": "237/18 Hoang Dieu Road, Ward 8, District 4, TP. Ho Chi Minh",

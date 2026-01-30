@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ChevronUpIcon, ChevronDownIcon, GripVerticalIcon, Trash2Icon, WandIcon, EditIcon } from 'lucide-react';
+import { ChevronUpIcon, ChevronDownIcon, GripVerticalIcon, Trash2Icon, WandIcon, EditIcon, PlusIcon } from 'lucide-react';
 
 interface DraggableSectionProps {
   id: string;
@@ -491,6 +491,7 @@ export const DraggableSection = ({
               title="Add Work Experience"
               aria-label="Add Work Experience"
             >
+              <PlusIcon size={16} />
               Add Work Experience
             </button>
           )}

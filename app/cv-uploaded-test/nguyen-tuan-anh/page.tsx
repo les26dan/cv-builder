@@ -21,9 +21,7 @@ function CVUploadTestComponentnguyentuananh() {
 
   // Test data from Nguyen Tuan Anh CV ChatGPT response
   const testLLMData = {
-    "possibility_score": [
-        10
-    ],
+    "possibility_score": 10,
     "contact": {
         "full_name": "TUAN ANH NGUYEN",
         "address": "",

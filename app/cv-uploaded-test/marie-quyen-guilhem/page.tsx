@@ -21,9 +21,7 @@ function CVUploadTestComponentmariequyenguilhem() {
 
   // Test data from Marie Quyen Guilhem CV ChatGPT response
   const testLLMData = {
-    "possibility_score": [
-        10
-    ],
+    "possibility_score": 10,
     "contact": {
         "full_name": "MARIE QUYEN GUILHEM",
         "address": "",

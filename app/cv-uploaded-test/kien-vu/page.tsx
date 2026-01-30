@@ -21,9 +21,7 @@ function CVUploadTestComponentkienvu() {
 
   // Test data from Kien Vu CV ChatGPT response
   const testLLMData = {
-    "possibility_score": [
-        10
-    ],
+    "possibility_score": 10,
     "contact": {
         "full_name": "KIEN (JONATHAN) VU VIET",
         "address": "Ho Chi Minh City, Vietnam",
