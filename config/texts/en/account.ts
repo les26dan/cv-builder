@@ -44,6 +44,8 @@ export const account = {
       },
       tosCheckbox: "I agree to the",
       tosLink: "terms of service",
+      privacyLink: "privacy policy",
+      linkSeparator: " and ",
       submitButton: "Sign Up",
       loading: "Processing...",
       signupLink: {
@@ -107,22 +109,80 @@ export const account = {
   terms: {
     title: "Terms of Service",
     backButton: "← Back",
+    lastUpdated: "Last Updated: August 3, 2025",
     sections: [
       {
-        title: "1. Privacy and Personal Data Protection",
-        content: "OkBuddy is committed to absolutely protecting your personal information. All personal data you provide when using our platform will be strictly protected and stored internally at OkBuddy only. We absolutely do not share, sell, or disclose any of your personal information to third parties in any form, except in cases where specifically required by law."
+        title: "1. Acceptance of Terms",
+        content: "By accessing or using OkBuddy's website, application, or services (\"OkBuddy\" or \"the Service\"), you signify that you have read and agree to these Terms of Service and our Privacy Policy. If you do not agree, please do not use OkBuddy. Continued use of OkBuddy after changes (see Section 8) means you accept the updated Terms. OkBuddy is a CV preparation tool powered by Large Language Models (LLMs). We strive to comply with international laws, including Vietnam's data laws, Singapore/Thailand PDPA, and U.S. regulations like the CCPA, to make this service safe and accessible to everyone."
       },
       {
-        title: "2. User Privacy Rights",
-        content: "You have the right to access, edit, and delete your personal information at any time. If you want to request access or changes to personal data, please contact us directly via email or OkBuddy's customer support system. We are committed to respecting and protecting user privacy throughout the service usage process."
+        title: "2. Accounts, Eligibility, and Third-Party Login",
+        content: "To use OkBuddy, you may need to create an account. You can sign up with an email and password or by using third-party login providers like Google or LinkedIn. If you choose a Google/LinkedIn login, you authorize OkBuddy to access certain information from that account (for example, your name and email address). We use this information to set up and manage your OkBuddy account in accordance with our Privacy Policy. You are responsible for maintaining the confidentiality of your login credentials and for all activities under your account. Age Requirements: OkBuddy is open to users of all ages, but if you are considered a minor in your country (for example, under 13 in the US, under 16 in Vietnam, or under 20 in Thailand), you must use OkBuddy with the consent and supervision of a parent or legal guardian."
       },
       {
-        title: "3. Purpose and Scope of Information Collection",
-        content: "Personal information collected from you will be used to support you in optimizing your job application profile, providing suitable job recommendations, and improving OkBuddy's service quality. Your data is only collected and processed within necessary scope, transparently and with clear consent from you."
+        title: "3. User Content and Intellectual Property",
+        content: "Your Content: Using OkBuddy often involves inputting your personal information, CV details, and other content (\"User Content\"). You retain ownership of your User Content – OkBuddy does not claim ownership of the materials you submit. However, to provide our service, you grant OkBuddy a license to use your content. This means you give us a non-exclusive, worldwide, royalty-free, perpetual right to use, copy, modify, create derivative works from, publish, and display your content solely for the purposes of operating, improving, and developing OkBuddy. For example, we might use your CV inputs to format suggestions, to train or fine-tune our AI models, or to troubleshoot service issues. This license is only for providing and enhancing OkBuddy – you continue to own your content and can delete it or request deletion as described in our Privacy Policy."
       },
       {
-        title: "4. Data Security Commitment",
-        content: "We use the most advanced technologies and security measures to protect your personal data against unauthorized access, modification, or disclosure risks. All personal data is encrypted and secured according to international standards, ensuring your information is always safe and absolutely private."
+        title: "4. Permitted Uses and Conduct",
+        content: "We aim to keep OkBuddy a helpful and safe service for everyone. By using OkBuddy, you agree to: • Use OkBuddy only for its intended purpose of creating or improving CVs and related career materials. • Not misuse the Service. This means you will not attempt to hack, disrupt, or overload our systems; you will not use OkBuddy to generate unlawful content or spam; and you will not reverse-engineer or otherwise attempt to extract source code or trade secrets from our software. • Respect others. Do not harass other users or our staff, and do not try to gain unauthorized access to others' accounts or data."
+      },
+      {
+        title: "5. Third-Party Services and Links",
+        content: "OkBuddy may incorporate or link to third-party services. For example, as noted, you can log in via Google or LinkedIn, and OkBuddy may integrate APIs from AI providers. Additionally, our site might contain links to external websites for job postings or resources as a convenience. Third-Party Account Data: If you link a third-party account, we will receive certain information from that account (such as your email and public profile info) and handle it according to our Privacy Policy. AI Providers: OkBuddy uses LLMs (large language models) which may be provided by third parties. This means that when you ask OkBuddy to review or draft text, your content might be securely transmitted to an AI service (for example, OpenAI or another AI platform) for processing."
+      },
+      {
+        title: "6. Disclaimers and Limitations of Liability",
+        content: "Service Provided \"AS-IS\": OkBuddy is a new and evolving service. While we work hard to provide accurate, useful CV suggestions, we cannot guarantee any specific results (for example, we can't guarantee you'll get a job interview or that our AI outputs will be error-free). You agree that you use OkBuddy at your own risk. The service is provided on an \"as is\" and \"as available\" basis, without warranties of any kind, either express or implied. No Advice: OkBuddy's content (including AI-generated resume drafts or feedback) is for informational purposes and does not constitute professional career advice or guarantees. Always consider whether advice is appropriate for your situation."
+      },
+      {
+        title: "7. Governing Law and Dispute Resolution",
+        content: "OkBuddy is used globally, so we strive to comply with laws in multiple jurisdictions. These Terms will be interpreted in accordance with general principles of fairness and the laws of the jurisdictions in which we operate, notably Vietnam, Singapore, Thailand, and applicable federal laws in the United States. If you are a consumer located in a country with mandatory consumer protection or data protection laws, those laws take precedence to the extent they conflict with these Terms."
+      },
+      {
+        title: "8. Changes to These Terms",
+        content: "We may update or modify these Terms of Service from time to time as our service evolves or laws change. If we make material changes, we will notify users by posting the updated Terms on our website and/or through a notice in the app or via email. The \"Effective Date\" at the top will indicate when changes become effective. Please check back periodically. Once new Terms are posted and effective, your continued use of OkBuddy means you accept the revised Terms. If you do not agree to the changes, you should stop using OkBuddy."
+      }
+    ]
+  },
+
+  // Privacy Policy page
+  privacy: {
+    title: "Privacy Policy",
+    backButton: "← Back",
+    lastUpdated: "Last Updated: August 3, 2025",
+    sections: [
+      {
+        title: "1. Information We Collect",
+        content: "We collect information to provide and improve OkBuddy for you. This includes: • Information You Provide Directly: When you create an account or use OkBuddy, you may give us personal information. For example: Account Details (your name, email address, and any profile information you choose to add), CV Content and Inputs (the content you input into OkBuddy's CV builder, such as your work experience, education, skills, or any text you ask our AI to analyze), and Communications (if you contact us via support email). • Information from Linked Accounts: If you choose to link or log in through a third-party platform (e.g., Google or LinkedIn OAuth login), we collect information from that platform as needed to create or authenticate your account. • Usage Data and Analytics: We automatically collect data about how you interact with OkBuddy, including usage information, device and technical data, and location information (we might infer your general location from your IP address)."
+      },
+      {
+        title: "2. How We Use Your Information",
+        content: "OkBuddy uses your information to operate, improve, and personalize our services. Specifically, we use information for the following purposes: • To Provide the Service: We use your data to create and maintain your account, enable the CV-building features, generate AI-based suggestions, and provide customer support. • To Improve and Develop OkBuddy: Your data helps us understand what's working and what's not. We may use your inputs and interactions to train and refine our AI models and algorithms. • Analytics: We analyze use of the Service to figure out overall trends and metrics. • Personalization: To enhance your experience, we may personalize certain content for you. • Communication: We use contact information to send necessary communications, product updates, and responses. • Security and Abuse Prevention: Information is used to keep OkBuddy secure and prevent fraud, spam, or abuse."
+      },
+      {
+        title: "3. How We Share Information",
+        content: "We understand that your personal information is important. OkBuddy is not in the business of selling personal data outright, and we share information only in the ways described below: • With Service Providers: We employ trusted third-party companies to help us operate OkBuddy (cloud hosting, email services, analytics). • With AI Processing Partners: When you use an AI-driven feature, the relevant text may be sent to an AI service provider for processing. • With Affiliates and Business Partners: OkBuddy might share data with its affiliates or in anonymized, aggregated form with partners for research purposes. • For Legal Reasons: We may disclose information if required by law or to protect rights and safety. • Business Transfers: If OkBuddy is involved in a merger or acquisition, user information may be transferred. • With Your Consent: In cases where you have explicitly given us consent to share your information."
+      },
+      {
+        title: "4. Data Storage and Security",
+        content: "Storage Location: OkBuddy primarily stores data on secure servers. Depending on where you are, your data might be stored in a different country. Security Measures: We use industry-standard technical and organizational measures to safeguard your personal information from loss, theft, misuse, and unauthorized access or disclosure. These measures include encryption of data in transit and at rest, firewalls and intrusion detection systems, and regular security audits. However, please note that no method of transmission over the Internet, or method of electronic storage, is 100% secure. While we strive to protect your information, we cannot guarantee absolute security."
+      },
+      {
+        title: "5. International Data Transfers",
+        content: "OkBuddy is accessible worldwide. Using our Service means your personal information may be transferred to and stored in servers located in countries other than your own. These countries may have different data protection laws than your home country. When we transfer personal data across borders, we take steps to safeguard it, including contractual protections, comparable safeguards, and your consent where required. By using OkBuddy, you acknowledge that your data may be transferred to and processed in other countries as described, subject to these safeguards."
+      },
+      {
+        title: "6. Your Rights and Choices",
+        content: "We believe you should have control over your personal information. Depending on where you live, you may have some or all of the following data protection rights: • Access and Portability: You can request a copy of the personal data we hold about you. • Correction: If any personal data we have is incorrect or outdated, you have the right to request that we correct or update it. • Deletion: You can ask us to delete your personal data. • Withdrawal of Consent: If we are processing your personal data based on your consent, you have the right to withdraw that consent at any time. • Objection and Restriction: You may have the right to object to certain processing or request that we restrict processing of your data. • Automated Decision-Making: OkBuddy does not make any legally significant decisions about you purely by algorithms without human involvement."
+      },
+      {
+        title: "7. Children's Privacy",
+        content: "OkBuddy is not intended for young children without supervision. We do not knowingly collect personal information from anyone under the age required by law to provide consent. In general, users under 13 years old (or higher minimum age in certain regions) should only use OkBuddy with a parent or guardian's permission. If you are a parent or guardian and you learn that your child under the relevant age has created an OkBuddy account or provided personal information without your consent, please contact us. We will take prompt steps to delete the child's personal data from our systems."
+      },
+      {
+        title: "8. Changes to This Privacy Policy",
+        content: "We may update this Privacy Policy from time to time to reflect changes in our practices, technologies, or legal requirements. If we make a significant change, we will notify you in an appropriate way – for example, by posting a prominent notice on our website or sending an email notification, and updating the \"Last updated\" date at the top. When we post changes to this Policy, if you continue to use OkBuddy after the changes take effect, it means you accept the revised Policy."
       }
     ]
   },

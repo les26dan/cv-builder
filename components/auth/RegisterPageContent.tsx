@@ -267,14 +267,22 @@ export default function RegisterPageContent() {
               })}
               className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary flex-shrink-0"
             />
-            <label className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                        <label className="text-xs sm:text-sm text-gray-700 leading-relaxed">
               {account.register.form.tosCheckbox}{" "}
               <Link 
                 href="/terms-of-service" 
                 className="text-primary hover:underline"
                 target="_blank"
               >
-{account.register.form.tosLink}
+                {account.register.form.tosLink}
+              </Link>
+              {account.register.form.linkSeparator}
+              <Link 
+                href="/privacy-policy" 
+                className="text-primary hover:underline"
+                target="_blank"
+              >
+                {account.register.form.privacyLink}
               </Link>
             </label>
           </div>

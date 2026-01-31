@@ -49,11 +49,14 @@ const Footer: React.FC = () => {
             <h4 className="font-inter font-semibold text-base leading-[19px] text-[#111827]">
               {footer.links.legal.title}
             </h4>
-            {footer.links.legal.items.map((item, index) => (
-              <a key={index} href="#" className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0277BD] transition-colors">
-                {item}
-              </a>
-            ))}
+            {footer.links.legal.items.map((item, index) => {
+              const href = index === 0 ? "/privacy-policy" : index === 1 ? "/terms-of-service" : "#";
+              return (
+                <a key={index} href={href} className="font-inter font-normal text-sm leading-[17px] text-[#374151] hover:text-[#0277BD] transition-colors">
+                  {item}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>
