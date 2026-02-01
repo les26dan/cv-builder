@@ -88,7 +88,7 @@ export default function PrivacyContent() {
             <div className="bg-gray-50 rounded-lg p-4">
               <p className="text-gray-700">
                 <strong>Email:</strong> admin@example.com<br/>
-                <strong>Website:</strong> www.okbuddy.com
+                <strong>Website:</strong> https://www.okbuddy.io
               </p>
             </div>
           </section>

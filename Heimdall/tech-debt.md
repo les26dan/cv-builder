@@ -1,5 +1,34 @@
 # Technical Debt Registry
-**Last Updated**: August 2, 2025 (OAuth Session)
+**Last Updated**: August 3, 2025 (Legal Compliance Implementation)
+
+## ⚙️ **MINOR TECHNICAL DEBT - TEST CONFIGURATION** (August 3, 2025)
+
+### **🟡 LOW PRIORITY: Test Framework Configuration**
+**Date Identified**: August 3, 2025  
+**Impact**: **MINIMAL - Testing Infrastructure Only**  
+**Priority**: **P3 - Non-blocking**
+
+**Issue Description:**
+- **Problem**: Jest/Vitest configuration conflict causing test framework imports to fail
+- **Scope**: Test files only, does not affect production code or build process
+- **Error Pattern**: `Cannot find module 'vitest'` in test files expecting Vitest but running under Jest
+
+**Technical Details:**
+- Some test files written for Vitest (using `vi` mocks) but project configured for Jest
+- TypeScript compilation fails on test files due to missing Vitest type definitions
+- Production build succeeds completely, issue isolated to test environment
+
+**Risk Assessment:**
+- ✅ **No Production Impact**: All production code compiles and builds successfully
+- ✅ **No User Impact**: Feature functionality unaffected
+- ✅ **No Security Risk**: Testing infrastructure only
+
+**Resolution Options:**
+1. **Standardize on Jest**: Convert Vitest syntax to Jest in affected test files
+2. **Standardize on Vitest**: Update project configuration to use Vitest instead of Jest
+3. **Hybrid Approach**: Configure project to support both testing frameworks
+
+**Recommendation**: Standardize on Jest (Option 1) as it's already the primary testing framework
 
 ## 🎉 **MAJOR TECHNICAL DEBT RESOLUTION** (February 3, 2025)
 

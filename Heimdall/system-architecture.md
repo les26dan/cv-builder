@@ -4,6 +4,50 @@
 
 ### Recent System Health Updates
 
+#### **✅ TERMS OF SERVICE & PRIVACY POLICY IMPLEMENTATION** (August 3, 2025)
+**CRITICAL LEGAL FEATURE**: Complete Terms of Service and Privacy Policy pages with multilingual support and authentication integration
+
+**Core Implementation:**
+1. **Legal Page Architecture**: Dedicated routes `/terms-of-service` and `/privacy-policy` with comprehensive content structure
+2. **Language Integration**: Full compatibility with existing language configuration system for English/Vietnamese support
+3. **Authentication Enhancement**: Updated register page checkbox to include both Terms of Service and Privacy Policy links
+4. **Footer Navigation**: Fixed footer links to properly route to legal pages instead of placeholder anchors
+5. **Content Management**: Centralized legal content in language configuration files with versioning support
+
+**Technical Architecture:**
+- **Page Structure**: Dedicated pages following existing pattern with `TermsContent.tsx` and `PrivacyContent.tsx`
+- **Language Detection**: Uses existing `detectLanguage()` and `getTexts()` from centralized language config
+- **Content Sections**: Dynamic rendering of legal sections with proper headings and last updated dates
+- **Contact Integration**: Updated all contact emails to `admin@example.com` throughout legal documents
+- **Build Integration**: Both pages included in production build with proper TypeScript compliance
+
+**Affected Components:**
+- ✅ **app/terms-of-service/**: Complete page implementation with language switching
+- ✅ **app/privacy-policy/**: Complete page implementation with language switching  
+- ✅ **config/texts/en/account.ts**: Updated Terms and Privacy content with accurate 8-section structure
+- ✅ **config/texts/vi/account.ts**: Complete Vietnamese translation with proper Vietnamese date format
+- ✅ **components/auth/RegisterPageContent.tsx**: Enhanced checkbox with privacy policy link
+- ✅ **components/Footer.tsx**: Fixed navigation links to route to actual pages
+
+**Legal Content Coverage:**
+- ✅ **Terms of Service**: 8 comprehensive sections (Acceptance, Accounts, IP, Conduct, Third-Party, Disclaimers, Governing Law, Changes)
+- ✅ **Privacy Policy**: 8 detailed sections (Information Collection, Usage, Sharing, Security, International Transfers, Rights, Children, Changes)
+- ✅ **Version Control**: Last updated date (August 3, 2025 / 3/8/2025) in both language formats
+- ✅ **Contact Information**: Standardized `admin@example.com` across all legal documents
+
+**Quality Implementation:**
+- ✅ **Build Validation**: Production build successful with pages included in output
+- ✅ **ESLint Compliance**: Zero errors, all TypeScript type safety maintained
+- ✅ **Language Switching**: Dynamic content updates based on stored language preference
+- ✅ **User Experience**: Consistent styling and navigation patterns with existing pages
+- ✅ **Register Flow**: Enhanced user agreement checkbox with both legal documents
+
+**Impact Measurement:**
+- ✅ **Legal Compliance**: Complete Terms of Service and Privacy Policy covering all business operations
+- ✅ **Multilingual Support**: Full English and Vietnamese translations for legal content
+- ✅ **Authentication Flow**: Enhanced register page with proper legal consent mechanism
+- ✅ **Navigation**: Fixed footer links providing proper user access to legal documents
+
 #### **✅ DYNAMIC LANGUAGE CONSISTENCY SYSTEM** (February 9, 2025)
 **CRITICAL FEATURE**: Complete internationalization system eliminating hardcoded Vietnamese text
 

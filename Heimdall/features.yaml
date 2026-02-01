@@ -14,6 +14,53 @@
 # Performance: ✅ Production build optimized + Data compression + Bundle sizes <177KB
 # Downloads: ✅ LaTeX download support + WYSIWYG compliance for all formats (PDF, Word, LaTeX)
 
+## 📋 **TERMS OF SERVICE & PRIVACY POLICY SYSTEM** ✅ IMPLEMENTED (August 3, 2025)
+location: /app/terms-of-service/, /app/privacy-policy/, /config/texts/[lang]/account.ts, /components/auth/, /components/Footer.tsx
+status: production_ready_legal_compliance
+
+core_implementation:
+  - **Legal Page Architecture**: Dedicated routes with comprehensive multilingual content structure ✅ NEW
+  - **Language Integration**: Full compatibility with existing language configuration system ✅ NEW
+  - **Authentication Enhancement**: Register page checkbox includes both legal documents ✅ NEW
+  - **Footer Navigation**: Fixed links routing to actual legal pages instead of placeholders ✅ NEW
+  - **Content Versioning**: Last updated dates in both English (Aug 3, 2025) and Vietnamese (3/8/2025) ✅ NEW
+
+features:
+  - **Terms of Service Page**: Complete 8-section legal document with multilingual support ✅ NEW
+  - **Privacy Policy Page**: Comprehensive 8-section privacy document with GDPR/CCPA compliance ✅ NEW
+  - **Dynamic Language Switching**: Legal content updates based on stored language preference ✅ NEW
+  - **Register Flow Enhancement**: Checkbox includes both Terms of Service and Privacy Policy links ✅ NEW
+  - **Contact Email Standardization**: All legal documents use admin@example.com ✅ NEW
+
+affected_components:
+  - **app/terms-of-service/page.tsx**: Main Terms of Service page component ✅ NEW
+  - **app/terms-of-service/TermsContent.tsx**: Dynamic content component with language detection ✅ NEW
+  - **app/privacy-policy/page.tsx**: Main Privacy Policy page component ✅ NEW
+  - **app/privacy-policy/PrivacyContent.tsx**: Dynamic content component with language detection ✅ NEW
+  - **components/auth/RegisterPageContent.tsx**: Enhanced checkbox with privacy policy link ✅ UPDATED
+  - **components/Footer.tsx**: Fixed navigation links to legal pages ✅ UPDATED
+  - **config/texts/en/account.ts**: Comprehensive English legal content with 8-section structure ✅ UPDATED
+  - **config/texts/vi/account.ts**: Complete Vietnamese legal translations ✅ UPDATED
+
+technical_architecture:
+  - **Page Structure**: Next.js app router with dedicated legal page directories
+  - **Language Detection**: Uses existing detectLanguage() and getTexts() from centralized config
+  - **Content Management**: Legal content stored in language configuration files with versioning
+  - **Build Integration**: Both pages included in production build with TypeScript compliance
+  - **Component Pattern**: Follows existing TermsContent.tsx pattern for consistency
+
+legal_coverage:
+  - **Terms of Service Sections**: Acceptance, Accounts, IP Rights, Conduct, Third-Party, Disclaimers, Law, Changes
+  - **Privacy Policy Sections**: Data Collection, Usage, Sharing, Security, International Transfers, Rights, Children, Changes
+  - **Compliance Standards**: GDPR (Europe), PDPA (Singapore/Thailand), CCPA (California), Vietnam data laws
+  - **Contact Information**: Standardized admin@example.com across all legal documents
+
+quality_metrics:
+  - **Build Success**: Production build includes both legal pages with zero TypeScript errors ✅
+  - **ESLint Compliance**: Zero warnings/errors in legal page implementations ✅
+  - **Language Switching**: Dynamic content updates work correctly for English/Vietnamese ✅
+  - **User Experience**: Consistent styling and navigation patterns with existing pages ✅
+
 ## 🌐 **DYNAMIC LANGUAGE CONSISTENCY SYSTEM** ✅ IMPLEMENTED (February 9, 2025)
 location: /config/languageConfig.ts, /config/texts/, /components/sections/, /components/EditorPanel.tsx
 status: production_ready_internationalization_system

@@ -126,7 +126,7 @@ export async function sendConfirmationEmail(data: EmailData): Promise<EmailResul
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: process.env.SMTP_FROM || '"OkBuddy" <noreply@okbuddy.com>',
+      from: process.env.SMTP_FROM || '"OkBuddy" <noreply@okbuddy.io>',
       to: data.email,
       subject: 'Chào mừng đến với OkBuddy - Tài khoản của bạn đã được tạo!',
       html: createEmailTemplate(data),
