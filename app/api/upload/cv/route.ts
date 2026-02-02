@@ -4,6 +4,8 @@ import fs from 'fs'
 import path from 'path'
 import { saveCVDraft } from '@/lib/supabase'
 import { processFile, analyzeExtractedText } from '@/lib/fileProcessing'
+import { serverAnalytics } from '@/shared/services/serverAnalyticsService'
+import { STATSIG_EVENTS } from '@/config/statsig'
 
 // Explicitly use Node.js runtime to avoid Edge Runtime warnings
 export const runtime = 'nodejs'
@@ -26,12 +28,30 @@ const ALLOWED_TYPES = [
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  let user = { userID: 'anonymous' };
+  
   try {
+    // Track API request start
+    serverAnalytics.track(STATSIG_EVENTS.API_REQUEST_RECEIVED, user, {
+      endpoint: '/api/upload/cv',
+      method: 'POST',
+      user_agent: request.headers.get('user-agent') || undefined,
+    });
+
     // Check authentication
     const cookieStore = await cookies()
     const userSessionCookie = cookieStore.get('user_session')
     
     if (!userSessionCookie?.value) {
+      serverAnalytics.trackAPIRequest(
+        '/api/upload/cv',
+        'POST',
+        401,
+        Date.now() - startTime,
+        user,
+        { error_type: 'UNAUTHORIZED' }
+      );
       return NextResponse.json(
         { success: false, message: 'Not authenticated', error: 'UNAUTHORIZED' },
         { status: 401 }
@@ -40,25 +60,71 @@ export async function POST(request: NextRequest) {
     
     const userSession = JSON.parse(userSessionCookie.value)
     if (!userSession.id) {
+      serverAnalytics.trackAPIRequest(
+        '/api/upload/cv',
+        'POST',
+        401,
+        Date.now() - startTime,
+        user,
+        { error_type: 'INVALID_SESSION' }
+      );
       return NextResponse.json(
         { success: false, message: 'Invalid session', error: 'INVALID_SESSION' },
         { status: 401 }
       )
     }
 
+    // Update user context for tracking
+    user = { 
+      userID: userSession.id,
+      email: userSession.email 
+    };
+
     // Parse form data
     const formData = await request.formData()
     const file = formData.get('cv') as File
     
     if (!file) {
+      serverAnalytics.trackAPIRequest(
+        '/api/upload/cv',
+        'POST',
+        400,
+        Date.now() - startTime,
+        user,
+        { error_type: 'NO_FILE' }
+      );
       return NextResponse.json(
         { success: false, message: 'No file uploaded', error: 'NO_FILE' },
         { status: 400 }
       )
     }
 
+    // Track CV upload started
+    serverAnalytics.trackCVProcessing(
+      'upload',
+      true,
+      user,
+      undefined,
+      file.size,
+      undefined,
+      undefined,
+      undefined
+    );
+
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
+      serverAnalytics.trackAPIRequest(
+        '/api/upload/cv',
+        'POST',
+        400,
+        Date.now() - startTime,
+        user,
+        { 
+          error_type: 'UNSUPPORTED_FORMAT',
+          file_type: file.type,
+          file_size_bytes: file.size
+        }
+      );
       return NextResponse.json(
         { 
           success: false, 
@@ -71,6 +137,18 @@ export async function POST(request: NextRequest) {
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
+      serverAnalytics.trackAPIRequest(
+        '/api/upload/cv',
+        'POST',
+        400,
+        Date.now() - startTime,
+        user,
+        { 
+          error_type: 'FILE_TOO_LARGE',
+          file_size_bytes: file.size,
+          max_allowed_size: MAX_FILE_SIZE
+        }
+      );
       return NextResponse.json(
         { 
           success: false, 
@@ -99,26 +177,104 @@ export async function POST(request: NextRequest) {
     fs.writeFileSync(filePath, buffer)
 
     // Process file to extract text
+    const processingStartTime = Date.now();
     const processingResult = await processFile(buffer, file.type)
+    const processingDuration = Date.now() - processingStartTime;
     
     let extractedText = ''
     let analysisData = null
     
     if (processingResult.success && processingResult.text) {
       extractedText = processingResult.text
-      analysisData = analyzeExtractedText(extractedText)
+      
+      // Track successful parsing
+      serverAnalytics.trackCVProcessing(
+        'parsing',
+        true,
+        user,
+        processingDuration,
+        file.size,
+        undefined,
+        undefined,
+        undefined
+      );
+      
+      // Analyze extracted text
+      const analysisStartTime = Date.now();
+      analysisData = analyzeExtractedText(extractedText);
+      const analysisDuration = Date.now() - analysisStartTime;
+      
+      // Track analysis completion
+      serverAnalytics.trackCVProcessing(
+        'analysis',
+        true,
+        user,
+        analysisDuration,
+        file.size,
+        'local_analysis',
+        undefined,
+        undefined
+      );
+    } else {
+      // Track parsing failure
+      serverAnalytics.trackCVProcessing(
+        'parsing',
+        false,
+        user,
+        processingDuration,
+        file.size,
+        undefined,
+        undefined,
+        processingResult.error
+      );
     }
 
-    // Save file reference and extracted data to database
-    await saveCVDraft({
-      user_id: userSession.id,
-      file_id: fileId,
-      file_name: file.name,
-      file_size: file.size,
-      file_path: filePath,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    })
+    // Track database operation
+    const dbStartTime = Date.now();
+    try {
+      await saveCVDraft({
+        user_id: userSession.id,
+        file_id: fileId,
+        file_name: file.name,
+        file_size: file.size,
+        file_path: filePath,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+      
+      serverAnalytics.trackDatabaseOperation(
+        'INSERT',
+        'cv_drafts',
+        Date.now() - dbStartTime,
+        true,
+        user
+      );
+    } catch (dbError) {
+      serverAnalytics.trackDatabaseOperation(
+        'INSERT',
+        'cv_drafts',
+        Date.now() - dbStartTime,
+        false,
+        user,
+        { error_message: String(dbError) }
+      );
+      throw dbError; // Re-throw to be caught by outer catch
+    }
+
+    // Track successful API completion
+    serverAnalytics.trackAPIRequest(
+      '/api/upload/cv',
+      'POST',
+      200,
+      Date.now() - startTime,
+      user,
+      {
+        file_size_bytes: file.size,
+        processing_duration_ms: processingDuration,
+        text_extracted: processingResult.success,
+        word_count: processingResult.metadata?.wordCount
+      }
+    );
 
     // Return success with processing results
     return NextResponse.json({
@@ -138,6 +294,19 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Upload error:', error)
+    
+    // Track server error
+    serverAnalytics.trackAPIRequest(
+      '/api/upload/cv',
+      'POST',
+      500,
+      Date.now() - startTime,
+      user,
+      {
+        error_type: 'INTERNAL_ERROR',
+        error_message: String(error)
+      }
+    );
     
     return NextResponse.json(
       { 

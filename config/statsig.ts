@@ -11,6 +11,7 @@ import { StatsigClient } from '@statsig/js-client';
 
 export interface StatsigConfig {
   sdkKey: string;
+  serverSecretKey?: string;
   environment: 'production' | 'staging' | 'development';
   enabled: boolean;
   userProperties: {
@@ -23,10 +24,16 @@ export interface StatsigConfig {
     maxBatchSize: number;
     flushIntervalMs: number;
   };
+  server?: {
+    enabled: boolean;
+    batchSize: number;
+    flushIntervalMs: number;
+  };
 }
 
 export const statsigConfig: StatsigConfig = {
   sdkKey: process.env.NEXT_PUBLIC_STATSIG_CLIENT_KEY || 'client-key-placeholder',
+  serverSecretKey: process.env.STATSIG_SERVER_SECRET_KEY,
   environment: (process.env.NODE_ENV as 'production' | 'staging' | 'development') || 'development',
   enabled: process.env.NEXT_PUBLIC_STATSIG_ENABLED !== 'false',
   userProperties: {
@@ -38,6 +45,11 @@ export const statsigConfig: StatsigConfig = {
     enabled: true,
     maxBatchSize: 50, // Batch events for performance
     flushIntervalMs: 5000, // 5 second intervals
+  },
+  server: {
+    enabled: true,
+    batchSize: 100, // Larger batches for server-side efficiency
+    flushIntervalMs: 10000, // 10 second intervals for server events
   }
 };
 
@@ -170,6 +182,31 @@ export const STATSIG_EVENTS = {
   PAGE_LOAD_ERROR: 'error_page_load_failed',
   API_ERROR: 'error_api_request_failed',
   PERFORMANCE_SLOW: 'performance_threshold_exceeded',
+  
+  // Server-side API Events
+  API_REQUEST_RECEIVED: 'server_api_request_received',
+  API_REQUEST_COMPLETED: 'server_api_request_completed',
+  API_REQUEST_FAILED: 'server_api_request_failed',
+  DATABASE_QUERY_EXECUTED: 'server_database_query_executed',
+  DATABASE_QUERY_FAILED: 'server_database_query_failed',
+  
+  // Server-side CV Processing Events
+  CV_PARSING_STARTED: 'server_cv_parsing_started',
+  CV_PARSING_COMPLETED: 'server_cv_parsing_completed',
+  CV_PARSING_FAILED: 'server_cv_parsing_failed',
+  CV_BLOB_UPLOADED: 'server_cv_blob_uploaded',
+  CV_BLOB_DOWNLOAD: 'server_cv_blob_download',
+  AI_ANALYSIS_INITIATED: 'server_ai_analysis_initiated',
+  AI_ANALYSIS_COMPLETED: 'server_ai_analysis_completed',
+  AI_ANALYSIS_FAILED: 'server_ai_analysis_failed',
+  
+  // Server-side Authentication Events
+  AUTH_TOKEN_GENERATED: 'server_auth_token_generated',
+  AUTH_TOKEN_VALIDATED: 'server_auth_token_validated',
+  AUTH_SESSION_CREATED: 'server_auth_session_created',
+  AUTH_SESSION_EXPIRED: 'server_auth_session_expired',
+  OAUTH_CALLBACK_PROCESSED: 'server_oauth_callback_processed',
+  PASSWORD_HASH_GENERATED: 'server_password_hash_generated',
   
   // Business Intelligence Events
   USER_JOURNEY_COMPLETED: 'conversion_user_journey_completed',
