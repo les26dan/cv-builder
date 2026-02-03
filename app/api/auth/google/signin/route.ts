@@ -64,6 +64,20 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Google OAuth initiation error:', error);
     
+    // Track OAuth initiation failure
+    serverAnalytics.trackAPIRequest(
+      '/api/auth/google/signin',
+      'GET',
+      302,
+      Date.now() - startTime,
+      { userID: 'anonymous' },
+      {
+        error_type: 'oauth_init_failed',
+        error_message: String(error),
+        auth_provider: 'google'
+      }
+    );
+    
     // Redirect back to login with error
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('error', 'oauth_init_failed');

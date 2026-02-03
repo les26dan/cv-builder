@@ -5,13 +5,17 @@ import { EmailConflictResolver } from './EmailConflictResolver';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export class AccountLinkingService {
   private supabase;
+  private supabaseService;
   private conflictResolver: EmailConflictResolver;
 
   constructor() {
     this.supabase = createClient(supabaseUrl, supabaseAnonKey);
+    // Service client for operations that need to bypass RLS (like user creation)
+    this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
     this.conflictResolver = new EmailConflictResolver();
   }
 
@@ -66,8 +70,8 @@ export class AccountLinkingService {
           linkedProviders: [profile.provider]
         };
       } else {
-        // User doesn't exist - create new OAuth account
-        const { data: newUser, error: createError } = await this.supabase
+        // User doesn't exist - create new OAuth account using service client to bypass RLS
+        const { data: newUser, error: createError } = await this.supabaseService
           .from('users')
           .insert({
             email: profile.email,
@@ -348,7 +352,8 @@ export class AccountLinkingService {
       updated_at: new Date().toISOString()
     };
 
-    const { data: user, error } = await this.supabase
+    // Use service client to bypass RLS for user creation
+    const { data: user, error } = await this.supabaseService
       .from('users')
       .insert(userData)
       .select()

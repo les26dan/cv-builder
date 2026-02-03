@@ -10,7 +10,7 @@
  * - Error monitoring and alerting
  */
 
-import Statsig from 'statsig-node';
+import Statsig, { StatsigUser as StatsigNodeUser } from 'statsig-node';
 import { 
   statsigConfig, 
   StatsigUser, 
@@ -25,7 +25,7 @@ import { monitoring } from '../../config/monitoring';
  */
 export interface ServerEventProperties extends Partial<BaseEventProperties> {
   // Server Context
-  server_timestamp: string;
+  server_timestamp?: string;
   request_id?: string;
   user_agent?: string;
   ip_address?: string;
@@ -55,6 +55,9 @@ export interface ServerEventProperties extends Partial<BaseEventProperties> {
   error_type?: string;
   error_message?: string;
   stack_trace?: string;
+  
+  // Allow additional dynamic properties
+  [key: string]: any;
 }
 
 /**
@@ -64,7 +67,7 @@ export interface ServerEventProperties extends Partial<BaseEventProperties> {
 export class ServerAnalyticsService {
   private static instance: ServerAnalyticsService;
   private isInitialized = false;
-  private eventQueue: Array<{ event: string; user: StatsigUser; properties: Record<string, any> }> = [];
+  private eventQueue: Array<{ event: string; user: StatsigNodeUser; properties: Record<string, any> }> = [];
 
   private constructor() {
     // Initialize immediately on server startup
@@ -108,10 +111,6 @@ export class ServerAnalyticsService {
       await Statsig.initialize(statsigConfig.serverSecretKey, {
         environment: {
           tier: statsigConfig.environment
-        },
-        api: statsigConfig.serverSecretKey,
-        logger: {
-          logLevel: statsigConfig.environment === 'development' ? 'debug' : 'warn'
         }
       });
 
@@ -148,7 +147,7 @@ export class ServerAnalyticsService {
    */
   public track(
     eventName: StatsigEventName | string,
-    user: StatsigUser | { userID: string },
+    user: StatsigNodeUser | { userID: string },
     properties: ServerEventProperties = {}
   ): void {
     const eventData: ServerEventProperties = {
@@ -207,7 +206,7 @@ export class ServerAnalyticsService {
     method: string,
     statusCode: number,
     responseTimeMs: number,
-    user?: StatsigUser,
+    user?: StatsigNodeUser,
     additionalProperties?: Record<string, any>
   ): void {
     const eventName = statusCode >= 400 
@@ -231,7 +230,7 @@ export class ServerAnalyticsService {
     tableName: string,
     durationMs: number,
     success: boolean,
-    user?: StatsigUser,
+    user?: StatsigNodeUser,
     additionalProperties?: Record<string, any>
   ): void {
     const eventName = success 
@@ -252,7 +251,7 @@ export class ServerAnalyticsService {
   public trackCVProcessing(
     operation: 'parsing' | 'analysis' | 'upload' | 'download',
     success: boolean,
-    user: StatsigUser,
+    user: StatsigNodeUser,
     processingTimeMs?: number,
     fileSizeBytes?: number,
     aiModel?: string,
@@ -293,7 +292,7 @@ export class ServerAnalyticsService {
    */
   public trackAuthEvent(
     eventType: 'token_generated' | 'token_validated' | 'session_created' | 'session_expired' | 'oauth_callback',
-    user: StatsigUser,
+    user: StatsigNodeUser,
     authProvider?: string,
     sessionDurationMs?: number,
     success: boolean = true,

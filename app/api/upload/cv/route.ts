@@ -76,8 +76,7 @@ export async function POST(request: NextRequest) {
 
     // Update user context for tracking
     user = { 
-      userID: userSession.id,
-      email: userSession.email 
+      userID: userSession.id
     };
 
     // Parse form data

@@ -6,12 +6,10 @@
    - CV Upload
    - CV Guided Editing
    - CV Workflow Integration
-- The focus of our initiative is to improve the existing CV text extracting -> send extracted texts & prompts to ChatGPT -> receive structured .JSON -> populating .JSON into CV Guided Editing page correctly.
-   - Review the files in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Files/Initiatives/CV Parser/Manroe'.
-      - The PDF file is the sample CV input.
-      - The 1,2,3 files are the system each step's input/ output
+- The focus of our initiative is to improve the CV parser & database.
 - Let me know once you have fully understood the context here. Do not proceed to make any change yet.
 
+**CV Parser**
 + Implement the CV attachment sent to ChatGPT API
 + Implement the prompts sent to ChatGPT API, depending the system's language being used
 + Implement the system's logic to handle the returned JSON. 
