@@ -12,9 +12,23 @@ export class OAuthService {
    * Initialize OAuth service with providers
    */
   public static initialize(): void {
-    // Initialize providers
-    this.providers.set('google', new GoogleOAuthProvider());
-    this.providers.set('linkedin', new LinkedInOAuthProvider());
+    // Initialize providers with graceful error handling
+    
+    // Try to initialize Google OAuth provider
+    try {
+      this.providers.set('google', new GoogleOAuthProvider());
+      console.log('✅ Google OAuth provider initialized');
+    } catch (error) {
+      console.log('⚠️ Google OAuth provider not configured, skipping:', error.message);
+    }
+    
+    // Try to initialize LinkedIn OAuth provider
+    try {
+      this.providers.set('linkedin', new LinkedInOAuthProvider());
+      console.log('✅ LinkedIn OAuth provider initialized');
+    } catch (error) {
+      console.log('⚠️ LinkedIn OAuth provider not configured, skipping:', error.message);
+    }
     
     // Initialize account linking service
     this.accountLinkingService = new AccountLinkingService();

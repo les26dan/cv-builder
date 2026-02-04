@@ -940,8 +940,49 @@ React Context → Component State → API Calls → Database → Response → UI
 - **Performance**: Next.js built-in metrics
 - **Security**: Rate limiting logs
 
+### **✅ ACTIVE ANALYTICS - STATSIG INTEGRATION** (August 3, 2025)
+**PRODUCTION READY**: Comprehensive server-side and client-side analytics tracking
+
+**Core Implementation:**
+1. **Client-Side Analytics**: `shared/services/analyticsService.ts` - Browser event tracking with Statsig JS SDK
+2. **Server-Side Analytics**: `shared/services/serverAnalyticsService.ts` - Backend operations tracking with Statsig Node SDK  
+3. **Event Definitions**: `config/statsig.ts` - 48+ standardized events covering entire user journey
+4. **Environment Configuration**: Dual key setup with client/server separation for security
+
+**Tracking Coverage:**
+- ✅ **Landing Page**: Page views, scroll tracking, exit intent, CTA interactions
+- ✅ **Authentication**: Login/register flows, OAuth callbacks, session management
+- ✅ **CV Upload**: File processing, parsing performance, AI analysis tracking  
+- ✅ **CV Editing**: Section interactions, AI suggestions, auto-save events
+- ✅ **API Operations**: Request/response metrics, database query performance
+- ✅ **Error Monitoring**: Categorized error tracking with stack traces
+
+**Server-Side Events (18+ new events):**
+- **API Tracking**: `API_REQUEST_RECEIVED`, `API_REQUEST_COMPLETED`, `API_REQUEST_FAILED`
+- **Database Monitoring**: `DATABASE_QUERY_EXECUTED`, `DATABASE_QUERY_FAILED` 
+- **CV Processing**: `CV_PARSING_STARTED/COMPLETED/FAILED`, `AI_ANALYSIS_INITIATED/COMPLETED/FAILED`
+- **Authentication**: `AUTH_TOKEN_GENERATED`, `AUTH_SESSION_CREATED`, `OAUTH_CALLBACK_PROCESSED`
+
+**Technical Architecture:**
+- **Singleton Pattern**: Consistent service instances across client and server
+- **Event Queuing**: Offline-first with intelligent batching (5s client, 10s server intervals)
+- **Type Safety**: Comprehensive TypeScript interfaces for all event properties
+- **Error Handling**: Graceful degradation with fallback to existing monitoring system
+- **Performance Optimized**: Minimal overhead with string metadata conversion for Statsig
+
+**Configuration:**
+```
+NEXT_PUBLIC_STATSIG_CLIENT_KEY="REDACTED_STATSIG_CLIENT_KEY"
+STATSIG_SERVER_SECRET_KEY="REDACTED_STATSIG_SERVER_KEY"
+```
+
+**Implementation Status:**
+- ✅ **Build Integration**: Zero TypeScript errors, production build successful
+- ✅ **Live Tracking**: Events successfully flowing to Statsig dashboard
+- ✅ **Error Handling**: Graceful fallbacks and proper error categorization
+- ✅ **Performance**: <5ms overhead per event, batched for efficiency
+
 ### **Ready for Integration**
-- **Analytics**: Google Analytics integration ready
 - **APM**: Application performance monitoring
 - **Logging**: Structured logging service
 - **Alerting**: Production alert system

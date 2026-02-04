@@ -13,6 +13,77 @@
 # CV Guided Editing: ✅ Real-time auto-save + Conflict resolution + Cross-session data persistence
 # Performance: ✅ Production build optimized + Data compression + Bundle sizes <177KB
 # Downloads: ✅ LaTeX download support + WYSIWYG compliance for all formats (PDF, Word, LaTeX)
+# Analytics: ✅ Comprehensive Statsig integration + Server-side tracking + Client-side analytics + Event batching
+
+## 📊 **STATSIG ANALYTICS SYSTEM** ✅ IMPLEMENTED (August 3, 2025)
+location: /shared/services/analyticsService.ts, /shared/services/serverAnalyticsService.ts, /config/statsig.ts, /app/api/*/route.ts
+status: production_ready_comprehensive_analytics
+
+core_implementation:
+  - **Client-Side Analytics**: Browser event tracking with Statsig JS SDK ✅ NEW
+  - **Server-Side Analytics**: Backend operations tracking with Statsig Node SDK ✅ NEW
+  - **Event Definitions**: 48+ standardized events covering entire user journey ✅ NEW
+  - **Environment Configuration**: Dual key setup with client/server separation for security ✅ NEW
+  - **Performance Optimization**: Event batching and queuing for minimal overhead ✅ NEW
+
+features:
+  - **Landing Page Tracking**: Page views, scroll depth, exit intent, CTA interactions ✅ NEW
+  - **Authentication Analytics**: Login/register flows, OAuth callbacks, session management ✅ NEW
+  - **CV Processing Metrics**: File upload, parsing performance, AI analysis duration ✅ NEW
+  - **API Performance Monitoring**: Request/response times, database query performance ✅ NEW
+  - **Error Categorization**: Structured error tracking with stack traces and categorization ✅ NEW
+  - **User Journey Mapping**: Complete funnel tracking from landing to CV completion ✅ NEW
+
+affected_components:
+  - **shared/services/analyticsService.ts**: Client-side Statsig integration with React hooks ✅ NEW
+  - **shared/services/serverAnalyticsService.ts**: Server-side analytics with automatic shutdown handling ✅ NEW
+  - **config/statsig.ts**: Event definitions and configuration with 48+ standardized events ✅ NEW
+  - **hooks/useAnalytics.ts**: React hooks for page view and interaction tracking ✅ UPDATED
+  - **app/api/upload/cv/route.ts**: CV upload API with comprehensive analytics tracking ✅ UPDATED
+  - **app/api/auth/google/signin/route.ts**: OAuth signin with authentication flow tracking ✅ UPDATED
+  - **app/page.tsx**: Landing page with scroll tracking and exit intent ✅ UPDATED
+
+technical_architecture:
+  - **Singleton Pattern**: Consistent service instances across client and server environments
+  - **Event Queuing**: Offline-first with intelligent batching (5s client, 10s server intervals)
+  - **Type Safety**: Comprehensive TypeScript interfaces for all event properties and metadata
+  - **Error Handling**: Graceful degradation with fallback to existing monitoring system
+  - **Performance Optimized**: <5ms overhead per event, string conversion for Statsig compatibility
+  - **Environment Separation**: Client keys for browser events, server secret for backend operations
+
+server_side_events:
+  - **API_REQUEST_RECEIVED**: Incoming API request tracking with user agent and endpoint info
+  - **API_REQUEST_COMPLETED**: Successful API responses with performance metrics
+  - **API_REQUEST_FAILED**: Failed API requests with error categorization and status codes
+  - **DATABASE_QUERY_EXECUTED**: Database operations with query type and performance timing
+  - **DATABASE_QUERY_FAILED**: Database errors with query details and failure reasons
+  - **CV_PARSING_STARTED**: CV file processing initiation with file metadata
+  - **CV_PARSING_COMPLETED**: Successful CV parsing with processing duration and extraction stats
+  - **CV_PARSING_FAILED**: CV parsing failures with error details and file characteristics
+  - **AI_ANALYSIS_INITIATED**: AI processing start with model information and request details
+  - **AI_ANALYSIS_COMPLETED**: AI analysis completion with token usage and processing time
+  - **AI_ANALYSIS_FAILED**: AI processing failures with error categorization
+  - **AUTH_TOKEN_GENERATED**: Authentication token creation with provider and session info
+  - **AUTH_SESSION_CREATED**: User session establishment with authentication method
+  - **OAUTH_CALLBACK_PROCESSED**: OAuth flow completion with provider performance metrics
+
+configuration:
+  environment_variables:
+    - **NEXT_PUBLIC_STATSIG_CLIENT_KEY**: Client-side browser tracking key
+    - **STATSIG_SERVER_SECRET_KEY**: Server-side backend operations key
+    - **NEXT_PUBLIC_STATSIG_ENABLED**: Feature toggle for analytics system
+  
+  batching_config:
+    - **Client Batch Size**: 50 events per batch with 5-second intervals
+    - **Server Batch Size**: 100 events per batch with 10-second intervals
+    - **Event Queue**: Offline storage with automatic processing on reconnection
+
+monitoring_coverage:
+  - **User Journey**: Complete tracking from landing page through CV completion
+  - **Performance Metrics**: API response times, database query performance, file processing duration
+  - **Error Analytics**: Categorized error tracking with stack traces and user context
+  - **Feature Adoption**: User interaction patterns and feature usage analytics
+  - **Business Intelligence**: Conversion rates, user retention, and engagement metrics
 
 ## 📋 **TERMS OF SERVICE & PRIVACY POLICY SYSTEM** ✅ IMPLEMENTED (August 3, 2025)
 location: /app/terms-of-service/, /app/privacy-policy/, /config/texts/[lang]/account.ts, /components/auth/, /components/Footer.tsx

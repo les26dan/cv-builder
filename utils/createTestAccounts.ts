@@ -26,6 +26,11 @@ const TEST_ACCOUNTS: Omit<TestAccount, 'id' | 'created' | 'error' | 'loginUrl'>[
     fullName: 'Master Admin - Full Access'
   },
   {
+    email: 'okbuddy.test.user@gmail.com',
+    password: 'OkBuddy2025!',
+    fullName: 'OkBuddy Test User'
+  },
+  {
     email: 'user1@okbuddy.com',
     password: 'test123',
     fullName: 'Test User 1'
