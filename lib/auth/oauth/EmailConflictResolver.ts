@@ -19,9 +19,16 @@ export class EmailConflictResolver {
   private supabaseService;
 
   constructor() {
-    this.supabase = createClient(supabaseUrl, supabaseAnonKey);
-    // Service client for operations that need to bypass RLS (like user creation)
-    this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+    // Validate Supabase configuration
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn('⚠️ EmailConflictResolver: Supabase not configured - using mock mode');
+      this.supabase = null;
+      this.supabaseService = null;
+    } else {
+      this.supabase = createClient(supabaseUrl, supabaseAnonKey);
+      // Service client for operations that need to bypass RLS (like user creation)
+      this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+    }
   }
 
   /**

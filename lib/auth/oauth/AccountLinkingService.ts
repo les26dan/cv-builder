@@ -13,9 +13,17 @@ export class AccountLinkingService {
   private conflictResolver: EmailConflictResolver;
 
   constructor() {
-    this.supabase = createClient(supabaseUrl, supabaseAnonKey);
-    // Service client for operations that need to bypass RLS (like user creation)
-    this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+    // Validate Supabase configuration
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn('⚠️ Supabase not configured - OAuth will use mock mode');
+      // Create mock clients that won't be used
+      this.supabase = null;
+      this.supabaseService = null;
+    } else {
+      this.supabase = createClient(supabaseUrl, supabaseAnonKey);
+      // Service client for operations that need to bypass RLS (like user creation)
+      this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+    }
     this.conflictResolver = new EmailConflictResolver();
   }
 
@@ -24,6 +32,27 @@ export class AccountLinkingService {
    */
   public async resolveAccount(profile: OAuthUserProfile): Promise<AccountLinkingResult> {
     try {
+      // If Supabase is not configured, return mock user for development
+      if (!this.supabase) {
+        console.log('🔧 Using mock OAuth user for development:', profile.email);
+        
+        // Generate a mock user ID
+        const mockUserId = `mock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        return {
+          action: 'login',
+          user: {
+            id: mockUserId,
+            email: profile.email,
+            fullName: profile.name,
+            signupMethod: 'oauth',
+            linkedProviders: [profile.provider]
+          },
+          isNewAccount: false,
+          linkedProviders: [profile.provider]
+        };
+      }
+      
       // Check if user already exists with this email
       const { data: existingUser, error: findError } = await this.supabase
         .from('users')
