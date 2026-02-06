@@ -8,8 +8,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export class AccountLinkingService {
-  private supabase;
-  private supabaseService;
+  private supabase: any | null;
+  private supabaseService: any | null;
   private conflictResolver: EmailConflictResolver;
 
   constructor() {
@@ -25,6 +25,24 @@ export class AccountLinkingService {
       this.supabaseService = createClient(supabaseUrl, supabaseServiceKey);
     }
     this.conflictResolver = new EmailConflictResolver();
+  }
+
+  /**
+   * Ensure Supabase client is configured for operations
+   */
+  private ensureSupabaseConfigured(): void {
+    if (!this.supabase) {
+      throw new Error('Supabase client not configured for database operations');
+    }
+  }
+
+  /**
+   * Ensure Supabase service client is configured for privileged operations
+   */
+  private ensureSupabaseServiceConfigured(): void {
+    if (!this.supabaseService) {
+      throw new Error('Supabase service client not configured for privileged operations');
+    }
   }
 
   /**
@@ -54,7 +72,9 @@ export class AccountLinkingService {
       }
       
       // Check if user already exists with this email
-      const { data: existingUser, error: findError } = await this.supabase
+      this.ensureSupabaseConfigured();
+      
+      const { data: existingUser, error: findError } = await this.supabase!
         .from('users')
         .select('*')
         .eq('email', profile.email)
@@ -65,8 +85,8 @@ export class AccountLinkingService {
       }
 
       if (existingUser) {
-        // User exists - update their OAuth info and return login result
-        const { error: updateError } = await this.supabase
+        // User exists - update their OAuth info and return login result  
+        const { error: updateError } = await this.supabase!
           .from('users')
           .update({
             oauth_provider: profile.provider,
@@ -100,7 +120,9 @@ export class AccountLinkingService {
         };
       } else {
         // User doesn't exist - create new OAuth account using service client to bypass RLS
-        const { data: newUser, error: createError } = await this.supabaseService
+        this.ensureSupabaseServiceConfigured();
+        
+        const { data: newUser, error: createError } = await this.supabaseService!
           .from('users')
           .insert({
             email: profile.email,
@@ -215,8 +237,10 @@ export class AccountLinkingService {
    */
   public async linkProvider(userId: string, profile: OAuthUserProfile): Promise<AccountLinkingResult> {
     try {
+      this.ensureSupabaseConfigured();
+      
       // Get existing user
-      const { data: user, error: userError } = await this.supabase
+      const { data: user, error: userError } = await this.supabase!
         .from('users')
         .select('*')
         .eq('id', userId)
@@ -227,7 +251,7 @@ export class AccountLinkingService {
       }
 
       // Check if provider is already linked
-      const { data: existingProvider } = await this.supabase
+      const { data: existingProvider } = await this.supabase!
         .from('user_oauth_providers')
         .select('*')
         .eq('user_id', userId)
@@ -236,7 +260,7 @@ export class AccountLinkingService {
 
       if (existingProvider) {
         // Update existing provider data
-        await this.supabase
+        await this.supabase!
           .from('user_oauth_providers')
           .update({
             provider_user_id: profile.id,
@@ -287,11 +311,12 @@ export class AccountLinkingService {
    */
   public async unlinkProvider(userId: string, provider: string): Promise<void> {
     try {
+      this.ensureSupabaseConfigured();
       // Check if user has other authentication methods
       const linkedProviders = await this.getLinkedProviders(userId);
       
       // Get user to check if they have a password
-      const { data: user } = await this.supabase
+      const { data: user } = await this.supabase!
         .from('users')
         .select('password_hash')
         .eq('id', userId)
@@ -305,7 +330,7 @@ export class AccountLinkingService {
       }
 
       // Remove provider
-      const { error } = await this.supabase
+      const { error } = await this.supabase!
         .from('user_oauth_providers')
         .delete()
         .eq('user_id', userId)
@@ -334,7 +359,8 @@ export class AccountLinkingService {
    */
   public async getLinkedProviders(userId: string): Promise<string[]> {
     try {
-      const { data: providers, error } = await this.supabase
+      this.ensureSupabaseConfigured();
+      const { data: providers, error } = await this.supabase!
         .from('user_oauth_providers')
         .select('provider')
         .eq('user_id', userId);
@@ -343,7 +369,7 @@ export class AccountLinkingService {
         throw error;
       }
 
-      return providers?.map(p => p.provider) || [];
+      return providers?.map((p: any) => p.provider) || [];
     } catch (error) {
       console.error('Error getting linked providers:', error);
       return [];
@@ -354,7 +380,7 @@ export class AccountLinkingService {
    * Find account by email
    */
   private async findAccountByEmail(email: string): Promise<any> {
-    const { data: user, error } = await this.supabase
+          const { data: user, error } = await this.supabase!
       .from('users')
       .select('*')
       .eq('email', email)
@@ -371,6 +397,8 @@ export class AccountLinkingService {
    * Create new account from OAuth profile
    */
   private async createAccountFromOAuth(profile: OAuthUserProfile): Promise<any> {
+    this.ensureSupabaseServiceConfigured();
+    
     const userData = {
       email: profile.email,
       full_name: profile.name,
@@ -382,7 +410,7 @@ export class AccountLinkingService {
     };
 
     // Use service client to bypass RLS for user creation
-    const { data: user, error } = await this.supabaseService
+    const { data: user, error } = await this.supabaseService!
       .from('users')
       .insert(userData)
       .select()
@@ -422,14 +450,14 @@ export class AccountLinkingService {
 
     // Update user's profile picture if they don't have one
     if (profile.profilePicture) {
-      const { data: user } = await this.supabase
+      const { data: user } = await this.supabase!
         .from('users')
         .select('profile_picture_url')
         .eq('id', userId)
         .single();
 
       if (user && !user.profile_picture_url) {
-        await this.supabase
+        await this.supabase!
           .from('users')
           .update({
             profile_picture_url: profile.profilePicture,
@@ -445,12 +473,13 @@ export class AccountLinkingService {
    */
   public async updateUserProfile(userId: string, profile: OAuthUserProfile): Promise<void> {
     try {
+      this.ensureSupabaseConfigured();
       const updateData: any = {
         updated_at: new Date().toISOString()
       };
 
       // Only update if current value is empty
-      const { data: currentUser } = await this.supabase
+      const { data: currentUser } = await this.supabase!
         .from('users')
         .select('full_name, profile_picture_url')
         .eq('id', userId)
@@ -466,7 +495,7 @@ export class AccountLinkingService {
       }
 
       if (Object.keys(updateData).length > 1) { // More than just updated_at
-        const { error } = await this.supabase
+        const { error } = await this.supabase!
           .from('users')
           .update(updateData)
           .eq('id', userId);
@@ -486,7 +515,8 @@ export class AccountLinkingService {
    */
   public async checkEmailConflict(email: string, excludeUserId?: string): Promise<boolean> {
     try {
-      let query = this.supabase
+      this.ensureSupabaseConfigured();
+      let query = this.supabase!
         .from('users')
         .select('id')
         .eq('email', email);
@@ -513,7 +543,8 @@ export class AccountLinkingService {
    */
   public async getProviderData(userId: string, provider: string): Promise<any> {
     try {
-      const { data, error } = await this.supabase
+      this.ensureSupabaseConfigured();
+      const { data, error } = await this.supabase!
         .from('user_oauth_providers')
         .select('*')
         .eq('user_id', userId)

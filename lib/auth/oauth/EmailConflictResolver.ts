@@ -15,8 +15,8 @@ export interface ConflictResolutionResult {
 }
 
 export class EmailConflictResolver {
-  private supabase;
-  private supabaseService;
+  private supabase: any | null;
+  private supabaseService: any | null;
 
   constructor() {
     // Validate Supabase configuration

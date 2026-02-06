@@ -19,7 +19,7 @@ export class OAuthService {
       this.providers.set('google', new GoogleOAuthProvider());
       console.log('✅ Google OAuth provider initialized');
     } catch (error) {
-      console.log('⚠️ Google OAuth provider not configured, skipping:', error.message);
+      console.log('⚠️ Google OAuth provider not configured, skipping:', error instanceof Error ? error.message : String(error));
     }
     
     // Try to initialize LinkedIn OAuth provider
@@ -27,7 +27,7 @@ export class OAuthService {
       this.providers.set('linkedin', new LinkedInOAuthProvider());
       console.log('✅ LinkedIn OAuth provider initialized');
     } catch (error) {
-      console.log('⚠️ LinkedIn OAuth provider not configured, skipping:', error.message);
+      console.log('⚠️ LinkedIn OAuth provider not configured, skipping:', error instanceof Error ? error.message : String(error));
     }
     
     // Initialize account linking service
