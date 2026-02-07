@@ -7,6 +7,7 @@
    - CV Guided Editing
    - CV Workflow Integration
 - The focus of our initiative is to improve the CV parser & database.
+- Always assume that all changes are made on both local and production environment. Since you don't have access to .env.local, ask me whenever you have to gain access to production credentials.
 - Let me know once you have fully understood the context here. Do not proceed to make any change yet.
 
 **CV Parser**
