@@ -37,9 +37,10 @@ You need to get **real OAuth credentials** from Google and LinkedIn. Here's exac
 2. Click **"+ Create Credentials" > "OAuth 2.0 Client IDs"**
 3. **Application type**: `Web application`
 4. **Name**: `OkBuddy OAuth Client`
-5. **Authorized redirect URIs**: Add this EXACT URL:
+5. **Authorized redirect URIs**: Add these EXACT URLs:
    ```
    http://localhost:3000/api/auth/google/callback
+   https://okbuddy.io/api/auth/google/callback
    ```
 6. Click **"Create"**
 7. **COPY THE CLIENT ID AND CLIENT SECRET** - you'll need these!
@@ -66,6 +67,7 @@ You need to get **real OAuth credentials** from Google and LinkedIn. Here's exac
 2. **Add redirect URL**:
    ```
    http://localhost:3000/api/auth/linkedin/callback
+   https://okbuddy.io/api/auth/linkedin/callback
    ```
 3. **Request OAuth scopes**: 
    - `r_liteprofile`
