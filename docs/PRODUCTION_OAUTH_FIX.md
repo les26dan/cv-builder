@@ -1,8 +1,8 @@
-# LinkedIn OAuth Production Fix
+# LinkedIn OAuth Production Fix - WWW Subdomain Issue
 
 ## Issue Diagnosis
 **Error**: "The redirect_uri does not match the registered value"
-**Root Cause**: LinkedIn OAuth app configured with localhost URLs instead of production domain
+**Root Cause**: Production domain uses `www.okbuddy.io` but OAuth configuration used `okbuddy.io` (missing www subdomain)
 
 ## Fix Applied
 
@@ -21,14 +21,14 @@ You must update your LinkedIn Developer app at https://www.linkedin.com/develope
 
 **Add this redirect URL**:
 ```
-https://okbuddy.io/api/auth/linkedin/callback
+https://www.okbuddy.io/api/auth/linkedin/callback
 ```
 
 #### **CRITICAL**: Set Production Environment Variables
 In your Vercel deployment, set:
 ```
-LINKEDIN_REDIRECT_URI=https://okbuddy.io/api/auth/linkedin/callback
-GOOGLE_REDIRECT_URI=https://okbuddy.io/api/auth/google/callback
+LINKEDIN_REDIRECT_URI=https://www.okbuddy.io/api/auth/linkedin/callback
+GOOGLE_REDIRECT_URI=https://www.okbuddy.io/api/auth/google/callback
 ```
 
 ## Testing Instructions
@@ -38,10 +38,10 @@ GOOGLE_REDIRECT_URI=https://okbuddy.io/api/auth/google/callback
    - Navigate to "Auth" tab
    - Ensure both URLs are listed:
      - `http://localhost:3000/api/auth/linkedin/callback` (development)
-     - `https://okbuddy.io/api/auth/linkedin/callback` (production)
+     - `https://www.okbuddy.io/api/auth/linkedin/callback` (production)
 
 2. **Production Test**:
-   - Visit https://okbuddy.io/login
+   - Visit https://www.okbuddy.io/login
    - Click "Continue with LinkedIn"
    - Should redirect properly without redirect_uri error
 

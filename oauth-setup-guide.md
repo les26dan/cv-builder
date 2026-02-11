@@ -36,7 +36,7 @@
 5. **Authorized redirect URIs**:
    ```
    http://localhost:3000/api/auth/google/callback
-   https://okbuddy.io/api/auth/google/callback
+   https://www.okbuddy.io/api/auth/google/callback
    ```
 6. **Click Create**
 7. **Copy Client ID and Client Secret**
@@ -62,7 +62,7 @@
 2. **OAuth 2.0 redirect URLs**:
    ```
    http://localhost:3000/api/auth/linkedin/callback
-   https://okbuddy.io/api/auth/linkedin/callback
+   https://www.okbuddy.io/api/auth/linkedin/callback
    ```
 3. **OAuth 2.0 scopes**: Request these permissions:
    - `r_liteprofile` (Basic profile info)
