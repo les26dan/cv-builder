@@ -1,17 +1,33 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-
 // Mock data completely removed - using real database only
 
-// Create Supabase client if credentials are available
+// Lazy-loaded Supabase client for API routes
 let supabase: ReturnType<typeof createClient> | null = null
 
-if (supabaseUrl && supabaseAnonKey) {
+// Function to get or create Supabase client with environment variables loaded at runtime
+export function getSupabaseClient() {
+  if (supabase) {
+    return supabase
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('❌ Supabase environment variables not configured:', {
+      url: supabaseUrl ? 'SET' : 'MISSING',
+      key: supabaseAnonKey ? 'SET' : 'MISSING'
+    })
+    return null
+  }
+
+  console.log('🔧 Initializing Supabase client with runtime environment variables')
   supabase = createClient(supabaseUrl, supabaseAnonKey)
+  return supabase
 }
 
+// Export getter function and direct client for backward compatibility
 export { supabase }
 
 // CV Data Types
@@ -51,22 +67,16 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
     return []
   }
   
-  // Force create Supabase client if not already created
-  if (!supabase) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (url && key) {
-      supabase = createClient(url, key)
-      console.log('🔧 Supabase client force-initialized')
-    } else {
-      console.error('❌ Supabase credentials missing - trying localStorage fallback')
-      return await fetchUserCVsFromLocalStorage(userId)
-    }
+  // Use lazy-loaded Supabase client
+  const supabaseClient = getSupabaseClient()
+  if (!supabaseClient) {
+    console.error('❌ Supabase credentials missing - trying localStorage fallback')
+    return await fetchUserCVsFromLocalStorage(userId)
   }
 
   try {
     console.log('🔍 Fetching CVs from cv_workflow table for user:', userId)
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClientClient
       .from('cv_workflow')
       .select('*')
       .eq('user_id', userId)
@@ -205,13 +215,14 @@ export async function createNewCV(userId: string, title: string): Promise<CVData
     userId,
   }
 
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     console.error('❌ Supabase not configured - cannot create CV')
     return null
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('cvs')
       .insert([{
         id: newCV.id,
@@ -283,7 +294,8 @@ const mockDrafts: Map<string, CVDraft> = new Map()
 const mockAnalysis: Map<string, AnalysisResult> = new Map()
 
 export async function saveCVDraft(draftData: CVDraft): Promise<CVDraft> {
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     // Mock implementation
     const draftId = draftData.user_id
     const existingDraft = mockDrafts.get(draftId) || {}
@@ -299,7 +311,7 @@ export async function saveCVDraft(draftData: CVDraft): Promise<CVDraft> {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('cv_drafts')
       .upsert({
         ...draftData,
@@ -323,12 +335,13 @@ export async function saveCVDraft(draftData: CVDraft): Promise<CVDraft> {
 }
 
 export async function getDraftData(userId: string): Promise<CVDraft | null> {
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     return mockDrafts.get(userId) || null
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('cv_drafts')
       .select('*')
       .eq('user_id', userId)
@@ -377,7 +390,8 @@ export interface UserResult {
 const mockUsers = new Map<string, User>()
 
 export async function getUserByEmail(email: string): Promise<UserResult> {
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     // Mock implementation
     const user = Array.from(mockUsers.values()).find(u => u.email === email)
     if (!user) {
@@ -387,7 +401,7 @@ export async function getUserByEmail(email: string): Promise<UserResult> {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .select('*')
       .eq('email', email)
@@ -416,7 +430,8 @@ export async function createUser(userData: CreateUserData): Promise<UserResult> 
     return { success: false, error: 'User already exists' }
   }
 
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     // Mock implementation
     const userId = crypto.randomUUID()
     const newUser: User = {
@@ -437,7 +452,7 @@ export async function createUser(userData: CreateUserData): Promise<UserResult> 
       updated_at: new Date().toISOString()
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('users')
       .insert(newUser)
       .select()
@@ -456,7 +471,8 @@ export async function createUser(userData: CreateUserData): Promise<UserResult> 
 }
 
 export async function updateCVTitle(cvId: string, newTitle: string, userId: string): Promise<boolean> {
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     console.error('❌ Supabase not configured - cannot update CV title')
     return false
   }
@@ -488,7 +504,8 @@ export async function updateCVTitle(cvId: string, newTitle: string, userId: stri
 }
 
 export async function deleteCV(cvId: string): Promise<boolean> {
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     console.error('❌ Supabase not configured - cannot delete CV')
     return false
   }
@@ -513,13 +530,14 @@ export async function deleteCV(cvId: string): Promise<boolean> {
 
 // Validate CV ownership - critical security function
 export async function validateCVOwnership(cvId: string, userId: string): Promise<boolean> {
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     console.error('❌ Supabase not configured - cannot validate CV ownership')
     return false
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('cvs')
       .select('user_id')
       .eq('id', cvId)
@@ -546,13 +564,14 @@ export async function getCVWithOwnership(cvId: string, userId: string): Promise<
     return null
   }
 
-  if (!supabase) {
+      const supabaseClient = getSupabaseClient()
+    if (!supabaseClient) {
     console.error('❌ Supabase not configured - cannot fetch CV data')
     return null
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('cvs')
       .select('*')
       .eq('id', cvId)

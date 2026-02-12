@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import VercelBlobStorageService, { BlobUploadResult } from '@/lib/vercelBlobStorage';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { processFile } from '@/lib/fileProcessing';
 import { cvParserService, type CVParsingResponse } from '@/shared/services/cvParserService';
 
@@ -227,6 +227,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
     }
 
     // 6. Store CV record in Supabase database with enhanced metadata
+    const supabase = getSupabaseClient();
     if (supabase) {
       try {
         console.log('💾 Storing enhanced CV record in database...');

@@ -54,10 +54,6 @@ export async function GET(request: NextRequest) {
     // Handle OAuth callback
     const result = await OAuthService.handleCallback('google', code, state, sessionId, clientIp);
     
-    // Clear OAuth session cookie
-    const response = NextResponse.redirect(new URL('/login', request.url));
-    response.cookies.delete('oauth_session');
-    
     if (result.success && result.user) {
       // Check if this is an admin user and set role
       let userRole = 'user';
@@ -66,7 +62,26 @@ export async function GET(request: NextRequest) {
         console.log('🔑 Admin user detected via Google OAuth:', result.user.email);
       }
       
-      // Set user session (you may want to use a proper session management system)
+      // Determine redirect URL based on user role and account status
+      let redirectUrl;
+      if (userRole === 'admin') {
+        // Admin users go to CV Workspace
+        redirectUrl = new URL('/cv-workspace', request.url);
+      } else if (result.isNewAccount) {
+        // New users go to CV Upload page (unified app)
+        redirectUrl = new URL('/cv-upload', request.url);
+      } else {
+        // Existing users go to CV Workspace (unified app)
+        redirectUrl = new URL('/cv-workspace', request.url);
+      }
+      
+      // Create successful redirect response
+      const response = NextResponse.redirect(redirectUrl);
+      
+      // Clear OAuth session cookie
+      response.cookies.delete('oauth_session');
+      
+      // Set user session
       response.cookies.set('user_session', JSON.stringify({
         id: result.user.id,
         email: result.user.email,
@@ -80,23 +95,17 @@ export async function GET(request: NextRequest) {
         maxAge: 60 * 60 * 24 * 7 // 7 days
       });
       
-      // Redirect based on user role and account status
-      if (userRole === 'admin') {
-        // Admin users go to CV Workspace
-        return NextResponse.redirect(new URL('/cv-workspace', request.url));
-      } else if (result.isNewAccount) {
-        // New users go to CV Upload page (unified app)
-        return NextResponse.redirect(new URL('/cv-upload', request.url));
-      } else {
-        // Existing users go to CV Workspace (unified app)
-        return NextResponse.redirect(new URL('/cv-workspace', request.url));
-      }
+      return response;
     } else {
-      // OAuth failed
+      // OAuth failed - create failure redirect response
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('error', 'oauth_failed');
+      const response = NextResponse.redirect(loginUrl);
       
-      return NextResponse.redirect(loginUrl);
+      // Clear OAuth session cookie
+      response.cookies.delete('oauth_session');
+      
+      return response;
     }
     
   } catch (error) {
