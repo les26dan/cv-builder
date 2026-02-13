@@ -27,6 +27,48 @@ export function getSupabaseClient() {
   return supabase
 }
 
+// Function to get authenticated Supabase client for API routes
+export function getAuthenticatedSupabaseClient(accessToken?: string) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('❌ Supabase credentials missing')
+    return null
+  }
+
+  // Create a new client instance with user auth
+  const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: accessToken ? {
+        Authorization: `Bearer ${accessToken}`
+      } : {}
+    }
+  })
+
+  return authClient
+}
+
+// Function to get service role Supabase client for API operations that bypass RLS
+export function getServiceRoleSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error('❌ Supabase service role credentials missing')
+    return null
+  }
+
+  console.log('🔧 Initializing Supabase client with service role for API operations')
+  // Service role bypasses RLS policies
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
+
 // Export getter function and direct client for backward compatibility
 export { supabase }
 
@@ -76,7 +118,7 @@ export async function fetchUserCVs(userId: string): Promise<CVData[]> {
 
   try {
     console.log('🔍 Fetching CVs from cv_workflow table for user:', userId)
-    const { data, error } = await supabaseClientClient
+    const { data, error } = await supabaseClient
       .from('cv_workflow')
       .select('*')
       .eq('user_id', userId)
