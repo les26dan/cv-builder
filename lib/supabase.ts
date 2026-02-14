@@ -523,7 +523,7 @@ export async function updateCVTitle(cvId: string, newTitle: string, userId: stri
     console.log(`🔄 Updating CV title: ${cvId} → "${newTitle}"`)
     
     // Update in cv_workflow table (the active table)
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('cv_workflow')
       .update({ 
         title: newTitle,
@@ -553,7 +553,7 @@ export async function deleteCV(cvId: string): Promise<boolean> {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('cv_workflow')
       .delete()
       .eq('id', cvId)
