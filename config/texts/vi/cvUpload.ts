@@ -50,10 +50,28 @@ export const cvUpload = {
     loadingMessage: "CV của bạn đang được phân tích bởi AI tiên tiến nhất của OkBuddy",
     processingMessage: "Chúng tôi đang so sánh CV với mô tả công việc và tối ưu từng chi tiết"
   },
+  template: {
+    title: "Dùng mẫu có sẵn",
+    subtitle: "Bắt đầu với template chuyên nghiệp được tối ưu cho ATS",
+    description: "Bắt đầu với template chuyên nghiệp được tối ưu cho ATS",
+    startButton: "Bắt đầu",
+    icon: "📄",
+    atsCompliant: "✓ Chuẩn ATS",
+    preview: {
+      name: "John Doe",
+      email: "john@doe",
+      phone: "0123456789",
+      location: "United States",
+      summary: "Lorem Ipsum"
+    }
+  },
   freshGraduate: {
     title: "Sinh viên mới ra trường?",
     subtitle: "Tạo CV chuyên nghiệp từ đầu với hướng dẫn từng bước",
     createButton: "Tạo CV từ đầu",
     icon: "🎓"
+  },
+  divider: {
+    text: "Hoặc:"
   }
 } as const 

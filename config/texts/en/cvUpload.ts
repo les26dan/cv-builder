@@ -50,10 +50,28 @@ export const cvUpload = {
     loadingMessage: "Your resume is being analyzed by OkBuddy's most advanced AI",
     processingMessage: "We are comparing your resume with the job description and optimizing every detail"
   },
+  template: {
+    title: "Start from our template",
+    subtitle: "Use a professional template optimized for ATS systems",
+    description: "Begin with a professional template designed for ATS success",
+    startButton: "Get Started",
+    icon: "📄",
+    atsCompliant: "✓ ATS Compliant",
+    preview: {
+      name: "John Doe",
+      email: "john.doe@email.com",
+      phone: "0123456789",
+      location: "United States",
+      summary: "Lorem Ipsum"
+    }
+  },
   freshGraduate: {
     title: "Fresh graduate?",
     subtitle: "Create professional resume from scratch with step-by-step guidance",
     createButton: "Create resume from scratch",
     icon: "🎓"
+  },
+  divider: {
+    text: "Or:"
   }
 } as const 

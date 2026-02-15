@@ -88,6 +88,92 @@ export default function CVUploadPage() {
     }
   }
 
+  // Template CV functionality
+  const handleStartFromTemplate = async () => {
+    if (!texts || !texts.template) {
+      console.error('Template texts not loaded yet')
+      return
+    }
+
+    setIsUploading(true)
+    setUploadError('')
+
+    try {
+      console.log('🎯 Template CV: Starting template-based CV creation')
+      
+      // Generate a unique CV ID for the template
+      const templateCvId = `template-${new Date().getTime()}`
+      
+      // Create default template JSON in the same format as ChatGPT response
+      const templateJSON = {
+        "possibility_score": 10, // Maximum score for template
+        "contact": {
+          "full_name": "John Doe",
+          "email": "john@doe",
+          "phone": "0123456789",
+          "address": "United States",
+          "linkedin": ""
+        },
+        "work_experience": [],
+        "education": [],
+        "skills": [],
+        "summary": "Lorem Ipsum"
+      }
+      
+      console.log('🎯 Template CV: Generated template JSON:', JSON.stringify(templateJSON, null, 2))
+      
+      // Use the same conversion logic as the upload flow
+      const { cvParserService } = await import('../../shared/services/cvParserService')
+      const structuredCV = cvParserService.convertToGuidedEditingFormat(templateJSON)
+      
+      console.log('🎯 Template CV: Converted to structured format:', JSON.stringify(structuredCV, null, 2))
+      
+      // Create upload data object that mimics the upload flow
+      const uploadData = {
+        cvId: templateCvId,
+        file: {
+          name: 'Template_CV.pdf',
+          size: 0,
+          type: 'application/pdf'
+        },
+        extractedData: null,
+        llmParsedData: templateJSON,
+        structuredCV: structuredCV,
+        blobUrl: null,
+        timestamp: Date.now(),
+        processed: true,
+        validCV: true,
+        source: 'template' // Mark as template-generated
+      }
+      
+      // Store in localStorage exactly like the upload flow
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('cv_upload_data', JSON.stringify(uploadData))
+        localStorage.setItem(`cv_upload_${templateCvId}`, JSON.stringify(uploadData))
+        console.log('🎯 Template CV: Data stored in localStorage')
+      }
+
+      // Show success message briefly before navigation
+      setShowSuccessMessage(true)
+      
+      setTimeout(() => {
+        console.log('🎯 Template CV: Navigating to CV guided editing')
+        // Navigate to CV guided editing with template parameter
+        router.push(`/cv-guided-editing/${templateCvId}?source=template&parsed=success`)
+      }, 1500)
+      
+    } catch (error) {
+      console.error('🎯 Template CV: Creation failed:', error)
+      
+      const errorMessage = currentLanguage === 'en'
+        ? "Failed to create template CV. Please try again."
+        : "Không thể tạo CV mẫu. Vui lòng thử lại."
+      
+      setUploadError(errorMessage)
+      setIsUploading(false)
+    }
+  }
+
   const handleStartAnalysis = async () => {
     if (!uploadedFile) return
 
@@ -262,7 +348,61 @@ export default function CVUploadPage() {
             </p>
           </div>
 
-          {/* Primary Upload Area */}
+          {/* Template Section - Primary Option */}
+          {texts.template && (
+          <div className="bg-white border-2 border-green-400 rounded-xl p-8 text-center shadow-sm">
+            <div className="flex flex-col items-center space-y-6">
+              {/* Template Text */}
+              <div className="space-y-2">
+                <h2 className="text-xl font-semibold text-gray-900">{texts.template.title}</h2>
+                <p className="text-base text-gray-600">{texts.template.subtitle}</p>
+              </div>
+
+              {/* Template Preview */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 w-full max-w-sm">
+                <div className="space-y-2 text-left text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="font-medium">{texts.template.preview.name}</span>
+                  </div>
+                  <div className="text-gray-600 space-y-1 ml-4">
+                    <div>{texts.template.preview.email}</div>
+                    <div>{texts.template.preview.phone}</div>
+                    <div>{texts.template.preview.location}</div>
+                  </div>
+                  <div className="border-t pt-2 ml-4">
+                    <div className="text-gray-500 text-xs">{texts.template.preview.summary}</div>
+                  </div>
+                  <div className="flex items-center justify-center mt-3">
+                    <span className="text-xs text-green-600 font-medium">{texts.template.atsCompliant}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Template Button */}
+              <button
+                onClick={handleStartFromTemplate}
+                disabled={isUploading}
+                className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors ${
+                  isUploading 
+                    ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl'
+                }`}
+              >
+                <span>{texts.template.startButton}</span>
+              </button>
+            </div>
+          </div>
+          )}
+
+          {/* Divider */}
+          {texts.template && texts.divider && (
+          <div className="text-center">
+            <span className="text-gray-500 font-medium">{texts.divider.text}</span>
+          </div>
+          )}
+
+          {/* Upload Existing CV Section */}
           <div
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -293,6 +433,19 @@ export default function CVUploadPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center space-y-6">
+                {/* Upload Section Header */}
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {currentLanguage === 'en' ? 'Upload Existing Resume' : 'Tải CV hiện có'}
+                  </h3>
+                  <p className="text-base text-gray-600">
+                    {currentLanguage === 'en' 
+                      ? 'Analyze and improve your existing resume' 
+                      : 'Phân tích và cải thiện CV sẵn có'
+                    }
+                  </p>
+                </div>
+
                 {/* Upload Cloud Icon */}
                 <div className="w-16 h-16 text-primary">
                   <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
