@@ -1,7 +1,35 @@
 # Language Consistency Tasks for CV Guided Editing Page
 
-## Overview
-This document lists all hardcoded Vietnamese text found in the CV Guided Editing page that needs to be replaced with dynamic language configuration to ensure consistency with the global language setting.
+## 🎯 GOAL
+Fix language inconsistency on the CV Guided Editing page where hardcoded Vietnamese text appears regardless of the user's language configuration setting. The system should dynamically display text based on the global language config (English when config is English, Vietnamese when config is Vietnamese).
+
+## 📋 OVERVIEW
+This document lists all hardcoded Vietnamese text found in the CV Guided Editing page that needs to be replaced with dynamic language configuration to ensure consistency with the global language setting. The CV Guided Editing page currently contains over 100 instances of hardcoded Vietnamese text in critical user workflow components, particularly the Work Experience and AI Wizards.
+
+## 🚨 EXTREMELY CRITICAL IMPLEMENTATION REQUIREMENTS
+
+### ⚠️ **SAFETY FIRST - DO NOT BREAK WORKING LOGIC**
+```
+WHILE IMPLEMENTING THIS TASK, YOU MUST BE EXTREMELY CAREFUL:
+
+❌ DO NOT BREAK ANY WORKING EXISTING LOGIC OR COMPONENTS
+❌ DO NOT ATTEMPT TO FIX ANY IMPORT ERRORS  
+❌ DO NOT FIX ANY SYNTAX ERRORS
+❌ DO NOT INTRODUCE BACKWARD COMPATIBILITY ISSUES
+❌ DO NOT INTRODUCE REGRESSION ISSUES
+
+✅ ONLY REPLACE HARDCODED VIETNAMESE TEXT WITH DYNAMIC CONFIG
+✅ PRESERVE ALL EXISTING FUNCTIONALITY
+✅ MAINTAIN EXACT SAME USER EXPERIENCE
+✅ TEST EACH COMPONENT AFTER CHANGES
+```
+
+### 🔧 **IMPLEMENTATION APPROACH**
+1. **MINIMAL CHANGES ONLY**: Replace hardcoded Vietnamese strings with dynamic text loading
+2. **USE EXISTING PATTERNS**: Follow the established text configuration system in `/config/texts/`
+3. **PRESERVE FALLBACKS**: Ensure English fallback when Vietnamese text is unavailable
+4. **NO REFACTORING**: Do not change component structure, imports, or logic
+5. **INCREMENTAL TESTING**: Test each component individually after changes
 
 ## Critical Hardcoded Vietnamese Text Identified
 

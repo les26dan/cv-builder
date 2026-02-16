@@ -175,6 +175,46 @@ export function CVWorkflowProvider({
       dispatch({ type: 'SET_LOADING', payload: true })
       dispatch({ type: 'SET_ERROR', payload: null })
       
+      // For template CVs, skip database and load from localStorage directly
+      if (cvId.startsWith('template-')) {
+        console.log('🎯 CVWorkflowProvider: Template CV detected, loading from localStorage:', cvId)
+        
+        // Try to load template data from upload localStorage
+        const uploadData = localStorage.getItem('cv_upload_data') || localStorage.getItem(`cv_upload_${cvId}`)
+        
+        if (uploadData) {
+          const parsed = JSON.parse(uploadData)
+          console.log('🎯 CVWorkflowProvider: Found template upload data:', parsed)
+          
+          if (parsed.cvId === cvId && parsed.structuredCV) {
+            // Convert upload data format to workflow data format
+            const workflowData = {
+              id: cvId,
+              userId: userId,
+              cv_data: parsed.structuredCV,
+              metadata: {
+                version: 1,
+                createdAt: new Date(parsed.timestamp).toISOString(),
+                updatedAt: new Date(parsed.timestamp).toISOString(),
+                source: 'template'
+              }
+            }
+            
+            console.log('🎯 CVWorkflowProvider: Template CV loaded successfully from localStorage')
+            dispatch({ type: 'SET_CV_DATA', payload: workflowData })
+            lastSavedData.current = workflowData
+            dispatch({ type: 'SET_LAST_SAVED', payload: new Date().toISOString() })
+            dispatch({ type: 'SET_SYNC_STATUS', payload: 'offline' }) // Mark as offline since not in DB yet
+            return
+          }
+        }
+        
+        console.warn('🎯 CVWorkflowProvider: Template CV data not found in localStorage')
+        dispatch({ type: 'SET_ERROR', payload: 'Template CV data not found' })
+        return
+      }
+      
+      // For regular CVs, load from database
       const result = await dataService.loadDraft(userId, cvId)
       
       if (result.success && result.data) {

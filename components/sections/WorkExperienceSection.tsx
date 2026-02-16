@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { AIAssistButton } from '../common/AIAssistButton';
@@ -68,12 +68,7 @@ export const WorkExperienceSection = ({
     loadLanguage();
   }, [language]);
 
-  // Provide the add function to parent component
-  useEffect(() => {
-    if (onProvideAddFunction) {
-      onProvideAddFunction(handleAddExperience);
-    }
-  }, [onProvideAddFunction]);
+
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [wizardModal, setWizardModal] = useState<{isOpen: boolean, experienceIndex: number}>({
     isOpen: false,
@@ -135,6 +130,17 @@ export const WorkExperienceSection = ({
     // Open the new comprehensive wizard instead of creating empty entry
     setNewExperienceWizard(true);
   };
+
+  // Provide the add function to parent component
+  const addExperienceCallback = useCallback(() => {
+    handleAddExperience();
+  }, []);
+
+  useEffect(() => {
+    if (onProvideAddFunction) {
+      onProvideAddFunction(addExperienceCallback);
+    }
+  }, [onProvideAddFunction, addExperienceCallback]);
 
   const handleWizardSave = async (experienceData: any) => {
     // Store the experience data temporarily

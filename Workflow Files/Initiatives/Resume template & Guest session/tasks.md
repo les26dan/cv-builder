@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Current Status**: ✅ **PHASE 1 COMPLETED** - Template Section Implementation  
+**Current Status**: ✅ **PHASE 1 COMPLETED** - Template Section Implementation + Critical Bug Fixes  
 **Next Phase**: Guest Session Authentication Removal  
 **Strategic Goal**: Reduce user friction and accelerate time-to-value by offering template-based CV creation
 
@@ -195,22 +195,340 @@ Both paths converge at **CV Guided Editing** with identical data structure, ensu
 
 ## 🎯 **COMPLETION CHECKLIST**
 
-### **✅ Phase 1 Complete**
+### **✅ Phase 1 Complete - Template Implementation + Critical Fixes**
 - [x] Template section UI design and implementation
 - [x] Template JSON generation and conversion logic
 - [x] Language support (English + Vietnamese)
 - [x] Integration with existing upload flow
 - [x] Error handling and user feedback
+- [x] **CRITICAL FIX**: CVWorkflowContext template CV loading from localStorage
+- [x] **CRITICAL FIX**: React setState error in WorkExperienceSection
+- [x] **VERIFIED**: Template CV flow working end-to-end
 - [x] Comprehensive documentation
-
-### **🔄 Phase 2 Planning**
-- [ ] Guest session architecture design
-- [ ] Authentication removal strategy
-- [ ] Account creation from editing page
-- [ ] Database integration for guest → user conversion
 
 ---
 
-**Last Updated**: Current Session  
-**Implementation Status**: Phase 1 Complete - Ready for Testing  
-**Next Action**: Begin Phase 2 planning for guest session support
+## 🎯 **PHASE 2: GUEST SESSION IMPLEMENTATION**
+
+### **⚠️ EXTREME CAUTION REQUIRED**
+**Authentication is extensively implemented across all pages. Any changes must be surgical and backwards-compatible.**
+
+### **Strategic Objectives**
+1. **Reduce Onboarding Friction**: Allow immediate CV creation without account requirements
+2. **Accelerate Time-to-Value**: Users reach "aha moment" faster
+3. **Increase Conversion**: More users experience value before committing to registration
+4. **Maintain Data Integrity**: Seamless guest → authenticated user transition
+
+---
+
+## 📋 **GUEST SESSION - DETAILED REQUIREMENTS**
+
+### **🔄 Task 1: Landing Page CTA Redirection**
+**Goal**: Direct new users to CV Upload instead of registration
+
+**Current State**: All main CTAs → `/register` (auth required)
+**Target State**: Main CTAs → `/cv-upload` (guest accessible)
+
+**CTAs to Redirect**:
+- [x] **Hero Section Primary CTA**: "Get Started" / "Bắt đầu ngay"
+- [x] **Hero Section Secondary CTA**: "Try for Free" / "Dùng thử miễn phí"  
+- [x] **Problem Section CTA**: "Fix My Resume" / "Tối ưu CV của tôi"
+- [x] **Solution Section CTA**: "Start Optimizing" / "Bắt đầu tối ưu"
+- [x] **How It Works CTA**: "Get Started Now" / "Bắt đầu ngay"
+
+**CTAs to PRESERVE** (Keep → `/register`):
+- [ ] Account Creation buttons in header/navigation
+- [ ] Login buttons  
+- [ ] Footer secondary links
+- [ ] Feedback/support buttons
+
+**Implementation Tasks**:
+- [ ] **Audit Landing Page**: Map all current CTA destinations
+- [ ] **Update Hero Section**: Primary CTA → `/cv-upload`
+- [ ] **Update Problem Section**: CTA → `/cv-upload`
+- [ ] **Update Solution Section**: CTA → `/cv-upload`
+- [ ] **Update How It Works**: CTA → `/cv-upload`
+- [ ] **Preserve Auth CTAs**: Keep account/login buttons intact
+- [ ] **Language Support**: Ensure all redirected CTAs maintain language context
+- [ ] **Analytics Update**: Update tracking for new CTA flows
+
+---
+
+### **🔄 Task 2: Authentication Removal for Guest Flow**
+**Goal**: Allow unauthenticated access to CV Upload and CV Guided Editing
+
+**Critical Files to Modify**:
+1. **middleware.ts** - Route protection logic
+2. **app/cv-upload/page.tsx** - Remove auth checks
+3. **app/cv-guided-editing/[cvId]/page.tsx** - Guest session handling
+4. **shared/contexts/CVWorkflowContext.tsx** - Guest user support
+
+**Middleware Strategy**:
+```typescript
+// BEFORE: All routes protected
+const protectedRoutes = ['/cv-upload', '/cv-guided-editing', '/cv-workspace']
+
+// AFTER: Selective protection
+const protectedRoutes = ['/cv-workspace', '/admin'] // Remove cv-upload and cv-guided-editing
+const guestAllowedRoutes = ['/cv-upload', '/cv-guided-editing'] // Allow guest access
+```
+
+**Implementation Tasks**:
+- [ ] **Middleware Analysis**: Map current authentication logic
+- [ ] **Route Protection Audit**: Identify all auth-protected routes
+- [ ] **Guest Route Definition**: Create guest-accessible route list
+- [ ] **Backward Compatibility**: Ensure authenticated users still work
+- [ ] **Error Handling**: Graceful fallbacks for auth failures
+- [ ] **Security Review**: Prevent unauthorized data access
+
+---
+
+### **🔄 Task 3: Guest Session Data Persistence**
+**Goal**: Create temporary user sessions for guest CV creation
+
+**Guest Session Strategy**:
+```typescript
+// Guest User Structure
+interface GuestUser {
+  id: string;           // guest-[timestamp]-[random]
+  type: 'guest';
+  sessionId: string;    // Browser session identifier
+  createdAt: string;
+  expiresAt: string;    // 24 hours from creation
+  cvIds: string[];      // Associated CV IDs
+}
+
+// Guest CV Structure  
+interface GuestCV {
+  id: string;           // template-[timestamp] or upload-[timestamp]
+  guestUserId: string;  // Links to guest user
+  data: CVData;
+  source: 'template' | 'upload';
+  createdAt: string;
+  lastModified: string;
+}
+```
+
+**Database Strategy**:
+- **Option A**: Create `guest_sessions` and `guest_cvs` tables
+- **Option B**: Use existing `users` table with `type: 'guest'` flag
+- **Option C**: Pure localStorage with optional DB sync
+
+**Recommended Approach**: **Option B** - Extend existing tables
+```sql
+-- Add guest support to existing users table
+ALTER TABLE users ADD COLUMN user_type VARCHAR(20) DEFAULT 'registered';
+ALTER TABLE users ADD COLUMN session_expires_at TIMESTAMP;
+
+-- cv_workflow already supports any user_id
+-- No changes needed to cv_workflow table
+```
+
+**Implementation Tasks**:
+- [ ] **Database Schema Design**: Choose guest session strategy
+- [ ] **Guest User Service**: Create guest user management
+- [ ] **Session Management**: Handle guest session lifecycle
+- [ ] **Data Migration**: Guest → authenticated user conversion
+- [ ] **Cleanup Jobs**: Remove expired guest sessions
+- [ ] **Storage Optimization**: Efficient guest data storage
+
+---
+
+### **🔄 Task 4: Data Loss Prevention System**
+**Goal**: Warn guests about progress loss and encourage registration
+
+**Warning Triggers**:
+- [ ] **Page Unload**: Browser tab close/refresh
+- [ ] **Navigation Away**: Leaving CV editing pages
+- [ ] **Session Timeout**: 24-hour session expiry
+- [ ] **Significant Progress**: After 5+ minutes of editing
+
+**Warning Modal Design**:
+```typescript
+interface DataLossWarning {
+  trigger: 'unload' | 'navigate' | 'timeout' | 'progress';
+  message: {
+    en: "If you close this page without registering, you will lose all progress so far";
+    vi: "Nếu bạn đóng trang này mà không đăng ký, bạn sẽ mất toàn bộ tiến trình đã thực hiện";
+  };
+  actions: {
+    register: "Create Account" | "Tạo tài khoản";
+    continue: "Continue Editing" | "Tiếp tục chỉnh sửa";
+    leave: "Leave Anyway" | "Vẫn rời đi";
+  };
+}
+```
+
+**Implementation Tasks**:
+- [ ] **Warning Component**: Create data loss warning modal
+- [ ] **Trigger Detection**: Implement warning triggers
+- [ ] **Language Support**: Dynamic warning text
+- [ ] **Progress Tracking**: Monitor editing activity
+- [ ] **User Flow**: Register → data transfer → continue editing
+- [ ] **A/B Testing**: Optimize warning effectiveness
+
+---
+
+### **🔄 Task 5: Account Creation from CV Editing**
+**Goal**: Seamless guest → authenticated user conversion
+
+**Integration Points**:
+- [ ] **CV Editor Header**: "Save Progress" button
+- [ ] **Auto-save Failures**: Prompt registration on sync issues
+- [ ] **Feature Restrictions**: Advanced features require account
+- [ ] **Session Expiry**: Registration prompt before timeout
+
+**Registration Flow**:
+```
+Guest User Editing → Registration Modal → Create Account → Data Transfer → Continue Editing
+                                     ↓
+                              All guest CV data transferred to new user account
+```
+
+**Data Transfer Process**:
+1. **User Registration**: Create authenticated user account
+2. **Data Migration**: Transfer guest CV data to new user
+3. **Session Upgrade**: Convert guest session to authenticated session
+4. **Cleanup**: Remove guest user data
+5. **Seamless Continue**: Return to editing without interruption
+
+**Implementation Tasks**:
+- [ ] **Registration Modal**: In-page account creation
+- [ ] **Data Transfer Service**: Guest → user migration
+- [ ] **Session Upgrade**: Convert session type
+- [ ] **Progress Preservation**: Maintain editing state
+- [ ] **Error Handling**: Handle transfer failures
+- [ ] **User Feedback**: Success/error notifications
+
+---
+
+### **🔄 Task 6: Guest Session Security & Privacy**
+**Goal**: Secure guest data while maintaining accessibility
+
+**Security Measures**:
+- [ ] **Session Isolation**: Prevent cross-guest data access
+- [ ] **Data Encryption**: Encrypt guest CV data
+- [ ] **Rate Limiting**: Prevent guest session abuse
+- [ ] **IP Tracking**: Monitor for suspicious activity
+- [ ] **Data Retention**: Auto-delete expired sessions
+
+**Privacy Compliance**:
+- [ ] **Data Minimization**: Collect only necessary guest data
+- [ ] **Anonymization**: No PII in guest sessions unless provided
+- [ ] **Consent Management**: Clear privacy notices
+- [ ] **Right to Deletion**: Easy data removal
+- [ ] **GDPR Compliance**: European privacy regulations
+
+**Implementation Tasks**:
+- [ ] **Security Audit**: Review guest session vulnerabilities
+- [ ] **Encryption Service**: Implement data encryption
+- [ ] **Rate Limiting**: Add guest session limits
+- [ ] **Privacy Notices**: Update privacy policy
+- [ ] **Compliance Review**: Legal/GDPR requirements
+- [ ] **Monitoring**: Security incident detection
+
+---
+
+## 🔧 **TECHNICAL ARCHITECTURE - GUEST SESSIONS**
+
+### **Data Flow Architecture**
+```
+Landing Page CTAs → CV Upload (Guest Mode) → Template/Upload → CV Guided Editing (Guest)
+                                                                        ↓
+                                          Optional Registration → Data Transfer → Continue as User
+```
+
+### **System Components**
+```
+┌─────────────────┬──────────────────┬─────────────────┐
+│   Guest Mode    │   Shared Mode    │ Authenticated   │
+├─────────────────┼──────────────────┼─────────────────┤
+│ Landing Page    │ CV Upload        │ CV Workspace    │
+│ Guest Sessions  │ CV Guided Edit   │ Account Mgmt    │
+│ Data Warnings   │ Template System  │ Full Features   │
+│ Registration    │ Upload/Parse     │ Cloud Sync      │
+└─────────────────┴──────────────────┴─────────────────┘
+```
+
+### **User Journey Flows**
+```
+Flow 1 - Template Guest:
+Landing → CV Upload → Template → Guest CV Editing → [Optional] Register → User
+
+Flow 2 - Upload Guest:  
+Landing → CV Upload → Upload PDF → Guest CV Editing → [Optional] Register → User
+
+Flow 3 - Authenticated (Existing):
+Landing → Login → CV Workspace → Upload/Template → CV Editing → User
+```
+
+---
+
+## ⚠️ **IMPLEMENTATION RISKS & MITIGATION**
+
+### **High-Risk Areas**
+1. **Authentication System**: Breaking existing user flows
+2. **Database Integrity**: Guest data contaminating user data  
+3. **Security Vulnerabilities**: Unauthorized access to user data
+4. **Performance Impact**: Guest session overhead
+5. **Legal Compliance**: Privacy regulation violations
+
+### **Mitigation Strategies**
+- **Incremental Rollout**: Feature flags for gradual deployment
+- **Comprehensive Testing**: Auth flow regression testing
+- **Data Segregation**: Clear guest vs user data boundaries
+- **Monitoring**: Real-time security and performance monitoring
+- **Rollback Plan**: Quick revert to authenticated-only mode
+
+---
+
+## 📊 **SUCCESS METRICS - GUEST SESSIONS**
+
+### **Primary KPIs**
+- **Guest Adoption Rate**: % of new users using guest mode
+- **Guest → User Conversion**: % of guests creating accounts
+- **Time to Value**: Seconds from landing to first CV interaction
+- **Drop-off Reduction**: % decrease in immediate bounces
+
+### **Secondary KPIs**
+- **Feature Engagement**: Guest usage of CV editing features
+- **Session Duration**: Time spent in guest sessions
+- **Registration Triggers**: Which prompts drive registration
+- **Data Transfer Success**: % successful guest → user migrations
+
+---
+
+## 🎯 **PHASE 2 COMPLETION CHECKLIST**
+
+### **🔄 Planning & Architecture (Week 1)**
+- [ ] Complete technical architecture design
+- [ ] Security and privacy review
+- [ ] Database schema finalization
+- [ ] Development task breakdown
+
+### **🔄 Implementation (Week 2-3)**
+- [ ] Landing page CTA redirects
+- [ ] Authentication middleware updates
+- [ ] Guest session management system
+- [ ] Data loss prevention warnings
+- [ ] Account creation integration
+
+### **🔄 Testing & Validation (Week 4)**
+- [ ] Guest flow end-to-end testing
+- [ ] Authentication regression testing
+- [ ] Security penetration testing
+- [ ] Performance impact assessment
+- [ ] User acceptance testing
+
+### **🔄 Deployment & Monitoring (Week 5)**
+- [ ] Feature flag implementation
+- [ ] Gradual rollout strategy
+- [ ] Real-time monitoring setup
+- [ ] A/B testing framework
+- [ ] Success metrics tracking
+
+---
+
+**Last Updated**: Current Session - Critical Bug Fixes Completed  
+**Implementation Status**: Phase 1 Complete + Bugs Fixed - Ready for Phase 2  
+**Next Action**: Begin Guest Session planning and architecture design
