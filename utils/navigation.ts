@@ -12,6 +12,7 @@ const REGISTER_URL = '/register';
 /**
  * Handles primary CTA clicks - routes to CV Upload flow
  * According to Product Spec: "All main 'Get Started' CTAs will route to CV & JD Upload screen"
+ * GUEST SESSION UPDATE: Unauthenticated users now go directly to CV Upload for template/upload flow
  */
 export const handlePrimaryCTA = async (): Promise<void> => {
   try {
@@ -19,16 +20,19 @@ export const handlePrimaryCTA = async (): Promise<void> => {
     const isAuthenticated = await checkAuthStatus();
     
     if (!isAuthenticated) {
-      // For unauthenticated users, redirect to register page
-      window.location.href = REGISTER_URL;
+      // GUEST SESSION: For unauthenticated users, redirect to CV Upload (guest mode)
+      console.log('🎯 Guest Session: Redirecting unauthenticated user to CV Upload');
+      window.location.href = CV_UPLOAD_URL;
     } else {
       // For authenticated users, go to workspace to see existing CVs
+      console.log('🔧 Authenticated user: Redirecting to CV Workspace');
       window.location.href = CV_WORKSPACE_URL;
     }
   } catch (error) {
     console.error('Error handling primary CTA:', error);
-    // Fallback: route to register page
-    window.location.href = REGISTER_URL;
+    // GUEST SESSION FALLBACK: Route to CV Upload instead of register for better UX
+    console.log('🎯 Guest Session Fallback: Redirecting to CV Upload');
+    window.location.href = CV_UPLOAD_URL;
   }
 };
 
