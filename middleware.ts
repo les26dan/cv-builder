@@ -3,8 +3,13 @@ import { cookies } from 'next/headers'
 
 // Define protected routes that require authentication
 const protectedRoutes = [
-  '/cv-workspace',
-  '/cv-upload', 
+  '/cv-workspace'
+  // Note: cv-upload and cv-guided-editing moved to guest-allowed for guest sessions
+]
+
+// GUEST SESSIONS: Routes that allow guest access (no authentication required)
+const guestAllowedRoutes = [
+  '/cv-upload',
   '/cv-guided-editing'
 ]
 
@@ -119,11 +124,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
   
+  // Handle guest-allowed routes (no authentication required)
+  const isGuestAllowedRoute = guestAllowedRoutes.some(route => pathname.startsWith(route))
+  
+  if (isGuestAllowedRoute) {
+    // GUEST SESSIONS: Allow access without authentication
+    console.log(`🎯 Guest Session: Allowing guest access to ${pathname}`)
+    return NextResponse.next()
+  }
+  
   // Handle protected routes
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
   
   if (isProtectedRoute && !isAuthenticated) {
-    // Allow CV guided editing in development for testing
+    // Allow certain routes in development for testing
     const isDevelopment = process.env.NODE_ENV === 'development'
     const isDevAllowed = devAllowedRoutes.some(route => pathname.startsWith(route))
     
@@ -144,6 +158,13 @@ export async function middleware(request: NextRequest) {
     
     if (cvIdMatch) {
       const cvId = cvIdMatch[1]
+      
+      // GUEST SESSIONS: Skip ownership validation for template CVs (guest sessions)
+      if (cvId.startsWith('template-')) {
+        console.log(`🎯 Guest Session: Allowing template CV access: ${cvId}`)
+        return NextResponse.next()
+      }
+      
       const isOwner = await validateCVOwnership(cvId, userSession.id)
       
       if (!isOwner) {

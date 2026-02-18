@@ -85,13 +85,22 @@ export default function CVGuidedEditingPage() {
   const mobileDetection = useMobileDetection()
   const [userId, setUserId] = useState<string | null>(null)
 
-  // Get real authenticated user using the proper auth system
+  // Get authenticated user or handle guest sessions
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
         console.log('🔧 CV Guided Editing: Starting authentication check...')
         
-        // Use the same authentication system as other components
+        // GUEST SESSIONS: Check if this is a template CV (guest session)
+        if (cvId.startsWith('template-')) {
+          console.log('🎯 Guest Session: Template CV detected, setting guest user:', cvId)
+          // Generate a temporary guest user ID for this session
+          const guestUserId = `guest-${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}`
+          setUserId(guestUserId)
+          return
+        }
+        
+        // For non-template CVs, require authentication
         const { checkAuthentication: checkAuth } = await import('@/lib/auth')
         const authResult = await checkAuth()
         
