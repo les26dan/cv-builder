@@ -299,6 +299,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   // JD Optimization removed - using new LLM-based CV parser
 
   // Active section state for editor panel
+  // GUEST SESSIONS: Default to 'experience' for guest users to enable quick aha moment
   const [activeSection, setActiveSection] = useState<string | null>('contact');
 
   // Calculate CV score (enhanced with parsing quality if available)
@@ -314,6 +315,23 @@ export const CVEditor: React.FC<CVEditorProps> = ({
     const score = calculateCvScore(cvData);
     setCvScore(score);
   }, [cvData]);
+
+  // GUEST SESSIONS: Focus on Work Experience for guest users to enable quick aha moment
+  useEffect(() => {
+    if (cvId && cvId.startsWith('template-')) {
+      console.log('🎯 Guest Session: Setting focus to Work Experience section for aha moment');
+      setActiveSection('experience');
+      
+      // Scroll to experience section after a brief delay to ensure DOM is ready
+      setTimeout(() => {
+        const sectionElement = document.getElementById('section-experience');
+        if (sectionElement) {
+          console.log('🎯 Guest Session: Scrolling to Work Experience section');
+          sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 500); // 500ms delay to ensure CV Editor is fully rendered
+    }
+  }, [cvId, cvData]); // Run when cvId changes or when cvData is loaded
 
   // Sync with workflow context when cvData changes
   useEffect(() => {
