@@ -187,16 +187,40 @@ export function CVWorkflowProvider({
           console.log('🎯 CVWorkflowProvider: Found template upload data:', parsed)
           
           if (parsed.cvId === cvId && parsed.structuredCV) {
-            // Convert upload data format to workflow data format
-            const workflowData = {
+            // Convert upload data format to workflow data format with all required properties
+            const workflowData: WorkflowCVData = {
+              // Core identification
               id: cvId,
               userId: userId,
-              cv_data: parsed.structuredCV,
+              title: 'Template CV',
+              status: 'draft',
+              score: 0,
+              
+              // CV Data structure (spread the parsed data)
+              ...parsed.structuredCV,
+              
+              // Workflow tracking
+              workflow: {
+                currentStep: 'editing',
+                stepsCompleted: ['upload'],
+                lastActiveStep: 'editing',
+                timeSpent: 0
+              },
+              
+              // Metadata
               metadata: {
                 version: 1,
                 createdAt: new Date(parsed.timestamp).toISOString(),
                 updatedAt: new Date(parsed.timestamp).toISOString(),
                 source: 'template'
+              },
+              
+              // Settings with defaults
+              settings: {
+                autoSave: true,
+                aiAssistance: true,
+                template: 'default',
+                language: 'en'
               }
             }
             
