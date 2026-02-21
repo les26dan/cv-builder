@@ -1,5 +1,5 @@
 # Technical Debt Registry
-**Last Updated**: February 16, 2025 (Vercel Blob Integration & Production Environment Setup)
+**Last Updated**: February 3, 2025 (Guest Session Implementation & Testing Infrastructure)
 
 ## ✅ **PRODUCTION ENVIRONMENT SETUP COMPLETION** (February 16, 2025)
 
@@ -28,6 +28,37 @@
 - ✅ **ESLint Validation**: ZERO errors or warnings
 - ✅ **Core Functionality**: Server responding, endpoints accessible
 - ✅ **Bundle Optimization**: Largest page <181KB (excellent performance)
+
+## 📋 **TESTING INFRASTRUCTURE MODERNIZATION** (February 3, 2025)
+
+### **🔧 TESTING FRAMEWORK MIGRATION NEEDED**
+**Date Identified**: February 3, 2025  
+**Impact**: **Testing Infrastructure Improvement**  
+**Priority**: **P2 - Medium Priority**
+
+**Technical Debt Identified:**
+- ⚠️ **Test Framework Mismatch**: Test files use Vitest syntax but Jest is configured as test runner
+- ⚠️ **Test Configuration**: Need to migrate Vitest imports (`vi`) to Jest syntax (`jest`) 
+- ⚠️ **Module Import Issues**: ESM imports in test files causing Jest parse failures
+- ⚠️ **Supabase Test Mocking**: isows/_esm/native.js import statement conflicts in test environment
+
+**Current Workaround:**
+- ✅ **Production Build**: All functionality working correctly in production
+- ✅ **Manual Testing**: Core guest session flows validated manually  
+- ✅ **Error Handling**: Comprehensive fallbacks verified
+- ✅ **Build Validation**: TypeScript strict mode + ESLint clean
+
+**Migration Plan (Future Sprint):**
+1. **Framework Decision**: Choose Vitest OR Jest consistently across project
+2. **Import Updates**: Update all test files to use chosen framework syntax
+3. **Configuration**: Update jest.config.js or migrate to vite.config.ts
+4. **Mock Updates**: Fix Supabase and module mocking for chosen framework
+5. **Test Verification**: Ensure all existing tests pass with new configuration
+
+**Business Impact**: 
+- **No Production Impact**: All features working correctly
+- **Development Experience**: Automated testing needs framework alignment
+- **Quality Assurance**: Manual testing sufficient for current release cycle
 
 **Status**: ✅ **PRODUCTION READY** - All critical infrastructure credentials validated and integrated
 
