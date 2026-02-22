@@ -4,6 +4,9 @@ export const workspace = {
     autosave: {
       saving: 'Đang lưu...',
       saved: 'Đã lưu tự động',
+      error: 'Lỗi lưu',
+      offline: 'Chế độ ngoại tuyến',
+      guestWarning: 'Tiến trình của bạn chưa được lưu',
     },
     userAvatar: 'N', // Will be dynamically set based on user's first name
   },

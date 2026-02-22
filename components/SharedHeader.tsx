@@ -31,7 +31,7 @@ interface SharedHeaderProps {
   backButtonTitle?: string;
   // Auto-save status (for CV Editor)
   showAutoSave?: boolean;
-  autoSaveStatus?: 'saving' | 'saved' | 'error' | 'offline';
+  autoSaveStatus?: 'saving' | 'saved' | 'error' | 'offline' | 'guest';
   // CV Editor specific props
   cvScore?: number;
   cvData?: any;
@@ -207,7 +207,8 @@ export default function SharedHeader({
       saving: 'Saving...',
       saved: 'Auto-saved',
       error: 'Save error',
-      offline: 'Offline mode'
+      offline: 'Offline mode',
+      guestWarning: 'Your progress is not saved'
     };
     
     switch (autoSaveStatus) {
@@ -219,6 +220,8 @@ export default function SharedHeader({
         return `❌ ${autosaveTexts.error}`;
       case 'offline':
         return `📴 ${autosaveTexts.offline}`;
+      case 'guest':
+        return `! ${autosaveTexts.guestWarning}`;
       default:
         return `✓ ${autosaveTexts.saved}`;
     }
@@ -235,6 +238,8 @@ export default function SharedHeader({
         return 'bg-red-50 text-red-600 border-red-500/20';
       case 'offline':
         return 'bg-yellow-50 text-yellow-600 border-yellow-500/20';
+      case 'guest':
+        return 'bg-orange-50 text-orange-600 border-orange-500/20';
       default:
         return 'bg-green-50 text-green-600 border-green-500/20';
     }

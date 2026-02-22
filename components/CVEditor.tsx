@@ -398,6 +398,11 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Get auto-save status from CV workflow context
   const getAutoSaveStatus = () => {
+    // Check if this is a guest session (template CV)
+    if (cvId && cvId.startsWith('template-')) {
+      return 'guest';
+    }
+    
     if (state.isSaving) return 'saving';
     if (state.error) return 'error';
     if (state.syncStatus === 'offline') return 'offline';

@@ -4,6 +4,9 @@ export const workspace = {
     autosave: {
       saving: 'Saving...',
       saved: 'Auto-saved',
+      error: 'Save error',
+      offline: 'Offline mode',
+      guestWarning: 'Your progress is not saved',
     },
     userAvatar: 'U', // Will be dynamically set based on user's first name
   },
