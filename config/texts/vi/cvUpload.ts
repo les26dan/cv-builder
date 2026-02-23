@@ -1,7 +1,7 @@
 export const cvUpload = {
   header: {
-    title: "Tối ưu CV trong 5 phút",
-    subtitle: "OkBuddy sẽ phân tích và giúp bạn cải thiện CV, tăng cơ hội phỏng vấn",
+    title: "Tối ưu CV chỉ trong 5 phút",
+    subtitle: "Tăng cơ hội phỏng vấn nhanh chóng nhờ công cụ tối ưu CV thông minh từ OkBuddy.",
     exitButton: "Thoát",
     autoSaveStatus: "Đã lưu tự động",
     userAvatar: "N",
@@ -51,8 +51,8 @@ export const cvUpload = {
     processingMessage: "Chúng tôi đang so sánh CV với mô tả công việc và tối ưu từng chi tiết"
   },
   template: {
-    title: "Dùng mẫu có sẵn",
-    subtitle: "Bắt đầu với template chuyên nghiệp được tối ưu cho ATS",
+    title: "Bắt đầu nhanh chóng với mẫu CV",
+    subtitle: "",
     description: "Bắt đầu với template chuyên nghiệp được tối ưu cho ATS",
     startButton: "Bắt đầu",
     icon: "📄",

@@ -1,7 +1,7 @@
 export const cvUpload = {
   header: {
-    title: "Optimize Resume in 5 minutes",
-    subtitle: "OkBuddy will analyze and help you improve your resume, increasing interview chances",
+    title: "Create your winning resume in 3 minutes",
+    subtitle: "Boost your chances of landing interviews with OkBuddy AI",
     exitButton: "Exit",
     autoSaveStatus: "Auto-saved",
     userAvatar: "U",
@@ -51,8 +51,8 @@ export const cvUpload = {
     processingMessage: "We are comparing your resume with the job description and optimizing every detail"
   },
   template: {
-    title: "Start from our template",
-    subtitle: "Use a professional template optimized for ATS systems",
+    title: "Quick Start with our Template",
+    subtitle: "",
     description: "Begin with a professional template designed for ATS success",
     startButton: "Get Started",
     icon: "📄",
