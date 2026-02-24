@@ -16,8 +16,7 @@ const guestAllowedRoutes = [
 // Routes that can be accessed in development without authentication
 const devAllowedRoutes = [
   '/cv-guided-editing',
-  '/cv-workspace',
-  '/cv-uploaded-test'
+  '/cv-workspace'
 ]
 
 // Define admin routes
@@ -101,9 +100,29 @@ export async function middleware(request: NextRequest) {
       return response
     }
     
-    // Allow CV test routes to pass through without authentication (development tool)
+    // Handle CV uploaded test routes - require admin authentication
     if (pathname.startsWith('/cv-uploaded-test')) {
-      console.log(`🧪 Allowing test route access: ${pathname}`)
+      // Get user session first
+      const userSession = await getUserSession(request)
+      const isAuthenticated = !!userSession
+      
+      if (!isAuthenticated) {
+        // Redirect unauthenticated users to login
+        const loginUrl = new URL('/login', request.url)
+        loginUrl.searchParams.set('redirect', pathname)
+        return NextResponse.redirect(loginUrl)
+      }
+      
+      // Check if user has admin role
+      if (userSession.role !== 'admin') {
+        // Redirect non-admin users to workspace with error
+        const workspaceUrl = new URL('/cv-workspace', request.url)
+        workspaceUrl.searchParams.set('error', 'admin_access_required')
+        return NextResponse.redirect(workspaceUrl)
+      }
+      
+      // Allow admin access
+      console.log('✅ Admin access granted to CV test routes:', userSession.email)
       return NextResponse.next()
     }
   } catch (error) {
