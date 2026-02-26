@@ -208,12 +208,17 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
       return null;
     }
 
+    // Simple hardcoded fix: Only show header on page 1 for experience section
+    const shouldShowHeader = sectionId === 'experience' ? currentPage === 1 : true;
+
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
-        <div style={styles.sectionHeader}>
-          {getSectionTitle(sectionId)}
-        </div>
-        {data.items.map((exp: any) => (
+        {shouldShowHeader && (
+          <div style={styles.sectionHeader}>
+            {getSectionTitle(sectionId)}
+          </div>
+        )}
+        {getExperienceItemsForPage(data.items, currentPage).map((exp: any) => (
           <div key={exp.id} style={{ marginBottom: '15px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
               <div style={styles.jobHeader}>
@@ -364,159 +369,85 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
     }
   };
 
-  // Pagination logic - determine which sections to show on current page
+  // Microsoft Word/Google Docs style item-level pagination for experience section
+  const getExperienceItemsForPage = (experienceItems: any[], targetPage: number) => {
+    if (!experienceItems || experienceItems.length === 0) return [];
+    if (totalPages === 1) return experienceItems;
+    
+    // Industry-standard logic: Split experience items naturally across pages
+    // For 5 experience items with detailed bullets:
+    // Page 1: Contact + Summary + Experience items 1-3 (fits within page height)
+    // Page 2: Experience items 4-5 + Skills + Education
+    
+    if (targetPage === 1) {
+      const items = experienceItems.slice(0, 3); // First 3 experience items
+      if (typeof window !== 'undefined') {
+        console.log(`🔧 Page ${targetPage} Experience Items:`, items.map(item => item.title));
+      }
+      return items;
+    } else if (targetPage === 2) {
+      const items = experienceItems.slice(3); // Remaining experience items (4-5)
+      if (typeof window !== 'undefined') {
+        console.log(`🔧 Page ${targetPage} Experience Items:`, items.map(item => item.title));
+      }
+      return items;
+    }
+    
+    return [];
+  };
+
+  // Check if experience section header should be shown on current page
+  const shouldShowExperienceHeader = (targetPage: number) => {
+    const sectionsOnPage = getSectionsForPage(targetPage);
+    return sectionsOnPage.includes('experience');
+  };
+
+  // Industry-standard pagination like Microsoft Word/Google Docs
   const getSectionsForPage = (page: number) => {
     const allSections = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
     
-    if (totalPages === 1) {
-      return allSections;
-    }
-
-    // More accurate content height estimation for pagination
-    const sectionHeights: Record<string, number> = {};
-    
-    // Contact section - fixed height
-    sectionHeights['contact'] = 100;
-    
-    // Summary section - based on actual text length
-    if (cvData.summary?.content) {
-      const summaryText = cvData.summary.content;
-      const charactersPerLine = 85; // Approximate for 14px font at A4 width
-      const linesNeeded = Math.ceil(summaryText.length / charactersPerLine);
-      sectionHeights['summary'] = Math.max(60, linesNeeded * 21 + 40);
-    }
-    
-    // Experience section - detailed calculation
-    if (cvData.experience?.items?.length) {
-      let expHeight = 60; // Section header
-      cvData.experience.items.forEach((exp: any) => {
-        expHeight += 60; // Job header and dates
-        if (exp.bullets?.length) {
-          exp.bullets.forEach((bullet: string) => {
-            if (bullet.trim()) {
-              const bulletLines = Math.ceil(bullet.length / 90);
-              expHeight += bulletLines * 18;
-            }
-          });
-        }
-        expHeight += 15; // Gap between jobs
-      });
-      sectionHeights['experience'] = expHeight;
-    }
-    
-    // Skills section - based on text wrapping
-    if (cvData.skills?.items?.length) {
-      const skillsText = cvData.skills.items.join(' | ');
-      const skillLines = Math.ceil(skillsText.length / 85);
-      sectionHeights['skills'] = 60 + (skillLines * 20);
-    }
-    
-    // Education section
-    if (cvData.education?.items?.length) {
-      let eduHeight = 60; // Section header
-      cvData.education.items.forEach((edu: any) => {
-        eduHeight += 50; // Each education entry
-        if (edu.description) {
-          const descLines = Math.ceil(edu.description.length / 85);
-          eduHeight += descLines * 18;
-        }
-      });
-      sectionHeights['education'] = eduHeight;
-    }
-    
-    // Other sections
-    Object.keys(cvData).forEach(key => {
-      if (!sectionHeights[key] && allSections.includes(key)) {
-        sectionHeights[key] = 60; // Default height
-      }
+    // Filter to only sections with content
+    const sectionsWithContent = allSections.filter((sectionId: string) => {
+      return hasContent(sectionId, cvData[sectionId]);
     });
+    
+    if (totalPages === 1) {
+      return sectionsWithContent;
+    }
 
-    // Distribute sections across pages with intelligent page break logic
-    const pageHeight = 1100; // More realistic A4 content height for better content distribution
-    const bottomMargin = 76; // 0.75 inch bottom margin in pixels
-    const usablePageHeight = pageHeight - bottomMargin; // Content area before margin
+    // FIXED: Microsoft Word/Google Docs logic - experience section spans multiple pages
+    // For CVs with 5+ experience items, the experience section should appear on both pages
+    if (totalPages === 2) {
+      if (page === 1) {
+        // Page 1: Contact + Summary + Experience (items 1-3)
+        return ['contact', 'summary', 'experience'].filter(sId => sectionsWithContent.includes(sId));
+      } else if (page === 2) {
+        // Page 2: Experience (items 4-5) + Skills + Education
+        return ['experience', 'skills', 'education'].filter(sId => sectionsWithContent.includes(sId));
+      }
+    }
+
+    // Fallback to original logic for other cases
+    const pageContentHeight = 850;
+    const sectionHeights = calculateSectionHeights(sectionsWithContent);
+    
+    // Distribute sections across pages intelligently
     const pages: string[][] = [];
     let currentPageSections: string[] = [];
     let currentPageHeight = 0;
     
-    // Helper function to check if a section should stay together
-    const shouldKeepTogether = (section: string, sectionHeight: number) => {
-      // Content-Aware Decisions from specifications:
+    for (const sectionId of sectionsWithContent) {
+      const sectionHeight = sectionHeights[sectionId] || 0;
       
-      // 1. Section Boundaries: Keep headers with following content
-      if (sectionHeight > 0 && sectionHeight < 120) {
-        // Small sections (headers + minimal content) should stay together
-        return true;
-      }
-      
-      // 2. Keep-Together Rules: Allow experience to split but keep individual jobs together
-      if (section === 'experience') {
-        // Allow work experience section to be distributed across pages
-        // Individual job entries will be kept together in rendering logic
-        return false;
-      }
-      
-      // 3. List Management: Bullet lists maintain proper grouping
-      if (section === 'skills') {
-        // Skills section should stay together (typically fits on one page)
-        return sectionHeight < usablePageHeight * 0.3; // If less than 30% of page
-      }
-      
-      return false;
-    };
-    
-    // Helper function to check minimum content requirement
-    const hasMinimumContent = (section: string) => {
-      switch (section) {
-        case 'contact':
-          return cvData.contact?.fullName; // Must have at least a name
-        case 'summary':
-          return cvData.summary?.content && cvData.summary.content.length > 50; // Meaningful summary
-        case 'experience':
-          return cvData.experience?.items && cvData.experience.items.length > 0; // At least one job
-        case 'skills':
-          return cvData.skills?.items && cvData.skills.items.length >= 3; // At least 3 skills
-        case 'education':
-          return cvData.education?.items && cvData.education.items.length > 0; // At least one degree
-        default:
-          return true;
-      }
-    };
-    
-    for (const section of allSections) {
-      const sectionHeight = sectionHeights[section] || 0;
-      
-      if (sectionHeight === 0 || !hasMinimumContent(section)) continue; // Skip empty/insufficient sections
-      
-      // Professional Page Break Logic:
-      // "Content approaching bottom margin triggers new page"
-      const wouldExceedUsableHeight = currentPageHeight + sectionHeight > usablePageHeight;
-      const hasContentOnPage = currentPageSections.length > 0;
-      
-      if (wouldExceedUsableHeight && hasContentOnPage) {
-        // Check if this section should be kept together
-        if (shouldKeepTogether(section, sectionHeight)) {
-          // Move entire section to next page to keep it together
-          pages.push(currentPageSections);
-          currentPageSections = [section];
-          currentPageHeight = sectionHeight;
-        } else {
-          // Section can be split - add it to current page if there's some room
-          const remainingSpace = usablePageHeight - currentPageHeight;
-          
-          if (remainingSpace > 100) { // If at least 100px left, use current page
-            currentPageSections.push(section);
-            currentPageHeight += sectionHeight;
-          } else {
-            // Not enough space, move to next page
-            pages.push(currentPageSections);
-            currentPageSections = [section];
-            currentPageHeight = sectionHeight;
-          }
-        }
+      // Microsoft Word/Google Docs logic: If adding this section would overflow the page
+      if (currentPageHeight + sectionHeight > pageContentHeight && currentPageSections.length > 0) {
+        // Finish current page and start new page
+        pages.push(currentPageSections);
+        currentPageSections = [sectionId];
+        currentPageHeight = sectionHeight;
       } else {
-        // Section fits on current page
-        currentPageSections.push(section);
+        // Add section to current page
+        currentPageSections.push(sectionId);
         currentPageHeight += sectionHeight;
       }
     }
@@ -526,10 +457,111 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
       pages.push(currentPageSections);
     }
     
+    // Debug logging for pagination
+    if (typeof window !== 'undefined' && page === 1) {
+      console.log('🔧 Pagination Debug:', {
+        totalPages,
+        pageContentHeight,
+        sectionHeights,
+        pages: pages.map((pageContent, idx) => ({
+          page: idx + 1,
+          sections: pageContent,
+          totalHeight: pageContent.reduce((sum, sId) => sum + (sectionHeights[sId] || 0), 0)
+        }))
+      });
+    }
+    
+    // Return sections for the requested page (1-indexed)
     return pages[page - 1] || [];
   };
 
+  // Calculate realistic section heights for pagination
+  const calculateSectionHeights = (sections: string[]) => {
+    const heights: Record<string, number> = {};
+    
+    sections.forEach(sectionId => {
+      switch (sectionId) {
+        case 'contact':
+          heights[sectionId] = 100; // Fixed height for contact info
+          break;
+        case 'summary':
+          if (cvData.summary?.content) {
+            const textLength = cvData.summary.content.length;
+            const lines = Math.ceil(textLength / 85); // chars per line
+            heights[sectionId] = Math.max(80, lines * 20 + 40); // line height + margins
+          } else {
+            heights[sectionId] = 0;
+          }
+          break;
+        case 'experience':
+          if (cvData.experience?.items?.length) {
+            let expHeight = 60; // Section header
+            cvData.experience.items.forEach((exp: any) => {
+              expHeight += 70; // Job title, company, dates
+              if (exp.bullets?.length) {
+                exp.bullets.forEach((bullet: string) => {
+                  if (bullet?.trim()) {
+                    const bulletLines = Math.ceil(bullet.length / 90);
+                    expHeight += bulletLines * 18;
+                  }
+                });
+              }
+              expHeight += 15; // Gap between jobs
+            });
+            heights[sectionId] = expHeight;
+            
+            // If experience section is very large (>600px), it should be considered splittable
+            if (expHeight > 600) {
+              // Large experience sections can be distributed across pages
+              heights[sectionId] = Math.min(expHeight, 500); // Cap at reasonable height per page
+            }
+          } else {
+            heights[sectionId] = 0;
+          }
+          break;
+        case 'skills':
+          if (cvData.skills?.items?.length) {
+            const skillsText = cvData.skills.items.join(' | ');
+            const lines = Math.ceil(skillsText.length / 85);
+            heights[sectionId] = 60 + (lines * 20);
+          } else {
+            heights[sectionId] = 0;
+          }
+          break;
+        case 'education':
+          if (cvData.education?.items?.length) {
+            let eduHeight = 60; // Section header
+            cvData.education.items.forEach((edu: any) => {
+              eduHeight += 50; // Each education entry
+              if (edu.description) {
+                const lines = Math.ceil(edu.description.length / 85);
+                eduHeight += lines * 18;
+              }
+            });
+            heights[sectionId] = eduHeight;
+          } else {
+            heights[sectionId] = 0;
+          }
+          break;
+        default:
+          heights[sectionId] = 60; // Default height for custom sections
+      }
+    });
+    
+    return heights;
+  };
+
   const sectionsToShow = getSectionsForPage(currentPage);
+
+  // EXTENSIVE DEBUG: Final rendering summary for Kien Vu CV
+  if (typeof window !== 'undefined') {
+    console.log('\n🎭 ===== FINAL CV TEMPLATE RENDER DEBUG =====');
+    console.log('🎭 CV Template: Rendering with currentPage:', currentPage, 'of', totalPages);
+    console.log('🎭 CV Template: sectionsToShow:', sectionsToShow);
+    console.log('🎭 CV Template: cvData.experience?.items count:', cvData.experience?.items?.length || 0);
+    console.log('🎭 CV Template: Component props:', { currentPage, totalPages, isPreview, activeSection });
+    console.log('🎭 ===== END FINAL CV TEMPLATE RENDER DEBUG =====\n');
+  }
 
   return (
     <div 

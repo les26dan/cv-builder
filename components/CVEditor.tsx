@@ -317,9 +317,13 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   }, [cvData]);
 
   // GUEST SESSIONS: Focus on Work Experience for guest users to enable quick aha moment
+  // Use a ref to track if we've already set focus for this template to prevent multiple executions
+  const hasSetTemplateFocusRef = useRef<string | null>(null);
+  
   useEffect(() => {
-    if (cvId && cvId.startsWith('template-')) {
+    if (cvId && cvId.startsWith('template-') && hasSetTemplateFocusRef.current !== cvId) {
       console.log('🎯 Guest Session: Setting focus to Work Experience section for aha moment');
+      hasSetTemplateFocusRef.current = cvId; // Mark this cvId as processed
       setActiveSection('experience');
       
       // Scroll to experience section after a brief delay to ensure DOM is ready

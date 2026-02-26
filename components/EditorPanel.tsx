@@ -951,6 +951,7 @@ export const EditorPanel = ({
                     onApplySuggestion={handleApplySuggestionInternal}
                     onDismissSuggestion={handleDismissSuggestionInternal}
                     onAddItem={sectionId === 'experience' ? addWorkExperienceFunction || undefined : undefined}
+                    experienceCount={sectionId === 'experience' ? cvData.experience?.items?.length || 0 : undefined}
                   >
                     {renderSection(sectionId)}
                   </DraggableSection>

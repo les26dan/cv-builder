@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { XIcon, ArrowLeftIcon, ArrowRightIcon, CalendarIcon, BuildingIcon, UserIcon, MapPinIcon, SparklesIcon } from 'lucide-react';
 
 interface WorkExperienceWizardProps {
@@ -89,8 +90,6 @@ export const WorkExperienceWizard: React.FC<WorkExperienceWizardProps> = ({
       setIsComposing(false); // Reset composition state
     }
   }, [isOpen]);
-
-  if (!isOpen) return null;
 
   const handleNext = () => {
     if (validateCurrentStep()) {
@@ -306,12 +305,14 @@ export const WorkExperienceWizard: React.FC<WorkExperienceWizardProps> = ({
 
   const isAIStep = currentStep > BASIC_INFO_STEPS;
 
-  return (
-          <div 
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        data-testid="wizard-backdrop"
-        onClick={handleCancel}
-      >
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[99999]"
+      data-testid="wizard-backdrop"
+      onClick={handleCancel}
+    >
       <div 
         className="bg-white rounded-lg max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"
         role="dialog"
@@ -577,6 +578,7 @@ export const WorkExperienceWizard: React.FC<WorkExperienceWizardProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }; 

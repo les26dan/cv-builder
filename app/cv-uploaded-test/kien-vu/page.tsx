@@ -125,8 +125,12 @@ function CVUploadTestComponentkienvu() {
   const handleStartAnalysis = async () => {
     setIsAnalyzing(true);
     
+    console.log('\n\n🧪 ===== KIEN VU CV TEST FLOW START =====');
     console.log('🧪 TEST: Starting JSON population analysis with Kien Vu CV data');
     console.log('📁 Source: Kien Vu Sr. Product Manager (Jan 2025).pdf');
+    console.log('🧪 TEST: Total work experience items in testLLMData:', testLLMData.work_experience.length);
+    console.log('🧪 TEST: Work experience titles:', testLLMData.work_experience.map((exp, idx) => `${idx + 1}. ${exp.position}`));
+    console.log('🧪 ===== KIEN VU CV TEST FLOW START =====\n');
     
     try {
       // Create test file metadata
@@ -174,13 +178,18 @@ function CVUploadTestComponentkienvu() {
       
       // Wait a moment then navigate
       setTimeout(() => {
+        console.log('\n🧪 ===== NAVIGATION TO CV GUIDED EDITING =====');
         console.log('🧪 TEST: Navigating to CV guided editing');
+        console.log('📊 TEST: Expected experience items in guided editing:', structuredCV.experience?.items?.length || 0);
+        console.log('📊 TEST: Experience items:', structuredCV.experience?.items?.map((exp: any, idx: number) => `${idx + 1}. ${exp.title}`) || []);
         console.log('🎯 TEST: Expected contact population:');
         console.log('  - Full Name: "' + structuredCV.contact?.fullName + '"');
         console.log('  - Email: "' + structuredCV.contact?.email + '"');
         console.log('  - Phone: "' + structuredCV.contact?.phone + '"');
         console.log('  - Location: "' + structuredCV.contact?.location + '"');
         console.log('  - LinkedIn: "' + structuredCV.contact?.linkedin + '"');
+        console.log('🧪 TARGET URL: /cv-guided-editing/' + cvId + '?source=test&parsed=success');
+        console.log('🧪 ===== NAVIGATION TO CV GUIDED EDITING =====\n\n');
         
         router.push('/cv-guided-editing/' + cvId + '?source=test&parsed=success');
       }, 2000);

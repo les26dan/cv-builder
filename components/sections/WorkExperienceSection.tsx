@@ -68,6 +68,16 @@ export const WorkExperienceSection = ({
     loadLanguage();
   }, [language]);
 
+  // Prevent automatic wizard opening during initial load for template users
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoadComplete(true);
+      console.log('🎯 Guest Session: Initial load complete, allowing user interactions');
+    }, 3000); // 3 second grace period for template users
+    
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [wizardModal, setWizardModal] = useState<{isOpen: boolean, experienceIndex: number}>({
@@ -81,6 +91,7 @@ export const WorkExperienceSection = ({
   const [newExperienceWizard, setNewExperienceWizard] = useState(false);
   const [pendingExperience, setPendingExperience] = useState<any>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
 
   // Drag and drop sensors - improved responsiveness
   const sensors = useSensors(
@@ -127,20 +138,52 @@ export const WorkExperienceSection = ({
   };
 
   const handleAddExperience = () => {
+    // Prevent automatic wizard opening for template users during initial load
+    const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
+    
+    if (isTemplateUser && !isInitialLoadComplete) {
+      console.log('🎯 Guest Session: Preventing wizard popup during initial load for template user');
+      return;
+    }
+    
+    console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
     // Open the new comprehensive wizard instead of creating empty entry
     setNewExperienceWizard(true);
   };
 
   // Provide the add function to parent component
   const addExperienceCallback = useCallback(() => {
+    console.log('🔍 TRACE: addExperienceCallback called, stack:', new Error().stack);
     handleAddExperience();
-  }, []);
+  }, [cvData?.id, isInitialLoadComplete]);
 
   useEffect(() => {
+    // Only block auto-triggering for actual guest users, not all uploaded CVs
+    const isGuestUser = cvData?.id && (
+      cvData.id.startsWith('template-') || // Template users
+      !cvData.userId || // Users without proper authentication
+      cvData.userId.startsWith('guest-') // Explicit guest users
+    );
+    
+    // Only block during initial load to prevent auto-popup, but allow manual use after
+    const shouldBlockFunction = isGuestUser && !isInitialLoadComplete;
+    
     if (onProvideAddFunction) {
-      onProvideAddFunction(addExperienceCallback);
+      // Defer the state update to after the current render cycle to prevent React violation
+      setTimeout(() => {
+        if (!shouldBlockFunction) {
+          console.log('🔧 Providing add experience function to parent (user can manually add)');
+          onProvideAddFunction(addExperienceCallback);
+        } else {
+          console.log('🎯 Guest Session: Temporarily blocking add function during initial load');
+          // Provide a no-op function during initial load only
+          onProvideAddFunction(() => {
+            console.log('🎯 Guest Session: Add function blocked during initial load');
+          });
+        }
+      }, 0);
     }
-  }, [onProvideAddFunction, addExperienceCallback]);
+  }, [onProvideAddFunction, addExperienceCallback, cvData?.id, isInitialLoadComplete]);
 
   const handleWizardSave = async (experienceData: any) => {
     // Store the experience data temporarily

@@ -155,7 +155,14 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   // Recalculate pages when CV data changes
   useEffect(() => {
-    calculateTotalPages();
+    console.log('\n🔄 ===== CV PREVIEW DATA CHANGE DETECTION =====');
+    console.log('🔄 PreviewPanel: useEffect triggered for calculateTotalPages');
+    console.log('🔄 PreviewPanel: cvData.experience?.items length:', cvData.experience?.items?.length || 0);
+    console.log('🔄 PreviewPanel: cvData.experience?.items:', cvData.experience?.items?.map((exp: any, idx: number) => `${idx + 1}. ${exp.title}`));
+    console.log('🔄 PreviewPanel: Calling calculateTotalPages...');
+    const newTotalPages = calculateTotalPages();
+    console.log('🔄 PreviewPanel: calculateTotalPages returned:', newTotalPages);
+    console.log('🔄 ===== END CV PREVIEW DATA CHANGE DETECTION =====\n');
   }, [calculateTotalPages]);
 
   // Memoized download handler for performance
@@ -214,7 +221,15 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
+      console.log('\n📝 ===== CV PREVIEW PAGE NAVIGATION =====');
+      console.log('📝 PreviewPanel: goToPage called with page:', page);
+      console.log('📝 PreviewPanel: currentPage before:', currentPage);
+      console.log('📝 PreviewPanel: totalPages:', totalPages);
+      console.log('📝 PreviewPanel: Setting currentPage to:', page);
       setCurrentPage(page);
+      console.log('📝 ===== END CV PREVIEW PAGE NAVIGATION =====\n');
+    } else {
+      console.log('🚀 PreviewPanel: goToPage rejected - page', page, 'not in range 1-', totalPages);
     }
   };
 
