@@ -80,4 +80,5 @@ Thumbs.db
 ehthumbs.db
 
 # Webpack bundle analyzer
-.webpack-bundle-analyzer/ 
+.webpack-bundle-analyzer/ Projects/
+Workflow Files/
