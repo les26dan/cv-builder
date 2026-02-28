@@ -1,0 +1,262 @@
+
+> okbuddy-unified@0.2.0 dev
+> next dev
+
+ ⚠ Warning: Found multiple lockfiles. Selecting /Users/tomnguyen/package-lock.json.
+   Consider removing the lockfiles at:
+   * /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/package-lock.json
+
+   ▲ Next.js 15.4.5
+   - Local:        http://localhost:3000
+   - Network:      http://10.163.32.117:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ⨯ optimizeServerReact
+     · optimizePackageImports
+
+ ✓ Starting...
+ ✓ Ready in 1497ms
+ ✓ Compiled /middleware in 311ms (113 modules)
+ ○ Compiling / ...
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Setting up new context...
+Finding changed files: 7.623ms
+Reading changed files: 255.34ms
+Sorting candidates: 6.439ms
+Generate rules: 89.883ms
+Build stylesheet: 4.802ms
+Potential classes:  11775
+Active contexts:  1
+JIT TOTAL: 456.102ms
+
+
+ ✓ Compiled / in 3.2s (856 modules)
+ GET / 200 in 3528ms
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 3.735ms
+Reading changed files: 0.007ms
+Sorting candidates: 0.003ms
+Generate rules: 0.129ms
+Build stylesheet: 0.002ms
+Potential classes:  1
+Active contexts:  1
+JIT TOTAL: 30.862ms
+
+
+ ✓ Compiled in 234ms (352 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+ GET / 200 in 47ms
+ GET / 200 in 56ms
+ ✓ Compiled /favicon.ico in 315ms (860 modules)
+ GET /favicon.ico 200 in 202ms
+ GET /api/auth/me/ 401 in 405ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+ ✓ Compiled /login in 235ms (875 modules)
+ GET /login/ 200 in 447ms
+ GET /api/auth/me/ 401 in 19ms
+ GET /favicon.ico 200 in 23ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+ ✓ Compiled /api/login in 375ms (1001 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+✅ Login successful: {
+  userId: 'b5787d9c-6cf7-422e-bce9-66cd284ec036',
+  email: 'admin@example.com',
+  emailVerified: true,
+  timestamp: '2025-08-10T06:26:40.166Z',
+  userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+}
+🍪 Session cookie set for admin: admin@example.com
+ POST /api/login/ 200 in 2140ms
+ ○ Compiling /cv-workspace ...
+ ✓ Compiled /cv-workspace in 590ms (1157 modules)
+ GET /cv-workspace/ 200 in 757ms
+ GET /favicon.ico 200 in 10ms
+ GET /api/auth/me/ 200 in 17ms
+ GET /api/auth/me/ 200 in 12ms
+ GET /favicon.ico 200 in 8ms
+ GET /api/auth/me/ 200 in 11ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+🎯 Guest Session: Allowing guest access to /cv-upload/
+ ✓ Compiled /cv-upload in 244ms (1170 modules)
+ GET /cv-upload/ 200 in 282ms
+ GET /favicon.ico 200 in 10ms
+ GET /api/auth/me/ 200 in 15ms
+ GET /api/auth/me/ 200 in 5ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+🎯 Guest Session: Allowing guest access to /cv-guided-editing/template-1754807209489/
+ ○ Compiling /cv-guided-editing/[cvId] ...
+ ✓ Compiled /cv-guided-editing/[cvId] in 637ms (1325 modules)
+ GET /cv-guided-editing/template-1754807209489/?source=template&parsed=success 200 in 1077ms
+ GET /favicon.ico 200 in 15ms
+ GET /api/auth/me/ 200 in 17ms
+ GET /api/auth/me/ 200 in 11ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+✅ Admin access granted to CV test routes: admin@example.com
+ ✓ Compiled /cv-uploaded-test in 311ms (1332 modules)
+ GET /cv-uploaded-test/ 200 in 443ms
+ GET /favicon.ico 200 in 12ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+✅ Admin access granted to CV test routes: admin@example.com
+ ✓ Compiled /cv-uploaded-test/kien-vu in 220ms (1226 modules)
+ GET /cv-uploaded-test/kien-vu/ 200 in 264ms
+ GET /favicon.ico 200 in 7ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+🎯 Guest Session: Allowing guest access to /cv-guided-editing/8a02e160-06df-4162-9ba5-25754fa075df/
+ GET /cv-guided-editing/8a02e160-06df-4162-9ba5-25754fa075df/?source=test&parsed=success 200 in 37ms
+ GET /favicon.ico 200 in 6ms
+ GET /api/auth/me/ 200 in 13ms
+ GET /api/auth/me/ 200 in 6ms
+ GET /api/auth/me/ 200 in 6ms
+ GET /api/auth/me/ 200 in 5ms
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 4.373ms
+Reading changed files: 6.698ms
+Sorting candidates: 0.29ms
+Generate rules: 0.713ms
+Build stylesheet: 0.001ms
+Potential classes:  699
+Active contexts:  1
+JIT TOTAL: 40.579ms
+
+
+ ✓ Compiled in 355ms (1201 modules)
+🎯 Guest Session: Allowing guest access to /cv-guided-editing/template-1754807209489/
+🎯 Guest Session: Allowing guest access to /cv-guided-editing/8a02e160-06df-4162-9ba5-25754fa075df/
+ GET /cv-guided-editing/template-1754807209489/?source=template&parsed=success 200 in 112ms
+ GET /cv-guided-editing/8a02e160-06df-4162-9ba5-25754fa075df/?source=test&parsed=success 200 in 114ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 3.611ms
+Reading changed files: 15.421ms
+Sorting candidates: 0.233ms
+Generate rules: 0.588ms
+Build stylesheet: 0.001ms
+Potential classes:  699
+Active contexts:  1
+JIT TOTAL: 42.146ms
+
+
+ ✓ Compiled in 215ms (1201 modules)
+🎯 Guest Session: Allowing guest access to /cv-guided-editing/template-1754807209489/
+🎯 Guest Session: Allowing guest access to /cv-guided-editing/8a02e160-06df-4162-9ba5-25754fa075df/
+ GET /cv-guided-editing/template-1754807209489/?source=template&parsed=success 200 in 57ms
+ GET /cv-guided-editing/8a02e160-06df-4162-9ba5-25754fa075df/?source=test&parsed=success 200 in 65ms
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 8.334ms
+Reading changed files: 5.693ms
+Sorting candidates: 0.069ms
+Generate rules: 0.269ms
+Build stylesheet: 0.001ms
+Potential classes:  211
+Active contexts:  1
+JIT TOTAL: 45.455ms
+
+
+ ✓ Compiled in 163ms (511 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 3.718ms
+Reading changed files: 2.804ms
+Sorting candidates: 0.094ms
+Generate rules: 0.183ms
+Build stylesheet: 0.001ms
+Potential classes:  223
+Active contexts:  1
+JIT TOTAL: 33.656ms
+
+
+ ✓ Compiled in 109ms (511 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 3.777ms
+Reading changed files: 1.979ms
+Sorting candidates: 0.065ms
+Generate rules: 0.14ms
+Build stylesheet: 0.001ms
+Potential classes:  237
+Active contexts:  1
+JIT TOTAL: 30.097ms
+
+
+ ✓ Compiled in 117ms (511 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 3.72ms
+Reading changed files: 2.443ms
+Sorting candidates: 0.075ms
+Generate rules: 0.163ms
+Build stylesheet: 0.001ms
+Potential classes:  229
+Active contexts:  1
+JIT TOTAL: 32.326ms
+
+
+ ✓ Compiled in 108ms (511 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js
+
+
+Source path: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/app/globals.css
+Finding changed files: 3.382ms
+Reading changed files: 0.003ms
+Sorting candidates: 0.001ms
+Generate rules: 0.026ms
+Build stylesheet: 0.001ms
+Potential classes:  1
+Active contexts:  1
+JIT TOTAL: 28.746ms
+
+
+ ✓ Compiled in 113ms (511 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: Can't resolve '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy'
+<w> while resolving '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js' in /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy as file
+<w>  at resolve commonjs /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/next.config.compiled.js

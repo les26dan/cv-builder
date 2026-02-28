@@ -1,0 +1,91 @@
+# ====================
+# OKBUDDY PRODUCTION ENVIRONMENT CONFIGURATION
+# ====================
+# Copy this content to .env.local and fill in your actual Supabase credentials
+
+# ====================
+# SUPABASE DATABASE
+# ====================
+NEXT_PUBLIC_SUPABASE_URL="https://your-project-id.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+
+# ====================
+# VERCEL BLOB STORAGE
+# ====================
+BLOB_READ_WRITE_TOKEN="your-vercel-blob-token"
+
+# ====================
+# OAUTH PROVIDERS (Optional - can be set up later)
+# ====================
+# Google OAuth
+GOOGLE_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# LinkedIn OAuth  
+LINKEDIN_CLIENT_ID="your-linkedin-client-id"
+LINKEDIN_CLIENT_SECRET="your-linkedin-client-secret"
+
+# ====================
+# APPLICATION SECURITY
+# ====================
+# JWT Secret for session management (generate with: openssl rand -base64 32)
+JWT_SECRET="your-jwt-secret-key-here"
+
+# ====================
+# APPLICATION CONFIGURATION
+# ====================
+NODE_ENV="development"
+# Application URLs (unified on port 3000)
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_API_URL="http://localhost:3000/api"
+
+# OAuth Redirect URIs (development)
+GOOGLE_REDIRECT_URI="http://localhost:3000/api/auth/google/callback"
+LINKEDIN_REDIRECT_URI="http://localhost:3000/api/auth/linkedin/callback"
+
+# Production OAuth Redirect URIs (set these in production environment)
+# GOOGLE_REDIRECT_URI="https://www.okbuddy.io/api/auth/google/callback"
+# LINKEDIN_REDIRECT_URI="https://www.okbuddy.io/api/auth/linkedin/callback"
+
+# ====================
+# FILE UPLOAD CONFIGURATION
+# ====================
+MAX_FILE_SIZE="10485760"
+ALLOWED_FILE_TYPES="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword"
+
+# ====================
+# RATE LIMITING
+# ====================
+RATE_LIMIT_RPM="60"
+RATE_LIMIT_RPH="1000"
+
+# ====================
+# ANALYTICS & MONITORING
+# ====================
+# Statsig Analytics (for event tracking and A/B testing)
+NEXT_PUBLIC_STATSIG_CLIENT_KEY="client-rnhaWM3M72hWYPmqsNLxorolnBT7Q0HNosA2DhjbJYI"
+NEXT_PUBLIC_STATSIG_ENABLED="true"
+# Server-side Statsig secret key for backend event tracking
+STATSIG_SERVER_SECRET_KEY="secret-2hnK0vzittTOjnVj299vN0fldRcZkaYxekSwNoDm7JH"
+
+# Google Analytics (optional)
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID="G-XXXXXXXXXX"
+
+# Error Tracking (optional)
+SENTRY_DSN="your-sentry-dsn"
+
+# ====================
+# AI SERVICES
+# ====================
+# OpenAI API for CV parsing and AI features
+VITE_OPENAI_API_KEY="sk-proj-your-openai-api-key"
+VITE_OPENAI_MODEL="gpt-4o-mini"
+VITE_OPENAI_MAX_TOKENS="2048"
+VITE_OPENAI_TEMPERATURE="0.7"
+
+# ====================
+# DEVELOPMENT SETTINGS
+# ====================
+DEBUG="true"
+NEXT_TELEMETRY_DISABLED="1" 
