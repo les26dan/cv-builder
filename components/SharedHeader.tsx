@@ -3,8 +3,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { checkAuthentication } from '../lib/auth';
-import { UserDrawer } from './common/UserDrawer';
-import { FeedbackModal } from './common/FeedbackModal';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for performance optimization
+const UserDrawer = dynamic(() => import('./common/UserDrawer').then(mod => ({ default: mod.UserDrawer })), {
+  ssr: false,
+  loading: () => null
+});
+
+const FeedbackModal = dynamic(() => import('./common/FeedbackModal').then(mod => ({ default: mod.FeedbackModal })), {
+  ssr: false,
+  loading: () => null
+});
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 import { getTexts } from '../config/texts/index';
 
@@ -63,17 +73,35 @@ export default function SharedHeader({
   const [accountTexts, setAccountTexts] = useState<any>(null);
 
   useEffect(() => {
-    // Check authentication status on component mount
+    // Check authentication status on component mount with retry logic
+    let retryCount = 0;
+    const maxRetries = 2;
+
     const checkAuthStatus = async () => {
       try {
         const authResult = await checkAuthentication();
         if (authResult.isAuthenticated && authResult.user) {
           setUser(authResult.user);
+        } else if (authResult.error === 'Authentication check timed out' && retryCount < maxRetries) {
+          // Retry on timeout
+          retryCount++;
+          console.log(`Auth check timeout, retrying... (${retryCount}/${maxRetries})`);
+          setTimeout(checkAuthStatus, 1000); // Retry after 1 second
+          return; // Don't set loading to false yet
         }
       } catch (error) {
         console.error('Auth check failed:', error);
+        if (retryCount < maxRetries) {
+          retryCount++;
+          console.log(`Auth check error, retrying... (${retryCount}/${maxRetries})`);
+          setTimeout(checkAuthStatus, 1000);
+          return;
+        }
       } finally {
-        setIsLoading(false);
+        // Only set loading to false if we're not retrying
+        if (retryCount >= maxRetries || retryCount === 0) {
+          setIsLoading(false);
+        }
       }
     };
 

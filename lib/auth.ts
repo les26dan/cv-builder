@@ -27,35 +27,58 @@ export async function getServerSession(): Promise<UserSession | null> {
 }
 
 /**
- * Check authentication status on client side
+ * Check authentication status on client side with timeout handling
  * This reads from the cookies set by the server
  */
 export async function checkAuthentication(): Promise<AuthCheckResult> {
   try {
-    // Try to get user info from a secure API endpoint
-    const response = await fetch('/api/auth/me', {
-      method: 'GET',
-      credentials: 'include', // Include cookies
-    })
+    // Create AbortController for timeout handling
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
 
-    if (response.ok) {
-      const user = await response.json()
-      return {
-        isAuthenticated: true,
-        user: user
+    try {
+      // Try to get user info from a secure API endpoint with timeout
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include', // Include cookies
+        signal: controller.signal
+      })
+
+      clearTimeout(timeoutId)
+
+      if (response.ok) {
+        const user = await response.json()
+        return {
+          isAuthenticated: true,
+          user: user
+        }
+      } else if (response.status === 401) {
+        return {
+          isAuthenticated: false,
+          user: null,
+          error: 'Not authenticated'
+        }
+      } else {
+        return {
+          isAuthenticated: false,
+          user: null,
+          error: 'Authentication check failed'
+        }
       }
-    } else if (response.status === 401) {
-      return {
-        isAuthenticated: false,
-        user: null,
-        error: 'Not authenticated'
+    } catch (fetchError) {
+      clearTimeout(timeoutId)
+      
+      // Handle abort/timeout specifically
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        console.warn('Authentication check timed out')
+        return {
+          isAuthenticated: false,
+          user: null,
+          error: 'Authentication check timed out'
+        }
       }
-    } else {
-      return {
-        isAuthenticated: false,
-        user: null,
-        error: 'Authentication check failed'
-      }
+      
+      throw fetchError // Re-throw for outer catch
     }
   } catch (error) {
     console.error('Error checking authentication:', error)

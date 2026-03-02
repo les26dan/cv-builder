@@ -2,9 +2,23 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { AIAssistButton } from '../common/AIAssistButton';
-import { AIWizardModal } from '../common/AIWizardModal';
-import { TemplateSelectionModal } from '../common/TemplateSelectionModal';
-import { WorkExperienceWizard } from '../common/WorkExperienceWizard';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for performance optimization - these are heavy AI components
+const AIWizardModal = dynamic(() => import('../common/AIWizardModal').then(mod => ({ default: mod.AIWizardModal })), {
+  ssr: false,
+  loading: () => null
+});
+
+const TemplateSelectionModal = dynamic(() => import('../common/TemplateSelectionModal').then(mod => ({ default: mod.TemplateSelectionModal })), {
+  ssr: false,
+  loading: () => null
+});
+
+const WorkExperienceWizard = dynamic(() => import('../common/WorkExperienceWizard').then(mod => ({ default: mod.WorkExperienceWizard })), {
+  ssr: false,
+  loading: () => null
+});
 import { SortableWorkExperience } from '../common/SortableWorkExperience';
 import { PlusIcon, GripVerticalIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, FileTextIcon } from 'lucide-react';
 import { aiService, WizardBulletGenerationRequest } from '../../utils/aiService';

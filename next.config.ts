@@ -31,6 +31,28 @@ const nextConfig: NextConfig = {
           config: [__filename],
         },
       };
+
+      // Bundle optimization for better loading performance
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              maxSize: 250000, // 250kb max chunks
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              chunks: 'all',
+              enforce: true,
+            },
+          },
+        },
+      };
     }
 
     return config;
@@ -51,8 +73,9 @@ const nextConfig: NextConfig = {
 
   // Fix: Enhanced experimental features for navigation stability
   experimental: {
-    optimizePackageImports: ['lodash'],
+    optimizePackageImports: ['lodash', 'react-icons', '@headlessui/react'],
     optimizeServerReact: false,
+    webpackBuildWorker: true,
   },
 
   // Fix: Asset optimization to prevent 500 errors
