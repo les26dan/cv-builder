@@ -10,12 +10,22 @@ const AIWizardModal = dynamic(() => import('../common/AIWizardModal').then(mod =
   loading: () => null
 });
 
+const NewAIWizardModal = dynamic(() => import('../common/NewAIWizardModal').then(mod => ({ default: mod.NewAIWizardModal })), {
+  ssr: false,
+  loading: () => null
+});
+
 const TemplateSelectionModal = dynamic(() => import('../common/TemplateSelectionModal').then(mod => ({ default: mod.TemplateSelectionModal })), {
   ssr: false,
   loading: () => null
 });
 
 const WorkExperienceWizard = dynamic(() => import('../common/WorkExperienceWizard').then(mod => ({ default: mod.WorkExperienceWizard })), {
+  ssr: false,
+  loading: () => null
+});
+
+const NewWorkExperienceWizard = dynamic(() => import('../common/NewWorkExperienceWizard').then(mod => ({ default: mod.NewWorkExperienceWizard })), {
   ssr: false,
   loading: () => null
 });
@@ -106,6 +116,14 @@ export const WorkExperienceSection = ({
   const [pendingExperience, setPendingExperience] = useState<any>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
+  
+  // New wizard states
+  const [newWizardOpen, setNewWizardOpen] = useState(false);
+  const [newAIWizardOpen, setNewAIWizardOpen] = useState(false);
+  const [newAIWizardIndex, setNewAIWizardIndex] = useState(-1);
+  
+  // Feature flag for new wizards (can be controlled via environment or user preference)
+  const useNewWizards = true; // Set to true to use new simplified wizards
 
   // Drag and drop sensors - improved responsiveness
   const sensors = useSensors(
@@ -161,8 +179,14 @@ export const WorkExperienceSection = ({
     }
     
     console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
-    // Open the new comprehensive wizard instead of creating empty entry
-    setNewExperienceWizard(true);
+    
+    if (useNewWizards) {
+      // Open the new streamlined 2-step wizard
+      setNewWizardOpen(true);
+    } else {
+      // Open the old 5-step wizard
+      setNewExperienceWizard(true);
+    }
   };
 
   // Provide the add function to parent component
@@ -278,6 +302,132 @@ export const WorkExperienceSection = ({
     // Close wizard and clean up
     setNewExperienceWizard(false);
     setPendingExperience(null);
+  };
+
+  // Handler for new streamlined wizard
+  const handleNewWizardSave = async (experienceData: any) => {
+    // Process the data similar to handleWizardSave but for new wizard
+    setPendingExperience(experienceData);
+
+    if (experienceData.aiGenerated) {
+      setIsGenerating(true);
+      
+      try {
+        const request: WizardBulletGenerationRequest = {
+          jobTitle: experienceData.title,
+          company: experienceData.company,
+          project: experienceData.project || '',
+          impact: experienceData.impact || '',
+          responsibility: experienceData.responsibility || ''
+        };
+
+        const result = await aiService.generateBulletFromWizard(request);
+
+        if (result.success && result.data) {
+          const newExperience = {
+            ...experienceData,
+            bullets: [result.data]
+          };
+          
+          const updatedItems = [...data.items, newExperience];
+          
+          onUpdate({
+            ...data,
+            items: updatedItems
+          });
+        } else {
+          console.error('Failed to generate bullet:', result.error);
+          const newExperience = {
+            ...experienceData,
+            bullets: ['']
+          };
+          
+          const updatedItems = [...data.items, newExperience];
+          
+          onUpdate({
+            ...data,
+            items: updatedItems
+          });
+        }
+      } catch (error) {
+        console.error('Error generating bullet:', error);
+        const newExperience = {
+          ...experienceData,
+          bullets: ['']
+        };
+        
+        const updatedItems = [...data.items, newExperience];
+        
+        onUpdate({
+          ...data,
+          items: updatedItems
+        });
+      } finally {
+        setIsGenerating(false);
+      }
+    } else {
+      const updatedItems = [...data.items, experienceData];
+      
+      onUpdate({
+        ...data,
+        items: updatedItems
+      });
+    }
+
+    setNewWizardOpen(false);
+    setPendingExperience(null);
+  };
+
+  // Handler for new AI wizard (adding bullets to existing experience)
+  const handleNewAIWizardGenerate = async (wizardData: any) => {
+    if (newAIWizardIndex < 0) return;
+
+    setIsGenerating(true);
+
+    try {
+      const experience = data.items[newAIWizardIndex];
+      const request: WizardBulletGenerationRequest = {
+        jobTitle: experience.title,
+        company: experience.company,
+        project: wizardData.project || '',
+        impact: wizardData.impact || '',
+        responsibility: wizardData.responsibility || ''
+      };
+
+      const result = await aiService.generateBulletFromWizard(request);
+
+      if (result.success && result.data) {
+        const updatedItems = [...data.items];
+        updatedItems[newAIWizardIndex] = {
+          ...updatedItems[newAIWizardIndex],
+          bullets: [...updatedItems[newAIWizardIndex].bullets, result.data]
+        };
+
+        onUpdate({
+          ...data,
+          items: updatedItems
+        });
+      } else {
+        console.error('Failed to generate bullet:', result.error);
+        // Add empty bullet for user to fill
+        const updatedItems = [...data.items];
+        updatedItems[newAIWizardIndex] = {
+          ...updatedItems[newAIWizardIndex],
+          bullets: [...updatedItems[newAIWizardIndex].bullets, '']
+        };
+
+        onUpdate({
+          ...data,
+          items: updatedItems
+        });
+      }
+    } catch (error) {
+      console.error('Error generating bullet:', error);
+    } finally {
+      setIsGenerating(false);
+      setNewAIWizardOpen(false);
+      setNewAIWizardIndex(-1);
+    }
   };
 
   
@@ -427,7 +577,14 @@ export const WorkExperienceSection = ({
       return;
     }
 
-    setWizardModal({ isOpen: true, experienceIndex });
+    if (useNewWizards) {
+      // Open the new streamlined 1-step AI wizard
+      setNewAIWizardIndex(experienceIndex);
+      setNewAIWizardOpen(true);
+    } else {
+      // Open the old 3-step AI wizard
+      setWizardModal({ isOpen: true, experienceIndex });
+    }
   };
 
   const handleOpenTemplates = (experienceIndex: number) => {
@@ -1019,6 +1176,32 @@ export const WorkExperienceSection = ({
         onSave={handleWizardSave}
         isGenerating={isGenerating}
       />
+
+      {/* New Streamlined Wizards */}
+      {useNewWizards && (
+        <>
+          {/* New 2-Step Work Experience Wizard */}
+          <NewWorkExperienceWizard
+            isOpen={newWizardOpen}
+            onClose={() => setNewWizardOpen(false)}
+            onSave={handleNewWizardSave}
+            isGenerating={isGenerating}
+          />
+
+          {/* New 1-Step AI Wizard for adding bullets */}
+          <NewAIWizardModal
+            isOpen={newAIWizardOpen}
+            onClose={() => {
+              setNewAIWizardOpen(false);
+              setNewAIWizardIndex(-1);
+            }}
+            onGenerate={handleNewAIWizardGenerate}
+            jobTitle={newAIWizardIndex >= 0 ? data.items[newAIWizardIndex]?.title || '' : ''}
+            company={newAIWizardIndex >= 0 ? data.items[newAIWizardIndex]?.company || '' : ''}
+            isGenerating={isGenerating}
+          />
+        </>
+      )}
     </div>
   );
 };

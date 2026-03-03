@@ -3,6 +3,55 @@ export const workExperienceWizardTexts = {
   modalTitle: 'Thêm kinh nghiệm làm việc',
   aiModalTitle: 'Tạo mô tả công việc AI',
   
+  // New simplified wizard texts
+  newWizard: {
+    modalTitle: 'Thêm kinh nghiệm làm việc',
+    subtitles: {
+      basicInfo: 'Thông tin cơ bản',
+      optionalDetails: 'Thông tin chi tiết (tùy chọn)'
+    },
+    steps: {
+      basicInfo: {
+        title: 'Nhập thông tin cơ bản',
+        description: 'AI sẽ tự động tạo mô tả công việc chuyên nghiệp từ thông tin này.'
+      },
+      optionalDetails: {
+        title: 'Thêm chi tiết (tùy chọn)',
+        description: 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'
+      }
+    },
+    aiPreview: {
+      title: 'AI sẽ tạo ra nội dung như thế này:',
+      subtitle: 'Dựa trên vị trí và công ty bạn nhập',
+      generatedBy: 'Được tạo bởi AI'
+    },
+    jobTitleSuggestions: ['Software Engineer', 'Marketing Manager', 'Sales Executive'],
+    tips: {
+      shortInput: 'Mẹo: Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!',
+      wordCount: '3-5 từ là đủ'
+    },
+    fields: {
+      jobTitle: {
+        label: 'Chức danh công việc của bạn là gì?',
+        placeholder: 'Ví dụ: Software Engineer, Marketing Manager...',
+        helper: 'Nhập chính xác chức danh để AI có thể tạo mô tả phù hợp nhất.'
+      },
+      company: {
+        label: 'Tên công ty hoặc tổ chức?',
+        placeholder: 'Ví dụ: Google, Vingroup, FPT Software'
+      },
+      project: {
+        label: 'Dự án hoặc trách nhiệm chính',
+        placeholder: 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'
+      },
+      impact: {
+        label: 'Kết quả hoặc tác động',
+        placeholder: 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...',
+        badge: '+ Điểm mạnh'
+      }
+    }
+  },
+  
   // Step titles
   stepTitles: {
     jobTitle: 'Chức danh công việc',
