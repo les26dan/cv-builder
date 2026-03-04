@@ -166,7 +166,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   }, [calculateTotalPages]);
 
   // Memoized download handler for performance
-  const handleDownload = useCallback(async (format: 'pdf' | 'docx') => {
+  const handleDownload = useCallback(async (format: 'pdf' | 'docx' | 'latex') => {
     console.log('💾 Download requested for format:', format);
     
     try {
@@ -300,6 +300,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
                   className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-t border-gray-100"
                 >
                   <span>Word (.docx)</span>
+                </button>
+                <button
+                  onClick={() => handleDownload('latex')}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-2 border-t border-gray-100"
+                >
+                  <span>LaTeX (.tex)</span>
                 </button>
               </div>
             )}

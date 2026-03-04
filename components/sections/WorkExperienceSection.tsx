@@ -102,8 +102,48 @@ export const WorkExperienceSection = ({
     return () => clearTimeout(timer);
   }, []);
 
+  // Detect if this is a parsed CV to control expansion behavior
+  useEffect(() => {
+    const checkIfParsedCV = () => {
+      try {
+        // Check localStorage for CV upload data
+        const uploadData = localStorage.getItem('cv_upload_data');
+        if (uploadData) {
+          const parsed = JSON.parse(uploadData);
+          if (parsed.processed && parsed.validCV && parsed.llmParsedData) {
+            console.log('🔍 Detected parsed CV from upload - keeping experiences collapsed by default');
+            setIsParsedCV(true);
+            return;
+          }
+        }
+
+        // Check URL parameters for source indicators
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search);
+          const source = urlParams.get('source');
+          const parsed = urlParams.get('parsed');
+          
+          if (source === 'upload' && parsed === 'success') {
+            console.log('🔍 Detected parsed CV from URL params - keeping experiences collapsed by default');
+            setIsParsedCV(true);
+            return;
+          }
+        }
+        
+        // Default to manual creation mode (expand new items)
+        setIsParsedCV(false);
+      } catch (error) {
+        console.error('Error checking CV source:', error);
+        setIsParsedCV(false);
+      }
+    };
+
+    checkIfParsedCV();
+  }, []);
+
 
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [isParsedCV, setIsParsedCV] = useState<boolean>(false);
   const [wizardModal, setWizardModal] = useState<{isOpen: boolean, experienceIndex: number}>({
     isOpen: false,
     experienceIndex: -1
@@ -335,6 +375,14 @@ export const WorkExperienceSection = ({
             ...data,
             items: updatedItems
           });
+
+          // Auto-expand the newly created experience (manual creation only, not parsed CV)
+          if (!isParsedCV) {
+            setExpandedItems(prev => ({
+              ...prev,
+              [newExperience.id]: true
+            }));
+          }
         } else {
           console.error('Failed to generate bullet:', result.error);
           const newExperience = {
@@ -348,6 +396,14 @@ export const WorkExperienceSection = ({
             ...data,
             items: updatedItems
           });
+
+          // Auto-expand the newly created experience (manual creation only, not parsed CV)
+          if (!isParsedCV) {
+            setExpandedItems(prev => ({
+              ...prev,
+              [newExperience.id]: true
+            }));
+          }
         }
       } catch (error) {
         console.error('Error generating bullet:', error);
@@ -362,6 +418,12 @@ export const WorkExperienceSection = ({
           ...data,
           items: updatedItems
         });
+
+        // Auto-expand the newly created experience (manual creation only)
+        setExpandedItems(prev => ({
+          ...prev,
+          [newExperience.id]: true
+        }));
       } finally {
         setIsGenerating(false);
       }
@@ -372,6 +434,14 @@ export const WorkExperienceSection = ({
         ...data,
         items: updatedItems
       });
+
+      // Auto-expand the newly created experience (manual creation only, not parsed CV)
+      if (!isParsedCV) {
+        setExpandedItems(prev => ({
+          ...prev,
+          [experienceData.id]: true
+        }));
+      }
     }
 
     setNewWizardOpen(false);

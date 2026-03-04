@@ -6,13 +6,17 @@ interface WizardStepProps {
   description: string;
   children: ReactNode;
   showAIBadge?: boolean;
+  aiBadgeTitle?: string;
+  aiBadgeDescription?: string;
 }
 
 export const WizardStep: React.FC<WizardStepProps> = ({
   title,
   description,
   children,
-  showAIBadge = false
+  showAIBadge = false,
+  aiBadgeTitle = '',
+  aiBadgeDescription = ''
 }) => {
   return (
     <div className="space-y-4">
@@ -23,11 +27,10 @@ export const WizardStep: React.FC<WizardStepProps> = ({
           </div>
           <div>
             <h3 className="font-medium text-[#0277BD]">
-              Tạo mô tả công việc với AI
+              {aiBadgeTitle}
             </h3>
             <p className="text-sm text-gray-600">
-              AI sẽ giúp bạn tạo gạch đầu dòng chuyên nghiệp dựa trên thông tin
-              bạn cung cấp.
+              {aiBadgeDescription}
             </p>
           </div>
         </div>

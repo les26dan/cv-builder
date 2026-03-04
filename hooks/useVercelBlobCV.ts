@@ -112,7 +112,7 @@ export function useVercelBlobCV(): UseVercelBlobCVReturn {
   /**
    * Download CV and store in Vercel Blob
    */
-  const downloadCV = async (cvId: string, format: 'pdf' | 'docx' = 'pdf'): Promise<DownloadResult> => {
+  const downloadCV = async (cvId: string, format: 'pdf' | 'docx' | 'latex' = 'pdf'): Promise<DownloadResult> => {
     setIsDownloading(true);
     setDownloadError(null);
 

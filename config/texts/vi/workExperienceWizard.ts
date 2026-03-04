@@ -10,6 +10,10 @@ export const workExperienceWizardTexts = {
       basicInfo: 'Thông tin cơ bản',
       optionalDetails: 'Thông tin chi tiết (tùy chọn)'
     },
+    aiBadge: {
+      title: 'Tạo mô tả công việc với AI',
+      description: 'AI sẽ giúp bạn tạo gạch đầu dòng chuyên nghiệp dựa trên thông tin bạn cung cấp.'
+    },
     steps: {
       basicInfo: {
         title: 'Nhập thông tin cơ bản',
@@ -21,15 +25,16 @@ export const workExperienceWizardTexts = {
       }
     },
     aiPreview: {
-      title: 'AI sẽ tạo ra nội dung như thế này:',
-      subtitle: 'Dựa trên vị trí và công ty bạn nhập',
+      title: 'OkBuddy giúp bạn viết CV nhanh chóng',
+      subtitle: '',
       generatedBy: 'Được tạo bởi AI'
     },
     jobTitleSuggestions: ['Software Engineer', 'Marketing Manager', 'Sales Executive'],
-    tips: {
-      shortInput: 'Mẹo: Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!',
-      wordCount: '3-5 từ là đủ'
-    },
+          tips: {
+        shortInput: '💡 Less typing = better results. AI works best with 2-3 keywords, not sentences.',
+        wordCount: '3-5 từ là đủ'
+      },
+    noResults: 'Không tìm thấy kết quả',
     fields: {
       jobTitle: {
         label: 'Chức danh công việc của bạn là gì?',
@@ -38,17 +43,34 @@ export const workExperienceWizardTexts = {
       },
       company: {
         label: 'Tên công ty hoặc tổ chức?',
-        placeholder: 'Ví dụ: Google, Vingroup, FPT Software'
+        placeholder: ''
       },
       project: {
         label: 'Dự án hoặc trách nhiệm chính',
-        placeholder: 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'
+        placeholder: 'Ứng dụng di động, Chiến dịch marketing...'
       },
       impact: {
         label: 'Kết quả hoặc tác động',
-        placeholder: 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...',
+        placeholder: 'Tăng doanh thu 30%, Giảm chi phí...',
         badge: '+ Điểm mạnh'
       }
+    },
+    buttons: {
+      cancel: 'Hủy',
+      next: 'Tiếp theo',
+      back: 'Quay lại',
+      saveWithAI: 'Lưu với AI',
+      saveWithoutAI: 'Lưu không dùng AI',
+      generate: 'Được tạo bởi AI',
+      generating: 'Đang tạo...'
+    },
+    progress: {
+      step: 'Bước',
+      of: '/'
+    },
+    addBulletWizard: {
+      modalTitle: 'Tạo mô tả công việc nhanh',
+      subtitle: 'Chức danh công việc'
     }
   },
   

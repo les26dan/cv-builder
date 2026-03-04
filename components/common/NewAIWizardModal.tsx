@@ -82,6 +82,16 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
     onGenerate(formData);
   };
 
+  // Handle Enter key navigation to trigger generation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      if (canGenerate()) {
+        handleGenerate();
+      }
+    }
+  };
+
   const handleInputChange = (field: keyof WizardData, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -97,10 +107,19 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
 
   const isVietnamese = language === 'vi';
   const newWizardTexts = texts.newWizard || {};
+  const addBulletTexts = newWizardTexts.addBulletWizard || {};
+  const fieldsTexts = newWizardTexts.fields || {};
+  const buttonsTexts = newWizardTexts.buttons || {};
+  const tipsTexts = newWizardTexts.tips || {};
+  const aiBadgeTexts = newWizardTexts.aiBadge || {};
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div 
+        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        onKeyDown={handleKeyDown}
+        tabIndex={-1}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-3">
@@ -109,10 +128,10 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
             </div>
             <div>
               <h2 className="text-xl font-semibold">
-                Tạo mô tả công việc nhanh
+                {addBulletTexts.modalTitle || 'Tạo mô tả công việc nhanh'}
               </h2>
               <p className="text-gray-500 text-sm">
-                Chức danh công việc
+                {addBulletTexts.subtitle || 'Chức danh công việc'}
               </p>
             </div>
           </div>
@@ -124,50 +143,45 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
         {/* Content */}
         <div className="p-6">
           <WizardStep 
-            title="Thêm chi tiết (tùy chọn)"
-            description="Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn."
+            title={newWizardTexts.steps?.optionalDetails?.title || 'Thêm chi tiết (tùy chọn)'}
+            description={newWizardTexts.steps?.optionalDetails?.description || 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'}
             showAIBadge={true}
+            aiBadgeTitle={aiBadgeTexts.title}
+            aiBadgeDescription={aiBadgeTexts.description}
           >
             <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-4">
               <p className="text-sm text-yellow-800">
-                <strong>Mẹo:</strong> {newWizardTexts.tips?.shortInput || 'Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!'}
+                {tipsTexts.shortInput || 'Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!'}
               </p>
             </div>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
-                  <span>{newWizardTexts.fields?.project?.label || 'Dự án hoặc trách nhiệm chính'}</span>
-                  <span className="text-xs text-gray-500">{newWizardTexts.tips?.wordCount || '3-5 từ là đủ'}</span>
+                  <span>{fieldsTexts.project?.label || 'Dự án hoặc trách nhiệm chính'}</span>
+                  <span className="text-xs text-gray-500">{tipsTexts.wordCount || '3-5 từ là đủ'}</span>
                 </label>
                 <input
                   type="text"
                   value={formData.project}
                   onChange={(e) => handleInputChange('project', e.target.value)}
-                  placeholder={newWizardTexts.fields?.project?.placeholder || 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'}
+                  placeholder={fieldsTexts.project?.placeholder || 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
-                  <span>{newWizardTexts.fields?.impact?.label || 'Kết quả hoặc tác động'}</span>
-                  <span className="text-xs text-gray-500">{newWizardTexts.tips?.wordCount || '3-5 từ là đủ'}</span>
+                  <span>{fieldsTexts.impact?.label || 'Kết quả hoặc tác động'}</span>
+                  <span className="text-xs text-gray-500">{tipsTexts.wordCount || '3-5 từ là đủ'}</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formData.impact}
-                    onChange={(e) => handleInputChange('impact', e.target.value)}
-                    placeholder={newWizardTexts.fields?.impact?.placeholder || 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...'}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
-                  />
-                  <div className="absolute top-0 right-0 h-full flex items-center pr-3">
-                    <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                      {newWizardTexts.fields?.impact?.badge || '+ Điểm mạnh'}
-                    </div>
-                  </div>
-                </div>
+                <input
+                  type="text"
+                  value={formData.impact}
+                  onChange={(e) => handleInputChange('impact', e.target.value)}
+                  placeholder={fieldsTexts.impact?.placeholder || 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...'}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
+                />
               </div>
             </div>
           </WizardStep>
@@ -195,7 +209,7 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
             onClick={onClose}
             className="text-gray-600 px-4 py-2 rounded-md hover:bg-gray-100"
           >
-            Hủy
+            {buttonsTexts.cancel || 'Hủy'}
           </button>
           
           <button
@@ -208,7 +222,7 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
             }`}
           >
             <SparklesIcon className="h-4 w-4" />
-            <span>{isGenerating ? 'Đang tạo...' : 'Được tạo bởi AI'}</span>
+            <span>{isGenerating ? (buttonsTexts.generating || 'Đang tạo...') : (buttonsTexts.generate || 'Được tạo bởi AI')}</span>
           </button>
         </div>
       </div>

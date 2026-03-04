@@ -54,6 +54,7 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   const [aiGenerating, setAiGenerating] = useState(false);
   const [filteredTitles, setFilteredTitles] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [hasSelectedSuggestion, setHasSelectedSuggestion] = useState(false);
   const [language, setLanguage] = useState<SupportedLanguage>('vi');
   const [texts, setTexts] = useState<any>({});
 
@@ -118,6 +119,16 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
     }
   };
 
+  // Handle Enter key navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      if (canProceed()) {
+        handleNext();
+      }
+    }
+  };
+
   const handleFinish = () => {
     const newExperience: WorkExperienceData = {
       id: `exp-${Date.now()}`,
@@ -154,6 +165,8 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   const selectJobTitle = (title: string) => {
     updateData('title', title);
     setIsTyping(false);
+    setFilteredTitles([]); // Hide suggestions after selection
+    setHasSelectedSuggestion(true); // Mark that user has selected a suggestion
   };
 
   const canProceed = () => {
@@ -164,26 +177,39 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
 
   const isVietnamese = language === 'vi';
   const newWizardTexts = texts.newWizard || {};
+  const fieldsTexts = newWizardTexts.fields || {};
+  const buttonsTexts = newWizardTexts.buttons || {};
+  const aiBadgeTexts = newWizardTexts.aiBadge || {};
+  const progressTexts = newWizardTexts.progress || {};
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div 
+        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        onKeyDown={handleKeyDown}
+        tabIndex={-1}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-md">
-              <SparklesIcon className="h-5 w-5 text-[#0277BD]" />
+            <div className="bg-blue-100 p-3 rounded-md">
+              <SparklesIcon className="h-6 w-6 text-[#0277BD]" />
             </div>
             <div>
               <h2 className="text-xl font-semibold">
                 {newWizardTexts.modalTitle || 'Thêm kinh nghiệm làm việc'}
               </h2>
-              <p className="text-gray-500 text-sm">
-                {currentStep === 1 
-                  ? (newWizardTexts.subtitles?.basicInfo || 'Thông tin cơ bản')
-                  : (newWizardTexts.subtitles?.optionalDetails || 'Thông tin chi tiết (tùy chọn)')
-                }
-              </p>
+              <div className="mt-1">
+                <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                  <span>{progressTexts.step || 'Bước'} {currentStep} {progressTexts.of || '/'} 2</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-[#0277BD] h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(currentStep / 2) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -191,31 +217,14 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
           </button>
         </div>
 
-        {/* Progress Bar */}
-        <div className="px-4 py-2">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span>Bước {currentStep} / 2</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-            <div 
-              className="bg-[#0277BD] h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / 2) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-
         {/* Content */}
         <div className="p-6">
-          {currentStep === 1 && (
-            <WizardStep 
-              title={newWizardTexts.steps?.basicInfo?.title || 'Nhập thông tin cơ bản'}
-              description={newWizardTexts.steps?.basicInfo?.description || 'AI sẽ tự động tạo mô tả công việc chuyên nghiệp từ thông tin này.'}
-              showAIBadge={true}
-            >
+                    {currentStep === 1 && (
+            <div className="space-y-4">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {newWizardTexts.fields?.jobTitle?.label || 'Chức danh công việc của bạn là gì?'}{' '}
+                    {fieldsTexts.jobTitle?.label || 'Chức danh công việc của bạn là gì?'}{' '}
                     <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -223,125 +232,118 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
                       type="text"
                       value={formData.title}
                       onChange={handleJobTitleChange}
-                      placeholder={newWizardTexts.fields?.jobTitle?.placeholder || 'Ví dụ: Software Engineer, Marketing Manager...'}
+                      placeholder={fieldsTexts.jobTitle?.placeholder || 'Ví dụ: Software Engineer, Marketing Manager...'}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
                     />
-                    {isTyping && formData.title && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
-                        {filteredTitles.length > 0 ? (
-                          filteredTitles.map((title, index) => (
-                            <div
-                              key={index}
-                              onClick={() => selectJobTitle(title)}
-                              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            >
-                              {title}
-                            </div>
-                          ))
-                        ) : (
-                          <div className="px-4 py-2 text-gray-500">
-                            Không tìm thấy kết quả
-                          </div>
-                        )}
-                      </div>
-                    )}
+                                               {isTyping && formData.title && filteredTitles.length > 0 && (
+                             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
+                               {filteredTitles.map((title, index) => (
+                                 <div
+                                   key={index}
+                                   onClick={() => selectJobTitle(title)}
+                                   className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                 >
+                                   {title}
+                                 </div>
+                               ))}
+                             </div>
+                           )}
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {filterJobTitles('', 3).map((title, index) => (
-                      <button
-                        key={index}
-                        onClick={() => selectJobTitle(title)}
-                        className="flex items-center gap-1 px-4 py-2 bg-blue-50 text-[#0277BD] rounded-full text-sm hover:bg-blue-100"
-                      >
-                        <span>+</span> {title}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {newWizardTexts.fields?.jobTitle?.helper || 'Nhập chính xác chức danh để AI có thể tạo mô tả phù hợp nhất.'}
-                  </p>
+                  {!hasSelectedSuggestion && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {filterJobTitles('', 3).map((title, index) => (
+                        <button
+                          key={index}
+                          onClick={() => selectJobTitle(title)}
+                          className="flex items-center gap-1 px-4 py-2 bg-blue-50 text-[#0277BD] rounded-full text-sm hover:bg-blue-100"
+                        >
+                          <span>+</span> {title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {newWizardTexts.fields?.company?.label || 'Tên công ty hoặc tổ chức?'}{' '}
+                    {fieldsTexts.company?.label || 'Tên công ty hoặc tổ chức?'}{' '}
                     <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.company}
                     onChange={(e) => updateData('company', e.target.value)}
-                    placeholder={newWizardTexts.fields?.company?.placeholder || 'Ví dụ: Google, Vingroup, FPT Software'}
+                    placeholder=""
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
                   />
                 </div>
               </div>
-            </WizardStep>
+            </div>
           )}
 
           {currentStep === 2 && (
-            <WizardStep 
-              title={newWizardTexts.steps?.optionalDetails?.title || 'Thêm chi tiết (tùy chọn)'}
-              description={newWizardTexts.steps?.optionalDetails?.description || 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'}
-              showAIBadge={true}
-            >
+            <div className="space-y-4">
+              {/* AI Preview Section - Show first */}
+              {formData.title && formData.company && (
+                <div className="mb-6">
+                  <AIPreview
+                    jobTitle={formData.title}
+                    company={formData.company}
+                    project={formData.project}
+                    impact={formData.impact}
+                    isLoading={aiGenerating}
+                    showPreview={showAIPreview}
+                    isEnhanced={!!(formData.project || formData.impact)}
+                    language={language}
+                    previewTitle={texts.newWizard?.aiPreview?.title || (isVietnamese ? 'OkBuddy giúp bạn viết CV nhanh chóng' : 'How OkBuddy writes your resume')}
+                    previewSubtitle={texts.newWizard?.aiPreview?.subtitle}
+                  />
+                </div>
+              )}
+              
+              <WizardStep 
+                title={newWizardTexts.steps?.optionalDetails?.title || 'Thêm chi tiết (tùy chọn)'}
+                description={newWizardTexts.steps?.optionalDetails?.description || 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'}
+                showAIBadge={true}
+                aiBadgeTitle={aiBadgeTexts.title}
+                aiBadgeDescription={aiBadgeTexts.description}
+              >
               <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-4">
                 <p className="text-sm text-yellow-800">
-                  <strong>Mẹo:</strong> {newWizardTexts.tips?.shortInput || 'Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!'}
+                  {newWizardTexts.tips?.shortInput || 'Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!'}
                 </p>
               </div>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
-                    <span>{newWizardTexts.fields?.project?.label || 'Dự án hoặc trách nhiệm chính'}</span>
+                    <span>{fieldsTexts.project?.label || 'Dự án hoặc trách nhiệm chính'}</span>
                     <span className="text-xs text-gray-500">{newWizardTexts.tips?.wordCount || '3-5 từ là đủ'}</span>
                   </label>
                   <input
                     type="text"
                     value={formData.project}
                     onChange={(e) => updateData('project', e.target.value)}
-                    placeholder={newWizardTexts.fields?.project?.placeholder || 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'}
+                    placeholder={fieldsTexts.project?.placeholder || 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
-                    <span>{newWizardTexts.fields?.impact?.label || 'Kết quả hoặc tác động'}</span>
+                    <span>{fieldsTexts.impact?.label || 'Kết quả hoặc tác động'}</span>
                     <span className="text-xs text-gray-500">{newWizardTexts.tips?.wordCount || '3-5 từ là đủ'}</span>
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={formData.impact}
-                      onChange={(e) => updateData('impact', e.target.value)}
-                      placeholder={newWizardTexts.fields?.impact?.placeholder || 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...'}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
-                    />
-                    <div className="absolute top-0 right-0 h-full flex items-center pr-3">
-                      <div className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                        {newWizardTexts.fields?.impact?.badge || '+ Điểm mạnh'}
-                      </div>
-                    </div>
-                  </div>
+                  <input
+                    type="text"
+                    value={formData.impact}
+                    onChange={(e) => updateData('impact', e.target.value)}
+                    placeholder={fieldsTexts.impact?.placeholder || 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...'}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
+                  />
                 </div>
               </div>
-            </WizardStep>
-          )}
-
-          {/* AI Preview Section */}
-          {formData.title && formData.company && (
-            <div className="mt-6">
-              <AIPreview
-                jobTitle={formData.title}
-                company={formData.company}
-                project={formData.project}
-                impact={formData.impact}
-                isLoading={aiGenerating}
-                showPreview={showAIPreview}
-                isEnhanced={currentStep === 2 && (!!formData.project || !!formData.impact)}
-                language={language}
-              />
+              </WizardStep>
             </div>
           )}
         </div>
@@ -354,14 +356,14 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
               className="flex items-center gap-2 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-100"
             >
               <ArrowLeftIcon className="h-4 w-4" />
-              <span>Quay lại</span>
+              <span>{buttonsTexts.back || 'Quay lại'}</span>
             </button>
           ) : (
             <button
               onClick={onClose}
               className="text-gray-600 px-4 py-2 rounded-md hover:bg-gray-100"
             >
-              Hủy
+              {buttonsTexts.cancel || 'Hủy'}
             </button>
           )}
           
@@ -377,11 +379,11 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
             {currentStep === 2 ? (
               <>
                 <SparklesIcon className="h-4 w-4" />
-                <span>Tạo với AI</span>
+                <span>{buttonsTexts.saveWithAI || 'Tạo với AI'}</span>
               </>
             ) : (
               <>
-                <span>Tiếp theo</span>
+                <span>{buttonsTexts.next || 'Tiếp theo'}</span>
                 <ArrowRightIcon className="h-4 w-4" />
               </>
             )}
