@@ -20,8 +20,8 @@ export const workExperienceWizardTexts = {
         description: 'AI will automatically create professional job descriptions from this information.'
       },
       optionalDetails: {
-        title: 'Add Details (Optional)',
-        description: 'Add more information so AI can create more detailed and impressive job descriptions.'
+        title: 'Your turn - only important keywords',
+        description: ''
       }
     },
     aiPreview: {
@@ -59,7 +59,7 @@ export const workExperienceWizardTexts = {
       cancel: 'Cancel',
       next: 'Next',
       back: 'Back',
-      saveWithAI: 'Save with AI',
+      saveWithAI: 'Add Work Experience',
       saveWithoutAI: 'Save without AI',
       generate: 'Generate with AI',
       generating: 'Generating...'

@@ -36,8 +36,8 @@ export const WizardStep: React.FC<WizardStepProps> = ({
         </div>
       )}
       <div>
-        <h3 className="text-lg font-medium">{title}</h3>
-        <p className="text-gray-500 text-sm">{description}</p>
+        <h3 className="text-base font-bold text-gray-800">{title}</h3>
+        {description && <p className="text-gray-500 text-sm">{description}</p>}
       </div>
       {children}
     </div>

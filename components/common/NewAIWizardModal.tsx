@@ -144,7 +144,7 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
         <div className="p-6">
           <WizardStep 
             title={newWizardTexts.steps?.optionalDetails?.title || 'Thêm chi tiết (tùy chọn)'}
-            description={newWizardTexts.steps?.optionalDetails?.description || 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'}
+            description={newWizardTexts.steps?.optionalDetails?.description || ''}
             showAIBadge={true}
             aiBadgeTitle={aiBadgeTexts.title}
             aiBadgeDescription={aiBadgeTexts.description}

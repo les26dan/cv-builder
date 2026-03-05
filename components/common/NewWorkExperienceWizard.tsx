@@ -304,21 +304,20 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
               
               <WizardStep 
                 title={newWizardTexts.steps?.optionalDetails?.title || 'Thêm chi tiết (tùy chọn)'}
-                description={newWizardTexts.steps?.optionalDetails?.description || 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'}
-                showAIBadge={true}
+                description={newWizardTexts.steps?.optionalDetails?.description || ''}
+                showAIBadge={false}
                 aiBadgeTitle={aiBadgeTexts.title}
                 aiBadgeDescription={aiBadgeTexts.description}
               >
-              <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-4">
+              <div className="bg-yellow-50 border border-yellow-100 rounded-md p-3 mb-6 mt-3">
                 <p className="text-sm text-yellow-800">
                   {newWizardTexts.tips?.shortInput || 'Chỉ cần nhập 3-5 từ cho mỗi mục và để AI hoàn thiện phần còn lại!'}
                 </p>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
-                    <span>{fieldsTexts.project?.label || 'Dự án hoặc trách nhiệm chính'}</span>
-                    <span className="text-xs text-gray-500">{newWizardTexts.tips?.wordCount || '3-5 từ là đủ'}</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {fieldsTexts.project?.label || 'Dự án hoặc trách nhiệm chính'}
                   </label>
                   <input
                     type="text"
@@ -330,9 +329,8 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
-                    <span>{fieldsTexts.impact?.label || 'Kết quả hoặc tác động'}</span>
-                    <span className="text-xs text-gray-500">{newWizardTexts.tips?.wordCount || '3-5 từ là đủ'}</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {fieldsTexts.impact?.label || 'Kết quả hoặc tác động'}
                   </label>
                   <input
                     type="text"

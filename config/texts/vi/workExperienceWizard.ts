@@ -20,8 +20,8 @@ export const workExperienceWizardTexts = {
         description: 'AI sẽ tự động tạo mô tả công việc chuyên nghiệp từ thông tin này.'
       },
       optionalDetails: {
-        title: 'Thêm chi tiết (tùy chọn)',
-        description: 'Bổ sung thông tin để AI tạo mô tả công việc chi tiết và ấn tượng hơn.'
+        title: 'Lượt của bạn - chỉ từ khóa quan trọng',
+        description: ''
       }
     },
     aiPreview: {
@@ -59,7 +59,7 @@ export const workExperienceWizardTexts = {
       cancel: 'Hủy',
       next: 'Tiếp theo',
       back: 'Quay lại',
-      saveWithAI: 'Lưu với AI',
+      saveWithAI: 'Thêm Kinh Nghiệm Làm Việc',
       saveWithoutAI: 'Lưu không dùng AI',
       generate: 'Được tạo bởi AI',
       generating: 'Đang tạo...'
