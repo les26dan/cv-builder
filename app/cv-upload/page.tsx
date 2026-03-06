@@ -323,7 +323,7 @@ export default function CVUploadPage() {
       />
       
       <main className="flex-1 flex justify-center items-center px-4 sm:px-6 lg:px-10 py-8">
-        <div className="w-full max-w-[600px] space-y-8">
+        <div className="w-full max-w-[1000px] space-y-8">
           
           {/* Success Message */}
           {showSuccessMessage && (
@@ -338,144 +338,164 @@ export default function CVUploadPage() {
               </div>
             </div>
           )}
-          {/* Value Proposition */}
-          <div className="text-center space-y-4">
+          {/* Title */}
+          <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-              {texts.header.title}
+              Create your winning resume in 3 minutes
             </h1>
-            <p className="text-lg text-gray-600">
-              {texts.header.subtitle}
-            </p>
           </div>
 
-          {/* Template Section - Primary Option */}
-          {texts.template && (
-          <div className="bg-white border-2 border-green-400 rounded-xl p-8 text-center shadow-sm">
-            <div className="flex flex-col items-center space-y-6">
-              {/* Template Text */}
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold text-gray-900">{texts.template.title}</h2>
-                <p className="text-base text-gray-600">{texts.template.subtitle}</p>
-              </div>
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {/* Column 1: Quick Start with Template */}
+            {texts.template && (
+            <div className="bg-white border-2 border-green-400 rounded-xl p-8 text-center shadow-sm h-full flex flex-col">
+              <div className="flex flex-col items-center space-y-6 flex-1">
+                {/* Template Text */}
+                <div className="space-y-2">
+                  <h2 className="text-xl font-semibold text-gray-900">{texts.template.title}</h2>
+                  <p className="text-base text-gray-600">{texts.template.subtitle}</p>
+                </div>
 
-              {/* Template Preview */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 w-full max-w-sm">
-                <div className="space-y-2 text-left text-sm">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="font-medium">{texts.template.preview.name}</span>
-                  </div>
-                  <div className="text-gray-600 space-y-1 ml-4">
-                    <div>{texts.template.preview.email}</div>
-                    <div>{texts.template.preview.phone}</div>
-                    <div>{texts.template.preview.location}</div>
-                  </div>
-                  <div className="border-t pt-2 ml-4">
-                    <div className="text-gray-500 text-xs">{texts.template.preview.summary}</div>
-                  </div>
-                  <div className="flex items-center justify-center mt-3">
-                    <span className="text-xs text-green-600 font-medium">{texts.template.atsCompliant}</span>
+                {/* Template Preview */}
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 w-full max-w-sm">
+                  <div className="space-y-2 text-left text-sm">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="font-medium">{texts.template.preview.name}</span>
+                    </div>
+                    <div className="text-gray-600 space-y-1 ml-4">
+                      <div>{texts.template.preview.email}</div>
+                      <div>{texts.template.preview.phone}</div>
+                      <div>{texts.template.preview.location}</div>
+                    </div>
+                    <div className="border-t pt-2 ml-4">
+                      <div className="text-gray-500 text-xs">{texts.template.preview.summary}</div>
+                    </div>
+                    <div className="flex items-center justify-center mt-3">
+                      <span className="text-xs text-green-600 font-medium">{texts.template.atsCompliant}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Template Button */}
-              <button
-                onClick={handleStartFromTemplate}
-                disabled={isUploading}
-                className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors ${
-                  isUploading 
-                    ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl'
+                {/* Template Button */}
+                <div className="mt-auto">
+                  <button
+                    onClick={handleStartFromTemplate}
+                    disabled={isUploading}
+                    className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors ${
+                      isUploading 
+                        ? 'bg-gray-400 text-gray-500 cursor-not-allowed'
+                        : 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl'
+                    }`}
+                  >
+                    <span>{texts.template.startButton}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            )}
+
+            {/* Column 2: Upload Existing Resume */}
+            <div className="h-full flex flex-col">
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className={`bg-white border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 shadow-sm flex-1 flex flex-col ${
+                  uploadedFile
+                    ? 'border-green-500 bg-green-50'
+                    : isUploading
+                    ? 'border-primary bg-primary-50'
+                    : 'border-primary hover:border-primary-600'
                 }`}
               >
-                <span>{texts.template.startButton}</span>
-              </button>
+                {isUploading ? (
+                  <div className="flex flex-col items-center space-y-6 flex-1 justify-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
+                    <span className="text-gray-600 font-medium text-lg">{texts.loading.analyzing}</span>
+                  </div>
+                ) : uploadedFile ? (
+                  <div className="flex flex-col items-center space-y-6 text-green-600 flex-1 justify-center">
+                    <div className="w-20 h-20 bg-green-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-xl text-gray-900">{texts.upload.uploadSuccess}</p>
+                      <p className="text-base text-gray-500 mt-2">{uploadedFile.name}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center space-y-6 flex-1 justify-center">
+                    {/* Upload Section Header */}
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold text-gray-900">
+                        {currentLanguage === 'en' ? 'Upload Existing Resume' : 'Tải CV hiện có'}
+                      </h3>
+                      <p className="text-base text-gray-600">
+                        {currentLanguage === 'en' 
+                          ? 'Analyze and improve your existing resume' 
+                          : 'Phân tích và cải thiện CV sẵn có'
+                        }
+                      </p>
+                    </div>
+
+                    {/* Upload Cloud Icon */}
+                    <div className="w-16 h-16 text-primary">
+                      <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    
+                    {/* Upload Text */}
+                    <div className="space-y-2">
+                      <p className="text-xl font-semibold text-gray-900">{texts.upload.title}</p>
+                      <p className="text-base text-gray-600">{texts.upload.supportedFormats}</p>
+                    </div>
+
+                    {/* Upload Button */}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-primary text-white px-8 py-4 rounded-lg hover:bg-primary-600 transition-colors font-semibold text-lg"
+                    >
+                      {texts.upload.uploadButton}
+                    </button>
+                    
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileInputChange}
+                      className="hidden"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Start Analysis Button - Part of Column 2 */}
+              {uploadedFile && (
+                <div className="mt-6">
+                  <button
+                    onClick={handleStartAnalysis}
+                    disabled={!uploadedFile}
+                    className={`w-full flex items-center justify-center gap-3 px-8 py-4 rounded-lg font-semibold text-lg transition-colors ${
+                      !uploadedFile
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-primary text-white hover:bg-primary-600 shadow-lg hover:shadow-xl'
+                    }`}
+                    title={!uploadedFile ? texts.actions.analyzeDisabled : undefined}
+                  >
+                    <div className="w-6 h-6">
+                      <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <span>{texts.actions.startAnalysis}</span>
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-          )}
-
-          {/* Divider */}
-          {texts.template && texts.divider && (
-          <div className="text-center">
-            <span className="text-gray-500 font-medium">{texts.divider.text}</span>
-          </div>
-          )}
-
-          {/* Upload Existing CV Section */}
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            className={`bg-white border-2 border-dashed rounded-xl p-12 text-center transition-all duration-200 shadow-sm ${
-              uploadedFile
-                ? 'border-green-500 bg-green-50'
-                : isUploading
-                ? 'border-primary bg-primary-50'
-                : 'border-primary hover:border-primary-600'
-            }`}
-          >
-            {isUploading ? (
-              <div className="flex flex-col items-center space-y-6">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary"></div>
-                <span className="text-gray-600 font-medium text-lg">{texts.loading.analyzing}</span>
-              </div>
-            ) : uploadedFile ? (
-              <div className="flex flex-col items-center space-y-6 text-green-600">
-                <div className="w-20 h-20 bg-green-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-semibold text-xl text-gray-900">{texts.upload.uploadSuccess}</p>
-                  <p className="text-base text-gray-500 mt-2">{uploadedFile.name}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center space-y-6">
-                {/* Upload Section Header */}
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {currentLanguage === 'en' ? 'Upload Existing Resume' : 'Tải CV hiện có'}
-                  </h3>
-                  <p className="text-base text-gray-600">
-                    {currentLanguage === 'en' 
-                      ? 'Analyze and improve your existing resume' 
-                      : 'Phân tích và cải thiện CV sẵn có'
-                    }
-                  </p>
-                </div>
-
-                {/* Upload Cloud Icon */}
-                <div className="w-16 h-16 text-primary">
-                  <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                </div>
-                
-                {/* Upload Text */}
-                <div className="space-y-2">
-                  <p className="text-xl font-semibold text-gray-900">{texts.upload.title}</p>
-                  <p className="text-base text-gray-600">{texts.upload.supportedFormats}</p>
-                </div>
-
-                {/* Upload Button */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="bg-primary text-white px-8 py-4 rounded-lg hover:bg-primary-600 transition-colors font-semibold text-lg"
-                >
-                  {texts.upload.uploadButton}
-                </button>
-                
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                />
-              </div>
-            )}
           </div>
           
           {uploadError && (
@@ -484,7 +504,7 @@ export default function CVUploadPage() {
             </div>
           )}
 
-          {/* Trust Section */}
+          {/* Trust Section - Centered between columns */}
           <div className="flex items-center justify-center gap-3 bg-white rounded-lg p-6 shadow-sm border border-gray-100">
             <div className="w-5 h-5 text-green-500 flex-shrink-0">
               <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -492,28 +512,37 @@ export default function CVUploadPage() {
               </svg>
             </div>
             <span className="text-sm text-gray-600 text-center">
-              {texts.upload.privacyNote}
+              {currentLanguage === 'en' 
+                ? (
+                  <>
+                    Your data is secure and protected following our{' '}
+                    <a 
+                      href={process.env.NODE_ENV === 'production' ? 'https://www.okbuddy.io/privacy-policy/' : '/privacy-policy'} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:text-primary-600 underline font-medium"
+                    >
+                      privacy policy
+                    </a>
+                  </>
+                )
+                : (
+                  <>
+                    Dữ liệu của bạn được bảo mật và bảo vệ theo{' '}
+                    <a 
+                      href={process.env.NODE_ENV === 'production' ? 'https://www.okbuddy.io/privacy-policy/' : '/privacy-policy'} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:text-primary-600 underline font-medium"
+                    >
+                      chính sách bảo mật
+                    </a>
+                    {' '}của chúng tôi
+                  </>
+                )
+              }
             </span>
           </div>
-
-          {/* Primary Action Button */}
-          <button
-            onClick={handleStartAnalysis}
-            disabled={!uploadedFile}
-            className={`w-full flex items-center justify-center gap-3 px-8 py-4 rounded-lg font-semibold text-lg transition-colors ${
-              !uploadedFile
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-primary text-white hover:bg-primary-600 shadow-lg hover:shadow-xl'
-            }`}
-            title={!uploadedFile ? texts.actions.analyzeDisabled : undefined}
-          >
-            <div className="w-6 h-6">
-              <svg className="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <span>{texts.actions.startAnalysis}</span>
-          </button>
         </div>
       </main>
     </div>

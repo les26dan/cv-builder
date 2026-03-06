@@ -218,6 +218,20 @@ export const WorkExperienceSection = ({
       return;
     }
     
+    // Check if wizard was manually closed recently (within last 5 seconds)
+    const manuallyClosed = localStorage.getItem('okbuddy_wizard_manually_closed');
+    if (manuallyClosed) {
+      const closedTime = parseInt(manuallyClosed);
+      const timeSinceClosed = Date.now() - closedTime;
+      if (timeSinceClosed < 5000) { // 5 seconds cooldown
+        console.log('🚫 Preventing wizard auto-trigger - user manually closed wizard recently');
+        return;
+      } else {
+        // Clean up old flag
+        localStorage.removeItem('okbuddy_wizard_manually_closed');
+      }
+    }
+    
     console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
     
     if (useNewWizards) {
@@ -376,13 +390,11 @@ export const WorkExperienceSection = ({
             items: updatedItems
           });
 
-          // Auto-expand the newly created experience (manual creation only, not parsed CV)
-          if (!isParsedCV) {
-            setExpandedItems(prev => ({
-              ...prev,
-              [newExperience.id]: true
-            }));
-          }
+          // Auto-expand the newly created experience (regardless of CV source)
+          setExpandedItems(prev => ({
+            ...prev,
+            [newExperience.id]: true
+          }));
         } else {
           console.error('Failed to generate bullet:', result.error);
           const newExperience = {
@@ -397,13 +409,11 @@ export const WorkExperienceSection = ({
             items: updatedItems
           });
 
-          // Auto-expand the newly created experience (manual creation only, not parsed CV)
-          if (!isParsedCV) {
-            setExpandedItems(prev => ({
-              ...prev,
-              [newExperience.id]: true
-            }));
-          }
+          // Auto-expand the newly created experience (regardless of CV source)
+          setExpandedItems(prev => ({
+            ...prev,
+            [newExperience.id]: true
+          }));
         }
       } catch (error) {
         console.error('Error generating bullet:', error);
@@ -419,7 +429,7 @@ export const WorkExperienceSection = ({
           items: updatedItems
         });
 
-        // Auto-expand the newly created experience (manual creation only)
+        // Auto-expand the newly created experience (regardless of CV source)
         setExpandedItems(prev => ({
           ...prev,
           [newExperience.id]: true
@@ -435,13 +445,11 @@ export const WorkExperienceSection = ({
         items: updatedItems
       });
 
-      // Auto-expand the newly created experience (manual creation only, not parsed CV)
-      if (!isParsedCV) {
-        setExpandedItems(prev => ({
-          ...prev,
-          [experienceData.id]: true
-        }));
-      }
+      // Auto-expand the newly created experience (regardless of CV source)
+      setExpandedItems(prev => ({
+        ...prev,
+        [experienceData.id]: true
+      }));
     }
 
     setNewWizardOpen(false);

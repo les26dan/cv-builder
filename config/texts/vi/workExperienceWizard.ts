@@ -69,8 +69,12 @@ export const workExperienceWizardTexts = {
       of: '/'
     },
     addBulletWizard: {
-      modalTitle: 'Tạo mô tả công việc nhanh',
-      subtitle: 'Chức danh công việc'
+      modalTitle: 'Thêm Thành Tích',
+      subtitle: 'Chức danh công việc',
+      buttonText: 'Thêm Thành Tích'
+    },
+    confirmations: {
+      closeWithProgress: 'Bạn có chắc chắn muốn đóng? Tiến trình hiện tại của bạn sẽ được lưu lại.'
     }
   },
   

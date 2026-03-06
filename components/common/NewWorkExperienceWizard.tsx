@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { XIcon, ArrowLeftIcon, ArrowRightIcon, SparklesIcon } from 'lucide-react';
 import { WizardStep } from './WizardStep';
@@ -57,6 +57,138 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   const [hasSelectedSuggestion, setHasSelectedSuggestion] = useState(false);
   const [language, setLanguage] = useState<SupportedLanguage>('vi');
   const [texts, setTexts] = useState<any>({});
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Auto-save key for localStorage
+  const AUTOSAVE_KEY = 'okbuddy_work_experience_wizard_draft';
+
+  // Check if form has data
+  const hasFormData = useCallback(() => {
+    return formData.title.trim() || formData.company.trim() || formData.project.trim() || formData.impact.trim();
+  }, [formData]);
+
+  // Auto-save to localStorage whenever form data changes
+  useEffect(() => {
+    if (hasFormData()) {
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({
+        ...formData,
+        currentStep,
+        timestamp: Date.now()
+      }));
+    }
+  }, [formData, currentStep, hasFormData]);
+
+  // Load auto-saved data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const savedData = localStorage.getItem(AUTOSAVE_KEY);
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          // Only restore if saved within last 24 hours
+          if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+            // Show recovery option to user
+            const isVietnamese = language === 'vi';
+            const message = isVietnamese 
+              ? 'Bạn có dữ liệu đã lưu từ lần trước. Bạn có muốn khôi phục không?\n\n✅ Có - Khôi phục dữ liệu\n❌ Không - Bắt đầu mới'
+              : 'You have saved data from previous session. Would you like to recover it?\n\n✅ Yes - Recover data\n❌ No - Start fresh';
+            
+            if (window.confirm(message)) {
+              // User wants to recover - restore data but ALWAYS start at step 1
+              setFormData({
+                title: parsed.title || '',
+                company: parsed.company || '',
+                project: parsed.project || '',
+                impact: parsed.impact || ''
+              });
+              setCurrentStep(1); // Always start at step 1, never restore step
+            } else {
+              // User wants fresh start - clear auto-saved data
+              localStorage.removeItem(AUTOSAVE_KEY);
+              setFormData({
+                title: '',
+                company: '',
+                project: '',
+                impact: ''
+              });
+              setCurrentStep(1);
+            }
+          } else {
+            // Expired data - clean up
+            localStorage.removeItem(AUTOSAVE_KEY);
+          }
+        } catch (error) {
+          console.error('Failed to parse auto-saved data:', error);
+          localStorage.removeItem(AUTOSAVE_KEY);
+        }
+      }
+    }
+  }, [isOpen, language]);
+
+  // Enhanced close handler with polished confirmation
+  const handleClose = useCallback(() => {
+    if (hasFormData()) {
+      const newWizardTexts = texts.newWizard || {};
+      const confirmationsTexts = newWizardTexts.confirmations || {};
+      const message = confirmationsTexts.closeWithProgress || 'Are you sure you want to close this? Your current progress will be saved.';
+      
+      if (window.confirm(message)) {
+        // Set a flag to prevent auto-triggering wizard after manual close
+        localStorage.setItem('okbuddy_wizard_manually_closed', Date.now().toString());
+        
+        // Auto-save as incomplete work experience when user has entered data
+        const incompleteExperience: WorkExperienceData = {
+          id: `exp-${Date.now()}`,
+          title: formData.title || 'Untitled Position',
+          company: formData.company || 'Company Name',
+          location: '',
+          startDate: '',
+          endDate: '',
+          current: false,
+          bullets: [''], // Empty bullet to show it needs completion
+          aiGenerated: false, // Mark as manual since it's incomplete
+          project: formData.project,
+          impact: formData.impact,
+          responsibility: ''
+        };
+        
+        // Clear auto-saved data since we're creating the actual entry
+        localStorage.removeItem(AUTOSAVE_KEY);
+        
+        // Auto-save the incomplete experience
+        onSave(incompleteExperience);
+        onClose();
+      }
+    } else {
+      // Clear auto-save if no data
+      localStorage.removeItem(AUTOSAVE_KEY);
+      onClose();
+    }
+  }, [hasFormData, texts, onClose, onSave, formData]);
+
+  // Handle Esc key and click outside
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isOpen, handleClose]);
 
   // Load language-specific texts
   useEffect(() => {
@@ -87,6 +219,9 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
       setShowAIPreview(false);
       setAiGenerating(false);
       setIsTyping(false);
+    } else {
+      // Clear manual close flag when wizard opens normally
+      localStorage.removeItem('okbuddy_wizard_manually_closed');
     }
   }, [isOpen]);
 
@@ -145,6 +280,8 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
       responsibility: ''
     };
 
+    // Clear auto-saved data on successful save
+    localStorage.removeItem(AUTOSAVE_KEY);
     onSave(newExperience);
   };
 
@@ -185,6 +322,7 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div 
+        ref={modalRef}
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         onKeyDown={handleKeyDown}
         tabIndex={-1}
@@ -199,20 +337,18 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
               <h2 className="text-xl font-semibold">
                 {newWizardTexts.modalTitle || 'Thêm kinh nghiệm làm việc'}
               </h2>
-              <div className="mt-1">
-                <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
-                  <span>{progressTexts.step || 'Bước'} {currentStep} {progressTexts.of || '/'} 2</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-[#0277BD] h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${(currentStep / 2) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
+
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button 
+            onClick={handleClose} 
+            disabled={isGenerating}
+            className={`${
+              isGenerating 
+                ? 'text-gray-300 cursor-not-allowed' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
@@ -233,7 +369,10 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
                       value={formData.title}
                       onChange={handleJobTitleChange}
                       placeholder={fieldsTexts.jobTitle?.placeholder || 'Ví dụ: Software Engineer, Marketing Manager...'}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
+                      disabled={isGenerating}
+                      className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD] ${
+                        isGenerating ? 'bg-gray-100 cursor-not-allowed' : ''
+                      }`}
                     />
                                                {isTyping && formData.title && filteredTitles.length > 0 && (
                              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
@@ -275,7 +414,10 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
                     value={formData.company}
                     onChange={(e) => updateData('company', e.target.value)}
                     placeholder=""
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
+                    disabled={isGenerating}
+                    className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD] ${
+                      isGenerating ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   />
                 </div>
               </div>
@@ -324,7 +466,10 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
                     value={formData.project}
                     onChange={(e) => updateData('project', e.target.value)}
                     placeholder={fieldsTexts.project?.placeholder || 'Ví dụ: Ứng dụng di động, Chiến dịch marketing...'}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
+                    disabled={isGenerating}
+                    className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD] ${
+                      isGenerating ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   />
                 </div>
                 
@@ -337,7 +482,10 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
                     value={formData.impact}
                     onChange={(e) => updateData('impact', e.target.value)}
                     placeholder={fieldsTexts.impact?.placeholder || 'Ví dụ: Tăng doanh thu 30%, Giảm chi phí...'}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD]"
+                    disabled={isGenerating}
+                    className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#0277BD] ${
+                      isGenerating ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   />
                 </div>
               </div>
@@ -351,7 +499,12 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
           {currentStep > 1 ? (
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 text-gray-600 px-4 py-2 rounded-md hover:bg-gray-100"
+              disabled={isGenerating}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md ${
+                isGenerating 
+                  ? 'text-gray-400 cursor-not-allowed' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
             >
               <ArrowLeftIcon className="h-4 w-4" />
               <span>{buttonsTexts.back || 'Quay lại'}</span>
@@ -359,7 +512,12 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
           ) : (
             <button
               onClick={onClose}
-              className="text-gray-600 px-4 py-2 rounded-md hover:bg-gray-100"
+              disabled={isGenerating}
+              className={`px-4 py-2 rounded-md ${
+                isGenerating 
+                  ? 'text-gray-400 cursor-not-allowed' 
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
             >
               {buttonsTexts.cancel || 'Hủy'}
             </button>
@@ -367,18 +525,25 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
           
           <button
             onClick={handleNext}
-            disabled={!canProceed()}
+            disabled={!canProceed() || isGenerating}
             className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-              !canProceed()
+              !canProceed() || isGenerating
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 : 'bg-[#0277BD] text-white hover:bg-blue-700'
             }`}
           >
             {currentStep === 2 ? (
-              <>
-                <SparklesIcon className="h-4 w-4" />
-                <span>{buttonsTexts.saveWithAI || 'Tạo với AI'}</span>
-              </>
+              isGenerating ? (
+                <>
+                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>{buttonsTexts.generating || 'Đang tạo...'}</span>
+                </>
+              ) : (
+                <>
+                  <SparklesIcon className="h-4 w-4" />
+                  <span>{buttonsTexts.saveWithAI || 'Add Work Experience'}</span>
+                </>
+              )
             ) : (
               <>
                 <span>{buttonsTexts.next || 'Tiếp theo'}</span>

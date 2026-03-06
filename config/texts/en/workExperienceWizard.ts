@@ -69,8 +69,12 @@ export const workExperienceWizardTexts = {
       of: 'of'
     },
     addBulletWizard: {
-      modalTitle: 'Generate Job Description with AI',
-      subtitle: 'Job Title'
+      modalTitle: 'Add Achievement',
+      subtitle: 'Job Title',
+      buttonText: 'Add Achievement'
+    },
+    confirmations: {
+      closeWithProgress: 'Are you sure you want to close this? Your current progress will be saved.'
     }
   },
   
