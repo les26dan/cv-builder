@@ -29,6 +29,11 @@ export const cvEditor = {
     addSection: 'Thêm phần mới',
     deleteSection: 'Xóa phần',
     reorderSections: 'Kéo để sắp xếp lại các phần',
+    addSectionModal: {
+      title: 'Thêm phần mới',
+      subtitle: 'Chọn loại phần bạn muốn thêm vào CV',
+      cancel: 'Hủy',
+    },
     cvScore: {
       title: 'Độ hoàn thiện CV',
       outOf: 'trên 100',
@@ -123,6 +128,50 @@ export const cvEditor = {
         placeholder: 'Mô tả một thành tích hoặc trách nhiệm cụ thể...',
         remove: 'Xóa',
         aiGenerate: 'Tạo bằng AI',
+        characterLimit: {
+          tooLong: 'Gạch đầu dòng này khá dài ({length}/200 ký tự). Hãy cân nhắc chia thành hai gạch đầu dòng.',
+          canShorten: '💡 {length}/200 ký tự',
+        },
+        templateSelection: {
+          title: 'Chọn mẫu gạch đầu dòng',
+          description: 'Chọn một mẫu phù hợp với kinh nghiệm của bạn. Bạn có thể điền vào các phần [trong ngoặc] với thông tin cụ thể của mình.',
+          closeLabel: 'Đóng',
+          jobTitleHint: 'Gợi ý cho vị trí:',
+          selectButton: 'Chọn',
+          exampleLabel: 'Ví dụ:',
+          templates: {
+            achievement: {
+              title: 'Thành tựu với kết quả',
+              content: 'Dẫn dắt [nhóm/dự án] để [đạt được mục tiêu], mang lại [tác động cụ thể].',
+              example: 'Dẫn dắt nhóm 5 kỹ sư để triển khai hệ thống CRM mới, mang lại cải thiện hiệu suất 30%.'
+            },
+            implementation: {
+              title: 'Triển khai dự án',
+              content: 'Triển khai [dự án/sáng kiến] giúp [kết quả đạt được].',
+              example: 'Triển khai quy trình tự động hóa báo cáo giúp giảm thời gian xử lý 50%.'
+            },
+            improvement: {
+              title: 'Cải thiện quy trình',
+              content: 'Cải thiện [quy trình/chỉ số] bằng [X%] thông qua [hành động cụ thể].',
+              example: 'Cải thiện tỷ lệ chuyển đổi khách hàng bằng 25% thông qua tối ưu hóa quy trình bán hàng.'
+            },
+            collaboration: {
+              title: 'Hợp tác nhóm',
+              content: 'Hợp tác với [bộ phận/nhóm] để [đạt được mục tiêu], mang lại [kết quả tích cực].',
+              example: 'Hợp tác với nhóm thiết kế và phát triển để ra mắt tính năng mới, tăng sự hài lòng của khách hàng 20%.'
+            },
+            management: {
+              title: 'Quản lý và lãnh đạo',
+              content: 'Quản lý [nhóm/tài nguyên] để [đạt được mục tiêu], đảm bảo [kết quả chất lượng].',
+              example: 'Quản lý nhóm 8 nhân viên để hoàn thành dự án đúng hạn, đảm bảo chất lượng cao và ngân sách.'
+            },
+            problemSolving: {
+              title: 'Giải quyết vấn đề',
+              content: 'Giải quyết [vấn đề/thách thức] bằng cách [phương pháp], dẫn đến [kết quả tích cực].',
+              example: 'Giải quyết vấn đề hiệu suất hệ thống bằng cách tối ưu hóa database, giảm thời gian phản hồi 60%.'
+            }
+          }
+        }
       },
       validation: {
         titleRequired: 'Vui lòng nhập chức danh công việc',
@@ -131,6 +180,16 @@ export const cvEditor = {
         startAfterEnd: 'Ngày bắt đầu phải trước ngày kết thúc',
         aiRequirement: 'Vui lòng điền chức danh và công ty để sử dụng AI hỗ trợ',
         aiDescription: 'Vui lòng nhập chức danh và công ty trước khi tạo mô tả',
+      },
+      messages: {
+        deleteConfirm: 'Bạn có chắc chắn muốn xóa kinh nghiệm này?',
+        aiRequiredAlert: 'Vui lòng điền chức danh và công ty để sử dụng AI hỗ trợ',
+        aiGenerationRequiredAlert: 'Vui lòng nhập chức danh và công ty trước khi sử dụng AI',
+        aiDescriptionRequiredAlert: 'Vui lòng nhập chức danh và công ty trước khi tạo mô tả',
+        improveDescriptionError: 'Không thể cải thiện mô tả. Vui lòng thử lại.',
+        improveDescriptionGeneralError: 'Có lỗi xảy ra khi cải thiện mô tả. Vui lòng thử lại.',
+        basicInfoHint: 'Bắt đầu với thông tin cơ bản',
+        buildExperienceTitle: 'Xây Dựng Kinh Nghiệm Làm Việc Ấn Tượng Trong 5 Giây!',
       },
     },
     skills: {

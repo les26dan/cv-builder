@@ -108,41 +108,106 @@ export class OAuthService {
     sessionId: string,
     clientIp?: string
   ): Promise<OAuthResult> {
+    console.log('🔄 [OAUTH-SERVICE] handleCallback started');
+    console.log('📋 [OAUTH-SERVICE] Parameters:', {
+      provider,
+      codeLength: code.length,
+      stateLength: state.length,
+      sessionIdLength: sessionId.length,
+      clientIp
+    });
+    
     try {
       // Rate limiting check
+      console.log('🛡️ [OAUTH-SERVICE] Checking rate limits...');
       if (clientIp && !SecurityService.checkRateLimit(`oauth_callback_${clientIp}`, 5, 60000)) {
+        console.error('❌ [OAUTH-SERVICE] Rate limit exceeded for IP:', clientIp);
         throw new Error('Rate limit exceeded');
       }
+      console.log('✅ [OAUTH-SERVICE] Rate limit check passed');
 
       // Validate OAuth session
+      console.log('🔍 [OAUTH-SERVICE] Validating OAuth session...');
       const session = SecurityService.getOAuthSession(sessionId);
+      console.log('📋 [OAUTH-SERVICE] Session validation result:', {
+        hasSession: !!session,
+        sessionDetails: session ? {
+          provider: session.provider,
+          csrfToken: session.csrfToken?.substring(0, 10) + '...',
+          returnUrl: session.returnUrl
+        } : null
+      });
+      
       if (!session) {
+        console.error('❌ [OAUTH-SERVICE] Invalid or expired OAuth session');
         throw new Error('Invalid or expired OAuth session');
       }
 
       // Validate state parameter
+      console.log('🔍 [OAUTH-SERVICE] Validating state parameter...');
       const stateData = SecurityService.validateState(state, { provider });
+      console.log('📋 [OAUTH-SERVICE] State validation result:', {
+        hasStateData: !!stateData,
+        stateProvider: stateData?.provider,
+        csrfMatch: stateData?.csrfToken === session.csrfToken
+      });
+      
       if (!stateData || stateData.csrfToken !== session.csrfToken) {
+        console.error('❌ [OAUTH-SERVICE] Invalid state parameter or CSRF mismatch');
         throw new Error('Invalid state parameter');
       }
+      console.log('✅ [OAUTH-SERVICE] State parameter validation passed');
 
       // Get OAuth provider
+      console.log('🔍 [OAUTH-SERVICE] Getting OAuth provider...');
       const oauthProvider = this.getProvider(provider);
+      console.log('📋 [OAUTH-SERVICE] Provider status:', {
+        hasProvider: !!oauthProvider,
+        providerName: oauthProvider?.name
+      });
+      
       if (!oauthProvider) {
+        console.error('❌ [OAUTH-SERVICE] OAuth provider not found:', provider);
         throw new Error(`OAuth provider '${provider}' not found`);
       }
+      console.log('✅ [OAUTH-SERVICE] OAuth provider found');
 
       // Exchange code for tokens
+      console.log('🔄 [OAUTH-SERVICE] Exchanging authorization code for tokens...');
       const tokenResponse = await oauthProvider.exchangeCode(code);
+      console.log('✅ [OAUTH-SERVICE] Token exchange successful:', {
+        hasAccessToken: !!tokenResponse.access_token,
+        accessTokenLength: tokenResponse.access_token?.length || 0,
+        hasRefreshToken: !!tokenResponse.refresh_token,
+        tokenType: tokenResponse.token_type
+      });
       
       // Fetch user profile
+      console.log('👤 [OAUTH-SERVICE] Fetching user profile...');
       const userProfile = await oauthProvider.fetchUserProfile(tokenResponse.access_token);
+      console.log('✅ [OAUTH-SERVICE] User profile fetched:', {
+        id: userProfile.id,
+        email: userProfile.email,
+        name: userProfile.name,
+        provider: userProfile.provider,
+        emailVerified: userProfile.emailVerified
+      });
 
       // Link or create account
+      console.log('🔗 [OAUTH-SERVICE] Resolving account with AccountLinkingService...');
       const accountResult = await this.accountLinkingService.resolveAccount(userProfile);
+      console.log('✅ [OAUTH-SERVICE] Account resolution complete:', {
+        action: accountResult.action,
+        userId: accountResult.user?.id,
+        userEmail: accountResult.user?.email,
+        isNewAccount: accountResult.isNewAccount,
+        linkedProviders: accountResult.linkedProviders
+      });
 
       // Clean up OAuth session
+      console.log('🧹 [OAUTH-SERVICE] Cleaning up OAuth session...');
       SecurityService.deleteOAuthSession(sessionId);
+      console.log('✅ [OAUTH-SERVICE] OAuth session cleaned up');
 
       SecurityService.logSecurityEvent('oauth_callback_success', {
         provider,
@@ -151,14 +216,27 @@ export class OAuthService {
         isNewAccount: accountResult.isNewAccount
       });
 
-      return {
+      const result = {
         success: true,
         action: accountResult.action,
         user: accountResult.user,
         isNewAccount: accountResult.isNewAccount
       };
+      
+      console.log('🎉 [OAUTH-SERVICE] OAuth callback completed successfully!');
+      console.log('📊 [OAUTH-SERVICE] Final result:', result);
+      
+      return result;
 
     } catch (error) {
+      console.error('💥 [OAUTH-SERVICE] OAuth callback error occurred:', error);
+      console.error('💥 [OAUTH-SERVICE] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        provider,
+        sessionId
+      });
+      
       SecurityService.logSecurityEvent('oauth_callback_error', {
         provider,
         sessionId,
@@ -173,12 +251,16 @@ export class OAuthService {
         retryable: this.isRetryableError(error instanceof Error ? error.message : 'Unknown error')
       };
 
-      return {
+      const errorResult = {
         success: false,
         action: 'login',
         isNewAccount: false,
         error: oauthError
       };
+      
+      console.error('❌ [OAUTH-SERVICE] Returning error result:', errorResult);
+      
+      return errorResult as OAuthResult;
     }
   }
 

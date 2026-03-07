@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { XIcon, PlusIcon } from 'lucide-react';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface Template {
   id: string;
@@ -13,53 +15,61 @@ interface TemplateSelectionModalProps {
   onClose: () => void;
   onSelectTemplate: (template: Template) => void;
   jobTitle?: string;
+  language?: SupportedLanguage;
 }
-
-const BULLET_TEMPLATES: Template[] = [
-  {
-    id: 'achievement',
-    title: 'Thành tựu với kết quả',
-    content: 'Dẫn dắt [nhóm/dự án] để [đạt được mục tiêu], mang lại [tác động cụ thể].',
-    example: 'Dẫn dắt nhóm 5 kỹ sư để triển khai hệ thống CRM mới, mang lại cải thiện hiệu suất 30%.'
-  },
-  {
-    id: 'implementation',
-    title: 'Triển khai dự án',
-    content: 'Triển khai [dự án/sáng kiến] giúp [kết quả đạt được].',
-    example: 'Triển khai quy trình tự động hóa báo cáo giúp giảm thời gian xử lý 50%.'
-  },
-  {
-    id: 'improvement',
-    title: 'Cải thiện quy trình',
-    content: 'Cải thiện [quy trình/chỉ số] bằng [X%] thông qua [hành động cụ thể].',
-    example: 'Cải thiện tỷ lệ chuyển đổi khách hàng bằng 25% thông qua tối ưu hóa quy trình bán hàng.'
-  },
-  {
-    id: 'collaboration',
-    title: 'Hợp tác nhóm',
-    content: 'Hợp tác với [bộ phận/nhóm] để [đạt được mục tiêu], mang lại [kết quả tích cực].',
-    example: 'Hợp tác với nhóm thiết kế và phát triển để ra mắt tính năng mới, tăng sự hài lòng của khách hàng 20%.'
-  },
-  {
-    id: 'management',
-    title: 'Quản lý và lãnh đạo',
-    content: 'Quản lý [nhóm/tài nguyên] để [đạt được mục tiêu], đảm bảo [kết quả chất lượng].',
-    example: 'Quản lý nhóm 8 nhân viên để hoàn thành dự án đúng hạn, đảm bảo chất lượng cao và ngân sách.'
-  },
-  {
-    id: 'problem-solving',
-    title: 'Giải quyết vấn đề',
-    content: 'Giải quyết [vấn đề/thách thức] bằng cách [phương pháp], dẫn đến [kết quả tích cực].',
-    example: 'Giải quyết vấn đề hiệu suất hệ thống bằng cách tối ưu hóa database, giảm thời gian phản hồi 60%.'
-  }
-];
 
 export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
   isOpen,
   onClose,
   onSelectTemplate,
-  jobTitle
+  jobTitle,
+  language
 }) => {
+  // Language and text configuration
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [templateTexts, setTemplateTexts] = useState<any>(null);
+  const [bulletTemplates, setBulletTemplates] = useState<Template[]>([]);
+  
+  // Load language configuration
+  useEffect(() => {
+    const loadLanguageAndTemplates = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+        
+        setCurrentLanguage(effectiveLanguage);
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+        setTemplateTexts(texts.sections.experience.bullets.templateSelection);
+        
+        // Create bullet templates from text configuration
+        const templates = texts.sections.experience.bullets.templateSelection.templates;
+        const templateKeys = ['achievement', 'implementation', 'improvement', 'collaboration', 'management', 'problemSolving'];
+        
+        const loadedTemplates: Template[] = templateKeys.map(key => ({
+          id: key,
+          title: templates[key]?.title || key,
+          content: templates[key]?.content || '',
+          example: templates[key]?.example || ''
+        }));
+        
+        setBulletTemplates(loadedTemplates);
+      } catch (error) {
+        console.error('Failed to load template texts:', error);
+        setCurrentLanguage('en');
+        // Fallback templates
+        setBulletTemplates([
+          {
+            id: 'achievement',
+            title: 'Achievement with results',
+            content: 'Led [team/project] to [achieve goal], resulting in [specific impact].',
+            example: 'Led team of 5 engineers to deploy new CRM system, resulting in 30% improved efficiency.'
+          }
+        ]);
+      }
+    };
+    
+    loadLanguageAndTemplates();
+  }, [language]);
   if (!isOpen) return null;
 
   return (
@@ -71,7 +81,7 @@ export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
       <div 
         className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
         role="dialog"
-        aria-label="Chọn mẫu gạch đầu dòng"
+        aria-label={templateTexts?.title || 'Choose bullet template'}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -81,13 +91,13 @@ export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
               <PlusIcon size={24} />
             </div>
             <h2 className="text-lg font-semibold text-gray-900">
-              Chọn mẫu gạch đầu dòng
+              {templateTexts?.title || 'Choose bullet template'}
             </h2>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Đóng"
+            aria-label={templateTexts?.closeLabel || 'Close'}
           >
             <XIcon size={24} />
           </button>
@@ -96,19 +106,18 @@ export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
         {/* Description */}
         <div className="px-6 py-4 bg-gray-50 border-b">
           <p className="text-sm text-gray-600">
-            Chọn một mẫu phù hợp với kinh nghiệm của bạn. Bạn có thể điền vào các phần [trong ngoặc] 
-            với thông tin cụ thể của mình.
+            {templateTexts?.description || 'Choose a template that fits your experience. You can fill in the parts [in brackets] with your specific information.'}
           </p>
           {jobTitle && (
             <p className="text-sm text-primary-600 mt-1">
-              Gợi ý cho vị trí: <span className="font-medium">{jobTitle}</span>
+              {templateTexts?.jobTitleHint || 'Suggestion for position:'} <span className="font-medium">{jobTitle}</span>
             </p>
           )}
         </div>
 
         {/* Templates */}
         <div className="p-6 space-y-4">
-          {BULLET_TEMPLATES.map((template) => (
+          {bulletTemplates.map((template) => (
             <div
               key={template.id}
               className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 hover:bg-primary-50 cursor-pointer transition-all"
@@ -118,7 +127,7 @@ export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
                 <h3 className="font-medium text-gray-900">{template.title}</h3>
                 <button className="text-primary-500 hover:text-primary-600 flex items-center gap-1 text-sm">
                   <PlusIcon size={16} />
-                  Chọn
+                  {templateTexts?.selectButton || 'Select'}
                 </button>
               </div>
               
@@ -127,7 +136,7 @@ export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
                   {template.content}
                 </p>
                 <div className="border-l-4 border-primary-200 pl-3">
-                  <p className="text-xs text-gray-500 mb-1">Ví dụ:</p>
+                  <p className="text-xs text-gray-500 mb-1">{templateTexts?.exampleLabel || 'Example:'}</p>
                   <p className="text-sm text-gray-700">{template.example}</p>
                 </div>
               </div>
@@ -135,17 +144,7 @@ export const TemplateSelectionModal: React.FC<TemplateSelectionModalProps> = ({
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t bg-gray-50">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <div className="w-4 h-4 bg-primary-100 rounded flex items-center justify-center">
-              <span className="text-primary-600 text-xs">💡</span>
-            </div>
-            <span>
-              Hoặc bạn có thể bắt đầu với một mẫu trống và sử dụng AI để hoàn thiện.
-            </span>
-          </div>
-        </div>
+
       </div>
     </div>
   );

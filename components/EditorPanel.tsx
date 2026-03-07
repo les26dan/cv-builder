@@ -425,6 +425,22 @@ export const EditorPanel = ({
     loadInitialData();
   }, [cvData?.id]);
 
+  // Handle Esc key and click outside to close Add Section Modal
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showAddSectionModal) {
+        setShowAddSectionModal(false);
+      }
+    };
+
+    if (showAddSectionModal) {
+      document.addEventListener('keydown', handleEscKey);
+      return () => {
+        document.removeEventListener('keydown', handleEscKey);
+      };
+    }
+  }, [showAddSectionModal]);
+
   // Auto-trigger JD analysis when CV data and JD input are available but no analysis exists
   useEffect(() => {
     const autoTriggerAnalysis = async () => {
@@ -974,8 +990,14 @@ export const EditorPanel = ({
 
       {/* Add Section Modal */}
       {showAddSectionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={() => setShowAddSectionModal(false)}
+        >
+          <div 
+            className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium">{editorTexts?.editorPanel?.addSection || 'Add New Section'}</h3>
               <button 
@@ -987,7 +1009,7 @@ export const EditorPanel = ({
             </div>
             
             <p className="text-sm text-gray-600 mb-4">
-              Chọn loại phần bạn muốn thêm vào CV
+              {editorTexts?.editorPanel?.addSectionModal?.subtitle || 'Choose the type of section you want to add to your CV'}
             </p>
             
             <div className="space-y-3">
@@ -1008,7 +1030,7 @@ export const EditorPanel = ({
                 onClick={() => setShowAddSectionModal(false)}
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
               >
-                Hủy
+{editorTexts?.editorPanel?.addSectionModal?.cancel || 'Cancel'}
               </button>
             </div>
           </div>

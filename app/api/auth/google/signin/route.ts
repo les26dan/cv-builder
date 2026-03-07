@@ -8,9 +8,11 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
+  console.log('🚀 [OAUTH] Google OAuth signin initiated');
   
   try {
     // Track OAuth initiation
+    console.log('📊 [OAUTH] Tracking analytics...');
     serverAnalytics.track(STATSIG_EVENTS.API_REQUEST_RECEIVED, { userID: 'anonymous' }, {
       endpoint: '/api/auth/google/signin',
       method: 'GET',
@@ -18,14 +20,24 @@ export async function GET(request: NextRequest) {
     });
 
     // Initialize OAuth service
+    console.log('🔧 [OAUTH] Initializing OAuth service...');
     OAuthService.initialize();
+    console.log('✅ [OAUTH] OAuth service initialized successfully');
     
     // Get return URL from query parameters
     const { searchParams } = new URL(request.url);
     const returnUrl = searchParams.get('returnUrl') || '/';
+    console.log('🔗 [OAUTH] Return URL configured:', returnUrl);
     
     // Generate OAuth authorization URL
+    console.log('🔄 [OAUTH] Generating OAuth authorization URL...');
     const { authUrl, sessionId } = await OAuthService.initiateOAuth('google', returnUrl);
+    
+    console.log('🔗 [OAUTH] OAuth URL generated successfully:', {
+      authUrlDomain: new URL(authUrl).origin,
+      sessionIdLength: sessionId.length,
+      sessionIdPreview: sessionId.substring(0, 10) + '...'
+    });
     
     // Track successful OAuth session creation
     serverAnalytics.trackAuthEvent(

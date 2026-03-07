@@ -29,6 +29,11 @@ export const cvEditor = {
     addSection: 'Add New Section',
     deleteSection: 'Delete Section',
     reorderSections: 'Drag to reorder sections',
+    addSectionModal: {
+      title: 'Add New Section',
+      subtitle: 'Choose the type of section you want to add to your CV',
+      cancel: 'Cancel',
+    },
     cvScore: {
       title: 'Your resume score',
       outOf: 'out of 100',
@@ -106,7 +111,7 @@ export const cvEditor = {
         startDate: 'Start Date',
         endDate: 'End Date',
         current: 'I currently work here',
-        description: 'Job Description',
+        description: 'Description',
         achievements: 'Key Achievements',
       },
       placeholders: {
@@ -123,6 +128,50 @@ export const cvEditor = {
         placeholder: 'Describe a specific achievement or responsibility...',
         remove: 'Remove',
         aiGenerate: 'Generate with AI',
+        characterLimit: {
+          tooLong: 'This bullet point is quite long ({length}/200 characters). Consider splitting it into two bullet points.',
+          canShorten: '💡 {length}/200 characters',
+        },
+        templateSelection: {
+          title: 'Choose bullet template',
+          description: 'Choose a template that fits your experience. You can fill in the parts [in brackets] with your specific information.',
+          closeLabel: 'Close',
+          jobTitleHint: 'Suggestion for position:',
+          selectButton: 'Select',
+          exampleLabel: 'Example:',
+          templates: {
+            achievement: {
+              title: 'Achievement with results',
+              content: 'Led [team/project] to [achieve goal], resulting in [specific impact].',
+              example: 'Led team of 5 engineers to deploy new CRM system, resulting in 30% improved efficiency.'
+            },
+            implementation: {
+              title: 'Project implementation',
+              content: 'Implemented [project/initiative] that helped [achieved result].',
+              example: 'Implemented automated reporting process that helped reduce processing time by 50%.'
+            },
+            improvement: {
+              title: 'Process improvement',
+              content: 'Improved [process/metric] by [X%] through [specific action].',
+              example: 'Improved customer conversion rate by 25% through sales process optimization.'
+            },
+            collaboration: {
+              title: 'Team collaboration',
+              content: 'Collaborated with [department/team] to [achieve goal], resulting in [positive outcome].',
+              example: 'Collaborated with design and development teams to launch new feature, increasing customer satisfaction by 20%.'
+            },
+            management: {
+              title: 'Management and leadership',
+              content: 'Managed [team/resources] to [achieve goal], ensuring [quality outcome].',
+              example: 'Managed team of 8 staff to complete project on time, ensuring high quality and budget compliance.'
+            },
+            problemSolving: {
+              title: 'Problem solving',
+              content: 'Solved [problem/challenge] by [method], leading to [positive result].',
+              example: 'Solved system performance issues by optimizing database, reducing response time by 60%.'
+            }
+          }
+        }
       },
       validation: {
         titleRequired: 'Please enter job title',
@@ -131,6 +180,16 @@ export const cvEditor = {
         startAfterEnd: 'Start date must be before end date',
         aiRequirement: 'Please fill in job title and company to use AI assistance',
         aiDescription: 'Please enter job title and company before generating description',
+      },
+      messages: {
+        deleteConfirm: 'Are you sure you want to delete this work experience?',
+        aiRequiredAlert: 'Please fill in job title and company to use AI assistance',
+        aiGenerationRequiredAlert: 'Please enter job title and company before using AI',
+        aiDescriptionRequiredAlert: 'Please enter job title and company before generating description',
+        improveDescriptionError: 'Unable to improve description. Please try again.',
+        improveDescriptionGeneralError: 'An error occurred while improving description. Please try again.',
+        basicInfoHint: 'Start with basic information',
+        buildExperienceTitle: 'Build Impressive Work Experience in 5 Seconds!',
       },
     },
     skills: {

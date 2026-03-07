@@ -534,7 +534,7 @@ export const WorkExperienceSection = ({
   };
 
   const handleRemoveExperience = (index: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa kinh nghiệm này?')) {
+    if (window.confirm(experienceTexts?.messages?.deleteConfirm || 'Are you sure you want to delete this work experience?')) {
       const updatedItems = [...data.items];
       updatedItems.splice(index, 1);
       onUpdate({
@@ -631,7 +631,7 @@ export const WorkExperienceSection = ({
     const currentBullet = experience.bullets[bulletIndex];
     
     if (!experience.title || !experience.company) {
-      alert('Vui lòng điền chức danh và công ty để sử dụng AI hỗ trợ');
+      alert(experienceTexts?.messages?.aiRequiredAlert || 'Please fill in job title and company to use AI assistance');
       return;
     }
 
@@ -651,7 +651,7 @@ export const WorkExperienceSection = ({
   const handleOpenWizard = (experienceIndex: number) => {
     const experience = data.items[experienceIndex];
     if (!experience.title || !experience.company) {
-      alert('Vui lòng nhập chức danh và công ty trước khi sử dụng AI');
+      alert(experienceTexts?.messages?.aiGenerationRequiredAlert || 'Please enter job title and company before using AI');
       return;
     }
 
@@ -750,7 +750,7 @@ export const WorkExperienceSection = ({
   const handleGenerateBullets = async (experienceIndex: number) => {
     const experience = data.items[experienceIndex];
     if (!experience.title && !experience.company) {
-      alert('Vui lòng nhập chức danh và công ty trước khi tạo mô tả');
+      alert(experienceTexts?.messages?.aiDescriptionRequiredAlert || 'Please enter job title and company before generating description');
       return;
     }
 
@@ -825,11 +825,11 @@ export const WorkExperienceSection = ({
         // markAIUsed('workExperience');
       } else {
         console.error('Failed to improve bullets:', result.error);
-        alert('Không thể cải thiện mô tả. Vui lòng thử lại.');
+        alert(experienceTexts?.messages?.improveDescriptionError || 'Unable to improve description. Please try again.');
       }
     } catch (error) {
       console.error('Error improving bullets:', error);
-      alert('Có lỗi xảy ra khi cải thiện mô tả. Vui lòng thử lại.');
+      alert(experienceTexts?.messages?.improveDescriptionGeneralError || 'An error occurred while improving description. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -897,7 +897,8 @@ export const WorkExperienceSection = ({
       return (
         <div className="text-orange-600 text-xs mt-1 flex items-center">
           <span className="mr-1">⚠️</span>
-          Gạch đầu dòng này khá dài ({bullet.length}/200 ký tự). Hãy cân nhắc chia thành hai gạch đầu dòng.
+          {experienceTexts?.bullets?.characterLimit?.tooLong?.replace('{length}', bullet.length.toString()) || 
+           `This bullet point is quite long (${bullet.length}/200 characters). Consider splitting it into two bullet points.`}
         </div>
       );
     }
@@ -905,7 +906,8 @@ export const WorkExperienceSection = ({
     if (bullet.length > 150) {
       return (
         <div className="text-yellow-600 text-xs mt-1">
-          💡 {bullet.length}/200 ký tự - có thể rút gọn thêm
+          {experienceTexts?.bullets?.characterLimit?.canShorten?.replace('{length}', bullet.length.toString()) || 
+           `💡 ${bullet.length}/200 characters - can be shortened`}
         </div>
       );
     }
@@ -974,10 +976,10 @@ export const WorkExperienceSection = ({
             <div className="text-primary-500 text-lg">⚡</div>
             <div className="flex-1">
               <h4 className="font-medium text-primary-700 mb-1">
-                Xây Dựng Kinh Nghiệm Làm Việc Ấn Tượng Trong 5 Giây!
+                {experienceTexts?.messages?.buildExperienceTitle || 'Build Impressive Work Experience in 5 Seconds!'}
               </h4>
               <p className="text-sm text-primary-500 mb-2">
-                Chỉ cần nhập chức danh và tên công ty - OkBuddy AI giúp bạn tạo mô tả kinh nghiệm làm việc ngay lập tức.
+                {experienceTexts?.guidance || 'Just enter job title and company name - OkBuddy AI will help you create a work experience description instantly.'}
               </p>
             </div>
           </div>
@@ -1107,7 +1109,7 @@ export const WorkExperienceSection = ({
 
             <div className="mb-4">
               <div className="flex items-center gap-3 mb-3">
-                <label className="block text-sm font-medium">{experienceTexts?.fields?.description || 'Job Description'} <span className="text-red-500 text-xs">*</span></label>
+                <label className="block text-sm font-medium">{experienceTexts?.fields?.description || 'Description'} <span className="text-red-500 text-xs">*</span></label>
                 {/* AI Generate Options Dropdown */}
                 <div className="flex items-center gap-2">
                   <button
@@ -1125,7 +1127,7 @@ export const WorkExperienceSection = ({
               {(!experience.title || !experience.company) && (
                 <div className="bg-warning-500/10 border border-warning-500/20 rounded-lg p-3 mb-3">
                   <p className="text-sm text-warning-500 font-medium">
-                    💡 {currentLanguage === 'vi' ? 'Bắt đầu với thông tin cơ bản' : 'Start with basic information'}
+                    💡 {experienceTexts?.messages?.basicInfoHint || 'Start with basic information'}
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
                     {experienceTexts?.aiGuidance || 'Fill in job title and company name so AI can help create the perfect job description for you.'}
@@ -1245,6 +1247,7 @@ export const WorkExperienceSection = ({
         onClose={() => setTemplateModal({ isOpen: false, experienceIndex: -1 })}
         onSelectTemplate={handleTemplateSelect}
         jobTitle={templateModal.experienceIndex >= 0 ? data.items[templateModal.experienceIndex]?.title : undefined}
+        language={currentLanguage}
       />
 
       {/* New Work Experience Wizard */}

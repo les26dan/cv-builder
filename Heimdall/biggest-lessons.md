@@ -1,7 +1,7 @@
 # OkBuddy Development: Biggest Lessons Learned
 
 ## Last Updated: February 8, 2025
-## Status: Production-Ready System - Guest User Logic & Conditional UI Lessons Added
+## Status: Production-Ready System - OAuth Database Access & Debugging Lessons Added
 
 ---
 
@@ -1236,4 +1236,129 @@ curl -X GET '[your-supabase-url]/rest/v1/your-table' \
 - **Environment Templates**: Provide `.env.example` with required variables documented
 - **CI/CD Validation**: Test database connectivity in deployment pipelines
 
-**CRITICAL TAKEAWAY**: Database connectivity issues should fail loudly and immediately, not silently default to mock mode. Implement strict environment validation on startup to catch missing credentials before they cause user-facing functionality failures. 
+**CRITICAL TAKEAWAY**: Database connectivity issues should fail loudly and immediately, not silently default to mock mode. Implement strict environment validation on startup to catch missing credentials before they cause user-facing functionality failures.
+
+---
+
+## 🚨 **LESSON #9: OAuth Database Access Permissions - The RLS vs Service Client Trap**
+
+### **The Problem That Cost 3 Hours of OAuth Debugging**
+**Issue**: Google OAuth authentication failing with "duplicate key constraint violation" despite correct implementation, due to using regular Supabase client instead of service client for admin database operations.
+
+### **Why This Qualifies as a Critical Lesson**
+- ✅ **HIGH IMPACT**: OAuth completely broken - authentication 100% non-functional for existing users
+- ✅ **HIGH PROBABILITY**: Any admin database operation will hit this RLS permission issue again
+- ✅ **HIGH COST**: Required extensive logging, OAuth flow tracing, and deep database client debugging
+- ✅ **PREVENTABLE**: Clear pattern for when service client vs regular client is needed
+- ✅ **SCALABLE**: Affects any feature requiring admin privileges or bypassing Row Level Security (RLS)
+
+### **What Happened**
+```javascript
+// ❌ WRONG: Regular client blocked by RLS for user lookup
+const { data: existingUser, error: findError } = await this.supabase!
+  .from('users')
+  .select('*')
+  .eq('email', profile.email)
+  .single();
+
+// Error: "PGRST116: JSON object requested, multiple (or no) rows returned"
+// Root cause: RLS policy preventing service from finding existing users
+
+// ✅ CORRECT: Service client bypasses RLS for admin operations  
+const { data: existingUser, error: findError } = await this.supabaseService!
+  .from('users')
+  .select('*')
+  .eq('email', profile.email)
+  .single();
+```
+
+### **The Misleading Symptoms**
+1. **Misleading Error**: `duplicate key constraint violation` suggested database schema issue
+2. **OAuth Flow Seemed Working**: Token exchange, profile fetch, session validation all succeeded
+3. **Logic Appeared Correct**: Code path for existing user detection looked right
+4. **Database Existed**: User was actually in database, but RLS prevented access
+
+### **The Debugging Trail That Led to Solution**
+```typescript
+// Console logs revealed the real issue:
+console.log('📋 [ACCOUNT-LINKING] User lookup result:', {
+  hasUser: false,        // ❌ Should be true
+  hasError: true,        // ❌ RLS permission denied
+  errorCode: 'PGRST116', // ❌ Multiple/no rows (actually RLS blocking)
+  userDetails: null      // ❌ Should have user data
+});
+
+// Then attempted to create "new" user:
+console.log('📋 [ACCOUNT-LINKING] User creation result:', {
+  hasError: true,
+  errorCode: '23505',    // ❌ Constraint violation - user already exists!
+  errorMessage: 'duplicate key value violates unique constraint "users_email_key"'
+});
+```
+
+### **The Service Client vs Regular Client Pattern**
+
+**🟢 Use Supabase Service Client (`supabaseService`) When:**
+- Admin operations that need to bypass RLS
+- User lookup across all users (like OAuth account linking)
+- System-level database operations
+- Creating/updating users with elevated privileges
+- Operations that need to see data regardless of user context
+
+**🔵 Use Regular Supabase Client (`supabase`) When:**
+- User-scoped operations within RLS policies
+- Normal user CRUD operations
+- Frontend database interactions
+- Operations that should respect user permissions
+
+### **The Critical Fix Pattern**
+```typescript
+// BEFORE: Mixed client usage causing permission issues
+class AccountLinkingService {
+  private ensureSupabaseConfigured(): void { /* regular client */ }
+  
+  public async resolveAccount(profile: OAuthUserProfile) {
+    this.ensureSupabaseConfigured(); // ❌ WRONG METHOD
+    
+    const { data: existingUser } = await this.supabase! // ❌ WRONG CLIENT
+      .from('users')
+      .select('*')
+      .eq('email', profile.email)
+      .single();
+  }
+}
+
+// AFTER: Consistent service client for admin operations
+class AccountLinkingService {
+  private ensureSupabaseServiceConfigured(): void { /* service client */ }
+  
+  public async resolveAccount(profile: OAuthUserProfile) {
+    this.ensureSupabaseServiceConfigured(); // ✅ CORRECT METHOD
+    
+    const { data: existingUser } = await this.supabaseService! // ✅ CORRECT CLIENT
+      .from('users')
+      .select('*')
+      .eq('email', profile.email)
+      .single();
+  }
+}
+```
+
+### **Prevention Strategy**
+1. **Clear Documentation**: Document when to use each client type
+2. **Naming Convention**: Use `supabaseService` consistently for service client
+3. **Method Consistency**: Match validation method to client type being used
+4. **Error Interpretation**: RLS errors can masquerade as "not found" errors
+
+### **Debugging Tools That Saved Time**
+```typescript
+// Add extensive logging to distinguish client permission issues:
+console.log('🔍 [SERVICE] Using client type:', {
+  isServiceClient: !!this.supabaseService,
+  isRegularClient: !!this.supabase,
+  operation: 'user_lookup',
+  context: 'oauth_account_linking'
+});
+```
+
+**CRITICAL TAKEAWAY**: When implementing OAuth or any admin-level database operations, always use the Supabase service client for user lookup and account management. Regular client RLS restrictions will block legitimate system operations, causing misleading constraint violation errors. The error "user already exists" often means "user exists but you don't have permission to see it."

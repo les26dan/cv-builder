@@ -1,5 +1,34 @@
 # Technical Debt Registry
-**Last Updated**: February 2025 (Loading Animation Implementation & QA Validation)
+**Last Updated**: February 2025 (Google OAuth Implementation & Production Readiness)
+
+## ✅ **GOOGLE OAUTH SUCCESSFULLY IMPLEMENTED** (February 2025)
+**Status**: COMPLETED - Production Ready  
+**Priority**: P1 - Critical Authentication Feature  
+**Effort**: 8 hours (completed)  
+
+### **Achievement Summary**
+Successfully implemented and debugged Google OAuth authentication system:
+- ✅ **Google OAuth App Approved**: Project `okbuddy-467808` verified and approved by Google
+- ✅ **Production Configuration**: Client ID and Secret configured for both development and production
+- ✅ **Database Integration**: Fixed AccountLinkingService to use Supabase service client for admin privileges
+- ✅ **End-to-End Testing**: Complete OAuth flow working with real Google accounts
+- ✅ **User Account Linking**: Existing users can now log in via Google OAuth successfully
+- ✅ **Production Build**: Zero build errors, ready for Vercel deployment
+- ✅ **Comprehensive Logging**: Extensive debugging logs implemented throughout OAuth flow
+- ✅ **Error Resolution**: Fixed critical database constraint violation by using proper service client
+
+### **Technical Fixes Applied**
+- **Database Access**: Switched from regular Supabase client to service client in AccountLinkingService
+- **User Lookup**: Fixed user lookup query that was failing due to RLS permissions
+- **Type Safety**: Added proper TypeScript casting for OAuth result types
+- **Production Readiness**: Confirmed build success and deployment compatibility
+
+### **Next Steps for Production**
+1. Update Google Cloud Console redirect URIs for `okbuddy.io` domain
+2. Configure Vercel environment variables with Google OAuth credentials
+3. Test complete flow on production environment
+
+---
 
 ## 🧪 **WIZARD TEST UPDATES NEEDED** (February 2025)
 **Status**: Known Debt - Not Blocking Production  
@@ -35,6 +64,36 @@ During wizard UI simplification and loading animation implementation, we intenti
 - Maintained language configuration compliance
 
 **Impact**: Zero impact on production functionality - tests need updating to match new UI
+
+## ✅ **INTERNATIONALIZATION HARDCODED TEXT CLEANUP** (January 2025)
+**Status**: Completed Successfully  
+**Priority**: P1 - High (Code Quality & I18N)  
+**Effort**: 4 hours  
+
+### **Debt Resolution Summary**
+Successfully eliminated 22+ hardcoded Vietnamese strings throughout CV editing components:
+
+**Technical Debt Eliminated**:
+- **WorkExperienceSection**: 12 hardcoded Vietnamese strings → dynamic language configuration
+- **TemplateSelectionModal**: 8 hardcoded strings + redundant footer → clean, internationalized interface  
+- **EditorPanel**: 2 hardcoded strings → dynamic text loading
+- **Character limits**: Fixed mixed language display ("155/200 ký tự - can be shortened")
+- **Modal controls**: All alert(), confirm(), and button text now properly localized
+
+**Architecture Improvements**:
+- **Centralized text management**: All UI copy in `/config/texts/` structure
+- **Type safety**: Proper TypeScript interfaces for text loading
+- **Performance**: Efficient async text loading with caching
+- **Accessibility**: Dynamic ARIA labels with proper language support
+- **UX enhancements**: Added click-outside and Esc key modal dismissal
+
+**Quality Validation**:
+- ✅ **Production build**: SUCCESSFUL (345KB CV guided editing page)  
+- ✅ **TypeScript strict**: No production code errors
+- ✅ **ESLint**: Zero warnings or errors
+- ✅ **Manual testing**: All dynamic text renders correctly across languages
+
+**Impact**: Eliminated major I18N technical debt, improved maintainability, enhanced user experience
 
 ## ✅ **LOADING ANIMATION IMPLEMENTATION** (February 2025)
 **Status**: Completed Successfully  

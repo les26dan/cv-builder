@@ -49,10 +49,19 @@ export class AccountLinkingService {
    * Resolve account by email - either find existing or create new (production schema)
    */
   public async resolveAccount(profile: OAuthUserProfile): Promise<AccountLinkingResult> {
+    console.log('🔗 [ACCOUNT-LINKING] resolveAccount started');
+    console.log('👤 [ACCOUNT-LINKING] Profile details:', {
+      id: profile.id,
+      email: profile.email,
+      name: profile.name,
+      provider: profile.provider,
+      emailVerified: profile.emailVerified
+    });
+    
     try {
       // If Supabase is not configured, return mock user for development
       if (!this.supabase) {
-        console.log('🔧 Using mock OAuth user for development:', profile.email);
+        console.log('🔧 [ACCOUNT-LINKING] Using mock OAuth user for development:', profile.email);
         
         // Generate a mock user ID
         const mockUserId = `mock-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -72,21 +81,39 @@ export class AccountLinkingService {
       }
       
       // Check if user already exists with this email
-      this.ensureSupabaseConfigured();
+      console.log('🔍 [ACCOUNT-LINKING] Checking for existing user with email:', profile.email);
+      this.ensureSupabaseServiceConfigured();
       
-      const { data: existingUser, error: findError } = await this.supabase!
+      const { data: existingUser, error: findError } = await this.supabaseService!
         .from('users')
         .select('*')
         .eq('email', profile.email)
         .single();
 
+      console.log('📋 [ACCOUNT-LINKING] User lookup result:', {
+        hasUser: !!existingUser,
+        hasError: !!findError,
+        errorCode: findError?.code,
+        errorMessage: findError?.message,
+        userDetails: existingUser ? {
+          id: existingUser.id,
+          email: existingUser.email,
+          fullName: existingUser.full_name,
+          oauthProvider: existingUser.oauth_provider,
+          oauthId: existingUser.oauth_id
+        } : null
+      });
+
       if (findError && findError.code !== 'PGRST116') {
+        console.error('❌ [ACCOUNT-LINKING] Database error during user lookup:', findError);
         throw findError;
       }
 
       if (existingUser) {
-        // User exists - update their OAuth info and return login result  
-        const { error: updateError } = await this.supabase!
+        console.log('✅ [ACCOUNT-LINKING] Existing user found, updating OAuth information...');
+        
+        // User exists - update their OAuth info and return login result using service client
+        const { error: updateError } = await this.supabaseService!
           .from('users')
           .update({
             oauth_provider: profile.provider,
@@ -97,8 +124,11 @@ export class AccountLinkingService {
           .eq('id', existingUser.id);
 
         if (updateError) {
+          console.error('❌ [ACCOUNT-LINKING] Error updating existing user OAuth info:', updateError);
           throw updateError;
         }
+
+        console.log('✅ [ACCOUNT-LINKING] Successfully updated existing user OAuth information');
 
         SecurityService.logSecurityEvent('oauth_account_linked', {
           userId: existingUser.id,
@@ -106,7 +136,7 @@ export class AccountLinkingService {
           email: profile.email
         });
 
-        return {
+        const result = {
           action: 'login',
           user: {
             id: existingUser.id,
@@ -118,10 +148,22 @@ export class AccountLinkingService {
           isNewAccount: false,
           linkedProviders: [profile.provider]
         };
+        
+        console.log('🎉 [ACCOUNT-LINKING] Returning login result for existing user:', {
+          action: result.action,
+          userId: result.user.id,
+          email: result.user.email,
+          isNewAccount: result.isNewAccount
+        });
+        
+        return result as AccountLinkingResult;
       } else {
+        console.log('📝 [ACCOUNT-LINKING] No existing user found, creating new OAuth account...');
+        
         // User doesn't exist - create new OAuth account using service client to bypass RLS
         this.ensureSupabaseServiceConfigured();
         
+        console.log('🔧 [ACCOUNT-LINKING] Using service client to create new user...');
         const { data: newUser, error: createError } = await this.supabaseService!
           .from('users')
           .insert({
@@ -135,6 +177,18 @@ export class AccountLinkingService {
           })
           .select()
           .single();
+          
+        console.log('📋 [ACCOUNT-LINKING] User creation result:', {
+          hasUser: !!newUser,
+          hasError: !!createError,
+          errorCode: createError?.code,
+          errorMessage: createError?.message,
+          userDetails: newUser ? {
+            id: newUser.id,
+            email: newUser.email,
+            fullName: newUser.full_name
+          } : null
+        });
 
         if (createError) {
           throw createError;
@@ -160,7 +214,16 @@ export class AccountLinkingService {
         };
       }
     } catch (error) {
-      console.error('❌ Error resolving account:', error);
+      console.error('💥 [ACCOUNT-LINKING] Error resolving account:', error);
+      console.error('💥 [ACCOUNT-LINKING] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        errorCode: (error as any)?.code,
+        errorDetails: (error as any)?.details,
+        errorHint: (error as any)?.hint,
+        profileEmail: profile.email,
+        profileProvider: profile.provider
+      });
       throw error;
     }
   }
