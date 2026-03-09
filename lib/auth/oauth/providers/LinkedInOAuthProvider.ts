@@ -6,8 +6,8 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
   
   private readonly LINKEDIN_AUTH_URL = 'https://www.linkedin.com/oauth/v2/authorization';
   private readonly LINKEDIN_TOKEN_URL = 'https://www.linkedin.com/oauth/v2/accessToken';
-  private readonly LINKEDIN_PROFILE_URL = 'https://api.linkedin.com/v2/me';
-  private readonly LINKEDIN_EMAIL_URL = 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))';
+  private readonly LINKEDIN_PROFILE_URL = 'https://api.linkedin.com/v2/userinfo';
+  private readonly LINKEDIN_EMAIL_URL = 'https://api.linkedin.com/v2/userinfo';
   
   private readonly clientId: string;
   private readonly clientSecret: string;
@@ -18,7 +18,7 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
     this.clientId = process.env.LINKEDIN_CLIENT_ID || '';
     this.clientSecret = process.env.LINKEDIN_CLIENT_SECRET || '';
     this.redirectUri = process.env.LINKEDIN_REDIRECT_URI || (process.env.NODE_ENV === 'production' ? 'https://www.okbuddy.io/api/auth/linkedin/callback' : 'http://localhost:3000/api/auth/linkedin/callback');
-    this.scopes = ['r_liteprofile', 'r_emailaddress'];
+    this.scopes = ['openid', 'profile', 'email'];
 
     if (!this.clientId || !this.clientSecret) {
       throw new Error('LinkedIn OAuth configuration is missing');
@@ -90,68 +90,45 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
   }
 
   /**
-   * Fetch user profile from LinkedIn
+   * Fetch user profile from LinkedIn using OpenID Connect userinfo endpoint
    */
   public async fetchUserProfile(accessToken: string): Promise<OAuthUserProfile> {
     try {
-      // Fetch profile data
-      const profileResponse = await fetch(this.LINKEDIN_PROFILE_URL, {
+      // Fetch user info from OpenID Connect userinfo endpoint
+      const userInfoResponse = await fetch(this.LINKEDIN_PROFILE_URL, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Accept': 'application/json'
         }
       });
 
-      if (!profileResponse.ok) {
-        throw new Error(`LinkedIn profile request failed: ${profileResponse.status}`);
+      if (!userInfoResponse.ok) {
+        throw new Error(`LinkedIn userinfo request failed: ${userInfoResponse.status}`);
       }
 
-      const linkedinProfile: LinkedInProfile = await profileResponse.json();
-
-      // Fetch email data
-      const emailResponse = await fetch(this.LINKEDIN_EMAIL_URL, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error(`LinkedIn email request failed: ${emailResponse.status}`);
-      }
-
-      const emailData: LinkedInEmailResponse = await emailResponse.json();
-
-      // Extract email
-      const email = emailData.elements?.[0]?.['handle~']?.emailAddress;
-      if (!email) {
-        throw new Error('LinkedIn email not found');
-      }
+      const userInfo = await userInfoResponse.json();
 
       // Validate required fields
-      if (!linkedinProfile.id) {
-        throw new Error('LinkedIn profile missing required fields');
+      if (!userInfo.sub || !userInfo.email) {
+        throw new Error('LinkedIn profile missing required fields (sub or email)');
       }
 
-      // Extract localized names
-      const firstName = this.extractLocalizedName(linkedinProfile.firstName);
-      const lastName = this.extractLocalizedName(linkedinProfile.lastName);
-      const fullName = `${firstName} ${lastName}`.trim();
+      // Extract name information
+      const firstName = userInfo.given_name || '';
+      const lastName = userInfo.family_name || '';
+      const fullName = userInfo.name || `${firstName} ${lastName}`.trim();
 
       // Normalize profile data
       const normalizedProfile: OAuthUserProfile = {
-        id: linkedinProfile.id,
-        email: SecurityService.sanitizeInput(email),
-        emailVerified: true, // LinkedIn emails are generally verified
+        id: userInfo.sub,
+        email: SecurityService.sanitizeInput(userInfo.email),
+        emailVerified: userInfo.email_verified || true, // LinkedIn emails are generally verified
         name: SecurityService.sanitizeInput(fullName),
         firstName: SecurityService.sanitizeInput(firstName),
         lastName: SecurityService.sanitizeInput(lastName),
-        profilePicture: linkedinProfile.profilePicture?.displayImage,
+        profilePicture: userInfo.picture,
         provider: 'linkedin',
-        providerData: {
-          profile: linkedinProfile,
-          email: emailData
-        }
+        providerData: userInfo
       };
 
       SecurityService.logSecurityEvent('linkedin_profile_fetch_success', {
