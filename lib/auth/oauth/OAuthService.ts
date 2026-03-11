@@ -49,7 +49,8 @@ export class OAuthService {
   public static async initiateOAuth(
     provider: string,
     returnUrl?: string,
-    userId?: string
+    userId?: string,
+    fallback = false
   ): Promise<{ authUrl: string; sessionId: string }> {
     const oauthProvider = this.getProvider(provider);
     if (!oauthProvider) {
@@ -79,7 +80,7 @@ export class OAuthService {
       );
 
       // Build authorization URL
-      const authUrl = await oauthProvider.buildAuthUrl(stateToken);
+      const authUrl = await oauthProvider.buildAuthUrl(stateToken, fallback);
 
       SecurityService.logSecurityEvent('oauth_initiate', {
         provider,

@@ -19,6 +19,17 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.log('❌ LinkedIn OAuth error:', error);
       
+      // Handle prompt=none failures - retry with normal OAuth flow
+      if (error === 'login_required' || error === 'interaction_required') {
+        console.log('🔄 User not logged in to LinkedIn, redirecting to normal OAuth flow...');
+        
+        // Initiate normal OAuth flow (without prompt=none)
+        const normalOAuthUrl = new URL('/api/auth/linkedin/signin', request.url);
+        normalOAuthUrl.searchParams.set('fallback', 'true');
+        
+        return NextResponse.redirect(normalOAuthUrl);
+      }
+      
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('error', 'oauth_cancelled');
       

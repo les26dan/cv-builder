@@ -84,7 +84,7 @@ export interface AccountLinkingResult {
 // OAuth Provider Interface
 export interface IOAuthProvider {
   name: string;
-  buildAuthUrl(state: string): Promise<string>;
+  buildAuthUrl(state: string, fallback?: boolean): Promise<string>;
   exchangeCode(code: string): Promise<TokenResponse>;
   fetchUserProfile(accessToken: string): Promise<OAuthUserProfile>;
   validateToken(token: string): Promise<boolean>;
