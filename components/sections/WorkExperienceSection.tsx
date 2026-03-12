@@ -25,10 +25,8 @@ const WorkExperienceWizard = dynamic(() => import('../common/WorkExperienceWizar
   loading: () => null
 });
 
-const NewWorkExperienceWizard = dynamic(() => import('../common/NewWorkExperienceWizard').then(mod => ({ default: mod.NewWorkExperienceWizard })), {
-  ssr: false,
-  loading: () => null
-});
+// Remove dynamic import to prevent wizard render delay - this is a critical UI component
+import { NewWorkExperienceWizard } from '../common/NewWorkExperienceWizard';
 import { SortableWorkExperience } from '../common/SortableWorkExperience';
 import { PlusIcon, GripVerticalIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, FileTextIcon } from 'lucide-react';
 import { aiService, WizardBulletGenerationRequest } from '../../utils/aiService';
@@ -102,6 +100,12 @@ export const WorkExperienceSection = ({
     return () => clearTimeout(timer);
   }, []);
 
+  // Reset function provision flag when CV ID changes (new CV loaded)
+  useEffect(() => {
+    setHasFunctionBeenProvided(false);
+    console.log('🔄 CV ID changed, resetting function provision flag');
+  }, [cvData?.id]);
+
   // Detect if this is a parsed CV to control expansion behavior
   useEffect(() => {
     const checkIfParsedCV = () => {
@@ -156,6 +160,7 @@ export const WorkExperienceSection = ({
   const [pendingExperience, setPendingExperience] = useState<any>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
+  const [hasFunctionBeenProvided, setHasFunctionBeenProvided] = useState(false);
   
   // New wizard states
   const [newWizardOpen, setNewWizardOpen] = useState(false);
@@ -209,7 +214,7 @@ export const WorkExperienceSection = ({
     setActiveId(null);
   };
 
-  const handleAddExperience = () => {
+  const handleAddExperience = useCallback(() => {
     // Prevent automatic wizard opening for template users during initial load
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
     
@@ -241,41 +246,31 @@ export const WorkExperienceSection = ({
       // Open the old 5-step wizard
       setNewExperienceWizard(true);
     }
-  };
+  }, [cvData?.id, isInitialLoadComplete, useNewWizards]);
 
   // Provide the add function to parent component
   const addExperienceCallback = useCallback(() => {
     console.log('🔍 TRACE: addExperienceCallback called, stack:', new Error().stack);
     handleAddExperience();
-  }, [cvData?.id, isInitialLoadComplete]);
+  }, [handleAddExperience]);
 
+  // Store the latest handleAddExperience in a ref to avoid stale closures
+  const handleAddExperienceRef = useRef(handleAddExperience);
+  handleAddExperienceRef.current = handleAddExperience;
+
+  // Provide add function to parent - ONCE ONLY to prevent auto-popup after wizard completion
   useEffect(() => {
-    // Only block auto-triggering for actual guest users, not all uploaded CVs
-    const isGuestUser = cvData?.id && (
-      cvData.id.startsWith('template-') || // Template users
-      !cvData.userId || // Users without proper authentication
-      cvData.userId.startsWith('guest-') // Explicit guest users
-    );
-    
-    // Only block during initial load to prevent auto-popup, but allow manual use after
-    const shouldBlockFunction = isGuestUser && !isInitialLoadComplete;
-    
-    if (onProvideAddFunction) {
-      // Defer the state update to after the current render cycle to prevent React violation
-      setTimeout(() => {
-        if (!shouldBlockFunction) {
-          console.log('🔧 Providing add experience function to parent (user can manually add)');
-          onProvideAddFunction(addExperienceCallback);
-        } else {
-          console.log('🎯 Guest Session: Temporarily blocking add function during initial load');
-          // Provide a no-op function during initial load only
-          onProvideAddFunction(() => {
-            console.log('🎯 Guest Session: Add function blocked during initial load');
-          });
-        }
-      }, 0);
+    if (onProvideAddFunction && !hasFunctionBeenProvided) {
+      console.log('🔧 Providing add experience function to parent (one-time provision)');
+      // Create a stable function that always calls the latest handleAddExperience
+      const stableAddFunction = () => {
+        console.log('🔍 TRACE: Stable add function called');
+        handleAddExperienceRef.current();
+      };
+      onProvideAddFunction(stableAddFunction);
+      setHasFunctionBeenProvided(true);
     }
-  }, [onProvideAddFunction, addExperienceCallback, cvData?.id, isInitialLoadComplete]);
+  }, [onProvideAddFunction, hasFunctionBeenProvided]);
 
   const handleWizardSave = async (experienceData: any) => {
     // Store the experience data temporarily
@@ -835,6 +830,65 @@ export const WorkExperienceSection = ({
     }
   };
 
+  const handleImproveSingleBullet = async (experienceIndex: number, bulletIndex: number) => {
+    console.log('🎯 WorkExperience: Starting handleImproveSingleBullet', { experienceIndex, bulletIndex });
+    
+    const experience = data.items[experienceIndex];
+    const bulletToImprove = experience.bullets[bulletIndex];
+    
+    console.log('📝 Bullet Details:', { 
+      bulletToImprove, 
+      experience: { title: experience.title, company: experience.company },
+      currentLanguage 
+    });
+    
+    if (!bulletToImprove || !bulletToImprove.trim()) {
+      alert('Please add content to this bullet point before improving');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      // Prepare enhanced context with full CV data
+      const otherExperiences = data.items.filter((_, index) => index !== experienceIndex);
+      
+      const contextData = {
+        jobTitle: experience.title,
+        company: experience.company,
+        workExperience: otherExperiences,
+        skills: cvData?.skills?.items || [],
+        targetJob: cvData?.targetJobDescription || '',
+        language: currentLanguage,
+        bulletIndex: bulletIndex
+      };
+
+      console.log('🔧 Calling AI Service with context:', contextData);
+      
+      // Use the new dedicated single bullet improvement method
+      const result = await aiService.improveSingleBullet(bulletToImprove, contextData);
+
+      if (result.success && result.data) {
+        const updatedItems = [...data.items];
+        updatedItems[experienceIndex].bullets[bulletIndex] = result.data;
+        onUpdate({
+          ...data,
+          items: updatedItems
+        });
+
+        // Mark AI as used for score calculation (will be implemented)
+        // markAIUsed('workExperience');
+      } else {
+        console.error('Failed to improve bullet:', result.error);
+        alert(experienceTexts?.messages?.improveDescriptionError || 'Unable to improve description. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error improving bullet:', error);
+      alert(experienceTexts?.messages?.improveDescriptionGeneralError || 'An error occurred while improving description. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const validateField = (index: number, field: string, value: string) => {
     const errorKey = `${index}-${field}`;
     let error = '';
@@ -883,31 +937,16 @@ export const WorkExperienceSection = ({
   };
 
   const getBulletClassName = (bullet: string) => {
-    const baseClass = 'flex-1 p-2 border rounded-md min-h-[60px] resize-none transition-all duration-200';
-    
-    if (bullet.length > 200) {
-      return `${baseClass} border-orange-300 bg-orange-50 focus:border-orange-500 focus:ring-2 focus:ring-orange-200`;
-    }
-    
+    const baseClass = 'flex-1 p-2 pl-2 pr-56 border rounded-md min-h-[60px] resize-none transition-all duration-200';
     return `${baseClass} border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200`;
   };
 
   const getBulletLengthIndicator = (bullet: string) => {
-    if (bullet.length > 200) {
+    // Show character count for all bullets when they have content
+    if (bullet.length > 0) {
       return (
-        <div className="text-orange-600 text-xs mt-1 flex items-center">
-          <span className="mr-1">⚠️</span>
-          {experienceTexts?.bullets?.characterLimit?.tooLong?.replace('{length}', bullet.length.toString()) || 
-           `This bullet point is quite long (${bullet.length}/200 characters). Consider splitting it into two bullet points.`}
-        </div>
-      );
-    }
-    
-    if (bullet.length > 150) {
-      return (
-        <div className="text-yellow-600 text-xs mt-1">
-          {experienceTexts?.bullets?.characterLimit?.canShorten?.replace('{length}', bullet.length.toString()) || 
-           `💡 ${bullet.length}/200 characters - can be shortened`}
+        <div className="text-black text-xs mt-1 text-right whitespace-nowrap">
+          {bullet.length}/200
         </div>
       );
     }
@@ -1108,19 +1147,16 @@ export const WorkExperienceSection = ({
             </div>
 
             <div className="mb-4">
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center justify-between mb-3">
                 <label className="block text-sm font-medium">{experienceTexts?.fields?.description || 'Description'} <span className="text-red-500 text-xs">*</span></label>
-                {/* AI Generate Options Dropdown */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleOpenTemplates(index)}
-                    disabled={isGenerating}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-                  >
-                    <FileTextIcon size={16} />
-                    {currentLanguage === 'vi' ? 'Dùng mẫu' : 'Use template'}
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleOpenTemplates(index)}
+                  disabled={isGenerating}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                  <FileTextIcon size={16} />
+                  {currentLanguage === 'vi' ? 'Dùng mẫu' : 'Use template'}
+                </button>
               </div>
 
               {/* Show informational message if either field is not filled */}
@@ -1139,49 +1175,49 @@ export const WorkExperienceSection = ({
                 <div key={`${experience.id}-bullet-${bulletIndex}`} className="mb-4">
                   <div className="flex items-start gap-2 w-full">
                     <div className="mt-3 text-gray-400 flex-shrink-0 w-4">•</div>
-                    <textarea 
-                      className={`${getBulletClassName(bullet)} flex-1`}
-                      value={bullet} 
-                      onChange={(e) => handleUpdateBullet(index, bulletIndex, e.target.value)}
-                      onBlur={(e) => handleBulletBlur(index, bulletIndex, e.target.value)}
-                      onKeyDown={(e) => handleBulletKeyDown(index, bulletIndex, e)}
-                      placeholder={experienceTexts?.bullets?.placeholder || 'Describe a specific achievement or responsibility...'}
-                      rows={2}
-                      data-experience-index={index}
-                      data-bullet-index={bulletIndex}
-                    />
-                    {experience.bullets.length > 1 && (
-                      <button 
-                        className="flex-shrink-0 mt-3 text-error-500 hover:text-error-600 hover:bg-red-50 p-1.5 rounded transition-all duration-200"
-                        onClick={() => handleRemoveBullet(index, bulletIndex)}
-                        title={experienceTexts?.bullets?.remove || 'Remove'}
-                      >
-                        <TrashIcon size={14} />
-                      </button>
-                    )}
+                    <div className="relative flex-1">
+                      <textarea 
+                        className={`${getBulletClassName(bullet)} w-full`}
+                        value={bullet} 
+                        onChange={(e) => handleUpdateBullet(index, bulletIndex, e.target.value)}
+                        onBlur={(e) => handleBulletBlur(index, bulletIndex, e.target.value)}
+                        onKeyDown={(e) => handleBulletKeyDown(index, bulletIndex, e)}
+                        placeholder={experienceTexts?.bullets?.placeholder || 'Describe a specific achievement or responsibility...'}
+                        rows={4}
+                        data-experience-index={index}
+                        data-bullet-index={bulletIndex}
+                      />
+                      <div className="absolute right-3 top-2 flex flex-col gap-2 items-end">
+                        <AIAssistButton 
+                          label={experienceTexts?.bullets?.aiGenerate || 'Improve with OkBuddy AI'} 
+                          onClick={() => handleImproveSingleBullet(index, bulletIndex)}
+                          disabled={buttonStates.improveButton.disabled}
+                          variant={buttonStates.improveButton.variant}
+                          size={buttonStates.improveButton.size}
+                        />
+                        <button 
+                          className="text-error-500 hover:text-error-600 hover:bg-red-50 p-2 rounded-lg transition-all duration-200"
+                          onClick={() => handleRemoveBullet(index, bulletIndex)}
+                          title={experienceTexts?.bullets?.remove || 'Remove'}
+                        >
+                          <TrashIcon size={16} />
+                        </button>
+                        {getBulletLengthIndicator(bullet)}
+                      </div>
+                    </div>
                   </div>
-                  {getBulletLengthIndicator(bullet)}
                 </div>
               ))}
               
               <button 
-                className="flex items-center text-sm text-primary-500 hover:text-primary-500 mt-2" 
+                className="flex items-center text-sm mt-2 transition-colors"
+                style={{ color: '#0177bd' }}
                 onClick={() => handleOpenWizard(index)}
               >
                 <PlusIcon size={14} className="mr-1" />
                 {experienceTexts?.bullets?.add || 'Add Achievement'}
               </button>
               
-              {/* Bottom AI Button - Remove horizontal line */}
-              <div className="mt-4">
-                <AIAssistButton 
-                  label={experienceTexts?.bullets?.aiGenerate || 'Generate with AI'} 
-                  onClick={() => handleImproveBullets(index)}
-                  disabled={buttonStates.improveButton.disabled}
-                  variant={buttonStates.improveButton.variant}
-                  size={buttonStates.improveButton.size}
-                />
-              </div>
             </div>
 
 
@@ -1224,7 +1260,16 @@ export const WorkExperienceSection = ({
       </DndContext>
 
       <button 
-        className="flex items-center justify-center w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-primary-500 hover:bg-primary-50 hover:border-primary-500/50 transition-colors bg-white" 
+        className={`flex items-center justify-center w-full py-3 border-2 border-solid rounded-lg transition-colors ${
+          data.items.length === 0 
+            ? 'text-white' 
+            : 'bg-white hover:bg-blue-50'
+        }`}
+        style={
+          data.items.length === 0 
+            ? { backgroundColor: '#0177bd', borderColor: '#0177bd' }
+            : { borderColor: '#0177bd', color: '#0177bd' }
+        }
         onClick={handleAddExperience}
       >
         <PlusIcon size={16} className="mr-2" />

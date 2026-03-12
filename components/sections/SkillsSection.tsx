@@ -30,6 +30,8 @@ export const SkillsSection = ({
   const [newSkill, setNewSkill] = useState('');
   const [validation, setValidation] = useState<ValidationState>({ error: '', warning: '' });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
+  const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
   
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
@@ -111,6 +113,10 @@ export const SkillsSection = ({
     
     setNewSkill('');
     setValidation({ error: '', warning: '' });
+    
+    // Clear suggestions to get fresh ones next time
+    setSuggestedSkills([]);
+    setCurrentSuggestionIndex(0);
   };
 
   const handleRemoveSkill = (index: number) => {
@@ -227,10 +233,30 @@ export const SkillsSection = ({
           return;
         }
 
-        onUpdate({
-          ...data,
-          items: [...data.items, ...newSkills]
-        });
+        // Store all suggestions and populate the first one in the input field
+        // This gives users control to review and manually add each skill
+        if (suggestedSkills.length === 0) {
+          // First time generating suggestions - start with all new skills
+          setSuggestedSkills(newSkills);
+          setCurrentSuggestionIndex(0);
+          setNewSkill(newSkills[0]);
+          
+          const message = newSkills.length > 1 
+            ? `Suggested "${newSkills[0]}" (1 of ${newSkills.length}). Click "Skill Suggestions" again for next suggestion.`
+            : `Suggested "${newSkills[0]}". Click "Add" to include it in your CV.`;
+          
+          setValidation({ error: '', warning: message });
+        } else {
+          // Cycling through existing suggestions
+          const nextIndex = (currentSuggestionIndex + 1) % suggestedSkills.length;
+          setCurrentSuggestionIndex(nextIndex);
+          setNewSkill(suggestedSkills[nextIndex]);
+          
+          const message = `Suggested "${suggestedSkills[nextIndex]}" (${nextIndex + 1} of ${suggestedSkills.length}). Click "Add" to include it in your CV.`;
+          setValidation({ error: '', warning: message });
+        }
+        
+        setTimeout(() => setValidation({ error: '', warning: '' }), 5000);
 
         // Mark AI as used for score calculation (will be implemented)
         // markAIUsed('skills');
@@ -336,8 +362,8 @@ export const SkillsSection = ({
         )}
         
         {newSkill.length > 0 && !validation.error && !validation.warning && (
-          <div className="mt-1 text-xs text-gray-500">
-            {newSkill.length}/50 ký tự
+          <div className="mt-1 text-xs text-black">
+            {newSkill.length}/50
           </div>
         )}
       </div>

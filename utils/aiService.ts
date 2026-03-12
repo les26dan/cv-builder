@@ -290,10 +290,13 @@ class AIService {
     context: PromptContext,
     language: SupportedLanguage
   ): { system: string; user: string } {
+    console.log('🔍 formatPromptForLanguage Called:', { templateKey, language, contextKeys: Object.keys(context) });
+
     // Check if this is a summary-specific template
     const summaryKeys = ['enhancedSummaryGeneration', 'summaryImprovement', 'contextBasedGeneration', 'emptyStateGuidance'];
     
     if (summaryKeys.includes(templateKey)) {
+      console.log('📋 Using Summary Template for:', templateKey);
       const summaryTemplates = this.getSummaryPromptTemplates(language);
       const template = summaryTemplates[templateKey as keyof typeof summaryTemplates] as AIPromptTemplate;
       
@@ -307,16 +310,21 @@ class AIService {
     }
 
     // Check if this is a work experience-specific template
-    const workExperienceKeys = ['enhancedBulletGeneration', 'contextAwareBulletGeneration', 'wizardEnhancedGeneration', 'bulletImprovement'];
+    const workExperienceKeys = ['enhancedBulletGeneration', 'contextAwareBulletGeneration', 'wizardEnhancedGeneration', 'bulletImprovement', 'singleBulletImprovement'];
+    console.log('💼 Checking Work Experience Keys:', { templateKey, workExperienceKeys, isMatch: workExperienceKeys.includes(templateKey) });
     
     if (workExperienceKeys.includes(templateKey)) {
+      console.log('💼 Using Work Experience Template for:', templateKey);
       const workExperienceTemplates = this.getWorkExperiencePromptTemplates(language);
+      console.log('💼 Available Templates:', Object.keys(workExperienceTemplates));
       const template = workExperienceTemplates[templateKey as keyof typeof workExperienceTemplates] as AIPromptTemplate;
       
       if (!template) {
+        console.error('❌ Template Not Found:', { templateKey, language, availableKeys: Object.keys(workExperienceTemplates) });
         throw new Error(`Work experience template '${templateKey}' not found for language '${language}'`);
       }
 
+      console.log('✅ Template Found, Formatting:', { templateKey, language });
       return language === 'en' 
         ? formatEnWorkExperiencePrompt(template, context)
         : formatViWorkExperiencePrompt(template, context);
@@ -525,6 +533,15 @@ class AIService {
   private async getFallbackResponse<T>(method: string, request: any, language: SupportedLanguage): Promise<T> {
     // Implement basic fallback responses based on method
     switch (method) {
+      case 'improveSingleBullet':
+        console.log('🔄 Using fallback for improveSingleBullet');
+        const fallbackBullet = request.bullet || 'Enhanced work achievement bullet point';
+        return {
+          success: true,
+          data: fallbackBullet,
+          source: 'fallback',
+          language
+        } as unknown as T;
       case 'generateSummary':
         return this.generateSummaryFallback(request, language) as unknown as T;
       case 'generateBulletPoints':
@@ -774,6 +791,87 @@ class AIService {
           .slice(0, maxSkills); // Limit to requested number of suggestions
       }
     );
+  }
+
+  /**
+   * Improve a single bullet point for work experience (optimized for granular editing)
+   */
+  async improveSingleBullet(bullet: string, context?: { 
+    jobTitle?: string; 
+    company?: string; 
+    cvData?: any; 
+    workExperience?: any[]; 
+    skills?: string[]; 
+    targetJob?: string; 
+    language?: SupportedLanguage;
+    bulletIndex?: number;
+  }): Promise<AIResponse<string>> {
+    console.log('🔧 AI Service: Starting improveSingleBullet', {
+      bullet,
+      context: {
+        jobTitle: context?.jobTitle,
+        company: context?.company,
+        language: context?.language,
+        bulletIndex: context?.bulletIndex,
+        workExperienceCount: context?.workExperience?.length || 0,
+        skillsCount: context?.skills?.length || 0
+      }
+    });
+
+    const language = context?.language || this.detectRequestLanguage(context || {});
+    console.log('🌐 Language Detection: Using language:', language);
+    
+    // Prepare enhanced context with full CV data for single bullet improvement
+    const workExperienceText = language === 'vi'
+      ? context?.workExperience?.map(exp => 
+          `${exp.title} tại ${exp.company}: ${exp.description || exp.bullets?.join(', ') || ''}`
+        ).join('\n') || ''
+      : context?.workExperience?.map(exp => 
+          `${exp.title} at ${exp.company}: ${exp.description || exp.bullets?.join(', ') || ''}`
+        ).join('\n') || '';
+    
+    const promptContext: PromptContext = {
+      existingContent: bullet,
+      jobTitle: context?.jobTitle || '',
+      company: context?.company || '',
+      workExperience: workExperienceText,
+      skills: context?.skills?.join(', ') || '',
+      targetJob: context?.targetJob || ''
+    };
+
+    console.log('📝 Prompt Context Prepared:', {
+      existingContent: promptContext.existingContent,
+      jobTitle: promptContext.jobTitle,
+      company: promptContext.company,
+      workExperienceLength: workExperienceText.length,
+      targetJob: promptContext.targetJob,
+      templateKey: 'singleBulletImprovement'
+    });
+
+    try {
+      const result = await this.generateAIResponse(
+        'improveSingleBullet',
+        { bullet, context },
+        'singleBulletImprovement', // New prompt template for single bullet
+        promptContext,
+        language,
+        (content: string) => {
+          console.log('🔄 Processing AI Response:', { rawContent: content });
+          // Parse single improved bullet point from response
+          const processed = content.split('\n')
+            .find(line => line.trim().length > 0)
+            ?.replace(/^[-•*]\s*/, '').trim() || bullet;
+          console.log('✨ Processed Result:', { processed });
+          return processed;
+        }
+      );
+
+      console.log('✅ improveSingleBullet Success:', { result });
+      return result;
+    } catch (error) {
+      console.error('❌ AI Service Error (improveSingleBullet):', error);
+      throw error;
+    }
   }
 
   /**

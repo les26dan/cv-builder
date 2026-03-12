@@ -260,7 +260,7 @@ describe('SkillsSection Validation', () => {
       fireEvent.change(input, { target: { value: 'JavaScript' } });
 
       await waitFor(() => {
-        expect(screen.getByText('10/50 ký tự')).toBeInTheDocument();
+        expect(screen.getByText('10/50')).toBeInTheDocument();
       });
     });
 

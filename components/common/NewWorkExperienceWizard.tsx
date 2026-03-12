@@ -225,20 +225,16 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
     }
   }, [isOpen]);
 
-  // Show AI preview after basic info is entered
+  // Show AI preview immediately when wizard opens to prevent render delay
   useEffect(() => {
-    if (formData.title && formData.company && currentStep >= 1) {
-      if (!showAIPreview) {
-        setAiGenerating(true);
-        setTimeout(() => {
-          setAiGenerating(false);
-          setShowAIPreview(true);
-        }, 1000);
-      }
+    if (isOpen) {
+      // Show AI preview immediately when wizard opens
+      setShowAIPreview(true);
+      setAiGenerating(false);
     } else {
       setShowAIPreview(false);
     }
-  }, [formData.title, formData.company, currentStep]);
+  }, [isOpen]);
 
   const handleNext = () => {
     if (currentStep < 2) {
@@ -426,12 +422,12 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
 
           {currentStep === 2 && (
             <div className="space-y-4">
-              {/* AI Preview Section - Show first */}
-              {formData.title && formData.company && (
+              {/* AI Preview Section - Show immediately to prevent render delay */}
+              {showAIPreview && (
                 <div className="mb-6">
                   <AIPreview
-                    jobTitle={formData.title}
-                    company={formData.company}
+                    jobTitle={formData.title || (isVietnamese ? 'Kỹ sư phần mềm' : 'Software Engineer')}
+                    company={formData.company || (isVietnamese ? 'Công ty ABC' : 'ABC Company')}
                     project={formData.project}
                     impact={formData.impact}
                     isLoading={aiGenerating}

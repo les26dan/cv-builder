@@ -15,46 +15,73 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
   private readonly scopes: string[];
 
   constructor() {
-    console.log('🔧 [LINKEDIN-OAUTH] Initializing LinkedIn OAuth Provider...');
+    console.log('🔧 [LINKEDIN-OAUTH] ========== INITIALIZING LINKEDIN OAUTH PROVIDER ==========');
     console.log('📋 [LINKEDIN-OAUTH] Environment check:', {
       NODE_ENV: process.env.NODE_ENV,
       hasClientId: !!process.env.LINKEDIN_CLIENT_ID,
       hasClientSecret: !!process.env.LINKEDIN_CLIENT_SECRET,
       hasRedirectUri: !!process.env.LINKEDIN_REDIRECT_URI,
       clientIdPreview: process.env.LINKEDIN_CLIENT_ID?.substring(0, 10) + '...',
+      currentTimestamp: new Date().toISOString()
     });
 
     this.clientId = process.env.LINKEDIN_CLIENT_ID || '';
     this.clientSecret = process.env.LINKEDIN_CLIENT_SECRET || '';
     this.redirectUri = process.env.LINKEDIN_REDIRECT_URI || (process.env.NODE_ENV === 'production' ? 'https://www.okbuddy.io/api/auth/linkedin/callback' : 'http://localhost:3000/api/auth/linkedin/callback');
+    // Use LinkedIn's recommended scopes for Sign In with LinkedIn
     this.scopes = ['openid', 'profile', 'email'];
 
-    console.log('⚙️ [LINKEDIN-OAUTH] Final configuration:', {
-      clientId: this.clientId,
+    console.log('⚙️ [LINKEDIN-OAUTH] Final configuration setup:', {
+      clientId: this.clientId ? 'SET' : 'MISSING',
+      clientIdLength: this.clientId.length,
+      clientIdFirst10: this.clientId.substring(0, 10),
       redirectUri: this.redirectUri,
+      redirectUriExpected: process.env.NODE_ENV === 'production' ? 'https://www.okbuddy.io/api/auth/linkedin/callback' : 'http://localhost:3000/api/auth/linkedin/callback',
+      redirectUriFromEnv: process.env.LINKEDIN_REDIRECT_URI || 'NOT_SET',
       scopes: this.scopes,
-      hasClientSecret: !!this.clientSecret
+      hasClientSecret: !!this.clientSecret,
+      clientSecretLength: this.clientSecret.length
     });
 
     if (!this.clientId || !this.clientSecret) {
-      console.error('❌ [LINKEDIN-OAUTH] Missing required configuration!');
-      throw new Error('LinkedIn OAuth configuration is missing');
+      console.error('❌ [LINKEDIN-OAUTH] CRITICAL ERROR: Missing required configuration!');
+      console.error('💥 [LINKEDIN-OAUTH] Missing credentials:', {
+        missingClientId: !this.clientId,
+        missingClientSecret: !this.clientSecret,
+        envVarsCheck: {
+          LINKEDIN_CLIENT_ID: process.env.LINKEDIN_CLIENT_ID ? 'SET' : 'MISSING',
+          LINKEDIN_CLIENT_SECRET: process.env.LINKEDIN_CLIENT_SECRET ? 'SET' : 'MISSING',
+          LINKEDIN_REDIRECT_URI: process.env.LINKEDIN_REDIRECT_URI || 'NOT_SET'
+        }
+      });
+      throw new Error('LinkedIn OAuth configuration is missing - check environment variables');
     }
 
     console.log('✅ [LINKEDIN-OAUTH] LinkedIn OAuth Provider initialized successfully');
+    console.log('🔧 [LINKEDIN-OAUTH] ========== PROVIDER READY ==========');
   }
 
   /**
    * Build LinkedIn OAuth authorization URL
    */
   public async buildAuthUrl(state: string, fallback = false): Promise<string> {
-    console.log('🔗 [LINKEDIN-OAUTH] Building auth URL...');
-    console.log('📋 [LINKEDIN-OAUTH] Configuration:', {
+    console.log('🔗 [LINKEDIN-OAUTH] ========== BUILDING AUTH URL ==========');
+    console.log('📋 [LINKEDIN-OAUTH] Input parameters:', {
+      stateProvided: !!state,
+      stateLength: state.length,
+      statePreview: state.substring(0, 20) + '...',
+      fallbackMode: fallback,
+      timestamp: new Date().toISOString()
+    });
+    
+    console.log('📋 [LINKEDIN-OAUTH] Current configuration being used:', {
       clientId: this.clientId,
+      clientIdLength: this.clientId.length,
       redirectUri: this.redirectUri,
+      redirectUriLength: this.redirectUri.length,
       scopes: this.scopes,
-      state: state.substring(0, 20) + '...',
-      fallback: fallback
+      scopesString: this.scopes.join(' '),
+      baseAuthUrl: this.LINKEDIN_AUTH_URL
     });
 
     const params = new URLSearchParams({
@@ -65,27 +92,56 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
       scope: this.scopes.join(' ')
     });
 
-    // Only add prompt=none if not in fallback mode
+    console.log('🔧 [LINKEDIN-OAUTH] Base URL parameters created:', {
+      response_type: 'code',
+      client_id: this.clientId,
+      redirect_uri: this.redirectUri,
+      state: state.substring(0, 20) + '...',
+      scope: this.scopes.join(' ')
+    });
+
+    // LinkedIn OAuth authentication strategy - CRITICAL FIX FOR SILENT AUTH
     if (!fallback) {
-      params.set('prompt', 'none');  // Skip login if user is already authenticated
-      console.log('🔒 [LINKEDIN-OAUTH] Using prompt=none for silent authentication');
+      // LINKEDIN SILENT AUTH FIX: Use prompt=consent instead of no prompt
+      // This forces LinkedIn to show consent screen quickly without full login
+      params.set('prompt', 'consent');
+      console.log('🔒 [LINKEDIN-OAUTH] SILENT AUTH MODE: Using prompt=consent for existing sessions');
+      console.log('🔍 [LINKEDIN-OAUTH] Strategy: Show quick consent screen for logged-in users');
+      console.log('🎯 [LINKEDIN-OAUTH] Expected behavior: Quick approval without password entry');
     } else {
-      console.log('🔓 [LINKEDIN-OAUTH] Using normal OAuth flow (fallback mode)');
+      // Force fresh authentication in fallback mode
+      params.set('prompt', 'login');
+      console.log('🔓 [LINKEDIN-OAUTH] FALLBACK MODE: Adding prompt=login for forced authentication');
+      console.log('🔍 [LINKEDIN-OAUTH] Strategy: Force fresh login even if user has existing session');
     }
 
     const authUrl = `${this.LINKEDIN_AUTH_URL}?${params.toString()}`;
     
-    console.log('🔗 [LINKEDIN-OAUTH] Generated auth URL:', {
-      url: authUrl,
+    console.log('🔗 [LINKEDIN-OAUTH] FINAL AUTH URL GENERATED:');
+    console.log('📍 [LINKEDIN-OAUTH] Full URL:', authUrl);
+    console.log('📍 [LINKEDIN-OAUTH] URL breakdown:', {
+      baseUrl: this.LINKEDIN_AUTH_URL,
+      queryParams: params.toString(),
+      paramCount: Array.from(params.keys()).length,
+      allParams: Object.fromEntries(params.entries())
+    });
+    
+    console.log('✅ [LINKEDIN-OAUTH] URL Generation Summary:', {
+      authUrl: authUrl,
       redirectUri: this.redirectUri,
-      scopes: this.scopes
+      scopes: this.scopes,
+      silentAuth: !fallback,
+      promptParameter: fallback ? 'login' : 'none (default)',
+      expectedBehavior: fallback ? 'Force fresh login' : 'Use existing LinkedIn session'
     });
     
     SecurityService.logSecurityEvent('linkedin_auth_url_generated', {
       redirectUri: this.redirectUri,
-      scopes: this.scopes
+      scopes: this.scopes,
+      silentAuth: !fallback
     });
 
+    console.log('🔗 [LINKEDIN-OAUTH] ========== URL READY FOR REDIRECT ==========');
     return authUrl;
   }
 

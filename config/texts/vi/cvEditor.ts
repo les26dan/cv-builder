@@ -98,6 +98,12 @@ export const cvEditor = {
       generating: 'Đang tạo nội dung...',
       generateWithAI: 'Tạo tóm tắt với AI',
       improveError: 'Không thể cải thiện tóm tắt. Vui lòng thử lại.',
+      emptyState: {
+        title: 'Bắt đầu dễ dàng hơn!',
+        description: 'Hãy bắt đầu với kinh nghiệm làm việc để AI có thể hỗ trợ viết tóm tắt tốt hơn',
+        navigateButton: 'Đi đến Kinh nghiệm làm việc',
+        orAlternative: 'Hoặc bạn có thể viết tóm tắt trực tiếp'
+      },
     },
     experience: {
       title: 'Kinh nghiệm làm việc',
@@ -127,7 +133,7 @@ export const cvEditor = {
         add: 'Thêm thành tích',
         placeholder: 'Mô tả một thành tích hoặc trách nhiệm cụ thể...',
         remove: 'Xóa',
-        aiGenerate: 'Tạo bằng AI',
+        aiGenerate: 'Cải thiện với OkBuddy AI',
         characterLimit: {
           tooLong: 'Gạch đầu dòng này khá dài ({length}/200 ký tự). Hãy cân nhắc chia thành hai gạch đầu dòng.',
           canShorten: '💡 {length}/200 ký tự',

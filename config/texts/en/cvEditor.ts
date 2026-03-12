@@ -98,6 +98,12 @@ export const cvEditor = {
       generating: 'Generating content...',
       generateWithAI: 'Generate Summary with AI',
       improveError: 'Unable to improve summary. Please try again.',
+      emptyState: {
+        title: 'Start easier!',
+        description: 'Begin with work experience so AI can help write a better summary',
+        navigateButton: 'Go to Work Experience',
+        orAlternative: 'Or you can write a summary directly'
+      },
     },
     experience: {
       title: 'Work Experience',
@@ -127,7 +133,7 @@ export const cvEditor = {
         add: 'Add Achievement',
         placeholder: 'Describe a specific achievement or responsibility...',
         remove: 'Remove',
-        aiGenerate: 'Generate with AI',
+        aiGenerate: 'Improve with OkBuddy AI',
         characterLimit: {
           tooLong: 'This bullet point is quite long ({length}/200 characters). Consider splitting it into two bullet points.',
           canShorten: '💡 {length}/200 characters',

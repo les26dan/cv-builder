@@ -297,7 +297,16 @@ export const EducationSection = ({
       })}
 
       <button 
-        className="flex items-center justify-center w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-primary-500 hover:bg-primary-50 hover:border-primary-500/50 transition-colors bg-white" 
+        className={`flex items-center justify-center w-full py-3 border-2 border-solid rounded-lg transition-colors ${
+          data.items.length === 0 
+            ? 'text-white' 
+            : 'bg-white hover:bg-blue-50'
+        }`}
+        style={
+          data.items.length === 0 
+            ? { backgroundColor: '#0177bd', borderColor: '#0177bd' }
+            : { borderColor: '#0177bd', color: '#0177bd' }
+        }
         onClick={handleAddEducation}
       >
         <PlusIcon size={16} className="mr-2" />

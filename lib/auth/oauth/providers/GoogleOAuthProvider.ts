@@ -28,7 +28,7 @@ export class GoogleOAuthProvider implements IOAuthProvider {
   /**
    * Build Google OAuth authorization URL
    */
-  public async buildAuthUrl(state: string): Promise<string> {
+  public async buildAuthUrl(state: string, fallback = false): Promise<string> {
     const params = new URLSearchParams({
       client_id: this.clientId,
       redirect_uri: this.redirectUri,

@@ -82,11 +82,11 @@ export const SummarySection = ({
         // markAIUsed('summary');
       } else {
         console.error('Failed to generate summary:', result.error);
-        alert('Không thể tạo tóm tắt. Vui lòng thử lại.');
+        alert(summaryTexts?.improveError || 'Unable to generate summary. Please try again.');
       }
     } catch (error) {
       console.error('Error generating summary:', error);
-      alert('Không thể tạo tóm tắt. Vui lòng thử lại.');
+      alert(summaryTexts?.improveError || 'Unable to generate summary. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -145,29 +145,33 @@ export const SummarySection = ({
           <div className="flex items-start gap-3">
             <div className="text-primary-500 text-lg">💡</div>
             <div className="flex-1">
-              <h4 className="font-medium text-primary-700 mb-1">Bắt đầu dễ dàng hơn!</h4>
+              <h4 className="font-medium text-primary-700 mb-1">
+                {summaryTexts?.emptyState?.title || 'Start easier!'}
+              </h4>
               <p className="text-sm text-primary-500 mb-3">
-                Hãy bắt đầu với kinh nghiệm làm việc để AI có thể hỗ trợ viết tóm tắt tốt hơn
+                {summaryTexts?.emptyState?.description || 'Begin with work experience so AI can help write a better summary'}
               </p>
               <button
                 onClick={handleNavigateToExperience}
                 className="px-4 py-2 bg-primary-500 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
               >
-                Đi đến Kinh nghiệm làm việc
+                {summaryTexts?.emptyState?.navigateButton || 'Go to Work Experience'}
               </button>
             </div>
           </div>
         </div>
         
         <div className="text-center py-3 text-gray-500">
-          <p className="text-sm">Hoặc bạn có thể viết tóm tắt trực tiếp</p>
+          <p className="text-sm">
+            {summaryTexts?.emptyState?.orAlternative || 'Or you can write a summary directly'}
+          </p>
         </div>
         
         <textarea 
           className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] resize-none transition-colors focus:border-primary-500 focus:ring-primary-500"
           value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
-          placeholder="Viết tóm tắt về kinh nghiệm và mục tiêu nghề nghiệp của bạn..."
+          placeholder={summaryTexts?.placeholderSimple || 'Write a summary about your experience and career goals...'}
         />
       </div>
     );

@@ -6,14 +6,40 @@ import { cookies } from 'next/headers';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const timestamp = new Date().toISOString();
+  console.log('🔙 [LINKEDIN-CALLBACK] ========== LINKEDIN OAUTH CALLBACK STARTED ==========');
+  console.log('📋 [LINKEDIN-CALLBACK] Callback initiated at:', timestamp);
+  console.log('📋 [LINKEDIN-CALLBACK] Full callback request:', {
+    url: request.url,
+    method: request.method,
+    userAgent: request.headers.get('user-agent'),
+    referer: request.headers.get('referer')
+  });
+
   try {
     // Initialize OAuth service
+    console.log('🔧 [LINKEDIN-CALLBACK] Step 1: Initializing OAuth service...');
     OAuthService.initialize();
+    console.log('✅ [LINKEDIN-CALLBACK] OAuth service initialized');
     
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
     const state = searchParams.get('state');
     const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    const errorCode = searchParams.get('error_code');
+    
+    console.log('🔍 [LINKEDIN-CALLBACK] Step 2: Analyzing callback parameters:', {
+      hasCode: !!code,
+      codeLength: code?.length || 0,
+      codePreview: code?.substring(0, 20) + '...' || 'null',
+      hasState: !!state,
+      stateLength: state?.length || 0,
+      statePreview: state?.substring(0, 20) + '...' || 'null',
+      hasError: !!error,
+      errorValue: error,
+      allParams: Object.fromEntries(searchParams.entries())
+    });
     
     // Handle OAuth errors (user cancelled or other errors)
     if (error) {
