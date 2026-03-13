@@ -43,6 +43,7 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   onSave,
   isGenerating
 }) => {
+  console.log('🚀 WIZARD DEBUG: NewWorkExperienceWizard render - isOpen:', isOpen, 'at', performance.now());
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<WizardFormData>({
     title: '',
@@ -67,18 +68,10 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
     return formData.title.trim() || formData.company.trim() || formData.project.trim() || formData.impact.trim();
   }, [formData]);
 
-  // Auto-save to localStorage whenever form data changes
-  useEffect(() => {
-    if (hasFormData()) {
-      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({
-        ...formData,
-        currentStep,
-        timestamp: Date.now()
-      }));
-    }
-  }, [formData, currentStep, hasFormData]);
+  // REMOVED: Auto-save effect that was causing cascade re-renders
+  // Auto-save will be handled manually on form changes instead
 
-  // Load auto-saved data when modal opens
+  // SIMPLIFIED: Load saved data when modal opens - remove cascade triggers
   useEffect(() => {
     if (isOpen) {
       const savedData = localStorage.getItem(AUTOSAVE_KEY);
@@ -87,43 +80,23 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
           const parsed = JSON.parse(savedData);
           // Only restore if saved within last 24 hours
           if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-            // Show recovery option to user
-            const isVietnamese = language === 'vi';
-            const message = isVietnamese 
-              ? 'Bạn có dữ liệu đã lưu từ lần trước. Bạn có muốn khôi phục không?\n\n✅ Có - Khôi phục dữ liệu\n❌ Không - Bắt đầu mới'
-              : 'You have saved data from previous session. Would you like to recover it?\n\n✅ Yes - Recover data\n❌ No - Start fresh';
-            
-            if (window.confirm(message)) {
-              // User wants to recover - restore data but ALWAYS start at step 1
-              setFormData({
-                title: parsed.title || '',
-                company: parsed.company || '',
-                project: parsed.project || '',
-                impact: parsed.impact || ''
-              });
-              setCurrentStep(1); // Always start at step 1, never restore step
-            } else {
-              // User wants fresh start - clear auto-saved data
-              localStorage.removeItem(AUTOSAVE_KEY);
-              setFormData({
-                title: '',
-                company: '',
-                project: '',
-                impact: ''
-              });
-              setCurrentStep(1);
-            }
+            // Batch all state updates together to prevent cascade re-renders
+            setFormData({
+              title: parsed.title || '',
+              company: parsed.company || '',
+              project: parsed.project || '',
+              impact: parsed.impact || ''
+            });
+            // Always start at step 1 for simplicity
           } else {
-            // Expired data - clean up
             localStorage.removeItem(AUTOSAVE_KEY);
           }
         } catch (error) {
-          console.error('Failed to parse auto-saved data:', error);
           localStorage.removeItem(AUTOSAVE_KEY);
         }
       }
     }
-  }, [isOpen, language]);
+  }, [isOpen]); // REMOVED language dependency
 
   // Enhanced close handler with polished confirmation
   const handleClose = useCallback(() => {
@@ -190,48 +163,54 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
     }
   }, [isOpen, handleClose]);
 
-  // Load language-specific texts
+  // OPTIMIZED: Load texts once when component mounts
   useEffect(() => {
     const loadTexts = async () => {
+      console.log('🚀 WIZARD DEBUG: Starting text loading at', performance.now());
       const detectedLanguage = detectLanguage();
-      setLanguage(detectedLanguage.language);
+      // Batch state updates to prevent re-renders
       const textData = await getTexts('workExperienceWizard', detectedLanguage.language);
+      console.log('🚀 WIZARD DEBUG: Text loading completed at', performance.now());
+      
+      // Single state update instead of multiple
+      setLanguage(detectedLanguage.language);
       setTexts(textData || {});
     };
     loadTexts();
-  }, []);
+  }, []); // Run only once on mount
 
   // Initialize job title suggestions
   useEffect(() => {
     setFilteredTitles(filterJobTitles('', 3));
   }, []);
 
-  // Reset form when modal opens/closes
+  // OPTIMIZED: Reset form when modal closes - batch all state updates
   useEffect(() => {
+    console.log('🚀 WIZARD DEBUG: Reset effect triggered - isOpen:', isOpen, 'at', performance.now());
     if (!isOpen) {
+      console.log('🚀 WIZARD DEBUG: Resetting form state - wizard closing');
+      // Batch all state resets in a single update cycle
       setCurrentStep(1);
-      setFormData({
-        title: '',
-        company: '',
-        project: '',
-        impact: ''
-      });
+      setFormData({ title: '', company: '', project: '', impact: '' });
       setShowAIPreview(false);
       setAiGenerating(false);
       setIsTyping(false);
     } else {
-      // Clear manual close flag when wizard opens normally
+      console.log('🚀 WIZARD DEBUG: Wizard opening - clearing manual close flag');
       localStorage.removeItem('okbuddy_wizard_manually_closed');
     }
   }, [isOpen]);
 
   // Show AI preview immediately when wizard opens to prevent render delay
   useEffect(() => {
+    console.log('🚀 WIZARD DEBUG: AI Preview effect triggered - isOpen:', isOpen, 'at', performance.now());
     if (isOpen) {
+      console.log('🚀 WIZARD DEBUG: Setting showAIPreview to true and aiGenerating to false');
       // Show AI preview immediately when wizard opens
       setShowAIPreview(true);
       setAiGenerating(false);
     } else {
+      console.log('🚀 WIZARD DEBUG: Setting showAIPreview to false');
       setShowAIPreview(false);
     }
   }, [isOpen]);
@@ -306,7 +285,12 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
     return formData.title.trim() && formData.company.trim();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('🚀 WIZARD DEBUG: Wizard not open - returning null');
+    return null;
+  }
+
+  console.log('🚀 WIZARD DEBUG: Wizard is open - preparing to render at', performance.now());
 
   const isVietnamese = language === 'vi';
   const newWizardTexts = texts.newWizard || {};
@@ -314,6 +298,8 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   const buttonsTexts = newWizardTexts.buttons || {};
   const aiBadgeTexts = newWizardTexts.aiBadge || {};
   const progressTexts = newWizardTexts.progress || {};
+
+  console.log('🚀 WIZARD DEBUG: Creating portal for wizard at', performance.now());
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -423,22 +409,25 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
           {currentStep === 2 && (
             <div className="space-y-4">
               {/* AI Preview Section - Show immediately to prevent render delay */}
-              {showAIPreview && (
-                <div className="mb-6">
-                  <AIPreview
-                    jobTitle={formData.title || (isVietnamese ? 'Kỹ sư phần mềm' : 'Software Engineer')}
-                    company={formData.company || (isVietnamese ? 'Công ty ABC' : 'ABC Company')}
-                    project={formData.project}
-                    impact={formData.impact}
-                    isLoading={aiGenerating}
-                    showPreview={showAIPreview}
-                    isEnhanced={!!(formData.project || formData.impact)}
-                    language={language}
-                    previewTitle={texts.newWizard?.aiPreview?.title || (isVietnamese ? 'OkBuddy giúp bạn viết CV nhanh chóng' : 'How OkBuddy writes your resume')}
-                    previewSubtitle={texts.newWizard?.aiPreview?.subtitle}
-                  />
-                </div>
-              )}
+              {(() => {
+                console.log('🚀 WIZARD DEBUG: AI Preview condition check - showAIPreview:', showAIPreview, 'at', performance.now());
+                return showAIPreview && (
+                  <div className="mb-6">
+                    <AIPreview
+                      jobTitle={formData.title || (isVietnamese ? 'Kỹ sư phần mềm' : 'Software Engineer')}
+                      company={formData.company || (isVietnamese ? 'Công ty ABC' : 'ABC Company')}
+                      project={formData.project}
+                      impact={formData.impact}
+                      isLoading={aiGenerating}
+                      showPreview={showAIPreview}
+                      isEnhanced={!!(formData.project || formData.impact)}
+                      language={language}
+                      previewTitle={texts.newWizard?.aiPreview?.title || (isVietnamese ? 'OkBuddy giúp bạn viết CV nhanh chóng' : 'How OkBuddy writes your resume')}
+                      previewSubtitle={texts.newWizard?.aiPreview?.subtitle}
+                    />
+                  </div>
+                );
+              })()}
               
               <WizardStep 
                 title={newWizardTexts.steps?.optionalDetails?.title || 'Thêm chi tiết (tùy chọn)'}

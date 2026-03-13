@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const timestamp = new Date().toISOString();
   console.log('🔙 [LINKEDIN-CALLBACK] ========== LINKEDIN OAUTH CALLBACK STARTED ==========');
   console.log('📋 [LINKEDIN-CALLBACK] Callback initiated at:', timestamp);
+  console.log('🚨 [LINKEDIN-CALLBACK] CALLBACK ENDPOINT HIT - LinkedIn is calling us!');
   console.log('📋 [LINKEDIN-CALLBACK] Full callback request:', {
     url: request.url,
     method: request.method,
@@ -43,21 +44,30 @@ export async function GET(request: NextRequest) {
     
     // Handle OAuth errors (user cancelled or other errors)
     if (error) {
-      console.log('❌ LinkedIn OAuth error:', error);
+      console.log('❌ [LINKEDIN-CALLBACK] LinkedIn OAuth error detected:', {
+        error: error,
+        errorDescription: errorDescription,
+        errorCode: errorCode,
+        allErrorParams: { error, errorDescription, errorCode }
+      });
       
-      // Handle prompt=none failures - retry with normal OAuth flow
-      if (error === 'login_required' || error === 'interaction_required') {
-        console.log('🔄 User not logged in to LinkedIn, redirecting to normal OAuth flow...');
+      // Handle prompt=consent failures - retry with normal OAuth flow
+      if (error === 'login_required' || error === 'interaction_required' || error === 'access_denied') {
+        console.log('🔄 [LINKEDIN-CALLBACK] Silent auth failed, retrying with fallback...');
+        console.log('🎯 [LINKEDIN-CALLBACK] Error indicates user interaction needed');
         
-        // Initiate normal OAuth flow (without prompt=none)
-        const normalOAuthUrl = new URL('/api/auth/linkedin/signin', request.url);
-        normalOAuthUrl.searchParams.set('fallback', 'true');
+        // Initiate fallback OAuth flow (with prompt=login)
+        const fallbackOAuthUrl = new URL('/api/auth/linkedin/signin', request.url);
+        fallbackOAuthUrl.searchParams.set('fallback', 'true');
         
-        return NextResponse.redirect(normalOAuthUrl);
+        console.log('🔄 [LINKEDIN-CALLBACK] Redirecting to fallback OAuth:', fallbackOAuthUrl.toString());
+        return NextResponse.redirect(fallbackOAuthUrl);
       }
       
+      console.log('❌ [LINKEDIN-CALLBACK] Unrecoverable OAuth error, redirecting to login');
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('error', 'oauth_cancelled');
+      loginUrl.searchParams.set('details', error);
       
       return NextResponse.redirect(loginUrl);
     }

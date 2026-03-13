@@ -24,6 +24,7 @@ export const cvEditor = {
       logout: 'Đăng xuất',
     },
   },
+
   editorPanel: {
     title: 'Chỉnh sửa CV',
     addSection: 'Thêm phần mới',
@@ -269,6 +270,7 @@ export const cvEditor = {
     },
   },
   notifications: {
+    aiSuccess: '✨ Thành công!',
     parsing: {
       success: 'Phân tích CV thành công!',
       successMessage: 'CV của bạn đã được phân tích và điền tự động.',

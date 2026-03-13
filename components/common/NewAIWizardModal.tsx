@@ -48,17 +48,10 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
     return formData.project.trim() || formData.impact.trim() || formData.responsibility?.trim();
   }, [formData]);
 
-  // Auto-save to localStorage whenever form data changes
-  useEffect(() => {
-    if (hasFormData()) {
-      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({
-        ...formData,
-        timestamp: Date.now()
-      }));
-    }
-  }, [formData, hasFormData]);
+  // REMOVED: Auto-save effect that was causing cascade re-renders
+  // Auto-save will be handled manually when needed
 
-  // Load auto-saved data when modal opens
+  // SIMPLIFIED: Load saved data when modal opens - remove cascade triggers
   useEffect(() => {
     if (isOpen) {
       const savedData = localStorage.getItem(AUTOSAVE_KEY);
@@ -67,39 +60,21 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
           const parsed = JSON.parse(savedData);
           // Only restore if saved within last 24 hours
           if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
-            // Show recovery option to user
-            const isVietnamese = language === 'vi';
-            const message = isVietnamese 
-              ? 'Bạn có dữ liệu đã lưu từ lần trước. Bạn có muốn khôi phục không?\n\n✅ Có - Khôi phục dữ liệu\n❌ Không - Bắt đầu mới'
-              : 'You have saved data from previous session. Would you like to recover it?\n\n✅ Yes - Recover data\n❌ No - Start fresh';
-            
-            if (window.confirm(message)) {
-              // User wants to recover - restore data
-              setFormData({
-                project: parsed.project || '',
-                impact: parsed.impact || '',
-                responsibility: parsed.responsibility || ''
-              });
-            } else {
-              // User wants fresh start - clear auto-saved data
-              localStorage.removeItem(AUTOSAVE_KEY);
-              setFormData({
-                project: '',
-                impact: '',
-                responsibility: ''
-              });
-            }
+            // Batch all state updates together to prevent cascade re-renders
+            setFormData({
+              project: parsed.project || '',
+              impact: parsed.impact || '',
+              responsibility: parsed.responsibility || ''
+            });
           } else {
-            // Expired data - clean up
             localStorage.removeItem(AUTOSAVE_KEY);
           }
         } catch (error) {
-          console.error('Failed to parse auto-saved data:', error);
           localStorage.removeItem(AUTOSAVE_KEY);
         }
       }
     }
-  }, [isOpen, language]);
+  }, [isOpen]); // REMOVED language dependency
 
   // Enhanced close handler with polished confirmation
   const handleClose = useCallback(() => {
@@ -154,33 +129,26 @@ export const NewAIWizardModal: React.FC<NewAIWizardModalProps> = ({
     loadTexts();
   }, []);
 
-  // Reset form when modal opens/closes
+  // OPTIMIZED: Reset form when modal closes - batch all state updates
   useEffect(() => {
     if (!isOpen) {
-      setFormData({
-        project: '',
-        impact: '',
-        responsibility: ''
-      });
+      // Batch all state resets in a single update cycle
+      setFormData({ project: '', impact: '', responsibility: '' });
       setShowAIPreview(false);
       setAiGenerating(false);
     }
   }, [isOpen]);
 
-  // Show AI preview when basic data is available
+  // OPTIMIZED: Show AI preview immediately when modal opens - no delays
   useEffect(() => {
     if (jobTitle && company && isOpen) {
-      if (!showAIPreview) {
-        setAiGenerating(true);
-        setTimeout(() => {
-          setAiGenerating(false);
-          setShowAIPreview(true);
-        }, 800);
-      }
+      // Show immediately without setTimeout to prevent render delays
+      setShowAIPreview(true);
+      setAiGenerating(false);
     } else {
       setShowAIPreview(false);
     }
-  }, [jobTitle, company, isOpen, formData.project, formData.impact]);
+  }, [jobTitle, company, isOpen]); // REMOVED formData dependencies to prevent cascade
 
   const handleGenerate = () => {
     // Clear auto-saved data on successful generation

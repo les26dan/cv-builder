@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { AIAssistButton } from '../common/AIAssistButton';
+import { SuccessNotification } from '../common/SuccessNotification';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports for performance optimization - these are heavy AI components
@@ -66,6 +67,9 @@ export const WorkExperienceSection = ({
 }: WorkExperienceSectionProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Success notification state
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
@@ -215,8 +219,14 @@ export const WorkExperienceSection = ({
   };
 
   const handleAddExperience = useCallback(() => {
+    console.log('🚀 DEBUG: handleAddExperience called at', new Date().toISOString());
+    console.log('🚀 DEBUG: cvData?.id:', cvData?.id);
+    console.log('🚀 DEBUG: isInitialLoadComplete:', isInitialLoadComplete);
+    console.log('🚀 DEBUG: useNewWizards:', useNewWizards);
+    
     // Prevent automatic wizard opening for template users during initial load
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
+    console.log('🚀 DEBUG: isTemplateUser:', isTemplateUser);
     
     if (isTemplateUser && !isInitialLoadComplete) {
       console.log('🎯 Guest Session: Preventing wizard popup during initial load for template user');
@@ -228,6 +238,7 @@ export const WorkExperienceSection = ({
     if (manuallyClosed) {
       const closedTime = parseInt(manuallyClosed);
       const timeSinceClosed = Date.now() - closedTime;
+      console.log('🚀 DEBUG: Manual close cooldown check - time since closed:', timeSinceClosed);
       if (timeSinceClosed < 5000) { // 5 seconds cooldown
         console.log('🚫 Preventing wizard auto-trigger - user manually closed wizard recently');
         return;
@@ -238,14 +249,19 @@ export const WorkExperienceSection = ({
     }
     
     console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
+    console.log('🚀 DEBUG: About to set wizard state - START TIME:', performance.now());
     
     if (useNewWizards) {
       // Open the new streamlined 2-step wizard
+      console.log('🚀 DEBUG: Setting newWizardOpen to true');
       setNewWizardOpen(true);
     } else {
       // Open the old 5-step wizard
+      console.log('🚀 DEBUG: Setting newExperienceWizard to true');
       setNewExperienceWizard(true);
     }
+    
+    console.log('🚀 DEBUG: Wizard state set - END TIME:', performance.now());
   }, [cvData?.id, isInitialLoadComplete, useNewWizards]);
 
   // Provide the add function to parent component
@@ -384,6 +400,9 @@ export const WorkExperienceSection = ({
             ...data,
             items: updatedItems
           });
+
+          // Show success notification
+          setShowSuccessNotification(true);
 
           // Auto-expand the newly created experience (regardless of CV source)
           setExpandedItems(prev => ({
@@ -708,6 +727,9 @@ export const WorkExperienceSection = ({
 
         // Mark AI as used for score calculation (will be implemented)
         // markAIUsed('workExperience');
+
+        // Show success notification
+        setShowSuccessNotification(true);
 
         // Close the wizard
         setWizardModal({ isOpen: false, experienceIndex: -1 });
@@ -1325,6 +1347,14 @@ export const WorkExperienceSection = ({
             jobTitle={newAIWizardIndex >= 0 ? data.items[newAIWizardIndex]?.title || '' : ''}
             company={newAIWizardIndex >= 0 ? data.items[newAIWizardIndex]?.company || '' : ''}
             isGenerating={isGenerating}
+          />
+
+          {/* Success Notification */}
+          <SuccessNotification
+            isVisible={showSuccessNotification}
+            message={experienceTexts?.notifications?.aiSuccess || (currentLanguage === 'vi' ? '✨ Thành công!' : '✨ Success!')}
+            duration={2000}
+            onComplete={() => setShowSuccessNotification(false)}
           />
         </>
       )}

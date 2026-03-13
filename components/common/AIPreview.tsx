@@ -34,6 +34,7 @@ export const AIPreview: React.FC<AIPreviewProps> = ({
   dynamicProject,
   dynamicImpact
 }) => {
+  console.log('🚀 AI PREVIEW DEBUG: Render started - showPreview:', showPreview, 'isLoading:', isLoading, 'at', performance.now());
   const [realBullets, setRealBullets] = useState<string[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
 
@@ -156,6 +157,15 @@ export const AIPreview: React.FC<AIPreviewProps> = ({
   
   // Use real AI bullets if available, otherwise fallback to mock data
   const bulletsToShow = useRealAI && realBullets.length > 0 ? realBullets : generateBullets();
+
+  console.log('🚀 AI PREVIEW DEBUG: About to render JSX - showPreview:', showPreview, 'at', performance.now());
+
+  if (!showPreview) {
+    console.log('🚀 AI PREVIEW DEBUG: Not showing preview - returning null');
+    return null;
+  }
+
+  console.log('🚀 AI PREVIEW DEBUG: Rendering full AIPreview component at', performance.now());
 
   return (
     <div className="rounded-lg overflow-hidden" style={{ backgroundColor: '#eff6ff' }}>

@@ -28,8 +28,9 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
     this.clientId = process.env.LINKEDIN_CLIENT_ID || '';
     this.clientSecret = process.env.LINKEDIN_CLIENT_SECRET || '';
     this.redirectUri = process.env.LINKEDIN_REDIRECT_URI || (process.env.NODE_ENV === 'production' ? 'https://www.okbuddy.io/api/auth/linkedin/callback' : 'http://localhost:3000/api/auth/linkedin/callback');
-    // Use LinkedIn's recommended scopes for Sign In with LinkedIn
-    this.scopes = ['openid', 'profile', 'email'];
+    // Use LinkedIn's most basic scope that requires no special approval
+    // Some LinkedIn apps need explicit scope approval even for basic scopes
+    this.scopes = ['r_basicprofile'];
 
     console.log('⚙️ [LINKEDIN-OAUTH] Final configuration setup:', {
       clientId: this.clientId ? 'SET' : 'MISSING',
@@ -100,14 +101,13 @@ export class LinkedInOAuthProvider implements IOAuthProvider {
       scope: this.scopes.join(' ')
     });
 
-    // LinkedIn OAuth authentication strategy - CRITICAL FIX FOR SILENT AUTH
+    // LinkedIn OAuth authentication strategy - FINAL FIX
     if (!fallback) {
-      // LINKEDIN SILENT AUTH FIX: Use prompt=consent instead of no prompt
-      // This forces LinkedIn to show consent screen quickly without full login
-      params.set('prompt', 'consent');
-      console.log('🔒 [LINKEDIN-OAUTH] SILENT AUTH MODE: Using prompt=consent for existing sessions');
-      console.log('🔍 [LINKEDIN-OAUTH] Strategy: Show quick consent screen for logged-in users');
-      console.log('🎯 [LINKEDIN-OAUTH] Expected behavior: Quick approval without password entry');
+      // LINKEDIN SILENT AUTH: Don't use any prompt parameter
+      // LinkedIn works best with no prompt parameter for silent auth
+      console.log('🔒 [LINKEDIN-OAUTH] SILENT AUTH MODE: No prompt parameter (LinkedIn default behavior)');
+      console.log('🔍 [LINKEDIN-OAUTH] Strategy: Let LinkedIn handle existing session automatically');
+      console.log('🎯 [LINKEDIN-OAUTH] Expected behavior: Use existing session if available, else show login');
     } else {
       // Force fresh authentication in fallback mode
       params.set('prompt', 'login');

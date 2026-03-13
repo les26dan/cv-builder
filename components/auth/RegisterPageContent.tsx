@@ -148,13 +148,14 @@ export default function RegisterPageContent() {
             loading={socialLoading === 'google'}
             disabled={socialLoading !== null}
           />
-          <SocialLoginButton
+          {/* LinkedIn login temporarily disabled due to OAuth configuration issues */}
+          {/* <SocialLoginButton
             provider="linkedin"
             text={account.register.social.linkedin.button}
             onClick={() => handleSocialLogin('linkedin')}
             loading={socialLoading === 'linkedin'}
             disabled={socialLoading !== null}
-          />
+          /> */}
         </div>
 
         {/* Divider */}

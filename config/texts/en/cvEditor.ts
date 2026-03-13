@@ -24,6 +24,7 @@ export const cvEditor = {
       logout: 'Sign Out',
     },
   },
+
   editorPanel: {
     title: 'Edit CV',
     addSection: 'Add New Section',
@@ -269,6 +270,7 @@ export const cvEditor = {
     },
   },
   notifications: {
+    aiSuccess: '✨ Success!',
     parsing: {
       success: 'CV Successfully Parsed!',
       successMessage: 'Your CV has been analyzed and populated automatically.',
