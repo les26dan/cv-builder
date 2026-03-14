@@ -25,9 +25,12 @@ jest.mock('../../../shared/contexts/CVWorkflowContext', () => ({
   })
 }));
 
+// Import aiService properly
+import * as aiServiceModule from '../../../utils/aiService';
+
 describe('SkillsSection - AI Suggestions Enhancement', () => {
   const mockOnUpdate = jest.fn();
-  const { aiService } = require('../../../utils/aiService');
+  const { aiService } = aiServiceModule;
 
   const defaultProps = {
     data: { items: ['React', 'JavaScript'] },
