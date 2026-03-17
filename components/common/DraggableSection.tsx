@@ -16,6 +16,7 @@ interface DraggableSectionProps {
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
   onAddItem?: () => void; // Optional function to add new items to the section
   experienceCount?: number; // Number of experience items (for conditional Add Experience button)
+  sectionTexts?: any; // Dynamic section name configuration
 }
 
 // Section labels are now passed as props from parent components with dynamic language loading
@@ -51,7 +52,8 @@ export const DraggableSection = ({
   onApplySuggestion,
   onDismissSuggestion,
   onAddItem,
-  experienceCount
+  experienceCount,
+  sectionTexts
 }: DraggableSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
@@ -213,20 +215,32 @@ export const DraggableSection = ({
       return customTitle;
     }
     
-    // For core sections, use predefined labels
+    // For core sections, use predefined labels (can be enhanced with sectionTexts in future)
     if (sectionLabels[id]) {
       return sectionLabels[id];
     }
     
-    // For custom sections, create a readable title
-    if (id.startsWith('projects-')) return 'Dự án';
-    if (id.startsWith('volunteer-')) return 'Hoạt động tình nguyện';
-    if (id.startsWith('certifications-')) return 'Chứng chỉ';
-    if (id.startsWith('languages-')) return 'Ngôn ngữ';
-    if (id.startsWith('hobbies-')) return 'Sở thích';
-    if (id.startsWith('custom-')) return 'Phần tùy chỉnh';
+    // For custom sections, use dynamic language configuration if available
+    if (id.startsWith('projects-')) {
+      return sectionTexts?.availableSections?.projects?.name || 'Projects';
+    }
+    if (id.startsWith('volunteer-')) {
+      return sectionTexts?.availableSections?.volunteer?.name || 'Volunteer Work';
+    }
+    if (id.startsWith('certifications-')) {
+      return sectionTexts?.availableSections?.certifications?.name || 'Certifications';
+    }
+    if (id.startsWith('languages-')) {
+      return sectionTexts?.availableSections?.languages?.name || 'Languages';
+    }
+    if (id.startsWith('hobbies-')) {
+      return sectionTexts?.availableSections?.hobbies?.name || 'Hobbies';
+    }
+    if (id.startsWith('custom-')) {
+      return sectionTexts?.availableSections?.custom?.name || 'Custom Section';
+    }
     
-    return 'Phần khác';
+    return 'Other Section';
   };
 
   const handleStartEdit = () => {

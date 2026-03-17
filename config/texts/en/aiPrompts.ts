@@ -32,6 +32,7 @@ export interface PromptContext {
   educationContent?: string;
   currentSkillsCount?: string;
   maxSkills?: string;
+  newlyAddedContent?: string;
 }
 
 export const enAIPrompts = {
@@ -68,6 +69,11 @@ export const enAIPrompts = {
   jobDescriptionAnalysis: {
     system: "You are a job description analysis and CV optimization expert. You can extract key requirements from job descriptions and provide appropriate CV improvement suggestions.",
     user: "Analyze the following job description and provide CV improvement suggestions:\n\nJob Description:\n{jobDescription}\n\nCurrent CV:\n{currentCV}\n\nAnalysis Requirements:\n1. Important keywords needed in CV\n2. Missing skills to add\n3. Summary section improvement suggestions\n4. Work experience section improvement suggestions\n5. Match level assessment (0-100%)\n\nRespond in English with clear structure"
+  },
+
+  singleBulletImprovement: {
+    system: "You are an expert at crafting concise, professional, compelling and highly effective CV. You consistently & effectively use the STAR (Situation–Task–Action–Result) methodology, always start with a strong action verb, and prioritize quantified outcomes (numbers, percentages). The work experience bullet points you produce are highly persuasive and tailored to impress recruiters globally.",
+    user: "Based on the following information, create exactly 1 professional bullet point highlighting my top achievement in this role:\n\nPosition: {jobTitle}\nCompany: {company}\nCurrent bullet point: {existingContent}\n\n[CRITICAL INSTRUCTION] {newlyAddedContent}\n\nCV Context:\nOther Experience: {workExperience}\nTarget Position: {targetJob}\n\nRequirements:\nWrite exactly 1 bullet point, strictly under 200 characters (ideally around 150-180 characters)\nClearly follow the STAR structure (Situation–Task–Action–Result)\nBegin with a strong action verb\nInclude clearly quantified results (specific numbers or percentages)\nDemonstrate leadership or initiative clearly if relevant\nCRITICAL: If you see content within < > brackets in the bullet point above, these represent newly added or changed information that MUST be emphasized, optimized, and built around in your improved version. The content in < > brackets should become the focal points and key highlights of the achievement.\nUse concise, professional English suitable for global job markets\nDo not fabricate details or include information not provided\nRemove the < > brackets in your final response - they are only markup to show you what to emphasize\nOnly return the bullet point itself, without any introductory or concluding text"
   }
 } as const;
 

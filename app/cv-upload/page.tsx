@@ -318,8 +318,7 @@ export default function CVUploadPage() {
       <SharedHeader 
         variant="app" 
         showBackButton={true}
-        onBackClick={() => window.location.href = '/cv-workspace'}
-        backButtonTitle="Quay lại CV Workspace"
+        backButtonTitle="Quay lại trang trước"
       />
       
       <main className="flex-1 flex justify-center items-center px-4 sm:px-6 lg:px-10 py-8">

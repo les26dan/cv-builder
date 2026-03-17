@@ -6,6 +6,11 @@ import { SummarySection } from './sections/SummarySection';
 import { WorkExperienceSection } from './sections/WorkExperienceSection';
 import { SkillsSection } from './sections/SkillsSection';
 import { EducationSection } from './sections/EducationSection';
+import { ProjectsSection } from './sections/ProjectsSection';
+import { VolunteerSection } from './sections/VolunteerSection';
+import { CertificationsSection } from './sections/CertificationsSection';
+import { LanguagesSection } from './sections/LanguagesSection';
+import { HobbiesSection } from './sections/HobbiesSection';
 import { DraggableSection } from './common/DraggableSection';
 import { ScoreIndicator } from './common/ScoreIndicator';
 import { XIcon, Sparkles, CheckCircle } from 'lucide-react';
@@ -546,49 +551,29 @@ export const EditorPanel = ({
 
   const handleAddSection = (sectionType: string) => {
     const newSectionId = `${sectionType}-${Date.now()}`;
+
     
     // Create default data structure based on section type
     let defaultData;
     switch (sectionType) {
       case 'projects':
         defaultData = {
-          items: [{
-            id: `project-${Date.now()}`,
-            title: '',
-            description: '',
-            technologies: [],
-            startDate: '',
-            endDate: '',
-            url: ''
-          }]
+          content: ''
         };
         break;
       case 'volunteer':
         defaultData = {
-          items: [{
-            id: `volunteer-${Date.now()}`,
-            organization: '',
-            role: '',
-            description: '',
-            startDate: '',
-            endDate: ''
-          }]
+          content: ''
         };
         break;
       case 'certifications':
         defaultData = {
-          items: [{
-            id: `cert-${Date.now()}`,
-            name: '',
-            issuer: '',
-            date: '',
-            url: ''
-          }]
+          content: ''
         };
         break;
       case 'languages':
         defaultData = {
-          items: []
+          content: ''
         };
         break;
       case 'hobbies':
@@ -606,16 +591,22 @@ export const EditorPanel = ({
         defaultData = { content: '' };
     }
 
+
+    
     // Add to CV data
+
     onUpdateSection(newSectionId, defaultData);
     
     // Add to section order
     const newOrder = [...(cvData?.sectionOrder || []), newSectionId];
+
     onSectionOrderChange(newOrder);
     
     // Close modal and activate new section
     setShowAddSectionModal(false);
     setActiveSection(newSectionId);
+    
+
     
     // Scroll to new section after a brief delay
     setTimeout(() => {
@@ -719,17 +710,80 @@ export const EditorPanel = ({
           />
         );
       default: {
-        // Handle custom sections
+        // Handle custom sections by type prefix
         const sectionData = cvData[sectionId];
-        if (!sectionData) return null;
+
         
+        if (sectionId.startsWith('projects-')) {
+
+          const projectData = sectionData || { content: '' };
+          return (
+            <ProjectsSection 
+              data={projectData}
+              onUpdate={(data) => onUpdateSection(sectionId, data)}
+              isActive={activeSection === sectionId}
+            />
+          );
+        }
+
+        if (sectionId.startsWith('volunteer-')) {
+
+          const volunteerData = sectionData || { content: '' };
+          return (
+            <VolunteerSection 
+              data={volunteerData}
+              onUpdate={(data) => onUpdateSection(sectionId, data)}
+              isActive={activeSection === sectionId}
+            />
+          );
+        }
+
+        if (sectionId.startsWith('certifications-')) {
+
+          const certData = sectionData || { content: '' };
+          return (
+            <CertificationsSection 
+              data={certData}
+              onUpdate={(data) => onUpdateSection(sectionId, data)}
+              isActive={activeSection === sectionId}
+            />
+          );
+        }
+
+        if (sectionId.startsWith('languages-')) {
+
+          const languagesData = sectionData || { content: '' };
+          return (
+            <LanguagesSection 
+              data={languagesData}
+              onUpdate={(data) => onUpdateSection(sectionId, data)}
+              isActive={activeSection === sectionId}
+            />
+          );
+        }
+
+        if (sectionId.startsWith('hobbies-')) {
+
+          const hobbiesData = sectionData || { content: '' };
+          return (
+            <HobbiesSection 
+              data={hobbiesData}
+              onUpdate={(data) => onUpdateSection(sectionId, data)}
+              isActive={activeSection === sectionId}
+            />
+          );
+        }
+
+        // Handle remaining custom sections (fallback to textarea)
+
+        const customData = sectionData || { content: '' };
         return (
           <div className="space-y-4">
             <textarea 
               className="w-full p-3 border border-gray-300 rounded-md min-h-[120px]" 
-              value={sectionData.content || ''} 
-              onChange={(e) => onUpdateSection(sectionId, { ...sectionData, content: e.target.value })}
-              placeholder="Nhập nội dung cho phần này..."
+              value={customData.content || ''} 
+              onChange={(e) => onUpdateSection(sectionId, { ...customData, content: e.target.value })}
+              placeholder="Enter content for this section..."
             />
           </div>
         );
@@ -968,6 +1022,7 @@ export const EditorPanel = ({
                     onDismissSuggestion={handleDismissSuggestionInternal}
                     onAddItem={sectionId === 'experience' ? addWorkExperienceFunction || undefined : undefined}
                     experienceCount={sectionId === 'experience' ? cvData.experience?.items?.length || 0 : undefined}
+                    sectionTexts={editorTexts}
                   >
                     {renderSection(sectionId)}
                   </DraggableSection>

@@ -214,44 +214,69 @@ Generated on: ${new Date().toLocaleString()}
 }
 
 /**
- * Generate DOCX CV (simplified version for demo)
+ * Generate DOCX CV using proper docx library
  */
 async function generateDOCXCV(cvData: any): Promise<Blob> {
-  // For now, create a simple text document
-  // In production, you'd use a library like docx
+  // Use the same DOCX generation from downloadUtils
+  const { generateDOCXContent } = await import('@/utils/downloadUtils');
   
-  const content = `
-CV: ${cvData.title}
+  // Transform the server CV data format to match client format
+  const clientFormatData = transformServerDataToClientFormat(cvData);
+  
+  return await generateDOCXContent(clientFormatData);
+}
 
-Contact Information:
-${cvData.content?.sections?.contact?.fullName || 'Not provided'}
-${cvData.content?.sections?.contact?.email || 'Not provided'}
-${cvData.content?.sections?.contact?.phone || 'Not provided'}
-
-Summary:
-${cvData.content?.sections?.summary?.content || 'Not provided'}
-
-Experience:
-${cvData.content?.sections?.experience?.items?.map((exp: any) => 
-  `- ${exp.position} at ${exp.company} (${exp.startDate} - ${exp.endDate})`
-).join('\n') || 'Not provided'}
-
-Education:
-${cvData.content?.sections?.education?.items?.map((edu: any) => 
-  `- ${edu.degree} from ${edu.institution} (${edu.year})`
-).join('\n') || 'Not provided'}
-
-Skills:
-${cvData.content?.sections?.skills?.items?.map((skill: any) => 
-  `- ${skill.name} (${skill.level})`
-).join('\n') || 'Not provided'}
-
-Generated on: ${new Date().toLocaleString()}
-  `.trim();
-
-  return new Blob([content], { 
-    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
-  });
+/**
+ * Transform server CV data format to client format
+ */
+function transformServerDataToClientFormat(cvData: any): any {
+  const sections = cvData.content?.sections || {};
+  
+  return {
+    sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
+    sectionTitles: {
+      contact: 'Contact Information',
+      summary: 'Professional Summary', 
+      experience: 'Work Experience',
+      skills: 'Skills',
+      education: 'Education'
+    },
+    contact: {
+      fullName: sections.contact?.fullName || sections.contact?.name,
+      email: sections.contact?.email,
+      phone: sections.contact?.phone,
+      location: sections.contact?.location,
+      linkedin: sections.contact?.linkedin
+    },
+    summary: {
+      content: sections.summary?.content
+    },
+    experience: {
+      items: sections.experience?.items?.map((exp: any) => ({
+        title: exp.position || exp.title,
+        company: exp.company,
+        location: exp.location,
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        current: exp.current,
+        bullets: exp.bullets || []
+      })) || []
+    },
+    skills: {
+      items: sections.skills?.items || []
+    },
+    education: {
+      items: sections.education?.items?.map((edu: any) => ({
+        degree: edu.degree,
+        institution: edu.institution,
+        location: edu.location,
+        graduationDate: edu.year || edu.graduationDate
+      })) || []
+    },
+    projects: {
+      items: sections.projects?.items || []
+    }
+  };
 }
 
 /**

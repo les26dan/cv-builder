@@ -20,6 +20,7 @@ const textModules = {
     jdOptimization: () => import('./en/jdOptimization').then(m => m.enJDOptimizationTexts),
     workExperienceWizard: () => import('./en/workExperienceWizard').then(m => m.default),
     aiPrompts: () => import('./en/aiPrompts').then(m => m.enAIPrompts),
+    career: () => import('./en/career').then(m => m.career),
   },
   vi: {
     landingPage: () => import('./vi/landingPage').then(m => m.landingPage),
@@ -33,6 +34,7 @@ const textModules = {
     jdOptimization: () => import('./vi/jdOptimization').then(m => m.viJDOptimizationTexts),
     workExperienceWizard: () => import('./vi/workExperienceWizard').then(m => m.default),
     aiPrompts: () => import('./vi/aiPrompts').then(m => m.viAIPrompts),
+    career: () => import('./vi/career').then(m => m.career),
   }
 };
 

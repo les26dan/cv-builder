@@ -6,7 +6,7 @@ export const workspace = {
       saved: 'Auto-saved',
       error: 'Save error',
       offline: 'Offline mode',
-      guestWarning: 'Your progress is not saved',
+      guestWarning: 'Your progress is not saved. Log in to save now',
     },
     userAvatar: 'U', // Will be dynamically set based on user's first name
   },

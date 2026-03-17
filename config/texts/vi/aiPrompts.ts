@@ -32,6 +32,7 @@ export interface PromptContext {
   educationContent?: string;
   currentSkillsCount?: string;
   maxSkills?: string;
+  newlyAddedContent?: string;
 }
 
 export const viAIPrompts = {
@@ -68,6 +69,11 @@ export const viAIPrompts = {
   jobDescriptionAnalysis: {
     system: "Bạn là chuyên gia phân tích mô tả công việc và tối ưu hóa CV. Bạn có khả năng trích xuất các yêu cầu chính từ mô tả công việc và đưa ra gợi ý cải thiện CV phù hợp.",
     user: "Phân tích mô tả công việc sau và đưa ra gợi ý cải thiện CV:\n\nMô tả công việc:\n{jobDescription}\n\nCV hiện tại:\n{currentCV}\n\nYêu cầu phân tích:\n1. Các từ khóa quan trọng cần có trong CV\n2. Kỹ năng thiếu cần bổ sung\n3. Gợi ý cải thiện phần tóm tắt\n4. Gợi ý cải thiện phần kinh nghiệm làm việc\n5. Đánh giá mức độ phù hợp (0-100%)\n\nTrả lời bằng tiếng Việt, cấu trúc rõ ràng"
+  },
+
+  singleBulletImprovement: {
+    system: "Bạn là chuyên gia hàng đầu trong việc cải thiện và tối ưu bullet point mô tả công việc cho CV, giúp chúng trở nên cực kỳ chuyên nghiệp, ngắn gọn và có sức thuyết phục cao. Bạn luôn sử dụng nhuần nhuyễn phương pháp STAR (Situation–Task–Action–Result) để tái cấu trúc nội dung công việc đã có, làm nổi bật thành tựu và kỹ năng quan trọng nhất của ứng viên. Bullet point sau khi bạn cải thiện luôn bắt đầu bằng động từ hành động mạnh, được định lượng rõ ràng (số liệu cụ thể hoặc %), tối ưu chặt chẽ theo từ khóa ATS và nhu cầu của vị trí mục tiêu, tạo ấn tượng mạnh với nhà tuyển dụng.",
+    user: "Dựa vào thông tin dưới đây, hãy cải thiện bullet point hiện tại để nó trở nên chuyên nghiệp, ấn tượng và thuyết phục hơn khi đưa vào CV:\n\nVị trí công việc: {jobTitle}\nTên công ty: {company}\nBullet point hiện tại: {existingContent}\n\n[CHỈ DẪN QUAN TRỌNG] {newlyAddedContent}\n\nBối cảnh CV:\nKinh nghiệm khác: {workExperience}\nVị trí mục tiêu: {targetJob}\n\nYêu cầu khi cải thiện:\nViết đúng 1 bullet point duy nhất, dài tối đa 200 ký tự (lý tưởng nhất 150-180 ký tự)\nÁp dụng rõ cấu trúc STAR (Situation–Task–Action–Result)\nBắt đầu bằng động từ hành động mạnh\nNêu rõ kết quả định lượng cụ thể (% hoặc số liệu rõ ràng)\nThể hiện rõ khả năng lãnh đạo hoặc chủ động nếu phù hợp\nCRITICAL: Nếu bạn thấy nội dung trong dấu < > ở bullet point trên, đây là thông tin mới được thêm vào hoặc thay đổi và PHẢI được nhấn mạnh, tối ưu hóa và xây dựng xung quanh trong phiên bản cải thiện của bạn. Nội dung trong dấu < > phải trở thành điểm nhấn và điểm nổi bật chính của thành tựu.\nSử dụng ngôn ngữ tiếng Việt chuyên nghiệp, ngắn gọn và súc tích\nKhông tạo ra thông tin không có thật hoặc không được cung cấp\nLoại bỏ dấu < > trong phản hồi cuối cùng - chúng chỉ là ký hiệu để chỉ cho bạn biết cần nhấn mạnh gì\nChỉ trả về đúng bullet point đã được cải thiện, không thêm bất kỳ nội dung giới thiệu hay kết luận nào khác"
   }
 } as const;
 

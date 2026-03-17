@@ -6,7 +6,7 @@ export const workspace = {
       saved: 'Đã lưu tự động',
       error: 'Lỗi lưu',
       offline: 'Chế độ ngoại tuyến',
-      guestWarning: 'Tiến trình của bạn chưa được lưu',
+      guestWarning: 'Tiến trình của bạn chưa được lưu. Đăng nhập để lưu ngay',
     },
     userAvatar: 'N', // Will be dynamically set based on user's first name
   },

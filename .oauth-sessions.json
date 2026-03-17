@@ -1,82 +1,11 @@
 {
-  "69101543d385939c2809819088d159e4": {
-    "id": "69101543d385939c2809819088d159e4",
+  "f752887b7efdbb510299c4f1e4ff06ac": {
+    "id": "f752887b7efdbb510299c4f1e4ff06ac",
     "provider": "google",
-    "stateToken": "state-0",
-    "csrfToken": "csrf-0",
-    "createdAt": "2025-08-20T09:13:40.262Z",
-    "expiresAt": "2025-08-20T09:43:40.262Z"
-  },
-  "81c39f13360dede5c3835512bb8a0d9a": {
-    "id": "81c39f13360dede5c3835512bb8a0d9a",
-    "provider": "google",
-    "stateToken": "state-1",
-    "csrfToken": "csrf-1",
-    "createdAt": "2025-08-20T09:13:40.262Z",
-    "expiresAt": "2025-08-20T09:43:40.262Z"
-  },
-  "ec41d803f8c8815fbc3b9503a694d6c7": {
-    "id": "ec41d803f8c8815fbc3b9503a694d6c7",
-    "provider": "google",
-    "stateToken": "state-2",
-    "csrfToken": "csrf-2",
-    "createdAt": "2025-08-20T09:13:40.264Z",
-    "expiresAt": "2025-08-20T09:43:40.264Z"
-  },
-  "a5136ea14c9ad80031a9a59ed674e31b": {
-    "id": "a5136ea14c9ad80031a9a59ed674e31b",
-    "provider": "google",
-    "stateToken": "state-3",
-    "csrfToken": "csrf-3",
-    "createdAt": "2025-08-20T09:13:40.264Z",
-    "expiresAt": "2025-08-20T09:43:40.264Z"
-  },
-  "8027c168e23d2fe2c0c9c0b4453fbf97": {
-    "id": "8027c168e23d2fe2c0c9c0b4453fbf97",
-    "provider": "google",
-    "stateToken": "state-4",
-    "csrfToken": "csrf-4",
-    "createdAt": "2025-08-20T09:13:40.266Z",
-    "expiresAt": "2025-08-20T09:43:40.266Z"
-  },
-  "4f4c62c2c32f239fa046c5c282d6b4ac": {
-    "id": "4f4c62c2c32f239fa046c5c282d6b4ac",
-    "provider": "google",
-    "stateToken": "state-5",
-    "csrfToken": "csrf-5",
-    "createdAt": "2025-08-20T09:13:40.267Z",
-    "expiresAt": "2025-08-20T09:43:40.267Z"
-  },
-  "645fb8d0d3a35438031b556fb3021508": {
-    "id": "645fb8d0d3a35438031b556fb3021508",
-    "provider": "google",
-    "stateToken": "state-6",
-    "csrfToken": "csrf-6",
-    "createdAt": "2025-08-20T09:13:40.267Z",
-    "expiresAt": "2025-08-20T09:43:40.267Z"
-  },
-  "f244a8c12b75698f4a0a5492649aa40e": {
-    "id": "f244a8c12b75698f4a0a5492649aa40e",
-    "provider": "google",
-    "stateToken": "state-7",
-    "csrfToken": "csrf-7",
-    "createdAt": "2025-08-20T09:13:40.267Z",
-    "expiresAt": "2025-08-20T09:43:40.267Z"
-  },
-  "fa51dbacc713538e1031b2fbbc7547a9": {
-    "id": "fa51dbacc713538e1031b2fbbc7547a9",
-    "provider": "google",
-    "stateToken": "state-8",
-    "csrfToken": "csrf-8",
-    "createdAt": "2025-08-20T09:13:40.267Z",
-    "expiresAt": "2025-08-20T09:43:40.267Z"
-  },
-  "b9810fc69f3bbf2e6e179ed904788e2e": {
-    "id": "b9810fc69f3bbf2e6e179ed904788e2e",
-    "provider": "google",
-    "stateToken": "state-9",
-    "csrfToken": "csrf-9",
-    "createdAt": "2025-08-20T09:13:40.267Z",
-    "expiresAt": "2025-08-20T09:43:40.267Z"
+    "stateToken": "MTc1NTc0NzI0MjA5MS43NDBiZDI4NjhhZDIwN2NkNzUyZjRkZDFjNTQwMGE3MS5lZWExM2NlOTdkZTllZTVlMjdkNzAzZjQ5Yzg0YTQ5YjpmMDk0ZDk5MzE3NDdkNGU0YzhkZDFmMWE3NDllODQxMToxODU2NjZmYWQyNzFiYTIyZjJlYjMxMDI5YTJkMjYzMGFmOWYxNTE4YjgxNTI4YzE3Y2ExZTZhYTVkNGRhNmFmMjI3NTFjNjg2MDZkNDEzNDM4ODBmM2YwNjE5ZWJmYTg2NGM2OWNhYzAwNTRkOTVkMzAzYzc2YTZhN2JlMTI0M2FjYTM1NDU5MDU3MGM0YTI3OTY4OWY4ZTJmNmU4YWI3OWQ3MWQzZDc1NjJjODRlNTE2NThlMTk3NmQ2YWFjZjczY2U2NzM1MTBmZDU4ZDlhMWVlMDg5YTc1ZGQ4ZDJkNDFkZWYyMDQxYWVkN2FkNTcwMjFkOTQzYjhhZTE3OTYwYTI4OWM1OGZkNDY4YWY3ODA3ZGFlOTRjMDY5OA",
+    "csrfToken": "112e13d6c531841952296692db15942e74dc98667b0c2defc34d37599f9c2c84",
+    "returnUrl": "/",
+    "createdAt": "2025-08-21T03:34:02.124Z",
+    "expiresAt": "2025-08-21T04:04:02.124Z"
   }
 }

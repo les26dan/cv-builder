@@ -419,8 +419,8 @@ export const CVEditor: React.FC<CVEditorProps> = ({
     if (cvData) {
       updateCVData(cvData);
     }
-    // Navigate to workspace
-    window.location.href = '/cv-workspace';
+    // Use browser history for proper back navigation
+    window.history.back();
   };
 
   return (
@@ -432,8 +432,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         showBackButton={true}
         onBackClick={handleBackToWorkspace}
         backButtonTitle={cvEditorTexts?.header?.backToWorkspace || 'Back to CV Workspace'}
-        showAutoSave={true}
-        autoSaveStatus={getAutoSaveStatus()}
+        showAutoSave={false}
         cvData={cvData}
         onUpdateCvData={updateCVData}
       />
@@ -490,6 +489,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
             cvData={cvData}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
+            autoSaveStatus={getAutoSaveStatus()}
           />
         </div>
       </div>

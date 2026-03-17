@@ -75,6 +75,9 @@ export const WorkExperienceSection = ({
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
   const [experienceTexts, setExperienceTexts] = useState<any>(null);
   
+  // Track original bullet content to detect newly added content
+  const [bulletOriginalContent, setBulletOriginalContent] = useState<Map<string, string>>(new Map());
+  
   // Load language configuration
   useEffect(() => {
     const loadLanguage = async () => {
@@ -149,6 +152,21 @@ export const WorkExperienceSection = ({
     checkIfParsedCV();
   }, []);
 
+  // Initialize bullet tracking for existing content
+  useEffect(() => {
+    if (data?.items) {
+      data.items.forEach((experience, expIndex) => {
+        if (experience.bullets) {
+          experience.bullets.forEach((bullet, bulletIndex) => {
+            if (bullet && bullet.trim()) {
+              initializeBulletTracking(expIndex, bulletIndex, bullet);
+            }
+          });
+        }
+      });
+    }
+  }, [data?.items?.length]); // Only run when number of items changes
+
 
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [isParsedCV, setIsParsedCV] = useState<boolean>(false);
@@ -219,17 +237,17 @@ export const WorkExperienceSection = ({
   };
 
   const handleAddExperience = useCallback(() => {
-    console.log('🚀 DEBUG: handleAddExperience called at', new Date().toISOString());
-    console.log('🚀 DEBUG: cvData?.id:', cvData?.id);
-    console.log('🚀 DEBUG: isInitialLoadComplete:', isInitialLoadComplete);
-    console.log('🚀 DEBUG: useNewWizards:', useNewWizards);
+
+
+
+
     
     // Prevent automatic wizard opening for template users during initial load
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
-    console.log('🚀 DEBUG: isTemplateUser:', isTemplateUser);
+
     
     if (isTemplateUser && !isInitialLoadComplete) {
-      console.log('🎯 Guest Session: Preventing wizard popup during initial load for template user');
+
       return;
     }
     
@@ -238,9 +256,9 @@ export const WorkExperienceSection = ({
     if (manuallyClosed) {
       const closedTime = parseInt(manuallyClosed);
       const timeSinceClosed = Date.now() - closedTime;
-      console.log('🚀 DEBUG: Manual close cooldown check - time since closed:', timeSinceClosed);
+
       if (timeSinceClosed < 5000) { // 5 seconds cooldown
-        console.log('🚫 Preventing wizard auto-trigger - user manually closed wizard recently');
+
         return;
       } else {
         // Clean up old flag
@@ -248,20 +266,20 @@ export const WorkExperienceSection = ({
       }
     }
     
-    console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
-    console.log('🚀 DEBUG: About to set wizard state - START TIME:', performance.now());
+
+
     
     if (useNewWizards) {
       // Open the new streamlined 2-step wizard
-      console.log('🚀 DEBUG: Setting newWizardOpen to true');
+
       setNewWizardOpen(true);
     } else {
       // Open the old 5-step wizard
-      console.log('🚀 DEBUG: Setting newExperienceWizard to true');
+
       setNewExperienceWizard(true);
     }
     
-    console.log('🚀 DEBUG: Wizard state set - END TIME:', performance.now());
+
   }, [cvData?.id, isInitialLoadComplete, useNewWizards]);
 
   // Provide the add function to parent component
@@ -567,7 +585,86 @@ export const WorkExperienceSection = ({
     });
   };
 
+  // Bullet content tracking functions
+  const getBulletKey = (experienceIndex: number, bulletIndex: number) => {
+    return `${data.items[experienceIndex].id}-bullet-${bulletIndex}`;
+  };
+
+  const initializeBulletTracking = (experienceIndex: number, bulletIndex: number, content: string) => {
+    const key = getBulletKey(experienceIndex, bulletIndex);
+    if (!bulletOriginalContent.has(key) && content.trim()) {
+      setBulletOriginalContent(prev => new Map(prev.set(key, content.trim())));
+    }
+  };
+
+  const getNewlyAddedContent = (experienceIndex: number, bulletIndex: number, currentContent: string): string => {
+    const key = getBulletKey(experienceIndex, bulletIndex);
+    const originalContent = bulletOriginalContent.get(key) || '';
+    
+    if (!originalContent || !currentContent) {
+      return currentContent; // If no original, all content is new
+    }
+
+    if (originalContent === currentContent) {
+      return ''; // No changes
+    }
+
+    // Use a more sophisticated diff algorithm to identify specific changes
+    return highlightContentChanges(originalContent, currentContent);
+  };
+
+  const highlightContentChanges = (original: string, current: string): string => {
+    // Split into words for better comparison
+    const originalWords = original.split(/(\s+)/);
+    const currentWords = current.split(/(\s+)/);
+    
+    let result = '';
+    let originalIndex = 0;
+    let currentIndex = 0;
+    
+    while (currentIndex < currentWords.length) {
+      const currentWord = currentWords[currentIndex];
+      
+      // Skip whitespace
+      if (/^\s+$/.test(currentWord)) {
+        result += currentWord;
+        currentIndex++;
+        continue;
+      }
+      
+      // Check if this word exists in the original at the current position
+      if (originalIndex < originalWords.length && originalWords[originalIndex] === currentWord) {
+        // Word unchanged
+        result += currentWord;
+        originalIndex++;
+        currentIndex++;
+      } else {
+        // Check if this word exists later in the original (replacement scenario)
+        const foundInOriginal = originalWords.slice(originalIndex).findIndex(word => word === currentWord);
+        
+        if (foundInOriginal !== -1) {
+          // This is a replacement - mark the new word
+          result += `<${currentWord}>`;
+          originalIndex += foundInOriginal + 1;
+          currentIndex++;
+        } else {
+          // This is a completely new word/phrase
+          result += `<${currentWord}>`;
+          currentIndex++;
+        }
+      }
+    }
+    
+    return result;
+  };
+
   const handleUpdateBullet = (experienceIndex: number, bulletIndex: number, value: string) => {
+    // Initialize tracking for this bullet if it's the first time we're seeing content
+    const currentBullet = data.items[experienceIndex].bullets[bulletIndex];
+    if (currentBullet && currentBullet.trim() && !bulletOriginalContent.has(getBulletKey(experienceIndex, bulletIndex))) {
+      initializeBulletTracking(experienceIndex, bulletIndex, currentBullet);
+    }
+
     const updatedItems = [...data.items];
     updatedItems[experienceIndex].bullets[bulletIndex] = value;
     onUpdate({
@@ -871,6 +968,18 @@ export const WorkExperienceSection = ({
 
     setIsGenerating(true);
     try {
+      // Detect newly added content and create highlighted version
+      const highlightedContent = getNewlyAddedContent(experienceIndex, bulletIndex, bulletToImprove);
+      const hasNewContent = highlightedContent.includes('<') && highlightedContent.includes('>');
+      
+      console.log('🆕 Content Change Detection:', { 
+        originalContent: bulletOriginalContent.get(getBulletKey(experienceIndex, bulletIndex)),
+        currentContent: bulletToImprove,
+        highlightedContent,
+        hasNewContent,
+        changeCount: (highlightedContent.match(/</g) || []).length
+      });
+
       // Prepare enhanced context with full CV data
       const otherExperiences = data.items.filter((_, index) => index !== experienceIndex);
       
@@ -881,7 +990,9 @@ export const WorkExperienceSection = ({
         skills: cvData?.skills?.items || [],
         targetJob: cvData?.targetJobDescription || '',
         language: currentLanguage,
-        bulletIndex: bulletIndex
+        bulletIndex: bulletIndex,
+        highlightedContent: highlightedContent, // Pass the highlighted content with < > syntax
+        hasNewContent: hasNewContent
       };
 
       console.log('🔧 Calling AI Service with context:', contextData);
@@ -896,6 +1007,10 @@ export const WorkExperienceSection = ({
           ...data,
           items: updatedItems
         });
+
+        // Update the original content tracking with the new improved content
+        const key = getBulletKey(experienceIndex, bulletIndex);
+        setBulletOriginalContent(prev => new Map(prev.set(key, result.data || '')));
 
         // Mark AI as used for score calculation (will be implemented)
         // markAIUsed('workExperience');

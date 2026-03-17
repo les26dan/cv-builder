@@ -6,7 +6,7 @@ const TestimonialsSection: React.FC = () => {
   const { testimonials } = landingPage;
 
   return (
-    <section className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] gap-12 w-full min-h-[440px] bg-[#E0F7FA]">
+    <section className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[40px] gap-12 w-full min-h-[440px] bg-[#E0F7FA]">
       {/* Testimonials Title */}
       <h2 className="font-inter font-bold text-3xl md:text-4xl leading-tight md:leading-[43px] text-center text-[#111827] w-full max-w-[600px]">
         {testimonials.title}

@@ -745,14 +745,20 @@ class AIService {
   }): Promise<AIResponse<string[]>> {
     const language = this.detectRequestLanguage(request);
     
-    // Prepare enhanced context with full CV data
+    // Prepare enhanced context with full CV data - emphasize work experience details
     const workExperienceText = language === 'vi'
-      ? request.workExperience?.map(exp => 
-          `${exp.title} tại ${exp.company}: ${exp.description || exp.bullets?.join(', ') || ''}`
-        ).join('\n') || ''
-      : request.workExperience?.map(exp => 
-          `${exp.title} at ${exp.company}: ${exp.description || exp.bullets?.join(', ') || ''}`
-        ).join('\n') || '';
+      ? request.workExperience?.map((exp, index) => {
+          const responsibilities = exp.bullets && exp.bullets.length > 0 
+            ? exp.bullets.join('; ') 
+            : (exp.description || '');
+          return `CÔNG VIỆC ${index + 1}: ${exp.title} tại ${exp.company}\nTRÁCH NHIỆM VÀ THÀNH TỰU: ${responsibilities}`;
+        }).join('\n\n') || ''
+      : request.workExperience?.map((exp, index) => {
+          const responsibilities = exp.bullets && exp.bullets.length > 0 
+            ? exp.bullets.join('; ') 
+            : (exp.description || '');
+          return `JOB ${index + 1}: ${exp.title} at ${exp.company}\nRESPONSIBILITIES & ACHIEVEMENTS: ${responsibilities}`;
+        }).join('\n\n') || '';
 
     // Prepare education string based on language  
     const educationText = language === 'vi'
@@ -805,6 +811,8 @@ class AIService {
     targetJob?: string; 
     language?: SupportedLanguage;
     bulletIndex?: number;
+    highlightedContent?: string;
+    hasNewContent?: boolean;
   }): Promise<AIResponse<string>> {
     console.log('🔧 AI Service: Starting improveSingleBullet', {
       bullet,
@@ -814,7 +822,9 @@ class AIService {
         language: context?.language,
         bulletIndex: context?.bulletIndex,
         workExperienceCount: context?.workExperience?.length || 0,
-        skillsCount: context?.skills?.length || 0
+        skillsCount: context?.skills?.length || 0,
+        highlightedContent: context?.highlightedContent,
+        hasNewContent: context?.hasNewContent
       }
     });
 
@@ -831,12 +841,13 @@ class AIService {
         ).join('\n') || '';
     
     const promptContext: PromptContext = {
-      existingContent: bullet,
+      existingContent: context?.hasNewContent ? context.highlightedContent : bullet,
       jobTitle: context?.jobTitle || '',
       company: context?.company || '',
       workExperience: workExperienceText,
       skills: context?.skills?.join(', ') || '',
-      targetJob: context?.targetJob || ''
+      targetJob: context?.targetJob || '',
+      newlyAddedContent: context?.hasNewContent ? 'Content with < > brackets shows newly added/changed text that should be emphasized' : ''
     };
 
     console.log('📝 Prompt Context Prepared:', {

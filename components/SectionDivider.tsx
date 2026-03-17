@@ -6,7 +6,7 @@ interface SectionDividerProps {
 
 const SectionDivider: React.FC<SectionDividerProps> = ({ activeIndex = 0 }) => {
   return (
-    <div className="w-full h-10 bg-white">
+    <div className="w-full h-4 bg-white">
       {/* Empty divider - 3-dot navigation removed per UI polish requirements */}
     </div>
   );

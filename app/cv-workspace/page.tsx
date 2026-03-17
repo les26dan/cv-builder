@@ -251,8 +251,7 @@ export default function WorkspacePage() {
         variant="app" 
         showFeedback={false} 
         showBackButton={true}
-        onBackClick={() => window.location.href = '/'}
-        backButtonTitle="Quay lại trang chủ"
+        backButtonTitle="Quay lại trang trước"
         showAutoSave={true}
         autoSaveStatus={getAutoSaveStatus()}
       />

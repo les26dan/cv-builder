@@ -34,7 +34,7 @@ const ProblemATS: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]"
+      className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[40px] pb-[50px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]"
     >
       {/* Content */}
       <div className="flex flex-col items-start gap-6 w-full md:w-[500px]">

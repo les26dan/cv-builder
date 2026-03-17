@@ -1,3 +1,5 @@
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from 'docx';
+
 interface CVData {
   contact: {
     fullName?: string;
@@ -219,8 +221,8 @@ export const generateTxtContent = (cvData: CVData): string => {
 };
 
 // Download file with given content and filename
-export const downloadFile = (content: string, filename: string, mimeType: string) => {
-  const blob = new Blob([content], { type: mimeType });
+export const downloadFile = (content: string | Blob, filename: string, mimeType: string) => {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   
   const link = document.createElement('a');
@@ -468,10 +470,9 @@ export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' 
     }
       
     case 'docx': {
-      // For DOCX, we'd typically use a library like docx or mammoth
-      // For now, we'll download as RTF which can be opened by Word
-      const rtfContent = generateRTFContent(cvData);
-      downloadFile(rtfContent, filename.replace('.docx', '.rtf'), 'application/rtf');
+      // Generate proper DOCX using docx library
+      const docxBlob = await generateDOCXContent(cvData);
+      downloadFile(docxBlob, filename, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       break;
     }
 
@@ -746,6 +747,281 @@ const generateHTMLForPrint = (cvData: CVData): string => {
   `;
   
   return html;
+};
+
+// Generate proper DOCX content using docx library
+export const generateDOCXContent = async (cvData: CVData): Promise<Blob> => {
+  const doc = new Document({
+    sections: [{
+      properties: {},
+      children: await generateDOCXParagraphs(cvData)
+    }]
+  });
+
+  return await Packer.toBlob(doc);
+};
+
+// Generate paragraphs for DOCX document
+const generateDOCXParagraphs = async (cvData: CVData): Promise<Paragraph[]> => {
+  const paragraphs: Paragraph[] = [];
+  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
+
+  for (const sectionId of sectionOrder) {
+    const sectionData = cvData[sectionId];
+    
+    if (!hasContent(sectionId, sectionData)) continue;
+    
+    switch (sectionId) {
+      case 'contact': {
+        // Full name as main heading
+        if (sectionData.fullName) {
+          paragraphs.push(new Paragraph({
+            children: [new TextRun({
+              text: sectionData.fullName,
+              bold: true,
+              size: 32, // 16pt
+            })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 200 }
+          }));
+        }
+        
+        // Contact information
+        const contactInfo = [];
+        if (sectionData.email) contactInfo.push(sectionData.email);
+        if (sectionData.phone) contactInfo.push(sectionData.phone);
+        if (sectionData.location) contactInfo.push(sectionData.location);
+        if (sectionData.linkedin) contactInfo.push(sectionData.linkedin);
+        
+        if (contactInfo.length > 0) {
+          paragraphs.push(new Paragraph({
+            children: [new TextRun({
+              text: contactInfo.join(' | '),
+              size: 22 // 11pt
+            })],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 }
+          }));
+        }
+        break;
+      }
+        
+      case 'summary':
+        if (sectionData.content) {
+          paragraphs.push(new Paragraph({
+            children: [new TextRun({
+              text: sectionData.content,
+              size: 22 // 11pt
+            })],
+            spacing: { after: 400 }
+          }));
+        }
+        break;
+        
+      case 'experience': {
+        // Section heading
+        paragraphs.push(new Paragraph({
+          children: [new TextRun({
+            text: getSectionTitle(sectionId, cvData.sectionTitles),
+            bold: true,
+            size: 26, // 13pt
+            allCaps: true
+          })],
+          spacing: { before: 200, after: 200 },
+          border: {
+            bottom: {
+              color: "000000",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 6
+            }
+          }
+        }));
+        
+        // Experience items
+        sectionData.items.forEach((exp: any) => {
+          if (exp.title || exp.company) {
+            // Job title and company
+            const jobLine = [];
+            if (exp.title) jobLine.push(exp.title);
+            if (exp.company) jobLine.push(exp.company);
+            if (exp.location) jobLine.push(exp.location);
+            
+            paragraphs.push(new Paragraph({
+              children: [new TextRun({
+                text: jobLine.join(', '),
+                bold: true,
+                size: 24 // 12pt
+              })],
+              spacing: { before: 100, after: 50 }
+            }));
+            
+            // Date range
+            const dateRange = `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate || ''}`;
+            paragraphs.push(new Paragraph({
+              children: [new TextRun({
+                text: dateRange,
+                italics: true,
+                size: 20 // 10pt
+              })],
+              spacing: { after: 100 }
+            }));
+            
+            // Bullets
+            if (exp.bullets && exp.bullets.length > 0) {
+              exp.bullets.forEach((bullet: string) => {
+                paragraphs.push(new Paragraph({
+                  children: [new TextRun({
+                    text: `• ${bullet}`,
+                    size: 22 // 11pt
+                  })],
+                  indent: { left: 720 }, // 0.5 inch
+                  spacing: { after: 100 }
+                }));
+              });
+            }
+            
+            // Space between experiences
+            paragraphs.push(new Paragraph({ text: "" }));
+          }
+        });
+        break;
+      }
+        
+      case 'skills': {
+        // Section heading
+        paragraphs.push(new Paragraph({
+          children: [new TextRun({
+            text: getSectionTitle(sectionId, cvData.sectionTitles),
+            bold: true,
+            size: 26, // 13pt
+            allCaps: true
+          })],
+          spacing: { before: 200, after: 200 },
+          border: {
+            bottom: {
+              color: "000000",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 6
+            }
+          }
+        }));
+        
+        // Skills list
+        if (sectionData.items && sectionData.items.length > 0) {
+          paragraphs.push(new Paragraph({
+            children: [new TextRun({
+              text: sectionData.items.join(', '),
+              size: 22 // 11pt
+            })],
+            spacing: { after: 400 }
+          }));
+        }
+        break;
+      }
+        
+      case 'education': {
+        // Section heading
+        paragraphs.push(new Paragraph({
+          children: [new TextRun({
+            text: getSectionTitle(sectionId, cvData.sectionTitles),
+            bold: true,
+            size: 26, // 13pt
+            allCaps: true
+          })],
+          spacing: { before: 200, after: 200 },
+          border: {
+            bottom: {
+              color: "000000",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 6
+            }
+          }
+        }));
+        
+        // Education items
+        sectionData.items.forEach((edu: any) => {
+          if (edu.degree || edu.institution) {
+            const eduLine = [];
+            if (edu.degree) eduLine.push(edu.degree);
+            if (edu.institution) eduLine.push(edu.institution);
+            if (edu.location) eduLine.push(edu.location);
+            
+            paragraphs.push(new Paragraph({
+              children: [new TextRun({
+                text: eduLine.join(', '),
+                bold: true,
+                size: 24 // 12pt
+              })],
+              spacing: { before: 100, after: 50 }
+            }));
+            
+            if (edu.graduationDate) {
+              paragraphs.push(new Paragraph({
+                children: [new TextRun({
+                  text: edu.graduationDate,
+                  italics: true,
+                  size: 20 // 10pt
+                })],
+                spacing: { after: 200 }
+              }));
+            }
+          }
+        });
+        break;
+      }
+        
+      case 'projects': {
+        // Section heading
+        paragraphs.push(new Paragraph({
+          children: [new TextRun({
+            text: getSectionTitle(sectionId, cvData.sectionTitles),
+            bold: true,
+            size: 26, // 13pt
+            allCaps: true
+          })],
+          spacing: { before: 200, after: 200 },
+          border: {
+            bottom: {
+              color: "000000",
+              space: 1,
+              style: BorderStyle.SINGLE,
+              size: 6
+            }
+          }
+        }));
+        
+        // Project items
+        sectionData.items.forEach((project: any) => {
+          if (project.name) {
+            paragraphs.push(new Paragraph({
+              children: [new TextRun({
+                text: project.name,
+                bold: true,
+                size: 24 // 12pt
+              })],
+              spacing: { before: 100, after: 50 }
+            }));
+            
+            if (project.description) {
+              paragraphs.push(new Paragraph({
+                children: [new TextRun({
+                  text: project.description,
+                  size: 22 // 11pt
+                })],
+                spacing: { after: 200 }
+              }));
+            }
+          }
+        });
+        break;
+      }
+    }
+  }
+
+  return paragraphs;
 };
 
 // Generate RTF content for DOCX alternative

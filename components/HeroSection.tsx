@@ -32,7 +32,7 @@ const HeroSection: React.FC = () => {
   return (
     <section 
       ref={sectionRef}
-      className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] md:py-[60px] pb-[80px] gap-8 w-full min-h-[840px] bg-[#E0F7FA]"
+      className="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-10 py-[40px] md:py-[40px] pb-[50px] gap-8 w-full min-h-[840px] bg-[#E0F7FA]"
     >
       {/* Content Container */}
       <div className="flex flex-col justify-center items-center gap-6 w-full max-w-[800px]">

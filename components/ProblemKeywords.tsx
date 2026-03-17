@@ -14,7 +14,7 @@ const ProblemKeywords: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[60px] pb-[80px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
+    <section className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-10 py-[40px] pb-[50px] gap-8 md:gap-16 w-full min-h-[500px] bg-[#E0F7FA]">
       {/* Image Container */}
       <div className="flex flex-row justify-center items-center w-full md:w-[500px] h-[400px] bg-white shadow-[0px_4px_20px_rgba(0,0,0,0.063)] rounded-xl">
         {/* Keyword Analysis */}

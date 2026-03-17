@@ -15,8 +15,8 @@ export const HeaderCVEditor = ({ cvScore, cvData, onUpdateCvData, onJobAnalysisC
       onUpdateCvData(cvData);
     }
     
-    // Navigate to workspace
-    window.location.href = '/cv-workspace';
+    // Use browser history for proper back navigation
+    window.history.back();
   };
 
   const handleLogoClick = () => {
@@ -26,8 +26,8 @@ export const HeaderCVEditor = ({ cvScore, cvData, onUpdateCvData, onJobAnalysisC
       onUpdateCvData(cvData);
     }
     
-    // Navigate to workspace
-    window.location.href = '/cv-workspace';
+    // Navigate to landing page when clicking logo
+    window.location.href = '/';
   };
 
   return (

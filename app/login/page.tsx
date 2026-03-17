@@ -17,8 +17,7 @@ export default function LoginPage() {
         variant="auth" 
         showFeedback={false} 
         showBackButton={true}
-        onBackClick={() => window.location.href = '/'}
-        backButtonTitle="Quay lại trang chủ"
+        backButtonTitle="Quay lại trang trước"
       />
       
       <Suspense fallback={

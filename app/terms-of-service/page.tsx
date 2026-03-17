@@ -1,11 +1,15 @@
 import { Suspense } from "react";
-import Header from "@/components/auth/Header";
+import SharedHeader from "@/components/SharedHeader";
 import TermsContent from "./TermsContent";
 
 export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
+      <SharedHeader 
+        variant="auth" 
+        showBackButton={true}
+        backButtonTitle="Quay lại trang trước"
+      />
       
       <Suspense fallback={
         <main className="flex-1 flex justify-center items-center px-4 py-6">

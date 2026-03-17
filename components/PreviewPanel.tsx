@@ -10,6 +10,7 @@ interface PreviewPanelProps {
   activeSection: string | null;
   setActiveSection: (section: string | null) => void;
   language?: SupportedLanguage;
+  autoSaveStatus?: 'saving' | 'saved' | 'error' | 'offline' | 'guest';
 }
 
 // PreviewPanel component - removed memo to ensure proper re-rendering on cvData changes
@@ -17,7 +18,8 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   cvData,
   activeSection,
   setActiveSection,
-  language
+  language,
+  autoSaveStatus = 'saved'
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState<string | null>(null);
@@ -233,6 +235,50 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
     }
   };
 
+  // Auto-save status display functions (updated to use proper texts)
+  const getAutoSaveDisplay = () => {
+    // Use the same text loading as the previewTexts
+    const autosaveTexts = previewTexts?.autosave || {
+      saving: 'Saving...',
+      saved: 'Auto-saved', 
+      error: 'Save error',
+      offline: 'Offline mode',
+      guestWarning: 'Your progress is not saved'
+    };
+    
+    switch (autoSaveStatus) {
+      case 'saving':
+        return `⏳ ${autosaveTexts.saving}`;
+      case 'saved':
+        return `✓ ${autosaveTexts.saved}`;
+      case 'error':
+        return `❌ ${autosaveTexts.error}`;
+      case 'offline':
+        return `📴 ${autosaveTexts.offline}`;
+      case 'guest':
+        return autosaveTexts.guestWarning;
+      default:
+        return `✓ ${autosaveTexts.saved}`;
+    }
+  };
+
+  const getAutoSaveStyle = () => {
+    switch (autoSaveStatus) {
+      case 'saving':
+        return 'bg-blue-50 text-blue-600 border-blue-500/20';
+      case 'saved':
+        return 'bg-green-50 text-green-600 border-green-500/20';
+      case 'error':
+        return 'bg-red-50 text-red-600 border-red-500/20';
+      case 'offline':
+        return 'bg-yellow-50 text-yellow-600 border-yellow-500/20';
+      case 'guest':
+        return 'bg-orange-50 text-orange-600 border-orange-500/20';
+      default:
+        return 'bg-green-50 text-green-600 border-green-500/20';
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       {/* Header Section - Fixed */}
@@ -240,6 +286,11 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         <h2 className="text-lg font-medium">{previewTexts?.title || 'CV Preview'}</h2>
         
         <div className="flex items-center gap-4">
+          {/* Auto-save Status - Left of Download Button */}
+          <div className={`px-3 py-1 text-sm rounded-full border font-inter ${getAutoSaveStyle()}`}>
+            {getAutoSaveDisplay()}
+          </div>
+
           {/* Pagination Controls - Subtle */}
           {totalPages > 1 && (
             <div className="flex items-center gap-2 text-sm text-gray-500">

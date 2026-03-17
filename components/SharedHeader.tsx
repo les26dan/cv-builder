@@ -363,28 +363,47 @@ export default function SharedHeader({
       {/* Center Section - Spacer */}
       <div className="flex-1"></div>
 
-      {/* Right Section - Auto-save, Feedback, Auth */}
+      {/* Right Section - Navigation, Auto-save, Feedback, Auth */}
       {children ? (
         children
       ) : (
         <div className="flex flex-row justify-center items-center gap-4">
-          {/* Auto-save Status (for editor/app pages) */}
-          {showAutoSave && (
-            <div className={`px-3 py-1 text-sm rounded-full border font-inter ${getAutoSaveStyle()}`}>
-              {getAutoSaveDisplay()}
-            </div>
-          )}
+          {/* Auto-save Status COMPLETELY REMOVED - Now shown in PreviewPanel */}
 
-          {/* Feedback Button */}
-          {showFeedback && (
+          {/* Navigation Items */}
+          <div className="hidden sm:flex flex-row justify-center items-center gap-4">
+            {/* Career / Join Us */}
             <button
-              onClick={handleFeedbackClick}
+              onClick={() => window.location.href = '/career'}
               className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-              aria-label={feedbackTexts?.aria?.feedbackButton || "Send feedback"}
+              aria-label="Career opportunities"
             >
-              {feedbackTexts?.buttonLabel || 'Feedback'}
+              Career / Join Us
             </button>
-          )}
+
+            {/* CV Workspace */}
+            <button
+              onClick={() => window.location.href = '/cv-workspace'}
+              className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
+              aria-label="CV Workspace"
+            >
+              CV Workspace
+            </button>
+
+            {/* Feedback Button */}
+            {showFeedback && (
+              <button
+                onClick={handleFeedbackClick}
+                className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
+                aria-label={feedbackTexts?.aria?.feedbackButton || "Send feedback"}
+              >
+                {feedbackTexts?.buttonLabel || 'Feedback'}
+              </button>
+            )}
+
+            {/* Elegant Separator */}
+            <div className="text-gray-300 text-lg font-light">|</div>
+          </div>
 
           {/* Auth Buttons / User Avatar */}
           <div className="flex flex-row justify-center items-center gap-4">

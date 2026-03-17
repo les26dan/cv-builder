@@ -27,8 +27,8 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
     return `p-2 -mx-2 cv-section ${activeSection === section ? 'bg-blue-50 rounded-sm' : ''}`;
   };
 
-  // Default section titles - EXACTLY matching PDF output
-  const defaultSectionTitles: Record<string, string> = {
+  // Default section titles - Dynamic based on language
+  const defaultSectionTitles: Record<string, string> = currentLanguage === 'vi' ? {
     summary: '', // Summary doesn't show a title in PDF
     experience: 'KINH NGHIỆM LÀM VIỆC',
     skills: 'KỸ NĂNG',
@@ -38,6 +38,16 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
     certifications: 'CHỨNG CHỈ',
     languages: 'NGÔN NGỮ',
     hobbies: 'SỞ THÍCH'
+  } : {
+    summary: '', // Summary doesn't show a title in PDF
+    experience: 'WORK EXPERIENCE',
+    skills: 'SKILLS',
+    education: 'EDUCATION',
+    projects: 'PROJECTS',
+    volunteer: 'VOLUNTEER WORK',
+    certifications: 'CERTIFICATIONS',
+    languages: 'LANGUAGES',
+    hobbies: 'HOBBIES'
   };
 
   // Get section title (custom or default) - EXACTLY matching PDF
@@ -52,9 +62,9 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
     if (sectionId.startsWith('certifications-')) return defaultSectionTitles.certifications;
     if (sectionId.startsWith('languages-')) return defaultSectionTitles.languages;
     if (sectionId.startsWith('hobbies-')) return defaultSectionTitles.hobbies;
-    if (sectionId.startsWith('custom-')) return 'PHẦN TÙY CHỈNH';
+    if (sectionId.startsWith('custom-')) return currentLanguage === 'vi' ? 'PHẦN TÙY CHỈNH' : 'CUSTOM SECTION';
     
-    return defaultSectionTitles[sectionId] || 'PHẦN KHÁC';
+    return defaultSectionTitles[sectionId] || (currentLanguage === 'vi' ? 'PHẦN KHÁC' : 'OTHER SECTION');
   };
 
   // Check if section has content
@@ -204,9 +214,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   const renderExperienceSection = (sectionId: string) => {
     const data = cvData[sectionId] || cvData.experience;
     
-    if (!hasContent(sectionId, data)) {
-      return null;
-    }
+    // Always show section title, even if no content
 
     // Simple hardcoded fix: Only show header on page 1 for experience section
     const shouldShowHeader = sectionId === 'experience' ? currentPage === 1 : true;
@@ -218,7 +226,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
             {getSectionTitle(sectionId)}
           </div>
         )}
-        {getExperienceItemsForPage(data.items, currentPage).map((exp: any) => (
+        {(data.items && data.items.length > 0) ? getExperienceItemsForPage(data.items, currentPage).map((exp: any) => (
           <div key={exp.id} style={{ marginBottom: '15px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
               <div style={styles.jobHeader}>
@@ -242,7 +250,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
               </div>
             )}
           </div>
-        ))}
+        )) : null}
       </div>
     );
   };
@@ -251,26 +259,26 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   const renderSkillsSection = (sectionId: string) => {
     const data = cvData[sectionId] || cvData.skills;
     
-    if (!hasContent(sectionId, data)) {
-      return null;
-    }
+    // Always show section title, even if no content
 
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
         <div style={styles.sectionHeader}>
           {getSectionTitle(sectionId)}
         </div>
-        <div style={styles.skillsText}>
-          {/* Handle both string arrays and skill objects */}
-          {data.items.map((skill: any) => {
-            // If skill is an object with name property, use name
-            if (typeof skill === 'object' && skill.name) {
-              return skill.name;
-            }
-            // If skill is a string, use it directly
-            return skill;
-          }).join(' | ')}
-        </div>
+        {(data.items && data.items.length > 0) && (
+          <div style={styles.skillsText}>
+            {/* Handle both string arrays and skill objects */}
+            {data.items.map((skill: any) => {
+              // If skill is an object with name property, use name
+              if (typeof skill === 'object' && skill.name) {
+                return skill.name;
+              }
+              // If skill is a string, use it directly
+              return skill;
+            }).join(' | ')}
+          </div>
+        )}
       </div>
     );
   };
@@ -279,16 +287,14 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   const renderEducationSection = (sectionId: string) => {
     const data = cvData[sectionId] || cvData.education;
     
-    if (!hasContent(sectionId, data)) {
-      return null;
-    }
+    // Always show section title, even if no content
 
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
         <div style={styles.sectionHeader}>
           {getSectionTitle(sectionId)}
         </div>
-        {data.items.map((edu: any) => (
+        {(data.items && data.items.length > 0) ? data.items.map((edu: any) => (
           <div key={edu.id} style={styles.educationEntry}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
               <div>
@@ -306,38 +312,30 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
               </div>
             )}
           </div>
-        ))}
+        )) : null}
       </div>
     );
   };
 
-  // Render custom section with content - EXACTLY matching PDF
+  // Render custom section with content - Enhanced for all section types
   const renderCustomSection = (sectionId: string) => {
     const data = cvData[sectionId];
-    if (!hasContent(sectionId, data)) return null;
+    // Always show section title, even if no content
 
     return (
       <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
         <div style={styles.sectionHeader}>
           {getSectionTitle(sectionId)}
         </div>
-        {data.content && (
+        
+        {/* Handle simple content (like hobbies) */}
+        {(data && data.content && data.content.trim()) && (
           <div style={{ fontSize: '14px', whiteSpace: 'pre-wrap', color: '#374151', lineHeight: '1.5' }}>
             {data.content}
           </div>
         )}
-        {data.items && data.items.length > 0 && (
-          <div style={{ marginTop: '10px' }}>
-            {data.items.map((item: any, index: number) => (
-              <div key={item.id || index} style={{ fontSize: '14px', marginBottom: '8px' }}>
-                {item.title && <div style={{ fontWeight: '600' }}>{item.title}</div>}
-                {item.description && <div style={{ color: '#374151' }}>{item.description}</div>}
-                {item.organization && <div style={{ color: '#374151' }}>{item.organization}</div>}
-                {item.name && <div style={{ color: '#374151' }}>{item.name}</div>}
-              </div>
-            ))}
-          </div>
-        )}
+        
+        
       </div>
     );
   };
@@ -356,10 +354,12 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
       case 'education':
         return renderEducationSection(sectionId);
       default:
-        // Handle custom sections
+        // Handle custom sections - ALL should use renderCustomSection for proper structured data display
         if (sectionId.startsWith('projects-') || sectionId.startsWith('volunteer-') || 
             sectionId.startsWith('certifications-') || sectionId.startsWith('languages-') ||
-            sectionId.includes('experience')) {
+            sectionId.startsWith('hobbies-') || sectionId.startsWith('custom-')) {
+          return renderCustomSection(sectionId);
+        } else if (sectionId.includes('experience')) {
           return renderExperienceSection(sectionId);
         } else if (sectionId.startsWith('skills-') || sectionId.includes('skills')) {
           return renderSkillsSection(sectionId);
@@ -406,10 +406,8 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   const getSectionsForPage = (page: number) => {
     const allSections = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
     
-    // Filter to only sections with content
-    const sectionsWithContent = allSections.filter((sectionId: string) => {
-      return hasContent(sectionId, cvData[sectionId]);
-    });
+    // Show ALL sections - titles should appear even without content
+    const sectionsWithContent = allSections;
     
     if (totalPages === 1) {
       return sectionsWithContent;

@@ -200,7 +200,7 @@ export const EducationSection = ({
                 value={education.degree} 
                 onChange={e => handleUpdateEducation(index, 'degree', e.target.value)}
                 onBlur={e => validateField(index, 'degree', e.target.value)}
-                placeholder="Cử nhân Khoa học Máy tính"
+                placeholder={educationTexts?.placeholders?.degree || 'e.g., Bachelor of Science in Computer Science'}
                 aria-invalid={!!errors[`${index}-degree`]}
               />
               {errors[`${index}-degree`] && (

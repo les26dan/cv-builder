@@ -18,6 +18,7 @@ interface SkillsSectionProps {
 interface ValidationState {
   error: string;
   warning: string;
+  success?: string;
 }
 
 export const SkillsSection = ({
@@ -28,7 +29,7 @@ export const SkillsSection = ({
   language
 }: SkillsSectionProps) => {
   const [newSkill, setNewSkill] = useState('');
-  const [validation, setValidation] = useState<ValidationState>({ error: '', warning: '' });
+  const [validation, setValidation] = useState<ValidationState>({ error: '', warning: '', success: '' });
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestedSkills, setSuggestedSkills] = useState<string[]>([]);
   const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
@@ -60,7 +61,7 @@ export const SkillsSection = ({
     const trimmedSkill = skill.trim();
     
     if (!trimmedSkill) {
-      return { error: '', warning: '' };
+      return { error: '', warning: '', success: '' };
     }
 
     // Check for duplicates (case-insensitive)
@@ -69,19 +70,12 @@ export const SkillsSection = ({
     );
     
     if (isDuplicate) {
-      return { error: 'This skill has already been added', warning: '' };
+      return { error: 'This skill has already been added', warning: '', success: '' };
     }
 
-    // Check length (warn if too long)
-    if (trimmedSkill.length > 50) {
-      return { error: 'Skill too long, please shorten (max 50 characters)', warning: '' };
-    }
+    // Length validation removed - no character limits for skills
 
-    if (trimmedSkill.length > 30) {
-      return { error: '', warning: 'This skill is a bit long, consider shortening' };
-    }
-
-    return { error: '', warning: '' };
+    return { error: '', warning: '', success: '' };
   };
 
   const handleSkillChange = (value: string) => {
@@ -98,21 +92,57 @@ export const SkillsSection = ({
     const trimmedSkill = newSkill.trim();
     if (!trimmedSkill) return;
 
-    const validation = validateSkill(trimmedSkill);
+    // Check if input contains comma-separated skills
+    const skillsToAdd = trimmedSkill.split(',').map(skill => skill.trim()).filter(skill => skill.length > 0);
     
-    if (validation.error) {
-      setValidation(validation);
-      return;
-    }
+    if (skillsToAdd.length === 1) {
+      // Single skill - use existing validation
+      const validation = validateSkill(trimmedSkill);
+      
+      if (validation.error) {
+        setValidation(validation);
+        return;
+      }
 
-    // Add skill if validation passes
-    onUpdate({
-      ...data,
-      items: [...data.items, trimmedSkill]
-    });
+      // Add single skill if validation passes
+      onUpdate({
+        ...data,
+        items: [...data.items, trimmedSkill]
+      });
+    } else {
+      // Multiple comma-separated skills
+      const validSkills = [];
+      const invalidSkills = [];
+      
+      for (const skill of skillsToAdd) {
+        const validation = validateSkill(skill);
+        if (!validation.error) {
+          validSkills.push(skill);
+        } else {
+          invalidSkills.push({ skill, error: validation.error });
+        }
+      }
+      
+      if (invalidSkills.length > 0) {
+        // Show error for first invalid skill
+        setValidation({ 
+          error: `"${invalidSkills[0].skill}": ${invalidSkills[0].error}`, 
+          warning: '' 
+        });
+        return;
+      }
+      
+      if (validSkills.length > 0) {
+        // Add all valid skills
+        onUpdate({
+          ...data,
+          items: [...data.items, ...validSkills]
+        });
+      }
+    }
     
     setNewSkill('');
-    setValidation({ error: '', warning: '' });
+    setValidation({ error: '', warning: '', success: '' });
     
     // Clear suggestions to get fresh ones next time
     setSuggestedSkills([]);
@@ -203,8 +233,8 @@ export const SkillsSection = ({
       
       // If already at max skills, show warning
       if (maxSkills === 0) {
-        setValidation({ error: '', warning: 'Reached limit of 8 skills. Please remove less important skills before adding new ones.' });
-        setTimeout(() => setValidation({ error: '', warning: '' }), 5000);
+        setValidation({ error: '', warning: 'Reached limit of 8 skills. Please remove less important skills before adding new ones.', success: '' });
+        setTimeout(() => setValidation({ error: '', warning: '', success: '' }), 5000);
         return;
       }
       
@@ -228,35 +258,27 @@ export const SkillsSection = ({
         );
         
         if (newSkills.length === 0) {
-          setValidation({ error: '', warning: 'All suggested skills are already in the list' });
-          setTimeout(() => setValidation({ error: '', warning: '' }), 3000);
+          setValidation({ error: '', warning: 'All suggested skills are already in the list', success: '' });
+          setTimeout(() => setValidation({ error: '', warning: '', success: '' }), 3000);
           return;
         }
 
-        // Store all suggestions and populate the first one in the input field
-        // This gives users control to review and manually add each skill
-        if (suggestedSkills.length === 0) {
-          // First time generating suggestions - start with all new skills
-          setSuggestedSkills(newSkills);
-          setCurrentSuggestionIndex(0);
-          setNewSkill(newSkills[0]);
-          
-          const message = newSkills.length > 1 
-            ? `Suggested "${newSkills[0]}" (1 of ${newSkills.length}). Click "Skill Suggestions" again for next suggestion.`
-            : `Suggested "${newSkills[0]}". Click "Add" to include it in your CV.`;
-          
-          setValidation({ error: '', warning: message });
-        } else {
-          // Cycling through existing suggestions
-          const nextIndex = (currentSuggestionIndex + 1) % suggestedSkills.length;
-          setCurrentSuggestionIndex(nextIndex);
-          setNewSkill(suggestedSkills[nextIndex]);
-          
-          const message = `Suggested "${suggestedSkills[nextIndex]}" (${nextIndex + 1} of ${suggestedSkills.length}). Click "Add" to include it in your CV.`;
-          setValidation({ error: '', warning: message });
-        }
+        // Show all AI suggestions in the input field as comma-separated list
+        // This allows users to see all suggestions at once and modify as needed
+        setSuggestedSkills(newSkills);
+        setCurrentSuggestionIndex(0);
         
-        setTimeout(() => setValidation({ error: '', warning: '' }), 5000);
+        // Join all suggestions with commas for user to see and edit
+        const allSuggestions = newSkills.join(', ');
+        setNewSkill(allSuggestions);
+        
+        const message = newSkills.length > 1 
+          ? skillsTexts?.aiSuccess?.multiple || 'Skills expertly matched to strengthen your profile based on your experience and target position. Review and add the ones that best showcase your value.'
+          : skillsTexts?.aiSuccess?.single || 'Skill expertly matched to enhance your profile based on your experience and target position. Add to showcase your strengths.';
+        
+        setValidation({ error: '', warning: '', success: message });
+        
+        setTimeout(() => setValidation({ error: '', warning: '', success: '' }), 7000); // Longer timeout for multiple skills
 
         // Mark AI as used for score calculation (will be implemented)
         // markAIUsed('skills');
@@ -278,6 +300,9 @@ export const SkillsSection = ({
     }
     if (validation.warning) {
       return 'flex-1 p-2 border border-yellow-300 bg-yellow-50 rounded-l-md focus:outline-none focus:ring-2 focus:ring-yellow-200';
+    }
+    if (validation.success) {
+      return 'flex-1 p-2 border border-green-300 bg-green-50 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-200';
     }
     return 'flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-200';
   };
@@ -333,12 +358,25 @@ export const SkillsSection = ({
             onChange={e => handleSkillChange(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
-            placeholder={skillsTexts?.placeholder || 'Add skills... (e.g., Python, Time Management, Adobe Photoshop)'}
+            placeholder={skillsTexts?.placeholder || 'Add skills... (e.g., Python, Time Management, Adobe Photoshop) - Separate multiple skills with commas'}
             aria-invalid={!!validation.error}
-            maxLength={60} // Prevent extremely long input
+            maxLength={200} // Allow for multiple comma-separated skills
           />
           <button 
-            className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed" 
+            className="text-white px-4 py-2 rounded-r-md disabled:bg-gray-400 disabled:cursor-not-allowed" 
+            style={{
+              backgroundColor: !!validation.error || !newSkill.trim() ? undefined : '#0277bd'
+            }}
+            onMouseEnter={(e) => {
+              if (!validation.error && newSkill.trim()) {
+                e.currentTarget.style.backgroundColor = '#01579b'; // Darker shade for hover
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!validation.error && newSkill.trim()) {
+                e.currentTarget.style.backgroundColor = '#0277bd';
+              }
+            }}
             onClick={handleAddSkill}
             disabled={!!validation.error || !newSkill.trim()}
           >
@@ -361,11 +399,14 @@ export const SkillsSection = ({
           </div>
         )}
         
-        {newSkill.length > 0 && !validation.error && !validation.warning && (
-          <div className="mt-1 text-xs text-black">
-            {newSkill.length}/50
+        {validation.success && !validation.error && !validation.warning && (
+          <div className="mt-2 flex items-center text-green-600 text-sm">
+            <span className="mr-1">✨</span>
+            {validation.success}
           </div>
         )}
+        
+
       </div>
 
       {/* AI Button - Only the skill suggestion feature remains */}

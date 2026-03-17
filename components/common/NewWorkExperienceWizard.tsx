@@ -43,7 +43,6 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   onSave,
   isGenerating
 }) => {
-  console.log('🚀 WIZARD DEBUG: NewWorkExperienceWizard render - isOpen:', isOpen, 'at', performance.now());
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<WizardFormData>({
     title: '',
@@ -166,11 +165,11 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   // OPTIMIZED: Load texts once when component mounts
   useEffect(() => {
     const loadTexts = async () => {
-      console.log('🚀 WIZARD DEBUG: Starting text loading at', performance.now());
+
       const detectedLanguage = detectLanguage();
       // Batch state updates to prevent re-renders
       const textData = await getTexts('workExperienceWizard', detectedLanguage.language);
-      console.log('🚀 WIZARD DEBUG: Text loading completed at', performance.now());
+
       
       // Single state update instead of multiple
       setLanguage(detectedLanguage.language);
@@ -186,9 +185,7 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
 
   // OPTIMIZED: Reset form when modal closes - batch all state updates
   useEffect(() => {
-    console.log('🚀 WIZARD DEBUG: Reset effect triggered - isOpen:', isOpen, 'at', performance.now());
     if (!isOpen) {
-      console.log('🚀 WIZARD DEBUG: Resetting form state - wizard closing');
       // Batch all state resets in a single update cycle
       setCurrentStep(1);
       setFormData({ title: '', company: '', project: '', impact: '' });
@@ -196,21 +193,18 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
       setAiGenerating(false);
       setIsTyping(false);
     } else {
-      console.log('🚀 WIZARD DEBUG: Wizard opening - clearing manual close flag');
+
       localStorage.removeItem('okbuddy_wizard_manually_closed');
     }
   }, [isOpen]);
 
   // Show AI preview immediately when wizard opens to prevent render delay
   useEffect(() => {
-    console.log('🚀 WIZARD DEBUG: AI Preview effect triggered - isOpen:', isOpen, 'at', performance.now());
     if (isOpen) {
-      console.log('🚀 WIZARD DEBUG: Setting showAIPreview to true and aiGenerating to false');
       // Show AI preview immediately when wizard opens
       setShowAIPreview(true);
       setAiGenerating(false);
     } else {
-      console.log('🚀 WIZARD DEBUG: Setting showAIPreview to false');
       setShowAIPreview(false);
     }
   }, [isOpen]);
@@ -285,12 +279,9 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
     return formData.title.trim() && formData.company.trim();
   };
 
-  if (!isOpen) {
-    console.log('🚀 WIZARD DEBUG: Wizard not open - returning null');
+    if (!isOpen) {
     return null;
   }
-
-  console.log('🚀 WIZARD DEBUG: Wizard is open - preparing to render at', performance.now());
 
   const isVietnamese = language === 'vi';
   const newWizardTexts = texts.newWizard || {};
@@ -299,7 +290,7 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
   const aiBadgeTexts = newWizardTexts.aiBadge || {};
   const progressTexts = newWizardTexts.progress || {};
 
-  console.log('🚀 WIZARD DEBUG: Creating portal for wizard at', performance.now());
+
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -410,7 +401,7 @@ export const NewWorkExperienceWizard: React.FC<NewWorkExperienceWizardProps> = (
             <div className="space-y-4">
               {/* AI Preview Section - Show immediately to prevent render delay */}
               {(() => {
-                console.log('🚀 WIZARD DEBUG: AI Preview condition check - showAIPreview:', showAIPreview, 'at', performance.now());
+
                 return showAIPreview && (
                   <div className="mb-6">
                     <AIPreview
