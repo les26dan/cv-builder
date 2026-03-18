@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { PerformanceMonitoringProvider } from '@/components/PerformanceMonitoringProvider';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -46,7 +47,9 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <RootErrorBoundary>
-          {children}
+          <PerformanceMonitoringProvider>
+            {children}
+          </PerformanceMonitoringProvider>
         </RootErrorBoundary>
       </body>
     </html>

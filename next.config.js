@@ -8,22 +8,22 @@ const nextConfig = {
     }
   },
   webpack: (config, { dev, isServer }) => {
-    // Completely disable caching to prevent module errors
-    config.cache = false;
+    // 🚀 PERFORMANCE FIX: Enable basic caching (simplified to avoid exports issues)
+    if (dev) {
+      // Development: Use memory cache
+      config.cache = {
+        type: 'memory'
+      };
+    } else {
+      // Production: Use filesystem cache
+      config.cache = {
+        type: 'filesystem'
+      };
+    }
     
-    // Disable persistent caching
+    // Basic infrastructure logging
     config.infrastructureLogging = {
       level: 'error'
-    };
-    
-    // Force fresh module resolution
-    config.snapshot = {
-      managedPaths: [],
-      immutablePaths: [],
-      buildDependencies: {
-        hash: true,
-        timestamp: true
-      }
     };
     
     return config;

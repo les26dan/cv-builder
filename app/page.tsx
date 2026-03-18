@@ -10,6 +10,8 @@ import ProblemCoverLetters from '../components/ProblemCoverLetters';
 import TestimonialsSection from '../components/TestimonialsSection';
 import Footer from '../components/Footer';
 import { usePageView, useScrollTracking, useExitIntentTracking } from '../hooks/useAnalytics';
+// 🚀 PERFORMANCE: Initialize performance optimizations (temporarily disabled due to dynamic import issues)
+// import { PerformanceInitializer } from '../components/PerformanceInitializer';
 
 export default function Home() {
   // Track page view
@@ -25,6 +27,9 @@ export default function Home() {
   useExitIntentTracking();
   return (
     <div className="min-h-screen bg-white">
+      {/* 🚀 PERFORMANCE: Initialize optimizations on landing page (temporarily disabled) */}
+      {/* <PerformanceInitializer language="vi" preloadBilingual={true} /> */}
+      
       <SharedHeader variant="landing" />
       <HeroSection />
       <SectionDivider activeIndex={0} />

@@ -7,18 +7,8 @@ import { CVWorkflowProvider } from '@/shared/contexts/CVWorkflowContext'
 import { MobileBlockingOverlay } from '@/components/MobileBlockingOverlay'
 import { useMobileDetection } from '@/utils/useMobileDetection'
 
-// Dynamically import heavy components to reduce initial bundle size
-const CVEditor = dynamic(() => import('@/components/CVEditor').then(mod => ({ default: mod.CVEditor })), {
-  loading: () => (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading CV editor...</p>
-      </div>
-    </div>
-  ),
-  ssr: false
-})
+// 🚀 PERFORMANCE: Use optimized lazy loading system
+import { CVEditor } from '@/components/LazyComponents'
 
 // Error Boundary Class Component
 class CVEditorErrorBoundary extends Component<

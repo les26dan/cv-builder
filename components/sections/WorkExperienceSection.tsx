@@ -680,11 +680,9 @@ export const WorkExperienceSection = ({
       return;
     }
     
-    // Add a new bullet if this is the last one and it has content
-    const bullets = data.items[experienceIndex].bullets;
-    if (bulletIndex === bullets.length - 1 && value.trim() && bullets.length < 8) {
-      handleAddBullet(experienceIndex);
-    }
+    // 🚫 REMOVED: Automatic bullet creation on blur
+    // Users should only create bullets through "Add Achievement" wizard
+    // This prevents unwanted empty bullets when clicking AI button or outside
   };
 
   const handleBulletKeyDown = (experienceIndex: number, bulletIndex: number, e: React.KeyboardEvent) => {
@@ -694,22 +692,12 @@ export const WorkExperienceSection = ({
       const bullets = data.items[experienceIndex].bullets;
       const currentValue = bullets[bulletIndex];
       
-      // If current bullet has content and we're at the last bullet, add a new one
-      if (currentValue.trim() && bulletIndex === bullets.length - 1 && bullets.length < 8) {
-        handleAddBullet(experienceIndex);
-        
-        // Focus the new bullet after a brief delay
-        setTimeout(() => {
-          const newBulletTextarea = document.querySelector(
-            `[data-experience-index="${experienceIndex}"][data-bullet-index="${bulletIndex + 1}"]`
-          ) as HTMLTextAreaElement;
-          if (newBulletTextarea) {
-            newBulletTextarea.focus();
-          }
-        }, 50);
-      }
+      // 🚫 REMOVED: Automatic bullet creation on Enter key
+      // Users should only create bullets through "Add Achievement" wizard
+      // This prevents unwanted empty bullets and enforces proper UX flow
+      
       // If current bullet is empty and not the only bullet, remove it and focus previous
-      else if (!currentValue.trim() && bullets.length > 1) {
+      if (!currentValue.trim() && bullets.length > 1) {
         handleRemoveBullet(experienceIndex, bulletIndex);
         
         // Focus the previous bullet
@@ -1476,3 +1464,5 @@ export const WorkExperienceSection = ({
     </div>
   );
 };
+
+export default WorkExperienceSection;

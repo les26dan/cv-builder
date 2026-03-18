@@ -7,7 +7,7 @@
 import { detectLanguage, type SupportedLanguage } from '../languageConfig';
 
 // Text imports with proper fallbacks
-const textModules = {
+export const textModules = {
   en: {
     landingPage: () => import('./en/landingPage').then(m => m.landingPage),
     account: () => import('./en/account').then(m => m.account),
@@ -127,4 +127,14 @@ export function getAvailableLanguages(): SupportedLanguage[] {
 
 export function isLanguageSupported(language: string): language is SupportedLanguage {
   return ['en', 'vi'].includes(language as SupportedLanguage);
-} 
+}
+
+// 🚀 PERFORMANCE: Export preloader functions for text optimization (temporarily disabled)
+// export { 
+//   getCachedTexts, 
+//   preloadTexts, 
+//   preloadBilingualTexts, 
+//   initializeTextPreloading,
+//   clearTextCache as clearPreloaderCache,
+//   getTextCacheStats
+// } from './preloader'; 

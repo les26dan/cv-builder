@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { checkAuthentication } from '../lib/auth';
+// 🚀 PERFORMANCE: Use non-blocking auth for better UX
+import { checkAuthenticationNonBlocking } from '../lib/auth-cache';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports for performance optimization
@@ -73,35 +75,33 @@ export default function SharedHeader({
   const [accountTexts, setAccountTexts] = useState<any>(null);
 
   useEffect(() => {
-    // Check authentication status on component mount with retry logic
-    let retryCount = 0;
-    const maxRetries = 2;
-
-    const checkAuthStatus = async () => {
-      try {
-        const authResult = await checkAuthentication();
-        if (authResult.isAuthenticated && authResult.user) {
-          setUser(authResult.user);
-        } else if (authResult.error === 'Authentication check timed out' && retryCount < maxRetries) {
-          // Retry on timeout
-          retryCount++;
-          console.log(`Auth check timeout, retrying... (${retryCount}/${maxRetries})`);
-          setTimeout(checkAuthStatus, 1000); // Retry after 1 second
-          return; // Don't set loading to false yet
+    // 🚀 PERFORMANCE: Use non-blocking authentication check
+    const checkAuthStatus = () => {
+      // Try non-blocking first (returns immediately if cached)
+      const cachedAuth = checkAuthenticationNonBlocking();
+      
+      if (cachedAuth) {
+        // We have cached auth result - use it immediately
+        if (cachedAuth.isAuthenticated && cachedAuth.user) {
+          setUser(cachedAuth.user);
         }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        if (retryCount < maxRetries) {
-          retryCount++;
-          console.log(`Auth check error, retrying... (${retryCount}/${maxRetries})`);
-          setTimeout(checkAuthStatus, 1000);
-          return;
-        }
-      } finally {
-        // Only set loading to false if we're not retrying
-        if (retryCount >= maxRetries || retryCount === 0) {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
+        console.log('🚀 SharedHeader: Using cached auth result');
+      } else {
+        // No cached result - start background auth check but don't block UI
+        setIsLoading(false); // Don't block the UI
+        console.log('🌐 SharedHeader: Starting background auth check');
+        
+        // Background auth check (non-blocking)
+        checkAuthentication().then(authResult => {
+          if (authResult.isAuthenticated && authResult.user) {
+            setUser(authResult.user);
+            console.log('✅ SharedHeader: Background auth completed');
+          }
+        }).catch(error => {
+          console.error('❌ SharedHeader: Background auth failed:', error);
+          // Don't show errors to user - just remain in logged-out state
+        });
       }
     };
 

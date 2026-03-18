@@ -50,9 +50,41 @@ export default function WorkspacePage() {
   const checkAuthentication = async () => {
     try {
       console.log('🔧 CV Workspace: Starting authentication check...')
+      
+      // 🚀 PERFORMANCE: Use non-blocking auth first
+      const { checkAuthenticationNonBlocking } = await import('@/lib/auth-cache')
+      const cachedAuth = checkAuthenticationNonBlocking()
+      
+      if (cachedAuth) {
+        console.log('🚀 CV Workspace: Using cached auth result')
+        if (!cachedAuth.isAuthenticated || !cachedAuth.user) {
+          console.log('🔧 Cached result shows no auth - redirecting to login')
+          router.push('/login?redirect=/cv-workspace')
+          return
+        }
+        
+        const realUser: User = {
+          id: cachedAuth.user.id,
+          fullName: cachedAuth.user.name || cachedAuth.user.email || 'User',
+          email: cachedAuth.user.email,
+          emailVerified: true
+        }
+        
+        console.log('🔧 CV Workspace: Cached authenticated user:', realUser.email)
+        setUser(realUser)
+        setIsLoading(false) // Stop loading immediately
+        
+        // Load CVs in background
+        loadUserCVs(realUser.id).catch(error => {
+          console.error('Failed to load CVs:', error)
+        })
+        return
+      }
+      
+      // No cached result - fall back to full auth check
+      console.log('🌐 CV Workspace: No cached auth, checking server...')
       setIsLoading(true)
       
-      // Use the same authentication system as other components
       const { checkAuthentication: checkAuth } = await import('@/lib/auth')
       const authResult = await checkAuth()
       
