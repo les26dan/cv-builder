@@ -66,11 +66,10 @@ export function PerformanceMonitoringProvider({ children }: PerformanceMonitorin
     
     // Monitor component loading times
     const monitorComponentLoading = () => {
-      // Track dynamic imports
-      const originalImport = window.__webpack_require__?.cache ? 
-        window.__webpack_require__ : null
+      // Track dynamic imports (webpack-specific)
+      const webpackRequire = (window as any).__webpack_require__
       
-      if (originalImport) {
+      if (webpackRequire?.cache) {
         console.log('📦 Webpack module loading monitoring enabled')
       }
     }

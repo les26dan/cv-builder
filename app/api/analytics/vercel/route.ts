@@ -104,14 +104,14 @@ function analyzeVercelMetric(metric: VercelMetric): string[] {
 
 async function storeVercelMetric(metric: VercelMetric) {
   try {
-    const fs = require('fs').promises
-    const path = require('path')
+    const { promises: fs } = await import('fs')
+    const { join } = await import('path')
     
-    const logDir = path.join(process.cwd(), 'logs', 'vercel')
+    const logDir = join(process.cwd(), 'logs', 'vercel')
     await fs.mkdir(logDir, { recursive: true })
     
     const filename = `vercel-metrics-${new Date().toISOString().split('T')[0]}.jsonl`
-    const filepath = path.join(logDir, filename)
+    const filepath = join(logDir, filename)
     
     const logEntry = JSON.stringify({
       ...metric,

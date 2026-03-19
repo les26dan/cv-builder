@@ -73,8 +73,9 @@ class VercelMonitor {
     // Check if this might be a cold start
     if (typeof window === 'undefined') {
       // Server-side: Check if this is the first request
-      const isColdStart = !global.__vercel_warm
-      global.__vercel_warm = true
+      const globalAny = global as any
+      const isColdStart = !globalAny.__vercel_warm
+      globalAny.__vercel_warm = true
       
       if (isColdStart) {
         console.log('🥶 POTENTIAL COLD START DETECTED')
@@ -117,7 +118,8 @@ class VercelMonitor {
           const duration = Date.now() - startTime
           
           // Check if this might be a timeout
-          if (duration > 9000 || error.message.includes('timeout')) {
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          if (duration > 9000 || errorMessage.includes('timeout')) {
             console.log(`🚨 POTENTIAL TIMEOUT: ${duration}ms`)
             this.logVercelMetric('timeoutError', duration)
           }

@@ -184,7 +184,7 @@ function generateSummary(performanceData: any[], errorData: any[]) {
 function aggregatePerformanceMetrics(data: any[]) {
   const metrics = data.flatMap(d => d.metrics || [])
   
-  const metricsByName = {}
+  const metricsByName: Record<string, number[]> = {}
   for (const metric of metrics) {
     if (!metricsByName[metric.name]) {
       metricsByName[metric.name] = []
@@ -192,7 +192,7 @@ function aggregatePerformanceMetrics(data: any[]) {
     metricsByName[metric.name].push(metric.value)
   }
   
-  const aggregated = {}
+  const aggregated: Record<string, any> = {}
   for (const [name, values] of Object.entries(metricsByName)) {
     const numValues = values as number[]
     aggregated[name] = {
@@ -208,8 +208,8 @@ function aggregatePerformanceMetrics(data: any[]) {
 }
 
 function aggregateErrorMetrics(data: any[]) {
-  const errorsByType = {}
-  const errorsBySeverity = {}
+  const errorsByType: Record<string, number> = {}
+  const errorsBySeverity: Record<string, number> = {}
   
   for (const error of data) {
     // By type
@@ -247,7 +247,7 @@ function aggregateVercelMetrics(data: any[]) {
 
 function generateTrends(data: any[], days: number) {
   // Group by day
-  const dailyMetrics = {}
+  const dailyMetrics: Record<string, Record<string, number[]>> = {}
   
   for (const entry of data) {
     const date = new Date(entry.timestamp).toISOString().split('T')[0]
@@ -263,7 +263,7 @@ function generateTrends(data: any[], days: number) {
   }
   
   // Calculate daily averages
-  const trends = {}
+  const trends: Record<string, Record<string, number>> = {}
   for (const [date, metrics] of Object.entries(dailyMetrics)) {
     trends[date] = {}
     for (const [name, values] of Object.entries(metrics)) {

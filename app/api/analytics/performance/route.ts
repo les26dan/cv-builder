@@ -140,14 +140,14 @@ async function storePerformanceData(payload: PerformancePayload) {
   try {
     // For now, store in a simple JSON file for analysis
     // In production, this would go to a proper database
-    const fs = require('fs').promises
-    const path = require('path')
+    const { promises: fs } = await import('fs')
+    const { join } = await import('path')
     
-    const logDir = path.join(process.cwd(), 'logs', 'performance')
+    const logDir = join(process.cwd(), 'logs', 'performance')
     await fs.mkdir(logDir, { recursive: true })
     
     const filename = `${payload.environment}-${new Date().toISOString().split('T')[0]}.jsonl`
-    const filepath = path.join(logDir, filename)
+    const filepath = join(logDir, filename)
     
     const logEntry = JSON.stringify({
       ...payload,

@@ -129,12 +129,4 @@ export function isLanguageSupported(language: string): language is SupportedLang
   return ['en', 'vi'].includes(language as SupportedLanguage);
 }
 
-// 🚀 PERFORMANCE: Export preloader functions for text optimization (temporarily disabled)
-// export { 
-//   getCachedTexts, 
-//   preloadTexts, 
-//   preloadBilingualTexts, 
-//   initializeTextPreloading,
-//   clearTextCache as clearPreloaderCache,
-//   getTextCacheStats
-// } from './preloader'; 
+// 🚀 PERFORMANCE: Preloader functions disabled for production build stability 

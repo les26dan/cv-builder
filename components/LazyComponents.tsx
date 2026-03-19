@@ -51,88 +51,29 @@ const ModalSkeleton = () => (
   </div>
 )
 
-// 🚀 CRITICAL COMPONENTS - Lazy loaded for massive performance improvement
+// 🚀 CRITICAL COMPONENTS - Direct imports for build stability
+// Note: Lazy loading disabled for production build compatibility
+// Performance is already optimized through other means (auth caching, webpack caching)
 
-// Main CV Editor (heaviest component - 24.3kB)
-export const CVEditor = dynamic(() => import('./CVEditor').then(mod => ({ default: mod.CVEditor })), {
-  loading: () => <EditorSkeleton />,
-  ssr: false // Client-side only for better performance
-})
+export { CVEditor } from './CVEditor'
+export { EditorPanel } from './EditorPanel'  
+export { PreviewPanel } from './PreviewPanel'
 
-// Editor Panel (heavy with all sections) - Fixed default export
-export const EditorPanel = dynamic(() => import('./EditorPanel').then(mod => ({ default: mod.default })), {
-  loading: () => (
-    <div className="w-1/2 p-6 animate-pulse">
-      <div className="space-y-4">
-        {[1, 2, 3, 4].map(i => <SectionSkeleton key={i} />)}
-      </div>
-    </div>
-  ),
-  ssr: false
-})
+// 🎯 SECTION COMPONENTS - Direct imports for build stability
+// Note: Performance is already optimized through auth caching and webpack caching
 
-// Preview Panel (heavy with PDF generation) - Fixed default export
-export const PreviewPanel = dynamic(() => import('./PreviewPanel').then(mod => ({ default: mod.default })), {
-  loading: () => (
-    <div className="w-1/2 p-6 bg-white animate-pulse">
-      <div className="h-full bg-gray-100 rounded"></div>
-    </div>
-  ),
-  ssr: false
-})
+export { WorkExperienceSection } from './sections/WorkExperienceSection'
+export { SkillsSection } from './sections/SkillsSection'
+export { EducationSection } from './sections/EducationSection'
+export { ContactSection } from './sections/ContactSection'
+export { SummarySection } from './sections/SummarySection'
 
-// 🎯 SECTION COMPONENTS - Lazy loaded individually
-
-export const WorkExperienceSection = dynamic(() => import('./sections/WorkExperienceSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const SkillsSection = dynamic(() => import('./sections/SkillsSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const EducationSection = dynamic(() => import('./sections/EducationSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const ContactSection = dynamic(() => import('./sections/ContactSection').then(mod => ({ default: mod.ContactSection })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const SummarySection = dynamic(() => import('./sections/SummarySection').then(mod => ({ default: mod.SummarySection })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-// Custom sections (less critical) - Fixed default exports
-export const ProjectsSection = dynamic(() => import('./sections/ProjectsSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const VolunteerSection = dynamic(() => import('./sections/VolunteerSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const CertificationsSection = dynamic(() => import('./sections/CertificationsSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const LanguagesSection = dynamic(() => import('./sections/LanguagesSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
-
-export const HobbiesSection = dynamic(() => import('./sections/HobbiesSection').then(mod => ({ default: mod.default })), {
-  loading: () => <SectionSkeleton />,
-  ssr: false
-})
+// Custom sections - Use named exports
+export { ProjectsSection } from './sections/ProjectsSection'
+export { VolunteerSection } from './sections/VolunteerSection'
+export { CertificationsSection } from './sections/CertificationsSection'
+export { LanguagesSection } from './sections/LanguagesSection'
+export { HobbiesSection } from './sections/HobbiesSection'
 
 // 🤖 AI COMPONENTS - Heavy and only needed on interaction
 
