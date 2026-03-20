@@ -11,6 +11,7 @@ interface UserSession {
   id: string;
   email: string;
   name: string;
+  provider?: string;
 }
 
 interface CVUploadResponse {
@@ -52,42 +53,86 @@ interface CVUploadResponse {
  */
 export async function POST(request: NextRequest): Promise<NextResponse<CVUploadResponse>> {
   try {
+    console.log('🚀 ==========================================================');
+    console.log('🚀 CV UPLOAD API - DETAILED STEP-BY-STEP DEBUGGING');
+    console.log('🚀 ==========================================================');
     console.log('📤 CV Upload with Enhanced Parsing - Starting upload process');
+    console.log('🕐 Timestamp:', new Date().toISOString());
 
-    // 1. Authenticate user
+    // 1. Authenticate user or handle guest sessions
+    console.log('🔐 STEP 1: Authentication Check');
     const cookieStore = await cookies();
+    console.log('🍪 Cookie store accessed successfully');
+    
     const userSessionCookie = cookieStore.get('user_session');
+    console.log('🍪 User session cookie:', userSessionCookie ? 'Found' : 'Not found');
+    if (userSessionCookie?.value) {
+      console.log('🍪 Cookie value length:', userSessionCookie.value.length);
+    }
+
+    let userSession: UserSession;
+    let userId: string;
+    let isGuestSession = false;
 
     if (!userSessionCookie?.value) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+      // Allow guest sessions for CV upload - generate temporary guest user
+      console.log('🎯 Guest Session: No authentication found, creating guest user for CV upload');
+      isGuestSession = true;
+      const guestUserId = `guest-${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}`;
+      userSession = {
+        id: guestUserId,
+        email: `guest-${Date.now()}@okbuddy.ai`,
+        name: 'Guest User',
+        provider: 'guest'
+      };
+      userId = guestUserId;
+      console.log(`🎯 Guest Session: Created temporary user: ${userId}`);
+      console.log('🎯 Guest Session: User session object:', JSON.stringify(userSession, null, 2));
+    } else {
+      // Authenticated user session
+      try {
+        userSession = JSON.parse(userSessionCookie.value);
+        console.log(`👤 Authenticated user: ${userSession.email}`);
+        console.log('👤 Authenticated user session:', JSON.stringify(userSession, null, 2));
 
-    const userSession: UserSession = JSON.parse(userSessionCookie.value);
-    console.log(`👤 Authenticated user: ${userSession.email}`);
-
-    // Fix user ID format for database compatibility
-    let userId = userSession.id;
-    if (userId === 'user-123' || !userId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-      // Generate a proper UUID for development mode
-      userId = crypto.randomUUID();
-      console.log(`🔧 Generated proper UUID for user: ${userId}`);
+        // Fix user ID format for database compatibility
+        userId = userSession.id;
+        console.log('👤 Original user ID:', userId);
+        if (userId === 'user-123' || !userId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+          // Generate a proper UUID for development mode
+          userId = crypto.randomUUID();
+          console.log(`🔧 Generated proper UUID for user: ${userId}`);
+        }
+      } catch (parseError) {
+        console.error('❌ Failed to parse user session cookie:', parseError);
+        throw new Error('Invalid user session cookie format');
+      }
     }
+    
+    console.log('✅ STEP 1 COMPLETE: Authentication processed');
+    console.log('📋 Final user details:', { userId, isGuestSession, email: userSession.email });
 
     // 2. Parse uploaded file
+    console.log('📁 STEP 2: File Processing');
     const formData = await request.formData();
+    console.log('📁 FormData parsed successfully');
+    
     const file = formData.get('file') as File;
+    console.log('📁 File extracted from FormData:', file ? 'Success' : 'Failed');
 
     if (!file) {
+      console.error('❌ STEP 2 FAILED: No file uploaded');
       return NextResponse.json(
         { success: false, error: 'No file uploaded' },
         { status: 400 }
       );
     }
 
-    console.log(`📄 Processing file: ${file.name} (${file.type}, ${Math.round(file.size / 1024)}KB)`);
+    console.log(`📄 File details: ${file.name} (${file.type}, ${Math.round(file.size / 1024)}KB)`);
+    console.log('📄 File size in bytes:', file.size);
+    console.log('📄 File MIME type:', file.type);
+    console.log('📄 File last modified:', file.lastModified ? new Date(file.lastModified).toISOString() : 'Not available');
+    console.log('✅ STEP 2 COMPLETE: File validated successfully');
 
     // 3. Generate CV ID
     const cvId = crypto.randomUUID();
@@ -129,32 +174,67 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
     }
 
     // 5. Extract text from file for LLM processing
-    console.log('📝 Extracting text from uploaded file...');
+    console.log('📝 STEP 5: Text Extraction');
+    console.log('📝 Starting text extraction from uploaded file...');
     let extractedText = '';
     
     try {
+      console.log('📝 Converting file to array buffer...');
       const arrayBuffer = await file.arrayBuffer();
+      console.log(`📝 Array buffer created: ${arrayBuffer.byteLength} bytes`);
+      
+      console.log('📝 Converting array buffer to Node.js Buffer...');
       const buffer = Buffer.from(arrayBuffer);
+      console.log(`📝 Buffer created: ${buffer.length} bytes`);
+      
+      console.log('📝 Calling processFile function...');
+      console.log('📝 File type for processing:', file.type);
       const result = await processFile(buffer, file.type);
+      
+      console.log('📝 processFile result:', {
+        success: result.success,
+        textLength: result.text?.length || 0,
+        error: result.error,
+        metadata: result.metadata
+      });
+      
       if (result.success && result.text) {
         extractedText = result.text;
-        console.log(`✅ Text extracted: ${extractedText.length} characters`);
+        console.log(`✅ Text extracted successfully: ${extractedText.length} characters`);
+        console.log('📝 First 200 characters:', extractedText.substring(0, 200));
+        console.log('📝 Last 200 characters:', extractedText.substring(Math.max(0, extractedText.length - 200)));
       } else {
-        console.warn(`⚠️ Text extraction failed: ${result.error}`);
+        console.error(`❌ STEP 5 FAILED: Text extraction failed: ${result.error}`);
+        console.log('📝 Full result object:', JSON.stringify(result, null, 2));
         return NextResponse.json({
           success: false,
           error: 'Failed to extract text from the uploaded file',
-          cvId
+          cvId,
+          debug: {
+            extractionError: result.error,
+            fileType: file.type,
+            fileSize: file.size,
+            fileName: file.name
+          }
         }, { status: 400 });
       }
     } catch (extractError) {
-      console.error('❌ Text extraction failed:', extractError);
+      console.error('❌ STEP 5 EXCEPTION: Text extraction failed with exception:', extractError);
+      console.error('❌ Error stack:', extractError instanceof Error ? extractError.stack : 'No stack trace');
       return NextResponse.json({
         success: false,
         error: 'Failed to process the uploaded file',
-        cvId
+        cvId,
+        debug: {
+          exception: extractError instanceof Error ? extractError.message : 'Unknown error',
+          fileType: file.type,
+          fileSize: file.size,
+          fileName: file.name
+        }
       }, { status: 400 });
     }
+    
+    console.log('✅ STEP 5 COMPLETE: Text extraction successful');
 
     // 6. LLM-based CV parsing with ChatGPT API (primary parsing method)
     let llmParsedData: CVParsingResponse | null = null;
@@ -266,8 +346,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
           created_at: new Date().toISOString(),
         };
 
-        // Check if we're in development mode with mock user
-        const isDevelopmentMode = userSession.email === 'demo@okbuddy.ai' || userSession.id === 'user-123';
+        // Check if we're in development mode with mock user or guest session
+        const isDevelopmentMode = userSession.email === 'demo@okbuddy.ai' || userSession.id === 'user-123' || isGuestSession;
         
         // Create cv_workflow record for the new workflow system
         const cvWorkflowRecord = {
@@ -310,6 +390,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
             metadata: {
               version: 1,
               source: 'upload',
+              isGuestSession: isGuestSession,
+              userType: isGuestSession ? 'guest' : 'authenticated',
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               lastSavedAt: new Date().toISOString()
@@ -331,6 +413,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
           language: 'en',
           version: 1,
           source: 'upload',
+          is_guest_session: isGuestSession,
+          user_type: isGuestSession ? 'guest' : 'authenticated',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           last_saved_at: new Date().toISOString()
@@ -340,7 +424,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
         let workflowInsertResult;
         
         if (isDevelopmentMode) {
-          console.log('🔧 Development mode detected, using localStorage fallback');
+          console.log(`🔧 ${isGuestSession ? 'Guest session' : 'Development mode'} detected, using localStorage fallback`);
           insertResult = { data: null, error: null };
           workflowInsertResult = { data: null, error: null };
         } else {

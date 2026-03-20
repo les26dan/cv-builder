@@ -4,8 +4,8 @@
  */
 
 export const feedback = {
-  title: 'Feedback',
-  buttonLabel: 'Góp ý',
+  title: 'Đóng góp ý kiến',
+  buttonLabel: 'Đóng góp ý kiến',
   description: 'Hãy chia sẻ với chúng tôi ý kiến, góp ý hoặc báo cáo lỗi để giúp OkBuddy ngày càng tốt hơn.',
   
   form: {

@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2025-08-23T09:00:37.193Z",
+  "productionUrl": "https://www.okbuddy.io",
+  "insights": {
+    "status": "DATA_AVAILABLE",
+    "totalDataPoints": 4,
+    "timeRange": {
+      "earliest": "2025-08-23T09:00:30.674Z",
+      "latest": "2025-08-23T09:00:37.189Z",
+      "span": 6515
+    },
+    "userActivity": {
+      "maxConcurrentSessions": 0,
+      "totalSessionsRecorded": 0,
+      "averageSessionsPerDataPoint": 0,
+      "hasUserActivity": false
+    },
+    "performance": {
+      "status": "NO_PERFORMANCE_DATA"
+    },
+    "errors": {
+      "totalErrors": 0,
+      "criticalErrors": 0,
+      "errorRate": 0,
+      "status": "NO_ERRORS"
+    },
+    "vercelMetrics": {
+      "status": "NO_VERCEL_DATA"
+    },
+    "trends": {
+      "status": "TRENDS_AVAILABLE",
+      "userGrowth": "STABLE",
+      "dataPoints": 4,
+      "timeSpan": 0
+    },
+    "recommendations": [
+      {
+        "priority": "HIGH",
+        "category": "User Acquisition",
+        "action": "Generate Traffic",
+        "description": "Share https://www.okbuddy.io with friends, colleagues, and social media to start collecting real user metrics"
+      },
+      {
+        "priority": "LOW",
+        "category": "Monitoring",
+        "action": "Regular Analysis",
+        "description": "Run this analysis tool daily to track trends and catch issues early"
+      }
+    ]
+  },
+  "rawDataCount": 4
+}

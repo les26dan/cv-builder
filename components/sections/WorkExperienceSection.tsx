@@ -97,12 +97,12 @@ export const WorkExperienceSection = ({
     loadLanguage();
   }, [language]);
 
-  // Prevent automatic wizard opening during initial load for template users
+  // Prevent automatic wizard opening during initial load for all users
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialLoadComplete(true);
-      console.log('🎯 Guest Session: Initial load complete, allowing user interactions');
-    }, 3000); // 3 second grace period for template users
+      console.log('🎯 Work Experience Section: Initial load complete, user interactions enabled');
+    }, 3000); // 3 second grace period to prevent auto-popups
     
     return () => clearTimeout(timer);
   }, []);
@@ -237,10 +237,15 @@ export const WorkExperienceSection = ({
   };
 
   const handleAddExperience = useCallback(() => {
-
-
-
-
+    // 🚫 TEMPORARY: Disable auto-popup completely 
+    // Check if this is from a user click on the actual "Add Work Experience" button
+    const stack = new Error().stack;
+    const isDirectUserClick = stack && stack.includes('onClick') && stack.includes('button');
+    
+    if (!isDirectUserClick) {
+      console.log('🚫 Auto-popup disabled: Only allowing direct button clicks');
+      return;
+    }
     
     // Prevent automatic wizard opening for template users during initial load
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');

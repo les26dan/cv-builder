@@ -16,6 +16,7 @@ export const textModules = {
     cvEditor: () => import('./en/cvEditor').then(m => m.cvEditor),
     userDrawer: () => import('./en/userDrawer').then(m => m.userDrawer),
     feedback: () => import('./en/feedback').then(m => m.feedback),
+    navigation: () => import('./en/navigation').then(m => m.navigation),
     jdAnalysis: () => import('./en/jdAnalysis').then(m => m.jdAnalysisTexts),
     jdOptimization: () => import('./en/jdOptimization').then(m => m.enJDOptimizationTexts),
     workExperienceWizard: () => import('./en/workExperienceWizard').then(m => m.default),
@@ -30,6 +31,7 @@ export const textModules = {
     cvEditor: () => import('./vi/cvEditor').then(m => m.cvEditor),
     userDrawer: () => import('./vi/userDrawer').then(m => m.userDrawer),
     feedback: () => import('./vi/feedback').then(m => m.feedback),
+    navigation: () => import('./vi/navigation').then(m => m.navigation),
     jdAnalysis: () => import('./vi/jdAnalysis').then(m => m.jdAnalysisTexts),
     jdOptimization: () => import('./vi/jdOptimization').then(m => m.viJDOptimizationTexts),
     workExperienceWizard: () => import('./vi/workExperienceWizard').then(m => m.default),
@@ -105,6 +107,7 @@ export { workspace } from './en/workspace';
 export { cvUpload } from './en/cvUpload';
 export { userDrawer } from './en/userDrawer';
 export { feedback } from './en/feedback';
+export { navigation } from './en/navigation';
 export { jdAnalysisTexts } from './en/jdAnalysis';
 export { enJDOptimizationTexts as jdOptimization } from './en/jdOptimization';
 export { default as workExperienceWizard } from './en/workExperienceWizard';

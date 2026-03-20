@@ -4,8 +4,8 @@
  */
 
 export const feedback = {
-  title: 'Feedback',
-  buttonLabel: 'Feedback',
+  title: 'Have a feedback?',
+  buttonLabel: 'Have a feedback?',
   description: 'Share your thoughts, suggestions, or report bugs to help us make OkBuddy better.',
   
   form: {

@@ -73,6 +73,7 @@ export default function SharedHeader({
   const [workspaceTexts, setWorkspaceTexts] = useState<any>(null);
   const [feedbackTexts, setFeedbackTexts] = useState<any>(null);
   const [accountTexts, setAccountTexts] = useState<any>(null);
+  const [navigationTexts, setNavigationTexts] = useState<any>(null);
 
   useEffect(() => {
     // 🚀 PERFORMANCE: Use non-blocking authentication check
@@ -155,6 +156,17 @@ export default function SharedHeader({
         const fallbackAccountTexts = await getTexts('account', 'en');
         setAccountTexts(fallbackAccountTexts);
       }
+      
+      // Load navigation texts for the detected language
+      try {
+        const navigationTexts = await getTexts('navigation', language);
+        setNavigationTexts(navigationTexts);
+      } catch (error) {
+        console.error('Failed to load navigation texts:', error);
+        // Fallback to English
+        const fallbackNavigationTexts = await getTexts('navigation', 'en');
+        setNavigationTexts(fallbackNavigationTexts);
+      }
     };
     
     initLanguage();
@@ -210,6 +222,13 @@ export default function SharedHeader({
       setAccountTexts(accountTexts);
     } catch (error) {
       console.error('Failed to load account texts:', error);
+    }
+    
+    try {
+      const navigationTexts = await getTexts('navigation', language);
+      setNavigationTexts(navigationTexts);
+    } catch (error) {
+      console.error('Failed to load navigation texts:', error);
     }
   };
 
@@ -372,34 +391,34 @@ export default function SharedHeader({
 
           {/* Navigation Items */}
           <div className="hidden sm:flex flex-row justify-center items-center gap-4">
-            {/* Career / Join Us */}
-            <button
-              onClick={() => window.location.href = '/career'}
-              className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-              aria-label="Career opportunities"
-            >
-              Career / Join Us
-            </button>
-
-            {/* CV Workspace */}
-            <button
-              onClick={() => window.location.href = '/cv-workspace'}
-              className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-              aria-label="CV Workspace"
-            >
-              CV Workspace
-            </button>
-
-            {/* Feedback Button */}
+            {/* Feedback Button - Moved to first position */}
             {showFeedback && (
               <button
                 onClick={handleFeedbackClick}
                 className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-                aria-label={feedbackTexts?.aria?.feedbackButton || "Send feedback"}
+                aria-label={navigationTexts?.aria?.feedback || feedbackTexts?.aria?.feedbackButton || "Send feedback"}
               >
-                {feedbackTexts?.buttonLabel || 'Feedback'}
+                {navigationTexts?.header?.feedback || feedbackTexts?.buttonLabel || 'Have a feedback?'}
               </button>
             )}
+
+            {/* Career / Join Us */}
+            <button
+              onClick={() => window.location.href = '/career'}
+              className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
+              aria-label={navigationTexts?.aria?.career || "Career opportunities"}
+            >
+              {navigationTexts?.header?.career || 'Career / Join Us'}
+            </button>
+
+            {/* CV Workspace - Updated text */}
+            <button
+              onClick={() => window.location.href = '/cv-workspace'}
+              className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
+              aria-label={navigationTexts?.aria?.workspace || "CV Workspace"}
+            >
+              {navigationTexts?.header?.workspace || 'Your Resumes'}
+            </button>
 
             {/* Elegant Separator */}
             <div className="text-gray-300 text-lg font-light">|</div>

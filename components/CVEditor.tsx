@@ -428,7 +428,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
       {/* Unified Header */}
       <SharedHeader 
         variant="editor"
-        showFeedback={false}
+        showFeedback={true}
         showBackButton={true}
         onBackClick={handleBackToWorkspace}
         backButtonTitle={cvEditorTexts?.header?.backToWorkspace || 'Back to CV Workspace'}

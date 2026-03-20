@@ -6,9 +6,40 @@ const loadPDFjs = async () => {
       console.log('🔍 Loading PDF.js library for high-quality text extraction...');
       
       try {
-        // Use require for better Node.js compatibility 
-        const pdfjsLib = await import('pdfjs-dist');
-        console.log('✅ PDF.js library loaded successfully');
+        // Set up Node.js environment polyfills for PDF.js
+        if (typeof globalThis.DOMMatrix === 'undefined') {
+          // Polyfill DOMMatrix for Node.js environment
+          (globalThis as any).DOMMatrix = class {
+            a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
+            
+            constructor() {
+              // Simple polyfill for PDF.js compatibility
+            }
+            
+            // Add required static methods to match interface
+            static fromFloat32Array() { return new this(); }
+            static fromFloat64Array() { return new this(); }
+            static fromMatrix() { return new this(); }
+          };
+        }
+        
+        // Use legacy build for Node.js compatibility
+        // Try different import approaches for better compatibility
+        let pdfjsLib;
+        try {
+          // @ts-ignore - PDF.js module resolution issues in build
+          pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+        } catch (mjsError) {
+          console.log('📄 .mjs import failed, trying regular build...', mjsError instanceof Error ? mjsError.message : 'Unknown error');
+          try {
+            // @ts-ignore - PDF.js module resolution issues in build
+            pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
+          } catch (regularError) {
+            console.log('📄 Regular build failed, trying CommonJS...', regularError instanceof Error ? regularError.message : 'Unknown error');
+            pdfjsLib = await import('pdfjs-dist');
+          }
+        }
+        console.log('✅ PDF.js library loaded successfully with Node.js polyfills');
         
         return pdfjsLib;
       } catch (importError) {
@@ -80,9 +111,18 @@ export interface EnhancedParsingResult {
  * Extract text from PDF files using PDF.js for high-quality text extraction
  */
 async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
+  console.log('📚 ==========================================');
+  console.log('📚 PDF EXTRACTION - DETAILED DEBUGGING');
+  console.log('📚 ==========================================');
+  console.log('📚 Starting PDF text extraction...');
+  console.log('📚 Buffer size:', buffer.length, 'bytes');
+  
   try {
     // Load PDF.js library
+    console.log('📚 Loading PDF.js library...');
     const pdfjsLib = await loadPDFjs();
+    console.log('📚 PDF.js load result:', pdfjsLib ? 'Success' : 'Failed');
+    
     if (!pdfjsLib) {
       console.log('❌ PDF.js not available, trying pdf-parse fallback...');
       return await extractPDFTextWithPdfParse(buffer);
@@ -223,26 +263,50 @@ async function extractPDFTextWithPdfParse(buffer: Buffer): Promise<ProcessedFile
   try {
     console.log('📄 Using pdf-parse library for text extraction...');
     
-    // Dynamic import of pdf-parse
-    const pdfParse = await import('pdf-parse');
-    const parseFunction = pdfParse.default || pdfParse;
+    // Validate buffer before processing
+    if (!buffer || buffer.length === 0) {
+      return {
+        success: false,
+        error: 'Invalid or empty buffer provided to pdf-parse'
+      };
+    }
     
-    const data = await parseFunction(buffer);
+    // Dynamic import of pdf-parse with better error handling
+    // Use require to avoid ES module issues that trigger test file loading
+    let parseFunction;
+    try {
+      const pdfParse = await import('pdf-parse');
+      parseFunction = pdfParse.default || pdfParse;
+      console.log('📄 pdf-parse loaded via dynamic import');
+    } catch (importError) {
+      console.log('📄 First import failed, trying fallback...', importError);
+      throw new Error('Could not load pdf-parse library');
+    }
+    
+    // Configure pdf-parse options to avoid test file issues
+    const options = {
+      // Disable internal test file loading that may cause path issues
+      normalizeWhitespace: false,
+      disableCombineTextItems: false,
+      max: 0, // No page limit
+    };
+    
+    const data = await parseFunction(buffer, options);
     
     if (!data.text || data.text.trim().length === 0) {
       return {
         success: false,
-        error: 'No text content found in PDF file'
+        error: 'No text content found in PDF file - may be image-based or corrupted'
       };
     }
     
-    console.log(`✅ pdf-parse extraction successful: ${data.text.length} characters`);
+    console.log(`✅ pdf-parse extraction successful: ${data.text.length} characters from ${data.numpages || 'unknown'} pages`);
     
     return {
       success: true,
       text: data.text,
       metadata: {
-        pageCount: data.numpages,
+        pageCount: data.numpages || 1,
         wordCount: data.text.split(/\s+/).length,
         fileType: 'pdf'
       }
@@ -252,9 +316,129 @@ async function extractPDFTextWithPdfParse(buffer: Buffer): Promise<ProcessedFile
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('❌ pdf-parse extraction failed:', errorMessage);
     
+    // Provide more specific error handling
+    if (errorMessage.includes('ENOENT') || errorMessage.includes('no such file')) {
+      console.error('🔧 pdf-parse configuration issue detected - likely internal library issue');
+      console.log('🔄 Attempting simpler pdf-parse approach...');
+      
+      // Try a simpler approach without options
+      try {
+        console.log('🔄 Trying require approach for simple pdf-parse...');
+        let simpleParseFunction;
+        try {
+          const simplePdfParse = await import('pdf-parse');
+          simpleParseFunction = simplePdfParse.default || simplePdfParse;
+          console.log('🔄 Simple pdf-parse loaded via import');
+        } catch (simpleImportError) {
+          console.log('🔄 Simple import failed:', simpleImportError);
+          throw new Error('Could not load pdf-parse in simple mode');
+        }
+        const simpleData = await simpleParseFunction(buffer);
+        
+        if (simpleData.text && simpleData.text.trim().length > 0) {
+          console.log(`✅ Simple pdf-parse extraction successful: ${simpleData.text.length} characters`);
+          return {
+            success: true,
+            text: simpleData.text,
+            metadata: {
+              pageCount: simpleData.numpages || 1,
+              wordCount: simpleData.text.split(/\s+/).length,
+              fileType: 'pdf'
+            }
+          };
+        }
+      } catch (simpleError) {
+        console.error('❌ Simple pdf-parse also failed:', simpleError);
+        console.log('🔄 Trying pdfreader library as final fallback...');
+        
+        // Try pdfreader as final fallback
+        return await extractPDFTextWithPDFReader(buffer);
+      }
+    }
+    
     return {
       success: false,
-      error: `PDF text extraction failed: ${errorMessage} - will use filename analysis instead`
+      error: `PDF text extraction failed: ${errorMessage}`
+    };
+  }
+}
+
+/**
+ * Extract text from PDF files using pdfreader library (final fallback method)
+ */
+async function extractPDFTextWithPDFReader(buffer: Buffer): Promise<ProcessedFileResult> {
+  try {
+    console.log('📖 Using pdfreader library for text extraction (final fallback)...');
+    
+    // Dynamic import of pdfreader
+    const PdfReader = await import('pdfreader');
+    const PdfReaderClass = PdfReader.PdfReader;
+    
+    console.log('📖 pdfreader loaded successfully');
+    
+    return new Promise((resolve) => {
+      let extractedText = '';
+      let pageCount = 0;
+      let isFirstItem = true;
+      
+      const pdfReader = new PdfReaderClass();
+      
+      pdfReader.parseBuffer(buffer, (err: any, item: any) => {
+        if (err) {
+          console.error('📖 pdfreader parsing error:', err);
+          resolve({
+            success: false,
+            error: `pdfreader parsing failed: ${err.message}`
+          });
+          return;
+        }
+        
+        if (!item) {
+          // End of document
+          console.log(`📖 pdfreader extraction completed: ${extractedText.length} characters from ${pageCount} pages`);
+          
+          if (extractedText.trim().length === 0) {
+            resolve({
+              success: false,
+              error: 'No text content found in PDF file using pdfreader'
+            });
+            return;
+          }
+          
+          resolve({
+            success: true,
+            text: extractedText.trim(),
+            metadata: {
+              pageCount: pageCount,
+              wordCount: extractedText.split(/\s+/).length,
+              fileType: 'pdf'
+            }
+          });
+          return;
+        }
+        
+        if (item.page) {
+          // New page
+          pageCount = Math.max(pageCount, item.page);
+          if (!isFirstItem) {
+            extractedText += '\n';
+          }
+        }
+        
+        if (item.text) {
+          extractedText += item.text + ' ';
+          isFirstItem = false;
+        }
+      });
+    });
+    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('📖 pdfreader library failed:', errorMessage);
+    
+    return {
+      success: false,
+      error: `pdfreader text extraction failed: ${errorMessage}`
     };
   }
 }
@@ -313,20 +497,51 @@ async function extractDOCText(buffer: Buffer): Promise<ProcessedFileResult> {
  * Main file processing function that handles different file types
  */
 export async function processFile(buffer: Buffer, mimeType: string): Promise<ProcessedFileResult> {
+  console.log('🔧 ==========================================');
+  console.log('🔧 FILE PROCESSING - DETAILED DEBUGGING');
+  console.log('🔧 ==========================================');
+  console.log('🔧 Input MIME type:', mimeType);
+  console.log('🔧 Buffer size:', buffer.length, 'bytes');
+  console.log('🔧 Buffer first 50 bytes:', buffer.slice(0, 50).toString('hex'));
+  
+  // Validate input
+  if (!buffer || buffer.length === 0) {
+    console.error('❌ Invalid buffer provided to processFile');
+    return {
+      success: false,
+      error: 'Invalid or empty buffer provided'
+    };
+  }
+  
+  if (!mimeType) {
+    console.error('❌ No MIME type provided to processFile');
+    return {
+      success: false,
+      error: 'No MIME type provided'
+    };
+  }
+  
+  console.log('🔧 Processing file based on MIME type...');
+  
   switch (mimeType) {
     case 'application/pdf':
+      console.log('🔧 → Processing as PDF file');
       return extractPDFText(buffer)
     
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      console.log('🔧 → Processing as DOCX file');
       return extractDOCXText(buffer)
     
     case 'application/msword':
+      console.log('🔧 → Processing as DOC file');
       return extractDOCText(buffer)
     
     default:
+      console.error('❌ Unsupported file type:', mimeType);
+      console.log('🔧 Supported types: application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword');
       return {
         success: false,
-        error: `Unsupported file type: ${mimeType}`
+        error: `Unsupported file type: ${mimeType}. Supported types: PDF, DOCX, DOC`
       }
   }
 }
