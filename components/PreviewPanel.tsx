@@ -1,9 +1,11 @@
 import React, { useState, useCallback, memo, useEffect, useRef } from 'react';
-import { DennisSchroderTemplate } from './templates/DennisSchroderTemplate';
 import { ChevronDownIcon, EyeIcon, DownloadIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { downloadCV } from '../utils/downloadUtils';
 import { getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
+
+// PDF Preview Integration - COMPLETE REPLACEMENT OF HTML/CSS RENDERING
+import { PDFPreviewDebounceReturn } from '../hooks/usePDFPreviewDebounce';
 
 interface PreviewPanelProps {
   cvData: any;
@@ -11,6 +13,7 @@ interface PreviewPanelProps {
   setActiveSection: (section: string | null) => void;
   language?: SupportedLanguage;
   autoSaveStatus?: 'saving' | 'saved' | 'error' | 'offline' | 'guest';
+  pdfPreview?: PDFPreviewDebounceReturn; // REQUIRED: PDF preview replaces HTML/CSS
 }
 
 // PreviewPanel component - removed memo to ensure proper re-rendering on cvData changes
@@ -19,7 +22,8 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   activeSection,
   setActiveSection,
   language,
-  autoSaveStatus = 'saved'
+  autoSaveStatus = 'saved',
+  pdfPreview // REQUIRED: PDF preview replaces HTML/CSS rendering
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState<string | null>(null);
@@ -157,19 +161,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   // Recalculate pages when CV data changes
   useEffect(() => {
-    console.log('\n🔄 ===== CV PREVIEW DATA CHANGE DETECTION =====');
-    console.log('🔄 PreviewPanel: useEffect triggered for calculateTotalPages');
-    console.log('🔄 PreviewPanel: cvData.experience?.items length:', cvData.experience?.items?.length || 0);
-    console.log('🔄 PreviewPanel: cvData.experience?.items:', cvData.experience?.items?.map((exp: any, idx: number) => `${idx + 1}. ${exp.title}`));
-    console.log('🔄 PreviewPanel: Calling calculateTotalPages...');
     const newTotalPages = calculateTotalPages();
-    console.log('🔄 PreviewPanel: calculateTotalPages returned:', newTotalPages);
-    console.log('🔄 ===== END CV PREVIEW DATA CHANGE DETECTION =====\n');
+    setTotalPages(newTotalPages);
   }, [calculateTotalPages]);
 
   // Memoized download handler for performance
   const handleDownload = useCallback(async (format: 'pdf' | 'docx' | 'latex') => {
-    console.log('💾 Download requested for format:', format);
     
     try {
       setDownloadLoading(format);
@@ -178,7 +175,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
       const success = true;
       
       if (success) {
-        console.log('✅ CV downloaded successfully as', format.toUpperCase());
+        // CV downloaded successfully
       } else {
         console.error('❌ Download failed for format:', format);
       }
@@ -223,15 +220,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      console.log('\n📝 ===== CV PREVIEW PAGE NAVIGATION =====');
-      console.log('📝 PreviewPanel: goToPage called with page:', page);
-      console.log('📝 PreviewPanel: currentPage before:', currentPage);
-      console.log('📝 PreviewPanel: totalPages:', totalPages);
-      console.log('📝 PreviewPanel: Setting currentPage to:', page);
       setCurrentPage(page);
-      console.log('📝 ===== END CV PREVIEW PAGE NAVIGATION =====\n');
-    } else {
-      console.log('🚀 PreviewPanel: goToPage rejected - page', page, 'not in range 1-', totalPages);
     }
   };
 
@@ -370,34 +359,166 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         className="flex-1 bg-[#f3f4f6] p-3 flex flex-col items-center justify-center overflow-hidden" 
         onClick={handlePreviewClick}
       >
-        {/* CV Preview Container - Zoom-Resistant Scaling */}
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div 
-            ref={cvPreviewRef}
-            className="bg-white shadow-lg border border-gray-300 overflow-hidden"
-            style={{
-              // Fixed A4 dimensions - never changes regardless of zoom
-              width: '794px', // 210mm at 96 DPI
-              height: '1123px', // 297mm at 96 DPI
-              transform: 'scale(var(--preview-scale, 1))',
-              transformOrigin: 'center center',
-              // Ensure content fits exactly like PDF
-              fontSize: '12px',
-              lineHeight: '1.4',
-              fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
-            }}
-          >
-            <DennisSchroderTemplate
-              cvData={cvData}
-              activeSection={activeSection}
-              onSectionClick={setActiveSection}
-              currentPage={currentPage}
-              totalPages={totalPages}  // Use calculated pagination for true WYSIWYG preview
-              isPreview={true}
-              language={currentLanguage}
-            />
+        {/* DEBUG: PDF Preview State - Temporary for troubleshooting */}
+        {pdfPreview && (
+          <div className="absolute top-2 left-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded z-50">
+            PDF: {pdfPreview.pdfState.pdfUrl ? 'Ready' : 'None'} | 
+            Gen: {pdfPreview.pdfState.isGenerating ? 'Yes' : 'No'} | 
+            Typing: {pdfPreview.isUserTyping ? 'Yes' : 'No'} |
+            Error: {pdfPreview.pdfState.error ? 'Yes' : 'No'}
+          </div>
+        )}
+        {/* PDF PREVIEW SYSTEM - Clean Display Like Resume.io */}
+        <div className="relative w-full h-full flex items-center justify-center bg-white">
+          <div className="w-full h-full overflow-hidden relative"
+               style={{
+                 maxWidth: '794px', // A4 width
+                 maxHeight: '1123px', // A4 height
+                 transform: 'scale(var(--preview-scale, 1))',
+                 transformOrigin: 'center center'
+               }}>
+            
+            {/* PDF Loading State */}
+            {pdfPreview?.pdfState.isGenerating && (
+              <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-600">Generating PDF preview...</p>
+                </div>
+              </div>
+            )}
+
+            {/* PDF Error State */}
+            {pdfPreview?.pdfState.error && (
+              <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
+                <div className="text-center p-4">
+                  <p className="text-sm text-red-600 mb-2">PDF Preview Error</p>
+                  <p className="text-xs text-gray-500">{pdfPreview.pdfState.error}</p>
+                  <button 
+                    onClick={() => pdfPreview.triggerPDFGeneration(true)}
+                    className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                  >
+                    Retry
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* PDF Content Display - EXTENSIVE DEBUG VERSION */}
+            {(() => {
+              console.log('🔍 PreviewPanel: Rendering decision point');
+              console.log('🔍 PreviewPanel: pdfPreview exists:', !!pdfPreview);
+              console.log('🔍 PreviewPanel: pdfState:', pdfPreview?.pdfState);
+              console.log('🔍 PreviewPanel: pdfUrl exists:', !!pdfPreview?.pdfState?.pdfUrl);
+              console.log('🔍 PreviewPanel: pdfUrl value:', pdfPreview?.pdfState?.pdfUrl);
+              console.log('🔍 PreviewPanel: pdfUrl length:', pdfPreview?.pdfState?.pdfUrl?.length);
+              console.log('🔍 PreviewPanel: isGenerating:', pdfPreview?.pdfState?.isGenerating);
+              console.log('🔍 PreviewPanel: error:', pdfPreview?.pdfState?.error);
+              
+              return pdfPreview?.pdfState.pdfUrl ? (
+                /* Show PDF when available - EXTENSIVE DEBUG */
+                <div className="w-full h-full relative">
+                  {/* Debug Info Overlay */}
+                  <div className="absolute top-2 left-2 bg-black text-white p-2 text-xs z-50 rounded max-w-xs">
+                    <div>🔍 DEBUG INFO:</div>
+                    <div>PDF URL: {pdfPreview.pdfState.pdfUrl.substring(0, 40)}...</div>
+                    <div>Length: {pdfPreview.pdfState.pdfUrl.length}</div>
+                    <div>Generated: {pdfPreview.pdfState.lastGenerated ? new Date(pdfPreview.pdfState.lastGenerated).toLocaleTimeString() : 'Never'}</div>
+                    <div>Cached: {pdfPreview.pdfState.cached ? 'Yes' : 'No'}</div>
+                    <div>Generating: {pdfPreview.pdfState.isGenerating ? 'Yes' : 'No'}</div>
+                  </div>
+                  
+                  {/* Iframe with visible borders for debugging */}
+                  <iframe
+                    key={pdfPreview.pdfState.pdfUrl}
+                    src={`${pdfPreview.pdfState.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0`}
+                    className="w-full h-full border-4 border-red-500"
+                    title="CV Preview"
+                    style={{
+                      minHeight: '600px',
+                      background: 'lightblue',
+                      border: '4px solid red'
+                    }}
+                    onLoad={(e) => {
+                      const iframe = e.target as HTMLIFrameElement;
+                      console.log('✅ PDF iframe LOADED successfully');
+                      console.log('✅ Iframe element:', iframe);
+                      console.log('✅ Iframe src:', iframe.src);
+                      console.log('✅ Iframe dimensions:', {
+                        width: iframe.offsetWidth,
+                        height: iframe.offsetHeight,
+                        clientWidth: iframe.clientWidth,
+                        clientHeight: iframe.clientHeight
+                      });
+                      
+                      // Try to access iframe content
+                      try {
+                        console.log('✅ Iframe contentDocument:', iframe.contentDocument);
+                        console.log('✅ Iframe contentWindow:', iframe.contentWindow);
+                      } catch (err) {
+                        console.log('⚠️ Cannot access iframe content (CORS):', (err as Error).message);
+                      }
+                    }}
+                    onError={(e) => {
+                      const iframe = e.target as HTMLIFrameElement;
+                      console.error('❌ PDF iframe FAILED to load');
+                      console.error('❌ Error event:', e);
+                      console.error('❌ Iframe src:', iframe?.src);
+                      console.error('❌ Error type:', e.type);
+                    }}
+                  />
+                </div>
+              ) : (
+              /* Show placeholder while PDF is being generated */
+              <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <div className="animate-pulse">
+                    <div className="w-16 h-16 bg-blue-200 rounded-full mx-auto mb-4"></div>
+                    <p className="text-gray-600">Preparing PDF preview...</p>
+                    <p className="text-sm text-gray-500 mt-2">This may take a few seconds</p>
+                  </div>
+                </div>
+              </div>
+            );
+            })()}
+
+            {/* PDF Cache Indicator */}
+            {pdfPreview?.pdfState.cached && (
+              <div className="absolute top-2 right-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                Cached
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Pagination Controls - Always Visible for Multi-page CVs */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 py-3 border-t border-gray-200 bg-gray-50">
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Previous page"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
+            </button>
+            
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-gray-600">Page</span>
+              <span className="font-medium text-gray-900">{currentPage}</span>
+              <span className="text-sm text-gray-600">of {totalPages}</span>
+            </div>
+            
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Next page"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -101,7 +101,7 @@ export const WorkExperienceSection = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialLoadComplete(true);
-      console.log('🎯 Work Experience Section: Initial load complete, user interactions enabled');
+
     }, 3000); // 3 second grace period to prevent auto-popups
     
     return () => clearTimeout(timer);
@@ -110,7 +110,7 @@ export const WorkExperienceSection = ({
   // Reset function provision flag when CV ID changes (new CV loaded)
   useEffect(() => {
     setHasFunctionBeenProvided(false);
-    console.log('🔄 CV ID changed, resetting function provision flag');
+
   }, [cvData?.id]);
 
   // Detect if this is a parsed CV to control expansion behavior
@@ -122,7 +122,7 @@ export const WorkExperienceSection = ({
         if (uploadData) {
           const parsed = JSON.parse(uploadData);
           if (parsed.processed && parsed.validCV && parsed.llmParsedData) {
-            console.log('🔍 Detected parsed CV from upload - keeping experiences collapsed by default');
+
             setIsParsedCV(true);
             return;
           }
@@ -135,7 +135,7 @@ export const WorkExperienceSection = ({
           const parsed = urlParams.get('parsed');
           
           if (source === 'upload' && parsed === 'success') {
-            console.log('🔍 Detected parsed CV from URL params - keeping experiences collapsed by default');
+
             setIsParsedCV(true);
             return;
           }
@@ -191,6 +191,8 @@ export const WorkExperienceSection = ({
   
   // Feature flag for new wizards (can be controlled via environment or user preference)
   const useNewWizards = true; // Set to true to use new simplified wizards
+  
+
 
   // Drag and drop sensors - improved responsiveness
   const sensors = useSensors(
@@ -237,13 +239,16 @@ export const WorkExperienceSection = ({
   };
 
   const handleAddExperience = useCallback(() => {
-    // 🚫 TEMPORARY: Disable auto-popup completely 
     // Check if this is from a user click on the actual "Add Work Experience" button
     const stack = new Error().stack;
-    const isDirectUserClick = stack && stack.includes('onClick') && stack.includes('button');
     
+    // Fixed: Check for actual user click patterns in React
+    const isDirectUserClick = stack && (
+      stack.includes('onClick') ||  // Direct onClick handler
+      stack.includes('executeDispatch') ||  // React event dispatch
+      stack.includes('dispatchEvent')  // DOM event dispatch
+    );
     if (!isDirectUserClick) {
-      console.log('🚫 Auto-popup disabled: Only allowing direct button clicks');
       return;
     }
     
@@ -251,19 +256,29 @@ export const WorkExperienceSection = ({
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
 
     
+    // FIXED: Only block automatic triggers, not user clicks
+    // The isInitialLoadComplete check should only apply to automatic/programmatic calls,
+    // not direct user button clicks which should always work
     if (isTemplateUser && !isInitialLoadComplete) {
-
-      return;
+      // Check if this is actually a user-initiated click by looking at recent user interaction
+      const isRecentUserClick = stack && (
+        stack.includes('executeDispatch') || 
+        stack.includes('dispatchEvent') ||
+        stack.includes('onClick')
+      );
+      
+      if (!isRecentUserClick) {
+        return;
+      }
     }
     
     // Check if wizard was manually closed recently (within last 5 seconds)
     const manuallyClosed = localStorage.getItem('okbuddy_wizard_manually_closed');
+    
     if (manuallyClosed) {
       const closedTime = parseInt(manuallyClosed);
       const timeSinceClosed = Date.now() - closedTime;
-
       if (timeSinceClosed < 5000) { // 5 seconds cooldown
-
         return;
       } else {
         // Clean up old flag
@@ -276,20 +291,17 @@ export const WorkExperienceSection = ({
     
     if (useNewWizards) {
       // Open the new streamlined 2-step wizard
-
       setNewWizardOpen(true);
     } else {
       // Open the old 5-step wizard
-
       setNewExperienceWizard(true);
     }
-    
 
   }, [cvData?.id, isInitialLoadComplete, useNewWizards]);
 
   // Provide the add function to parent component
   const addExperienceCallback = useCallback(() => {
-    console.log('🔍 TRACE: addExperienceCallback called, stack:', new Error().stack);
+
     handleAddExperience();
   }, [handleAddExperience]);
 
@@ -300,10 +312,8 @@ export const WorkExperienceSection = ({
   // Provide add function to parent - ONCE ONLY to prevent auto-popup after wizard completion
   useEffect(() => {
     if (onProvideAddFunction && !hasFunctionBeenProvided) {
-      console.log('🔧 Providing add experience function to parent (one-time provision)');
       // Create a stable function that always calls the latest handleAddExperience
       const stableAddFunction = () => {
-        console.log('🔍 TRACE: Stable add function called');
         handleAddExperienceRef.current();
       };
       onProvideAddFunction(stableAddFunction);
@@ -943,16 +953,12 @@ export const WorkExperienceSection = ({
   };
 
   const handleImproveSingleBullet = async (experienceIndex: number, bulletIndex: number) => {
-    console.log('🎯 WorkExperience: Starting handleImproveSingleBullet', { experienceIndex, bulletIndex });
+
     
     const experience = data.items[experienceIndex];
     const bulletToImprove = experience.bullets[bulletIndex];
     
-    console.log('📝 Bullet Details:', { 
-      bulletToImprove, 
-      experience: { title: experience.title, company: experience.company },
-      currentLanguage 
-    });
+
     
     if (!bulletToImprove || !bulletToImprove.trim()) {
       alert('Please add content to this bullet point before improving');
@@ -965,13 +971,7 @@ export const WorkExperienceSection = ({
       const highlightedContent = getNewlyAddedContent(experienceIndex, bulletIndex, bulletToImprove);
       const hasNewContent = highlightedContent.includes('<') && highlightedContent.includes('>');
       
-      console.log('🆕 Content Change Detection:', { 
-        originalContent: bulletOriginalContent.get(getBulletKey(experienceIndex, bulletIndex)),
-        currentContent: bulletToImprove,
-        highlightedContent,
-        hasNewContent,
-        changeCount: (highlightedContent.match(/</g) || []).length
-      });
+
 
       // Prepare enhanced context with full CV data
       const otherExperiences = data.items.filter((_, index) => index !== experienceIndex);
@@ -988,7 +988,7 @@ export const WorkExperienceSection = ({
         hasNewContent: hasNewContent
       };
 
-      console.log('🔧 Calling AI Service with context:', contextData);
+
       
       // Use the new dedicated single bullet improvement method
       const result = await aiService.improveSingleBullet(bulletToImprove, contextData);
@@ -1219,6 +1219,17 @@ export const WorkExperienceSection = ({
               </div>
             </div>
 
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">{experienceTexts?.fields?.location || 'Location'}</label>
+              <input 
+                type="text" 
+                className="w-full p-2 border border-gray-200 rounded-md transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                value={experience.location || ''} 
+                onChange={(e) => handleUpdateExperience(index, 'location', e.target.value)}
+                placeholder={experienceTexts?.placeholders?.location || 'e.g., San Francisco, CA'} 
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
@@ -1266,19 +1277,8 @@ export const WorkExperienceSection = ({
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">{experienceTexts?.fields?.location || 'Location'}</label>
-              <input 
-                type="text" 
-                className="w-full p-2 border border-gray-200 rounded-md transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
-                value={experience.location || ''} 
-                onChange={(e) => handleUpdateExperience(index, 'location', e.target.value)}
-                placeholder={experienceTexts?.placeholders?.location || 'e.g., San Francisco, CA'} 
-              />
-            </div>
-
-            <div className="mb-4">
               <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium">{experienceTexts?.fields?.description || 'Description'} <span className="text-red-500 text-xs">*</span></label>
+                <label className="block text-sm font-medium">{experienceTexts?.fields?.responsibilities || 'Responsibilities & Achievements'} <span className="text-red-500 text-xs">*</span></label>
                 <button
                   onClick={() => handleOpenTemplates(index)}
                   disabled={isGenerating}
@@ -1400,7 +1400,13 @@ export const WorkExperienceSection = ({
             ? { backgroundColor: '#0177bd', borderColor: '#0177bd' }
             : { borderColor: '#0177bd', color: '#0177bd' }
         }
-        onClick={handleAddExperience}
+        onClick={(e) => {
+          try {
+            handleAddExperience();
+          } catch (error) {
+            console.error('❌ Error calling handleAddExperience:', error);
+          }
+        }}
       >
         <PlusIcon size={16} className="mr-2" />
         {experienceTexts?.addExperience || 'Add Work Experience'}
@@ -1436,10 +1442,14 @@ export const WorkExperienceSection = ({
       {/* New Streamlined Wizards */}
       {useNewWizards && (
         <>
+
+          
           {/* New 2-Step Work Experience Wizard */}
           <NewWorkExperienceWizard
             isOpen={newWizardOpen}
-            onClose={() => setNewWizardOpen(false)}
+            onClose={() => {
+              setNewWizardOpen(false);
+            }}
             onSave={handleNewWizardSave}
             isGenerating={isGenerating}
           />

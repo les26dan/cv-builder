@@ -511,8 +511,8 @@ Mandatory requirements for your response:
       return null;
     }
 
-    console.log('🔄 CV Parser: Converting ChatGPT JSON to Guided Editing format');
-    console.log('🔍 CV Parser: Input ChatGPT contact data:', JSON.stringify(parsedData.contact, null, 2));
+
+
 
     const result = {
       contact: {
@@ -565,8 +565,7 @@ Mandatory requirements for your response:
       }
     };
 
-    console.log('🔍 CV Parser: Converted contact data:', JSON.stringify(result.contact, null, 2));
-    console.log('✅ CV Parser: Conversion completed successfully');
+
 
     return result;
   }

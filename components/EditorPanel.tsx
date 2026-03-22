@@ -17,18 +17,19 @@ import { XIcon, Sparkles, CheckCircle } from 'lucide-react';
 import { CVWorkflowDataService } from '../shared/services/cvWorkflowDataService';
 import { jdAnalysisTexts, getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
+
+// PDF Preview Integration - SAFETY: Additive import for input event handling
+import { PDFPreviewDebounceReturn } from '../hooks/usePDFPreviewDebounce';
 import { UpgradeModal } from './common/UpgradeModal';
 // JD optimization components removed - using new LLM-based CV parser
 // Mock services for build compatibility
 const mockFetch = async (url: string, options?: any) => {
-  console.log('Mock fetch called:', url, options);
   return { ok: true, json: () => Promise.resolve({}) };
 };
 
 const JDOptimizationService = {
   getInstance: () => ({
     generateUnifiedAnalysis: async (jdInput: string, cvData: any, language: string) => {
-      console.log('Mock JD analysis:', { jdInput, cvData, language });
       return { 
         analysisId: 'mock-analysis-id',
         jobMatch: {
@@ -58,6 +59,7 @@ interface EditorPanelProps {
   onApplySuggestion?: (sectionId: string, suggestion: any) => void;
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
   language?: SupportedLanguage;
+  pdfPreview?: PDFPreviewDebounceReturn; // SAFETY: Optional prop for PDF integration
 }
 
 // Available section types that can be added - will be populated with dynamic text
@@ -93,7 +95,8 @@ export const EditorPanel = ({
   suggestions = {},
   onApplySuggestion,
   onDismissSuggestion,
-  language
+  language,
+  pdfPreview // SAFETY: Optional prop with default undefined
 }: EditorPanelProps) => {
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   
@@ -222,8 +225,7 @@ export const EditorPanel = ({
   };
 
   const handleAnalyzeJob = async () => {
-    console.log('🔥 handleAnalyzeJob triggered', { jdInput: jdInput.length, cvData: !!cvData });
-    console.log('🔍 Full CV Data Structure:', JSON.stringify(cvData, null, 2));
+
     
     if (!jdInput.trim()) {
       setAnalysisError(editorTexts?.editorPanel?.jobAnalysis?.errors?.required || 'Please enter job description to analyze');
@@ -242,14 +244,11 @@ export const EditorPanel = ({
     
     setIsAnalyzing(true);
     setAnalysisError(null);
-    console.log('🔄 Starting fresh analysis, cleared old results');
+
 
     try {
-      console.log('🚀 Starting Feature 4 unified analysis...');
-      
       // NEW: Use the unified analysis service directly
       const jdOptimizationService = JDOptimizationService.getInstance();
-      console.log('✅ JD Optimization service instance created');
       
       const result = await jdOptimizationService.generateUnifiedAnalysis(
         jdInput,
@@ -257,7 +256,7 @@ export const EditorPanel = ({
         'vi' // TODO: Get from language context
       );
       
-      console.log('🎉 Analysis result received:', result);
+
       
       // Save complete analysis results to state
       setAnalysisResults(result);
@@ -266,11 +265,11 @@ export const EditorPanel = ({
       // Update keywords from analysis result
       if (result.jobMatch?.missingKeywords) {
         setMissingKeywords(result.jobMatch.missingKeywords);
-        console.log('📝 Missing keywords updated:', result.jobMatch.missingKeywords);
+
       }
       if (result.jobMatch?.matchedKeywords) {
         setMatchedKeywords(result.jobMatch.matchedKeywords);
-        console.log('✅ Matched keywords updated:', result.jobMatch.matchedKeywords);
+
       }
       
       // Save to database with fallback to localStorage
@@ -281,7 +280,7 @@ export const EditorPanel = ({
             originalJobDescription: jdInput
           });
           if (saveResult.success) {
-            console.log('💾 JD Analysis saved to database successfully');
+
           } else {
             console.warn('⚠️ Failed to save to database:', saveResult.error);
           }
@@ -290,7 +289,7 @@ export const EditorPanel = ({
         }
       }
       
-      console.log('🎯 Unified JD Analysis completed successfully!');
+
       
     } catch (error) {
       console.error('❌ JD Analysis Error:', error);
@@ -309,7 +308,7 @@ export const EditorPanel = ({
       );
     } finally {
       setIsAnalyzing(false);
-      console.log('🏁 Analysis process completed, isAnalyzing set to false');
+
     }
   };
 
@@ -451,10 +450,7 @@ export const EditorPanel = ({
     const autoTriggerAnalysis = async () => {
       // Only auto-trigger if we have both CV data and JD input, but no existing analysis
       if (cvData && jdInput.trim() && !analysisResults && !isAnalyzing) {
-        console.log('🤖 Auto-triggering JD analysis with available data...');
-        console.log('📊 CV Data available:', !!cvData);
-        console.log('📋 JD Input length:', jdInput.length);
-        console.log('🔍 Analysis Results:', !!analysisResults);
+
         
         // Wait a short delay to ensure UI is ready
         setTimeout(() => {
@@ -484,7 +480,7 @@ export const EditorPanel = ({
   // Handle applying individual suggestions
   const handleApplySuggestion = async (suggestion: any) => {
     try {
-      console.log('Applying suggestion:', suggestion);
+
       
       const response = await mockFetch('/api/suggestions/apply', {
         method: 'POST',
@@ -535,7 +531,7 @@ export const EditorPanel = ({
         };
       });
 
-      console.log('Suggestion applied successfully:', result); // Small delay to allow CV data to update
+      // Small delay to allow CV data to update
       
     } catch (error) {
       console.error('Error applying suggestion:', error);
@@ -674,6 +670,7 @@ export const EditorPanel = ({
             data={cvData.contact} 
             onUpdate={(data: any) => onUpdateSection('contact', data)} 
             {...commonProps}
+            pdfPreview={pdfPreview}
           />
         );
       case 'summary':
@@ -682,6 +679,7 @@ export const EditorPanel = ({
             data={cvData.summary} 
             onUpdate={(data: any) => onUpdateSection('summary', data)} 
             {...commonProps}
+            pdfPreview={pdfPreview}
           />
         );
       case 'experience':
@@ -939,7 +937,7 @@ export const EditorPanel = ({
             {/* Template-Matching Suggestions Display */}
             <div className="mt-6 space-y-3 pb-6">
               {analysisResults.suggestions && Object.entries(analysisResults.suggestions).map(([section, suggestions]) => {
-                console.log('🔍 Rendering section:', section, 'suggestions:', suggestions);
+
                 
                 const typedSuggestions = Array.isArray(suggestions) ? suggestions : [suggestions];
                 if (!typedSuggestions || typedSuggestions.length === 0) return null;
@@ -966,7 +964,7 @@ export const EditorPanel = ({
 
                 // Convert suggestions to the proper format with safe fallbacks
                 const formattedSuggestions = typedSuggestions.map((suggestion: any, index: number) => {
-                  console.log('🔍 Formatting suggestion:', suggestion);
+
                   
                   const formattedSuggestion = {
                     id: suggestion?.id || `${section}-${index}`,
@@ -984,7 +982,7 @@ export const EditorPanel = ({
                     metadata: suggestion?.metadata || {}
                   };
                   
-                  console.log('✅ Formatted suggestion:', formattedSuggestion);
+
                   return formattedSuggestion;
                 });
 

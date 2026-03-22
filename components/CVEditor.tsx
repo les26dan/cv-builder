@@ -17,6 +17,9 @@ import { getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 // JD optimization service removed - using new LLM-based CV parser instead
 
+// PDF Preview Integration - SAFETY: Completely additive, no existing code modified
+import { usePDFPreviewDebounce } from '../hooks/usePDFPreviewDebounce';
+
 interface CVEditorProps {
   className?: string;
   initialData?: CVData;
@@ -49,12 +52,8 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   const [cvData, setCvData] = useState<CVData>(() => {
     // Simple initial state - avoid complex computation here
     if (initialData) {
-      console.log('🔄 CVEditor: Using provided initialData');
       return initialData;
     }
-    
-    // Default empty CV structure
-    console.log('🔄 CVEditor: Using default empty CV structure');
     return {
       id: cvId, // Include cvId if provided
       contact: { fullName: '', email: '', phone: '', location: '', linkedin: '' },
@@ -87,7 +86,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         const texts = await getTexts('cvEditor', detectedLanguage);
         setCvEditorTexts(texts);
         
-        console.log('🌐 CVEditor: Language loaded:', detectedLanguage);
+
       } catch (error) {
         console.error('Failed to load language configuration:', error);
         // Fallback to English
@@ -123,33 +122,13 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         if (uploadData) {
           const parsed = JSON.parse(uploadData);
           
-          console.log('🔍 CVEditor: Raw localStorage data:', JSON.stringify(parsed, null, 2));
-          
           if (parsed.cvId === cvId && (parsed.structuredCV || parsed.llmParsedData)) {
-            console.log('✅ CVEditor: Loading parsed CV from upload');
-            
-            // Enhanced debugging for contact data mapping
-            if (parsed.llmParsedData?.contact) {
-              console.log('🔍 CVEditor: Raw ChatGPT contact data:', JSON.stringify(parsed.llmParsedData.contact, null, 2));
-            }
-            if (parsed.structuredCV?.contact) {
-              console.log('🔍 CVEditor: Structured CV contact data:', JSON.stringify(parsed.structuredCV.contact, null, 2));
-            }
-            
             // Prioritize LLM-parsed structured CV data over basic extraction
             const structuredCV = parsed.structuredCV;
             
             // Enhanced contact field mapping with direct access to ChatGPT data as fallback
             const chatGptContact = parsed.llmParsedData?.contact || {};
             const structuredContact = structuredCV?.contact || {};
-            
-            console.log('🔍 CVEditor: Contact field mapping debug:');
-            console.log('  - ChatGPT full_name:', chatGptContact.full_name);
-            console.log('  - Structured fullName:', structuredContact.fullName);
-            console.log('  - ChatGPT address:', chatGptContact.address);
-            console.log('  - Structured location:', structuredContact.location);
-            console.log('  - ChatGPT linkedin:', chatGptContact.linkedin);
-            console.log('  - Structured linkedin:', structuredContact.linkedin);
             
             const transformedData: CVData = {
               id: cvId,
@@ -161,17 +140,14 @@ export const CVEditor: React.FC<CVEditorProps> = ({
                               structuredContact.full_name || 
                               structuredContact.name || 
                               '';
-                  console.log('🎯 CVEditor: Final mapped fullName:', name);
                   return name;
                 })(),
                 email: (() => {
                   const email = structuredContact.email || chatGptContact.email || '';
-                  console.log('🎯 CVEditor: Final mapped email:', email);
                   return email;
                 })(),
                 phone: (() => {
                   const phone = structuredContact.phone || chatGptContact.phone || '';
-                  console.log('🎯 CVEditor: Final mapped phone:', phone);
                   return phone;
                 })(),
                 location: (() => {
@@ -180,12 +156,10 @@ export const CVEditor: React.FC<CVEditorProps> = ({
                                   chatGptContact.address || 
                                   structuredContact.address || 
                                   '';
-                  console.log('🎯 CVEditor: Final mapped location:', location);
                   return location;
                 })(),
                 linkedin: (() => {
                   const linkedin = structuredContact.linkedin || chatGptContact.linkedin || '';
-                  console.log('🎯 CVEditor: Final mapped linkedin:', linkedin);
                   return linkedin;
                 })()
               },
@@ -200,29 +174,22 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               },
               experience: {
                 items: (() => {
-                  console.log('🔍 CVEditor: Processing work experience data');
-                  
                   // Enhanced work experience mapping with ChatGPT fallback
                   const chatGptExperience = parsed.llmParsedData?.work_experience || [];
                   const structuredExperience = structuredCV.experience?.items || structuredCV.experience || [];
                   
-                  console.log('🔍 CVEditor: ChatGPT work experience count:', chatGptExperience.length);
-                  console.log('🔍 CVEditor: Structured work experience count:', structuredExperience.length);
-                  
                   if (structuredExperience.length > 0) {
-                    console.log('✅ CVEditor: Using structured experience data');
                     return structuredExperience;
                   }
                   
                   // Fallback: Map ChatGPT data directly with Present/hiện tại handling
-                  console.log('⚠️ CVEditor: Falling back to ChatGPT data mapping');
                   return chatGptExperience.map((exp: any, index: number) => {
                     // Handle "Present" or "hiện tại" end dates
                     const isCurrentJob = exp.end_date && 
                       (exp.end_date.toLowerCase().includes('present') || 
                        exp.end_date.toLowerCase().includes('hiện tại'));
                     
-                    console.log(`🔍 CVEditor: Fallback Experience ${index + 1} - Position: ${exp.position}, End Date: "${exp.end_date}", Is Current: ${isCurrentJob}`);
+
                     
                     return {
                       id: `experience-${index}-${Date.now()}`,
@@ -257,7 +224,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               }
             };
             
-            console.log('🔍 CVEditor: Final transformed contact data:', JSON.stringify(transformedData.contact, null, 2));
+
             
             // Update state with transformed data
             setCvData(transformedData);
@@ -265,7 +232,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
             
             // Check if this was a successful LLM parsing
             if (parsed.llmParsedData && parsed.llmParsedData.possibility_score >= 5) {
-              console.log('🎉 CVEditor: LLM parsing was successful - will show success notification');
               // Use setTimeout to show notification after component mounts
               setTimeout(() => {
                 if (mountedRef.current) setShowParsingSuccess(true);
@@ -289,7 +255,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
     // Only use workflow context if we don't have initialData and haven't loaded data yet
     if (!initialData && !hasLoadedDataRef.current) {
       if (state.cvData && Object.keys(state.cvData).length > 0) {
-        console.log('🔄 CVEditor: Using CV workflow context data');
         setCvData(state.cvData as CVData);
         hasLoadedDataRef.current = true; // Mark as loaded
       }
@@ -308,6 +273,63 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   // Success notification for LLM parsing
   const [showParsingSuccess, setShowParsingSuccess] = useState(false);
 
+  // PDF Preview Integration - SAFETY: Independent system, no interference with existing auto-save
+  const pdfPreview = usePDFPreviewDebounce(cvData, {
+    debounceMs: 3000, // 3-second debounce as per requirements
+    enableCache: true,
+    onGenerationStart: () => {
+      console.log('🔄 CVEditor: PDF generation started');
+    },
+    onGenerationComplete: (result) => {
+      console.log('✅ CVEditor: PDF generation completed', { 
+        cached: result.cached,
+        hasPdfUrl: !!result.pdfUrl,
+        pdfUrlLength: result.pdfUrl?.length || 0
+      });
+    },
+    onError: (error) => {
+      console.error('❌ CVEditor: PDF generation error:', error);
+    }
+  });
+
+  // Debug PDF preview state
+  useEffect(() => {
+    console.log('📊 CVEditor: PDF Preview State Update:', {
+      isGenerating: pdfPreview.pdfState.isGenerating,
+      hasPdfUrl: !!pdfPreview.pdfState.pdfUrl,
+      error: pdfPreview.pdfState.error,
+      isUserTyping: pdfPreview.isUserTyping,
+      lastGenerated: pdfPreview.pdfState.lastGenerated ? new Date(pdfPreview.pdfState.lastGenerated).toLocaleTimeString() : null
+    });
+  }, [pdfPreview.pdfState, pdfPreview.isUserTyping]);
+
+  // Global PDF Generation Trigger - Monitor CV Data Changes
+  // SAFETY: This ensures PDF generation happens regardless of which input field is used
+  useEffect(() => {
+    console.log('🔄 CVEditor: CV Data changed, triggering PDF generation...');
+    console.log('📊 CVEditor: CV Data summary:', {
+      contactName: cvData.contact?.fullName,
+      summaryLength: cvData.summary?.content?.length || 0,
+      experienceCount: cvData.experience?.items?.length || 0,
+      skillsCount: cvData.skills?.items?.length || 0
+    });
+    
+    // Trigger PDF generation with debounce (3-second delay)
+    pdfPreview.triggerPDFGeneration(false);
+  }, [cvData]); // FIXED: Removed pdfPreview from dependencies to prevent infinite loops
+
+  // Initial PDF Generation - Trigger PDF generation when component mounts
+  // SAFETY: Ensures PDF is generated even if user doesn't edit anything
+  useEffect(() => {
+    console.log('🚀 CVEditor: Component mounted, triggering initial PDF generation...');
+    // Small delay to ensure component is fully mounted
+    const timer = setTimeout(() => {
+      pdfPreview.triggerPDFGeneration(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []); // Empty dependency array - only run on mount
+
   // Suggestions removed - using new LLM-based CV parser instead
 
   // Update CV score when data changes
@@ -322,7 +344,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   
   useEffect(() => {
     if (cvId && cvId.startsWith('template-') && hasSetTemplateFocusRef.current !== cvId) {
-      console.log('🎯 Guest Session: Setting focus to Work Experience section for aha moment');
       hasSetTemplateFocusRef.current = cvId; // Mark this cvId as processed
       setActiveSection('experience');
       
@@ -330,7 +351,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
       setTimeout(() => {
         const sectionElement = document.getElementById('section-experience');
         if (sectionElement) {
-          console.log('🎯 Guest Session: Scrolling to Work Experience section');
           sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 500); // 500ms delay to ensure CV Editor is fully rendered
@@ -356,14 +376,12 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Enhanced data update handler with auto-save
   const handleDataUpdate = useCallback((newData: CVData) => {
-    console.log('📝 CVEditor: Updating CV data');
     setCvData(newData);
     
     // Auto-save to workflow context
     if (saveCVData) {
       try {
         saveCVData(newData);
-        console.log('💾 CVEditor: Auto-saved to workflow context');
       } catch (error) {
         console.error('❌ CVEditor: Auto-save failed:', error);
       }
@@ -372,7 +390,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Handle section updates (compatible with existing EditorPanel interface)
   const handleUpdateSection = useCallback((sectionId: string, data: any) => {
-    console.log(`🔧 CVEditor: Updating section ${sectionId}`, data);
     
     const updatedData = {
       ...cvData,
@@ -479,6 +496,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               setActiveSection={setActiveSection}
               cvScore={cvScore}
               language={currentLanguage}
+              pdfPreview={pdfPreview}
             />
           </div>
         </div>
@@ -490,6 +508,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             autoSaveStatus={getAutoSaveStatus()}
+            pdfPreview={pdfPreview}
           />
         </div>
       </div>

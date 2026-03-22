@@ -551,15 +551,7 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
 
   const sectionsToShow = getSectionsForPage(currentPage);
 
-  // EXTENSIVE DEBUG: Final rendering summary for Kien Vu CV
-  if (typeof window !== 'undefined') {
-    console.log('\n🎭 ===== FINAL CV TEMPLATE RENDER DEBUG =====');
-    console.log('🎭 CV Template: Rendering with currentPage:', currentPage, 'of', totalPages);
-    console.log('🎭 CV Template: sectionsToShow:', sectionsToShow);
-    console.log('🎭 CV Template: cvData.experience?.items count:', cvData.experience?.items?.length || 0);
-    console.log('🎭 CV Template: Component props:', { currentPage, totalPages, isPreview, activeSection });
-    console.log('🎭 ===== END FINAL CV TEMPLATE RENDER DEBUG =====\n');
-  }
+
 
   return (
     <div 

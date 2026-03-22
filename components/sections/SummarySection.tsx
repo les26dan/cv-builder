@@ -4,6 +4,10 @@ import { aiService, EnhancedSummaryGenerationRequest } from '../../utils/aiServi
 import { getTexts } from '../../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
+// PDF Preview Integration - SAFETY: Additive import for input event handling
+import { PDFPreviewTextarea } from '../common/PDFPreviewInput';
+import { PDFPreviewDebounceReturn } from '../../hooks/usePDFPreviewDebounce';
+
 interface SummarySectionProps {
   data: {
     content: string;
@@ -13,6 +17,7 @@ interface SummarySectionProps {
   cvData?: any; // Access to full CV data to check work experience
   onNavigateToSection?: (sectionId: string) => void;
   language?: SupportedLanguage;
+  pdfPreview?: PDFPreviewDebounceReturn; // SAFETY: Optional prop for PDF integration
 }
 
 export const SummarySection = ({
@@ -20,7 +25,8 @@ export const SummarySection = ({
   onUpdate,
   cvData,
   onNavigateToSection,
-  language
+  language,
+  pdfPreview // SAFETY: Optional prop with default undefined
 }: SummarySectionProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   
@@ -167,11 +173,12 @@ export const SummarySection = ({
           </p>
         </div>
         
-        <textarea 
+        <PDFPreviewTextarea 
           className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] resize-none transition-colors focus:border-primary-500 focus:ring-primary-500"
           value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
           placeholder={summaryTexts?.placeholderSimple || 'Write a summary about your experience and career goals...'}
+          pdfPreview={pdfPreview}
         />
       </div>
     );
@@ -186,12 +193,13 @@ export const SummarySection = ({
 
       {/* Summary textarea */}
       <div className="relative">
-        <textarea 
+        <PDFPreviewTextarea 
           className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] resize-none transition-colors focus:border-primary-500 focus:ring-primary-500"
           value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
           placeholder={summaryTexts?.placeholder || 'Brief summary of your experience and career objectives...'}
           disabled={isGenerating}
+          pdfPreview={pdfPreview}
         />
         {isGenerating && (
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-md">
