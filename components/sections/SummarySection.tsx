@@ -6,7 +6,7 @@ import { detectLanguage, type SupportedLanguage } from '../../config/languageCon
 
 // PDF Preview Integration - SAFETY: Additive import for input event handling
 import { PDFPreviewTextarea } from '../common/PDFPreviewInput';
-import { PDFPreviewDebounceReturn } from '../../hooks/usePDFPreviewDebounce';
+// PDF preview is now handled directly in PreviewPanel
 
 interface SummarySectionProps {
   data: {
@@ -17,7 +17,7 @@ interface SummarySectionProps {
   cvData?: any; // Access to full CV data to check work experience
   onNavigateToSection?: (sectionId: string) => void;
   language?: SupportedLanguage;
-  pdfPreview?: PDFPreviewDebounceReturn; // SAFETY: Optional prop for PDF integration
+  // PDF preview is now handled directly in PreviewPanel - no props needed
 }
 
 export const SummarySection = ({
@@ -25,8 +25,7 @@ export const SummarySection = ({
   onUpdate,
   cvData,
   onNavigateToSection,
-  language,
-  pdfPreview // SAFETY: Optional prop with default undefined
+  language // SAFETY: Optional prop with default undefined
 }: SummarySectionProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   
@@ -178,7 +177,7 @@ export const SummarySection = ({
           value={safeContent} 
           onChange={(e) => handleChange(e.target.value)}
           placeholder={summaryTexts?.placeholderSimple || 'Write a summary about your experience and career goals...'}
-          pdfPreview={pdfPreview}
+
         />
       </div>
     );
@@ -199,7 +198,7 @@ export const SummarySection = ({
           onChange={(e) => handleChange(e.target.value)}
           placeholder={summaryTexts?.placeholder || 'Brief summary of your experience and career objectives...'}
           disabled={isGenerating}
-          pdfPreview={pdfPreview}
+
         />
         {isGenerating && (
           <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-md">

@@ -12,14 +12,13 @@
  */
 
 import React, { forwardRef, useCallback } from 'react';
-import { PDFPreviewDebounceReturn } from '../../hooks/usePDFPreviewDebounce';
 
 interface PDFPreviewInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  pdfPreview?: PDFPreviewDebounceReturn;
+  // PDF preview is now handled directly in PreviewPanel - no props needed
 }
 
 interface PDFPreviewTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  pdfPreview?: PDFPreviewDebounceReturn;
+  // PDF preview is now handled directly in PreviewPanel - no props needed
 }
 
 /**
@@ -27,34 +26,13 @@ interface PDFPreviewTextareaProps extends React.TextareaHTMLAttributes<HTMLTextA
  * SAFETY: Direct textarea wrapper with PDF preview integration
  */
 export const PDFPreviewTextarea = forwardRef<HTMLTextAreaElement, PDFPreviewTextareaProps>(
-  ({ pdfPreview, ...textareaProps }, ref) => {
-    const handleFocus = useCallback(() => {
-      console.log('🎯 PDFPreviewTextarea: Focus event');
-      pdfPreview?.handleInputFocus();
-    }, [pdfPreview]);
-
-    const handleBlur = useCallback(() => {
-      console.log('👆 PDFPreviewTextarea: Blur event');
-      pdfPreview?.handleInputBlur();
-    }, [pdfPreview]);
-
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      console.log('⌨️ PDFPreviewTextarea: Change event');
-      pdfPreview?.handleInputChange();
-      
-      // Call original onChange if provided
-      if (textareaProps.onChange) {
-        textareaProps.onChange(e);
-      }
-    }, [pdfPreview, textareaProps.onChange]);
-
+  (textareaProps, ref) => {
+    // PDF preview is now handled automatically in PreviewPanel
+    // This component is now just a regular textarea wrapper
     return (
       <textarea
         {...textareaProps}
         ref={ref}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onChange={handleChange}
       />
     );
   }
@@ -67,34 +45,13 @@ PDFPreviewTextarea.displayName = 'PDFPreviewTextarea';
  * SAFETY: Direct input wrapper with PDF preview integration
  */
 export const PDFPreviewInput = forwardRef<HTMLInputElement, PDFPreviewInputProps>(
-  ({ pdfPreview, ...inputProps }, ref) => {
-    const handleFocus = useCallback(() => {
-      console.log('🎯 PDFPreviewInput: Focus event');
-      pdfPreview?.handleInputFocus();
-    }, [pdfPreview]);
-
-    const handleBlur = useCallback(() => {
-      console.log('👆 PDFPreviewInput: Blur event');
-      pdfPreview?.handleInputBlur();
-    }, [pdfPreview]);
-
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('⌨️ PDFPreviewInput: Change event');
-      pdfPreview?.handleInputChange();
-      
-      // Call original onChange if provided
-      if (inputProps.onChange) {
-        inputProps.onChange(e);
-      }
-    }, [pdfPreview, inputProps.onChange]);
-
+  (inputProps, ref) => {
+    // PDF preview is now handled automatically in PreviewPanel
+    // This component is now just a regular input wrapper
     return (
       <input
         {...inputProps}
         ref={ref}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onChange={handleChange}
       />
     );
   }
@@ -102,29 +59,6 @@ export const PDFPreviewInput = forwardRef<HTMLInputElement, PDFPreviewInputProps
 
 PDFPreviewInput.displayName = 'PDFPreviewInput';
 
-/**
- * Higher-order component that wraps any component with PDF preview integration
- * SAFETY: Non-invasive wrapper that preserves all existing component behavior
- */
-export function withPDFPreviewIntegration<T extends Record<string, any>>(
-  WrappedComponent: React.ComponentType<T>,
-  pdfPreview?: PDFPreviewDebounceReturn
-) {
-  const WithPDFPreview = forwardRef<any, T>((props, ref) => {
-    return (
-      <div
-        onFocus={() => pdfPreview?.handleInputFocus()}
-        onBlur={() => pdfPreview?.handleInputBlur()}
-        onChange={() => pdfPreview?.handleInputChange()}
-      >
-        <WrappedComponent {...props as T} />
-      </div>
-    );
-  });
-
-  WithPDFPreview.displayName = `withPDFPreview(${WrappedComponent.displayName || WrappedComponent.name})`;
-  
-  return WithPDFPreview;
-}
+// Higher-order component removed - PDF preview now handled directly in PreviewPanel
 
 export type { PDFPreviewInputProps, PDFPreviewTextareaProps };

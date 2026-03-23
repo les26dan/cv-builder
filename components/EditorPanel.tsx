@@ -18,8 +18,7 @@ import { CVWorkflowDataService } from '../shared/services/cvWorkflowDataService'
 import { jdAnalysisTexts, getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 
-// PDF Preview Integration - SAFETY: Additive import for input event handling
-import { PDFPreviewDebounceReturn } from '../hooks/usePDFPreviewDebounce';
+// PDF Preview Integration - Now handled directly in PreviewPanel
 import { UpgradeModal } from './common/UpgradeModal';
 // JD optimization components removed - using new LLM-based CV parser
 // Mock services for build compatibility
@@ -59,7 +58,7 @@ interface EditorPanelProps {
   onApplySuggestion?: (sectionId: string, suggestion: any) => void;
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
   language?: SupportedLanguage;
-  pdfPreview?: PDFPreviewDebounceReturn; // SAFETY: Optional prop for PDF integration
+  // PDF preview is now handled directly in PreviewPanel - no props needed
 }
 
 // Available section types that can be added - will be populated with dynamic text
@@ -95,8 +94,8 @@ export const EditorPanel = ({
   suggestions = {},
   onApplySuggestion,
   onDismissSuggestion,
-  language,
-  pdfPreview // SAFETY: Optional prop with default undefined
+  language
+  // PDF preview is now handled directly in PreviewPanel
 }: EditorPanelProps) => {
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   
@@ -670,7 +669,7 @@ export const EditorPanel = ({
             data={cvData.contact} 
             onUpdate={(data: any) => onUpdateSection('contact', data)} 
             {...commonProps}
-            pdfPreview={pdfPreview}
+
           />
         );
       case 'summary':
@@ -679,7 +678,7 @@ export const EditorPanel = ({
             data={cvData.summary} 
             onUpdate={(data: any) => onUpdateSection('summary', data)} 
             {...commonProps}
-            pdfPreview={pdfPreview}
+
           />
         );
       case 'experience':

@@ -488,7 +488,7 @@ export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' 
 };
 
 // Generate HTML for printing (PDF simulation) - EXACTLY matching preview
-const generateHTMLForPrint = (cvData: CVData): string => {
+export const generateHTMLForPrint = (cvData: CVData): string => {
   const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
   
   let html = `
@@ -558,8 +558,11 @@ const generateHTMLForPrint = (cvData: CVData): string => {
           text-align: justify;
         }
         
-        /* Section headers - EXACTLY matching preview */
-        .section { margin-bottom: 20px; }
+        /* Section headers - EXACTLY matching preview + PAGE BREAK CONTROL */
+        .section { 
+          margin-bottom: 20px; 
+          page-break-inside: avoid; /* Prevent section from breaking across pages */
+        }
         .section-title { 
           font-size: 16px; 
           font-weight: bold; 
@@ -569,6 +572,7 @@ const generateHTMLForPrint = (cvData: CVData): string => {
           padding-bottom: 8px;
           color: #111827;
           letter-spacing: 0.5px;
+          page-break-after: avoid; /* Keep title with its content */
         }
         
         /* Experience section - EXACTLY matching preview */

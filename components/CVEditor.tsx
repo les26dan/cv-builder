@@ -17,8 +17,8 @@ import { getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 // JD optimization service removed - using new LLM-based CV parser instead
 
-// PDF Preview Integration - SAFETY: Completely additive, no existing code modified
-import { usePDFPreviewDebounce } from '../hooks/usePDFPreviewDebounce';
+// PDF Preview Integration - REMOVED: Replaced with HTML-to-PDF browser engine
+// import { usePDFPreviewDebounce } from '../hooks/usePDFPreviewDebounce';
 
 interface CVEditorProps {
   className?: string;
@@ -273,62 +273,17 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   // Success notification for LLM parsing
   const [showParsingSuccess, setShowParsingSuccess] = useState(false);
 
-  // PDF Preview Integration - SAFETY: Independent system, no interference with existing auto-save
-  const pdfPreview = usePDFPreviewDebounce(cvData, {
-    debounceMs: 3000, // 3-second debounce as per requirements
-    enableCache: true,
-    onGenerationStart: () => {
-      console.log('🔄 CVEditor: PDF generation started');
-    },
-    onGenerationComplete: (result) => {
-      console.log('✅ CVEditor: PDF generation completed', { 
-        cached: result.cached,
-        hasPdfUrl: !!result.pdfUrl,
-        pdfUrlLength: result.pdfUrl?.length || 0
-      });
-    },
-    onError: (error) => {
-      console.error('❌ CVEditor: PDF generation error:', error);
-    }
-  });
+  // PDF Preview Integration - REMOVED: Replaced with HTML-to-PDF browser engine
+  // const pdfPreview = usePDFPreviewDebounce(cvData, { ... });
 
-  // Debug PDF preview state
-  useEffect(() => {
-    console.log('📊 CVEditor: PDF Preview State Update:', {
-      isGenerating: pdfPreview.pdfState.isGenerating,
-      hasPdfUrl: !!pdfPreview.pdfState.pdfUrl,
-      error: pdfPreview.pdfState.error,
-      isUserTyping: pdfPreview.isUserTyping,
-      lastGenerated: pdfPreview.pdfState.lastGenerated ? new Date(pdfPreview.pdfState.lastGenerated).toLocaleTimeString() : null
-    });
-  }, [pdfPreview.pdfState, pdfPreview.isUserTyping]);
+  // Debug PDF preview state - REMOVED: Old jsPDF system
+  // useEffect(() => { ... }, [pdfPreview.pdfState, pdfPreview.isUserTyping]);
 
-  // Global PDF Generation Trigger - Monitor CV Data Changes
-  // SAFETY: This ensures PDF generation happens regardless of which input field is used
-  useEffect(() => {
-    console.log('🔄 CVEditor: CV Data changed, triggering PDF generation...');
-    console.log('📊 CVEditor: CV Data summary:', {
-      contactName: cvData.contact?.fullName,
-      summaryLength: cvData.summary?.content?.length || 0,
-      experienceCount: cvData.experience?.items?.length || 0,
-      skillsCount: cvData.skills?.items?.length || 0
-    });
-    
-    // Trigger PDF generation with debounce (3-second delay)
-    pdfPreview.triggerPDFGeneration(false);
-  }, [cvData]); // FIXED: Removed pdfPreview from dependencies to prevent infinite loops
+  // Global PDF Generation Trigger - REMOVED: Old jsPDF system
+  // useEffect(() => { pdfPreview.triggerPDFGeneration(false); }, [cvData]);
 
-  // Initial PDF Generation - Trigger PDF generation when component mounts
-  // SAFETY: Ensures PDF is generated even if user doesn't edit anything
-  useEffect(() => {
-    console.log('🚀 CVEditor: Component mounted, triggering initial PDF generation...');
-    // Small delay to ensure component is fully mounted
-    const timer = setTimeout(() => {
-      pdfPreview.triggerPDFGeneration(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []); // Empty dependency array - only run on mount
+  // Initial PDF Generation - REMOVED: Old jsPDF system
+  // useEffect(() => { pdfPreview.triggerPDFGeneration(false); }, []);
 
   // Suggestions removed - using new LLM-based CV parser instead
 
@@ -496,7 +451,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
               setActiveSection={setActiveSection}
               cvScore={cvScore}
               language={currentLanguage}
-              pdfPreview={pdfPreview}
             />
           </div>
         </div>
@@ -508,7 +462,6 @@ export const CVEditor: React.FC<CVEditorProps> = ({
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             autoSaveStatus={getAutoSaveStatus()}
-            pdfPreview={pdfPreview}
           />
         </div>
       </div>

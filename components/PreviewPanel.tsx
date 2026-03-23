@@ -4,8 +4,9 @@ import { downloadCV } from '../utils/downloadUtils';
 import { getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 
-// PDF Preview Integration - COMPLETE REPLACEMENT OF HTML/CSS RENDERING
-import { PDFPreviewDebounceReturn } from '../hooks/usePDFPreviewDebounce';
+// BREAKTHROUGH: Browser PDF Generation - EXACT same system as Download PDF
+import { useBrowserPDFPreview } from '../hooks/useBrowserPDFPreview';
+import DirectPDFViewer from './common/DirectPDFViewer';
 
 interface PreviewPanelProps {
   cvData: any;
@@ -13,28 +14,43 @@ interface PreviewPanelProps {
   setActiveSection: (section: string | null) => void;
   language?: SupportedLanguage;
   autoSaveStatus?: 'saving' | 'saved' | 'error' | 'offline' | 'guest';
-  pdfPreview?: PDFPreviewDebounceReturn; // REQUIRED: PDF preview replaces HTML/CSS
+  // pdfPreview is now OPTIONAL - we generate HTML directly
 }
 
-// PreviewPanel component - removed memo to ensure proper re-rendering on cvData changes
+// PreviewPanel component - BREAKTHROUGH: Now uses EXACT same PDF as Download
 export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   cvData,
   activeSection,
   setActiveSection,
   language,
-  autoSaveStatus = 'saved',
-  pdfPreview // REQUIRED: PDF preview replaces HTML/CSS rendering
+  autoSaveStatus = 'saved'
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [downloadLoading, setDownloadLoading] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const previewContainerRef = useRef<HTMLDivElement>(null);
-  const cvPreviewRef = useRef<HTMLDivElement>(null);
   
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
   const [previewTexts, setPreviewTexts] = useState<any>(null);
+
+  // BREAKTHROUGH: Use browser PDF generation - EXACT same system as Download
+  const browserPDF = useBrowserPDFPreview(cvData, {
+    debounceMs: 3000, // 3-second debounce as per requirements
+    enableCache: true,
+    onGenerationStart: () => {
+      console.log('🔄 Preview Panel: PDF generation started');
+    },
+    onGenerationComplete: (result) => {
+      console.log('✅ Preview Panel: PDF generation completed', {
+        success: result.success,
+        cached: result.cached
+      });
+    },
+    onError: (error) => {
+      console.error('❌ Preview Panel: PDF generation error:', error);
+    }
+  });
+
   
   // Load language configuration
   useEffect(() => {
@@ -54,116 +70,8 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
     
     loadLanguage();
   }, [language]);
-  
-  // Calculate optimal scale to fit A4 in container while maintaining exact aspect ratio
-  const calculateOptimalScale = useCallback(() => {
-    if (!previewContainerRef.current) return 1;
-    
-    const container = previewContainerRef.current;
-    const containerWidth = container.clientWidth - 24; // Account for padding
-    const containerHeight = container.clientHeight - 24;
-    
-    // A4 dimensions in pixels at 96 DPI (standard web DPI)
-    const A4_WIDTH_PX = 794; // 210mm at 96 DPI
-    const A4_HEIGHT_PX = 1123; // 297mm at 96 DPI
-    
-    // Calculate scale to fit both width and height, maintaining aspect ratio
-    const widthScale = containerWidth / A4_WIDTH_PX;
-    const heightScale = containerHeight / A4_HEIGHT_PX;
-    
-    // Use the smaller scale to ensure the entire page fits
-    const optimalScale = Math.min(widthScale, heightScale, 1); // Never scale above 100%
-    
-    return Math.max(0.3, optimalScale); // Minimum 30% scale for readability
-  }, []);
 
-  // Update scale on container resize
-  useEffect(() => {
-    const updateScale = () => {
-      if (cvPreviewRef.current) {
-        const scale = calculateOptimalScale();
-        cvPreviewRef.current.style.setProperty('--preview-scale', scale.toString());
-      }
-    };
-
-    // Initial scale calculation
-    updateScale();
-
-    // Handle window resize
-    const handleResize = () => {
-      updateScale();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [calculateOptimalScale]);
-
-  // Calculate total pages based on actual content height
-  const calculateTotalPages = useCallback(() => {
-    // A4 page content height after margins (297mm - 2*19mm margins = 259mm ≈ 980px at 96 DPI)
-    const pageContentHeight = 980;
-    
-    // Estimate content heights more accurately
-    let totalContentHeight = 0;
-    
-    // Contact section (fixed height)
-    if (cvData.contact?.fullName) totalContentHeight += 100;
-    
-    // Summary section (based on text length and line wrapping)
-    if (cvData.summary?.content) {
-      const summaryText = cvData.summary.content;
-      const charactersPerLine = 85; // Approximate for 14px font at A4 width
-      const linesNeeded = Math.ceil(summaryText.length / charactersPerLine);
-      totalContentHeight += Math.max(60, linesNeeded * 21 + 40); // 21px line height + margins
-    }
-    
-    // Experience section
-    if (cvData.experience?.items?.length) {
-      totalContentHeight += 60; // Section header
-      cvData.experience.items.forEach((exp: any) => {
-        totalContentHeight += 70; // Job header and dates
-        if (exp.bullets?.length) {
-          exp.bullets.forEach((bullet: string) => {
-            if (bullet.trim()) {
-              const bulletLines = Math.ceil(bullet.length / 90); // Characters per bullet line
-              totalContentHeight += bulletLines * 18; // 18px per bullet line
-            }
-          });
-        }
-        totalContentHeight += 15; // Gap between jobs
-      });
-    }
-    
-    // Skills section
-    if (cvData.skills?.items?.length) {
-      const skillsText = cvData.skills.items.join(' | ');
-      const skillLines = Math.ceil(skillsText.length / 85);
-      totalContentHeight += 60 + (skillLines * 20);
-    }
-    
-    // Education section
-    if (cvData.education?.items?.length) {
-      totalContentHeight += 60; // Section header
-      cvData.education.items.forEach((edu: any) => {
-        totalContentHeight += 50; // Each education entry
-        if (edu.description) {
-          const descLines = Math.ceil(edu.description.length / 85);
-          totalContentHeight += descLines * 18;
-        }
-      });
-    }
-    
-    // Calculate pages
-    const pages = Math.max(1, Math.ceil(totalContentHeight / pageContentHeight));
-    setTotalPages(pages);
-    return pages;
-  }, [cvData]);
-
-  // Recalculate pages when CV data changes
-  useEffect(() => {
-    const newTotalPages = calculateTotalPages();
-    setTotalPages(newTotalPages);
-  }, [calculateTotalPages]);
+  // PDF rendering is now handled by PDFRenderer component
 
   // Memoized download handler for performance
   const handleDownload = useCallback(async (format: 'pdf' | 'docx' | 'latex') => {
@@ -218,11 +126,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
     }
   }, [setActiveSection]);
 
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+
 
   // Auto-save status display functions (updated to use proper texts)
   const getAutoSaveDisplay = () => {
@@ -280,28 +184,12 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
             {getAutoSaveDisplay()}
           </div>
 
-          {/* Pagination Controls - Subtle */}
-          {totalPages > 1 && (
+          {/* PDF Status Info */}
+          {browserPDF.pdfState.pdfUrl && (
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <button 
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-1 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeftIcon size={16} />
-              </button>
-              
-              <span className="text-xs font-medium min-w-[30px] text-center">
-                {currentPage}/{totalPages}
+              <span className="text-xs font-medium">
+                PDF Ready
               </span>
-              
-              <button 
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="p-1 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRightIcon size={16} />
-              </button>
             </div>
           )}
 
@@ -353,172 +241,96 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         </div>
       </div>
 
-      {/* Preview Content - Fixed Scale WYSIWYG */}
+      {/* BREAKTHROUGH: PDF Preview Content - EXACT same PDF as Download */}
       <div 
         ref={previewContainerRef}
         className="flex-1 bg-[#f3f4f6] p-3 flex flex-col items-center justify-center overflow-hidden" 
         onClick={handlePreviewClick}
       >
-        {/* DEBUG: PDF Preview State - Temporary for troubleshooting */}
-        {pdfPreview && (
-          <div className="absolute top-2 left-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded z-50">
-            PDF: {pdfPreview.pdfState.pdfUrl ? 'Ready' : 'None'} | 
-            Gen: {pdfPreview.pdfState.isGenerating ? 'Yes' : 'No'} | 
-            Typing: {pdfPreview.isUserTyping ? 'Yes' : 'No'} |
-            Error: {pdfPreview.pdfState.error ? 'Yes' : 'No'}
-          </div>
-        )}
-        {/* PDF PREVIEW SYSTEM - Clean Display Like Resume.io */}
+        {/* ACTUAL PDF PREVIEW SYSTEM - Clean Display Like Resume.io */}
         <div className="relative w-full h-full flex items-center justify-center bg-white">
           <div className="w-full h-full overflow-hidden relative"
                style={{
                  maxWidth: '794px', // A4 width
                  maxHeight: '1123px', // A4 height
-                 transform: 'scale(var(--preview-scale, 1))',
+                 transform: 'scale(0.9)', // Fixed scale for clean display
                  transformOrigin: 'center center'
                }}>
             
-            {/* PDF Loading State */}
-            {pdfPreview?.pdfState.isGenerating && (
+            {/* PDF Generation Loading State */}
+            {browserPDF.pdfState.isGenerating && (
               <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
                   <p className="text-sm text-gray-600">Generating PDF preview...</p>
+                  <p className="text-xs text-gray-500 mt-1">Using EXACT same system as Download</p>
                 </div>
               </div>
             )}
 
-            {/* PDF Error State */}
-            {pdfPreview?.pdfState.error && (
-              <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10">
-                <div className="text-center p-4">
-                  <p className="text-sm text-red-600 mb-2">PDF Preview Error</p>
-                  <p className="text-xs text-gray-500">{pdfPreview.pdfState.error}</p>
+            {/* Error State */}
+            {browserPDF.pdfState.error && (
+              <div className="absolute inset-0 bg-red-50 flex items-center justify-center z-10">
+                <div className="text-center text-red-600">
+                  <p className="text-sm font-medium">PDF Generation Error</p>
+                  <p className="text-xs mt-1">{browserPDF.pdfState.error}</p>
                   <button 
-                    onClick={() => pdfPreview.triggerPDFGeneration(true)}
-                    className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                    onClick={() => browserPDF.triggerPDFGeneration(true)}
+                    className="mt-2 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
                   >
                     Retry
                   </button>
                 </div>
               </div>
             )}
-
-            {/* PDF Content Display - EXTENSIVE DEBUG VERSION */}
-            {(() => {
-              console.log('🔍 PreviewPanel: Rendering decision point');
-              console.log('🔍 PreviewPanel: pdfPreview exists:', !!pdfPreview);
-              console.log('🔍 PreviewPanel: pdfState:', pdfPreview?.pdfState);
-              console.log('🔍 PreviewPanel: pdfUrl exists:', !!pdfPreview?.pdfState?.pdfUrl);
-              console.log('🔍 PreviewPanel: pdfUrl value:', pdfPreview?.pdfState?.pdfUrl);
-              console.log('🔍 PreviewPanel: pdfUrl length:', pdfPreview?.pdfState?.pdfUrl?.length);
-              console.log('🔍 PreviewPanel: isGenerating:', pdfPreview?.pdfState?.isGenerating);
-              console.log('🔍 PreviewPanel: error:', pdfPreview?.pdfState?.error);
-              
-              return pdfPreview?.pdfState.pdfUrl ? (
-                /* Show PDF when available - EXTENSIVE DEBUG */
-                <div className="w-full h-full relative">
-                  {/* Debug Info Overlay */}
-                  <div className="absolute top-2 left-2 bg-black text-white p-2 text-xs z-50 rounded max-w-xs">
-                    <div>🔍 DEBUG INFO:</div>
-                    <div>PDF URL: {pdfPreview.pdfState.pdfUrl.substring(0, 40)}...</div>
-                    <div>Length: {pdfPreview.pdfState.pdfUrl.length}</div>
-                    <div>Generated: {pdfPreview.pdfState.lastGenerated ? new Date(pdfPreview.pdfState.lastGenerated).toLocaleTimeString() : 'Never'}</div>
-                    <div>Cached: {pdfPreview.pdfState.cached ? 'Yes' : 'No'}</div>
-                    <div>Generating: {pdfPreview.pdfState.isGenerating ? 'Yes' : 'No'}</div>
-                  </div>
-                  
-                  {/* Iframe with visible borders for debugging */}
-                  <iframe
-                    key={pdfPreview.pdfState.pdfUrl}
-                    src={`${pdfPreview.pdfState.pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0`}
-                    className="w-full h-full border-4 border-red-500"
-                    title="CV Preview"
-                    style={{
-                      minHeight: '600px',
-                      background: 'lightblue',
-                      border: '4px solid red'
-                    }}
-                    onLoad={(e) => {
-                      const iframe = e.target as HTMLIFrameElement;
-                      console.log('✅ PDF iframe LOADED successfully');
-                      console.log('✅ Iframe element:', iframe);
-                      console.log('✅ Iframe src:', iframe.src);
-                      console.log('✅ Iframe dimensions:', {
-                        width: iframe.offsetWidth,
-                        height: iframe.offsetHeight,
-                        clientWidth: iframe.clientWidth,
-                        clientHeight: iframe.clientHeight
-                      });
-                      
-                      // Try to access iframe content
-                      try {
-                        console.log('✅ Iframe contentDocument:', iframe.contentDocument);
-                        console.log('✅ Iframe contentWindow:', iframe.contentWindow);
-                      } catch (err) {
-                        console.log('⚠️ Cannot access iframe content (CORS):', (err as Error).message);
-                      }
-                    }}
-                    onError={(e) => {
-                      const iframe = e.target as HTMLIFrameElement;
-                      console.error('❌ PDF iframe FAILED to load');
-                      console.error('❌ Error event:', e);
-                      console.error('❌ Iframe src:', iframe?.src);
-                      console.error('❌ Error type:', e.type);
-                    }}
-                  />
-                </div>
-              ) : (
-              /* Show placeholder while PDF is being generated */
-              <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                  <div className="animate-pulse">
-                    <div className="w-16 h-16 bg-blue-200 rounded-full mx-auto mb-4"></div>
-                    <p className="text-gray-600">Preparing PDF preview...</p>
-                    <p className="text-sm text-gray-500 mt-2">This may take a few seconds</p>
-                  </div>
-                </div>
-              </div>
-            );
-            })()}
-
-            {/* PDF Cache Indicator */}
-            {pdfPreview?.pdfState.cached && (
-              <div className="absolute top-2 right-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                Cached
-              </div>
-            )}
+            
+            {/* BREAKTHROUGH: Direct PDF Viewer - ACTUAL PDF Display */}
+            <DirectPDFViewer
+              pdfUrl={browserPDF.pdfState.pdfUrl}
+              className="w-full h-full"
+              onLoadSuccess={() => {
+                console.log('✅ Direct PDF Viewer: PDF loaded successfully');
+                console.log('✅ PDF Preview: Shows EXACT IDENTICAL PDF as Download');
+              }}
+              onLoadError={(error) => {
+                console.error('❌ Direct PDF Viewer: Failed to load PDF:', error);
+              }}
+            />
           </div>
         </div>
 
-        {/* Pagination Controls - Always Visible for Multi-page CVs */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 py-3 border-t border-gray-200 bg-gray-50">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Previous page"
+        {/* Status Display */}
+        <div className="flex items-center justify-center py-2 text-xs text-gray-500">
+          {browserPDF.pdfState.cached && (
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              Cached PDF
+            </span>
+          )}
+          {!browserPDF.pdfState.cached && browserPDF.pdfState.pdfUrl && (
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+              Fresh PDF
+            </span>
+          )}
+          {browserPDF.isUserTyping && (
+            <span className="flex items-center gap-1 ml-4">
+              <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+              Typing...
+            </span>
+          )}
+          {/* DEBUG: Direct PDF download link for testing */}
+          {browserPDF.pdfState.pdfUrl && (
+            <a 
+              href={browserPDF.pdfState.pdfUrl} 
+              download="test-preview.pdf"
+              className="ml-4 text-blue-600 hover:text-blue-800 underline"
+              target="_blank"
             >
-              <ChevronLeftIcon className="w-4 h-4" />
-            </button>
-            
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-gray-600">Page</span>
-              <span className="font-medium text-gray-900">{currentPage}</span>
-              <span className="text-sm text-gray-600">of {totalPages}</span>
-            </div>
-            
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage >= totalPages}
-              className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Next page"
-            >
-              <ChevronRightIcon className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+              Test Download
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

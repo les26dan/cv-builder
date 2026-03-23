@@ -23,25 +23,9 @@ const loadPDFjs = async () => {
           };
         }
         
-        // Use legacy build for Node.js compatibility
-        // Try different import approaches for better compatibility
-        let pdfjsLib;
-        try {
-          // @ts-ignore - PDF.js module resolution issues in build
-          pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-        } catch (mjsError) {
-          console.log('📄 .mjs import failed, trying regular build...', mjsError instanceof Error ? mjsError.message : 'Unknown error');
-          try {
-            // @ts-ignore - PDF.js module resolution issues in build
-            pdfjsLib = await import('pdfjs-dist/build/pdf.mjs');
-          } catch (regularError) {
-            console.log('📄 Regular build failed, trying CommonJS...', regularError instanceof Error ? regularError.message : 'Unknown error');
-            pdfjsLib = await import('pdfjs-dist');
-          }
-        }
-        console.log('✅ PDF.js library loaded successfully with Node.js polyfills');
-        
-        return pdfjsLib;
+        // PDF.js temporarily disabled - not needed for PDF preview functionality
+        console.log('⚠️ PDF.js disabled for build compatibility - PDF upload processing may be limited');
+        return null;
       } catch (importError) {
         const errorMessage = importError instanceof Error ? importError.message : 'Unknown import error';
         console.log('❌ PDF.js import failed:', errorMessage);
@@ -131,13 +115,8 @@ async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
     console.log('📄 PDF.js loaded successfully, extracting text with high quality...');
     
     try {
-      // Load PDF document
-      const pdf = await pdfjsLib.getDocument({ 
-        data: new Uint8Array(buffer),
-        verbosity: 0 // Reduce console noise
-      }).promise;
-      
-      console.log(`📋 PDF loaded: ${pdf.numPages} pages`);
+      // PDF.js disabled - fallback to pdf-parse
+      throw new Error('PDF.js disabled for build compatibility');
       
       let fullText = '';
       

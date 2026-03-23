@@ -5,7 +5,7 @@ import { detectLanguage, type SupportedLanguage } from '../../config/languageCon
 
 // PDF Preview Integration - SAFETY: Additive import for input event handling
 import { PDFPreviewInput } from '../common/PDFPreviewInput';
-import { PDFPreviewDebounceReturn } from '../../hooks/usePDFPreviewDebounce';
+// PDF preview is now handled directly in PreviewPanel
 
 interface ContactSectionProps {
   data: {
@@ -18,7 +18,7 @@ interface ContactSectionProps {
   onUpdate: (data: any) => void;
   isActive: boolean;
   language?: SupportedLanguage;
-  pdfPreview?: PDFPreviewDebounceReturn; // SAFETY: Optional prop for PDF integration
+  // PDF preview is now handled directly in PreviewPanel - no props needed
 }
 
 interface ValidationErrors {
@@ -38,8 +38,7 @@ export const ContactSection = ({
   data,
   onUpdate,
   isActive,
-  language,
-  pdfPreview // SAFETY: Optional prop with default undefined
+  language // SAFETY: Optional prop with default undefined
 }: ContactSectionProps) => {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [emailSuggestion, setEmailSuggestion] = useState<EmailSuggestion | null>(null);
@@ -221,7 +220,7 @@ export const ContactSection = ({
           onBlur={e => handleBlur('fullName', e.target.value)}
           placeholder={contactTexts?.placeholders?.fullName || 'John Doe'}
           aria-invalid={!!errors.fullName}
-          pdfPreview={pdfPreview}
+
         />
         {errors.fullName && (
           <p className="text-red-500 text-xs mt-1 flex items-center">
