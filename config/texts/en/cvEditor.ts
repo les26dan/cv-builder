@@ -1,0 +1,316 @@
+export const cvEditor = {
+  sectionTitles: {
+    contact: 'Contact Information',
+    summary: 'Professional Summary',
+    experience: 'Work Experience',
+    skills: 'Skills',
+    education: 'Education',
+    projects: 'Projects',
+    achievements: 'Achievements',
+    languages: 'Languages',
+    certifications: 'Certifications',
+  },
+  header: {
+    backToWorkspace: 'Back to CV Workspace',
+    autoSave: {
+      saving: 'Saving...',
+      saved: 'Auto-saved',
+      error: 'Save failed',
+      offline: 'Offline mode',
+    },
+    userMenu: {
+      profile: 'Profile',
+      settings: 'Settings',
+      logout: 'Sign Out',
+    },
+  },
+
+  editorPanel: {
+    title: 'Edit CV',
+    addSection: 'Add New Section',
+    deleteSection: 'Delete Section',
+    reorderSections: 'Drag to reorder sections',
+    addSectionModal: {
+      title: 'Add New Section',
+      subtitle: 'Choose the type of section you want to add to your CV',
+      cancel: 'Cancel',
+    },
+    cvScore: {
+      title: 'Your resume score',
+      outOf: 'out of 100',
+      improving: 'Keep improving!',
+    },
+    jobAnalysis: {
+      title: 'Job Description Analysis',
+      subtitle: 'OkBuddy helps you analyze job descriptions and provides optimization suggestions for your CV',
+      placeholder: 'Paste the job description here to receive CV optimization suggestions...',
+      analyzeButton: 'Analyze',
+      analyzing: 'Analyzing...',
+      maxLength: 'Maximum 5000 characters',
+      errors: {
+        required: 'Please enter job description to analyze',
+        tooLong: 'Job description too long (maximum 5000 characters)',
+        analysisFailed: 'An error occurred while analyzing the job description. Please try again.',
+      },
+    },
+    suggestions: {
+      title: 'Optimization Suggestions',
+      apply: 'Apply',
+      dismiss: 'Dismiss',
+      noSuggestions: 'No suggestions available',
+    },
+    loadingEditor: 'Loading CV editor...',
+    editorError: 'CV editor encountered an issue. Please try again later.',
+  },
+  sections: {
+    contact: {
+      title: 'Contact Information',
+      fields: {
+        fullName: 'Full Name',
+        email: 'Email',
+        phone: 'Phone',
+        location: 'Location',
+        linkedin: 'LinkedIn Profile',
+        website: 'Website',
+      },
+      placeholders: {
+        fullName: 'John Doe',
+        email: 'your.email@example.com',
+        phone: '+1 (555) 123-4567',
+        location: 'City, State/Country',
+        linkedin: 'linkedin.com/in/yourprofile',
+        website: 'yourwebsite.com',
+      },
+      validation: {
+        requiredField: 'Please enter',
+        invalidEmail: 'Please enter a valid email address',
+        invalidPhone: 'Please enter a valid phone number',
+      },
+    },
+    summary: {
+      title: 'Professional Summary',
+      guidance: 'Write 2-4 concise & energetic sentences to capture attention! Present your role, experience & most importantly - biggest achievements, best skills and qualities.',
+      placeholder: 'Brief summary of your experience and career objectives...',
+      placeholderSimple: 'Write a summary about your experience and career goals...',
+      aiHelper: 'Generate with AI',
+      aiImprove: 'Improve Summary',
+      characterCount: 'characters',
+      recommended: 'Recommended: 150-300 characters',
+      generating: 'Generating content...',
+      generateWithAI: 'Generate Summary with AI',
+      improveError: 'Unable to improve summary. Please try again.',
+      emptyState: {
+        title: 'Start easier!',
+        description: 'Begin with work experience so AI can help write a better summary',
+        navigateButton: 'Go to Work Experience',
+        orAlternative: 'Or you can write a summary directly'
+      },
+    },
+    experience: {
+      title: 'Work Experience',
+      addExperience: 'Add Work Experience',
+      guidance: 'Just enter job title and company name - OkBuddy AI will help you create a work experience description instantly.',
+      aiGuidance: 'Fill in job title and company name so AI can help create the perfect job description for you.',
+      fields: {
+        title: 'Job Title',
+        company: 'Company',
+        location: 'Location',
+        startDate: 'Start Date',
+        endDate: 'End Date',
+        current: 'I currently work here',
+        description: 'Description',
+        achievements: 'Key Achievements',
+      },
+      placeholders: {
+        title: 'e.g., Software Engineer',
+        company: 'ABC Corporation',
+        location: 'e.g., San Francisco, CA',
+        startDate: 'MM/YYYY',
+        endDate: 'MM/YYYY',
+        description: 'Describe your main responsibilities and duties...',
+        achievements: 'List your key achievements and accomplishments...',
+      },
+      bullets: {
+        add: 'Add Achievement',
+        placeholder: 'Describe a specific achievement or responsibility...',
+        remove: 'Remove',
+        aiGenerate: 'Improve with OkBuddy AI',
+        characterLimit: {
+          tooLong: 'This bullet point is quite long ({length}/200 characters). Consider splitting it into two bullet points.',
+          canShorten: '💡 {length}/200 characters',
+        },
+        templateSelection: {
+          title: 'Choose bullet template',
+          description: 'Choose a template that fits your experience. You can fill in the parts [in brackets] with your specific information.',
+          closeLabel: 'Close',
+          jobTitleHint: 'Suggestion for position:',
+          selectButton: 'Select',
+          exampleLabel: 'Example:',
+          templates: {
+            achievement: {
+              title: 'Achievement with results',
+              content: 'Led [team/project] to [achieve goal], resulting in [specific impact].',
+              example: 'Led team of 5 engineers to deploy new CRM system, resulting in 30% improved efficiency.'
+            },
+            implementation: {
+              title: 'Project implementation',
+              content: 'Implemented [project/initiative] that helped [achieved result].',
+              example: 'Implemented automated reporting process that helped reduce processing time by 50%.'
+            },
+            improvement: {
+              title: 'Process improvement',
+              content: 'Improved [process/metric] by [X%] through [specific action].',
+              example: 'Improved customer conversion rate by 25% through sales process optimization.'
+            },
+            collaboration: {
+              title: 'Team collaboration',
+              content: 'Collaborated with [department/team] to [achieve goal], resulting in [positive outcome].',
+              example: 'Collaborated with design and development teams to launch new feature, increasing customer satisfaction by 20%.'
+            },
+            management: {
+              title: 'Management and leadership',
+              content: 'Managed [team/resources] to [achieve goal], ensuring [quality outcome].',
+              example: 'Managed team of 8 staff to complete project on time, ensuring high quality and budget compliance.'
+            },
+            problemSolving: {
+              title: 'Problem solving',
+              content: 'Solved [problem/challenge] by [method], leading to [positive result].',
+              example: 'Solved system performance issues by optimizing database, reducing response time by 60%.'
+            }
+          }
+        }
+      },
+      validation: {
+        titleRequired: 'Please enter job title',
+        companyRequired: 'Please enter company name',
+        endBeforeStart: 'End date must be after start date',
+        startAfterEnd: 'Start date must be before end date',
+        aiRequirement: 'Please fill in job title and company to use AI assistance',
+        aiDescription: 'Please enter job title and company before generating description',
+      },
+      messages: {
+        deleteConfirm: 'Are you sure you want to delete this work experience?',
+        aiRequiredAlert: 'Please fill in job title and company to use AI assistance',
+        aiGenerationRequiredAlert: 'Please enter job title and company before using AI',
+        aiDescriptionRequiredAlert: 'Please enter job title and company before generating description',
+        improveDescriptionError: 'Unable to improve description. Please try again.',
+        improveDescriptionGeneralError: 'An error occurred while improving description. Please try again.',
+        basicInfoHint: 'Start with basic information',
+        buildExperienceTitle: 'Build Impressive Work Experience in 5 Seconds!',
+      },
+    },
+    skills: {
+      title: 'Skills',
+      addSkill: 'Add Skill',
+      guidance: 'Choose 5-10 skills most relevant to the position you\'re applying for.',
+      categories: {
+        technical: 'Technical Skills',
+        soft: 'Soft Skills',
+        languages: 'Languages',
+        tools: 'Tools & Software',
+      },
+      placeholder: 'Add skills... (e.g., Python, Time Management, Adobe Photoshop) - Separate multiple skills with commas',
+      aiSuggestions: 'Skill Suggestions',
+      clearAll: 'Clear All',
+      clearAllTitle: 'Remove all skills',
+      removeSkillTitle: 'Remove this skill',
+      validation: {
+        alreadyAdded: 'This skill has already been added',
+        limitReached: 'Reached limit of 8 skills. Please remove less important skills before adding new ones.',
+        allSuggestionsExist: 'All suggested skills are already in the list',
+        generateError: 'Unable to generate skill suggestions. Please try again.',
+        generalError: 'An error occurred while generating skill suggestions. Please try again.',
+      },
+      aiSuccess: {
+        multiple: 'Skills expertly matched to strengthen your profile based on your experience and target position. Review and add the ones that best showcase your value.',
+        single: 'Skill expertly matched to enhance your profile based on your experience and target position. Add to showcase your strengths.',
+      },
+      confirmations: {
+        clearAll: 'Are you sure you want to remove all skills? This action cannot be undone.',
+      },
+    },
+    education: {
+      title: 'Education',
+      addEducation: 'Add Education',
+      itemTitle: 'Education',
+      fields: {
+        degree: 'Degree and Major',
+        institution: 'Institution',
+        location: 'Location',
+        graduationDate: 'Graduation Date',
+        gpa: 'GPA (optional)',
+        description: 'Description',
+      },
+      placeholders: {
+        degree: 'e.g., Bachelor of Science in Computer Science',
+        institution: 'e.g., University of California',
+        location: 'e.g., Berkeley, CA',
+        graduationDate: 'MM/YYYY',
+        gpa: 'e.g., 3.8/4.0',
+        description: 'Relevant coursework, honors, activities...',
+      },
+      validation: {
+        degreeRequired: 'Please enter degree and major',
+      },
+      confirmations: {
+        delete: 'Are you sure you want to delete this education?',
+      },
+    },
+  },
+  preview: {
+    title: 'CV Preview',
+    pageCounter: 'Page {{current}} of {{total}}',
+    actions: {
+      download: 'Download',
+      previewPDF: 'Preview your resume in PDF',
+      print: 'Print',
+      share: 'Share',
+    },
+    downloading: 'Preparing download...',
+    formats: {
+      pdf: 'PDF',
+      word: 'Word',
+    },
+  },
+  notifications: {
+    aiSuccess: '✨ Success!',
+    parsing: {
+      success: 'CV Successfully Parsed!',
+      successMessage: 'Your CV has been analyzed and populated automatically.',
+      error: 'Parsing Failed',
+      errorMessage: 'Unable to extract CV information. Please fill manually.',
+    },
+    save: {
+      success: 'CV saved successfully',
+      error: 'Failed to save CV',
+      offline: 'Changes saved locally (offline)',
+    },
+  },
+  availableSections: {
+    projects: { name: 'Projects', description: 'Completed projects' },
+    volunteer: { name: 'Volunteer Work', description: 'Volunteer and social experience' },
+    certifications: { name: 'Certifications', description: 'Professional certifications' },
+    languages: { name: 'Languages', description: 'Languages known' },
+    hobbies: { name: 'Hobbies', description: 'Personal interests' },
+    custom: { name: 'Custom Section', description: 'Create new section with custom content' },
+  },
+  errors: {
+    loadFailed: 'Failed to load CV data',
+    saveFailed: 'Failed to save CV',
+    validationFailed: 'Please fill in required fields',
+    networkError: 'Network error. Please check your connection.',
+  },
+  common: {
+    required: 'required',
+    optional: 'optional',
+    add: 'Add',
+    remove: 'Remove',
+    edit: 'Edit',
+    delete: 'Delete',
+    save: 'Save',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    yes: 'Yes',
+    no: 'No',
+  },
+} as const

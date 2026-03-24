@@ -1,0 +1,1 @@
+{"sessionId":"test-session","environment":"local","metrics":[{"name":"fcp","value":800,"timestamp":1640995200000,"url":"http://localhost:3000"}],"errors":[],"timestamp":1640995200000,"url":"http://localhost:3000","userAgent":"test-agent","receivedAt":"2025-08-23T08:37:26.350Z"}

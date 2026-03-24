@@ -1,0 +1,16 @@
+John Doe
+Software Engineer
+john.doe@email.com
++1-555-123-4567
+
+EXPERIENCE
+Software Engineer at Tech Corp (2020-2023)
+- Developed web applications using React and Node.js
+- Improved application performance by 40%
+
+EDUCATION  
+Bachelor of Science in Computer Science
+University of Technology (2016-2020)
+
+SKILLS
+JavaScript, Python, React, Node.js, Docker

@@ -1,0 +1,129 @@
+{
+  "possibility_score": [
+    10
+  ],
+  "contact": {
+    "full_name": "TUAN ANH NGUYEN",
+    "address": "",
+    "email": "tuananh.email001@gmail.com",
+    "phone": "+84 988 221015",
+    "linkedin": ""
+  },
+  "summary": "Starting his career as an electronic engineer when just graduated from HCM University of Technology (Polytechnic) in 2008, Tuan Anh has moved to Supply Chain Management area (Intel) and latterly in Real Estate - Office Leasing & Investment area after he finished his Master of Business Administration course in Sydney, Australia in 2011. His career achievement is listed as the top three papers submitted for Intel Manufacturing Excellence Conference in planning organization world-wide in 2014, successful leading planning team’s project for transferring CPU products from Intel Malaysia to Intel Vietnam in 2015. Found Vietnam Office Leasing Co. Ltd, in 2017 and made it become profitable business operation from 2017 to 2020. His strengths are expertise in Production Planning, Office Management, Real Estate Investment, Property Management, Business Financial Analysis, Company starting up and Professional Networking.",
+  "work_experience": [
+    {
+      "position": "DEPUTY ASSOCIATE DIRECTOR",
+      "company": "COLLIERS",
+      "location": "",
+      "start_date": "June 2022",
+      "end_date": "Present",
+      "bullets": [
+        "Joined Office Services team to provide office leasing consulting services to top high-end Buildings (Grade A, A+) to high-grade international companies in HCM.",
+        "Supporting international and domestic clients, and planning for their office leasing include strategy go-stay analysis, searching for contingency options, leasing negotiation, leasing document submission and review.",
+        "Landlord representative for a grade B building- Central Plaza building- 17 Le Duan Street.",
+        "Acquiring new clients via professional networking and customer relationship activities."
+      ]
+    },
+    {
+      "position": "FOUNDER & CEO",
+      "company": "VIETNAM OFFICE LEASING",
+      "location": "",
+      "start_date": "Jan 2017",
+      "end_date": "May 2022",
+      "bullets": [
+        "Founded Vietnam Office Leasing (VOL) CO., LTD to provide building management services, office searching services and office leasing to small & medium enterprises in Ho Chi Minh City.",
+        "Strategic planning for office leasing business. Weekly operation and finance status review.",
+        "Financial analysis for acquiring any new buildings, all cost management.",
+        "Negotiation and contracting to building owners, customers, sub-contractors, suppliers and supplement services."
+      ]
+    },
+    {
+      "position": "DEPUTY MANAGING DIRECTOR",
+      "company": "DSG VIETNAM",
+      "location": "",
+      "start_date": "Oct 2015",
+      "end_date": "Dec 2016",
+      "bullets": [
+        "Joining Digital Solution Company (DSG) CO., LTD as a deputy managing director responsible for maintaining ISO9001 standard for the company, direct managing department heads such as Accounting & Finance, Sale, Technical product training, Software Development, Customer services and Admin team.",
+        "Manage internal projects such as upgrading ERP system, ISO 9001 new version implementation, compiling company training materials for software and hardware of company’s product.",
+        "Support Managing Director to issue and control the implementation of company’s policies and procedures.",
+        "Manage accounts of large enterprise customers in Banks, Insurances, FMCG, and pharmaceutical."
+      ]
+    },
+    {
+      "position": "FACTORY PLANNER",
+      "company": "INTEL VN & MALAYSIA",
+      "location": "",
+      "start_date": "June 2014",
+      "end_date": "Sep 2015",
+      "bullets": [
+        "Working as a production planner for Intel products in Malaysia and Vietnam as a same time, the role was to make sure Intel customers have the right supply from Manufacturing in the 2 countries.",
+        "Communicate with upstream factories/ organizations regarding resource availability (piece parts, factory capacity and die) to support weekly commit.",
+        "Working with logistic managers to make sure raw materials are ship to Vietnam factory without any delay and at saving cost mode of shipment, and finished goods will be distributed to customers’ warehouse on time without any quality issue.",
+        "Closely work with custom team for any new products and material that will come to Vietnam factory."
+      ]
+    },
+    {
+      "position": "SUPPLY MANAGEMENT ANALYST",
+      "company": "INTEL VIETNAM",
+      "location": "",
+      "start_date": "June 2012",
+      "end_date": "May 2014",
+      "bullets": [
+        "Joining Intel Vietnam as a supply management analyst with main responsible is producing flawless execution plan that can bring Vietnam factory performance to serve Intel customers.",
+        "Own and manage manufacturing assembly/test wip, inventory and product parameters.",
+        "Closely work with manufacturing, integration, engineers and quality divisions on product commitments, product quality and product detail execution.",
+        "Joining continuous improvement activities results in working process improvement which cut waste and reducing lead time."
+      ]
+    },
+    {
+      "position": "HARDWARE ENGINEER",
+      "company": "RENESAS DESIGN VIETNAM",
+      "location": "",
+      "start_date": "Mar 2008",
+      "end_date": "Feb 2009",
+      "bullets": [
+        "Worked as a hardware-design engineer in Japanese professional working environment to make sure every electronic designed module was implemented test circuits."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Master of Business Administration",
+      "institution": "University of Technology, Sydney",
+      "location": "",
+      "graduationDate": "2011",
+      "description": "Mentored, coached & tutored peers, team members during tutorials, seminars & workshops as a means of collaborative problem solving & decision making."
+    },
+    {
+      "degree": "Master of Engineering Management",
+      "institution": "University of Technology, Sydney",
+      "location": "",
+      "graduationDate": "2010",
+      "description": "Focused studies on working with teams in a practical engineering environment; and in particular leading teams of engineers in a vast spectrum of specialties to achieve an outcome in desired projects based on real life case studies."
+    },
+    {
+      "degree": "Bachelor of Electronic & Telecommunication Engineering",
+      "institution": "University of Polytechnic, Ho Chi Minh City (HCMUT)",
+      "location": "",
+      "graduationDate": "2008",
+      "description": ""
+    },
+    {
+      "degree": "Professional C.E.O assistant",
+      "institution": "Toppion Training & Consulting group, HCM city",
+      "location": "",
+      "graduationDate": "2013",
+      "description": ""
+    }
+  ],
+  "skills": [
+    "Production Planning",
+    "Office Management",
+    "Real Estate Investment",
+    "Property Management",
+    "Business Financial Analysis",
+    "Company starting up",
+    "Professional Networking"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-08-23T09:00:37.189Z",
+  "data": {
+    "summary": {
+      "totalSessions": 0,
+      "totalErrors": 0,
+      "criticalErrors": 0,
+      "averageMetrics": {
+        "fcp": 0,
+        "lcp": 0,
+        "ttfb": 0
+      }
+    },
+    "performance": {},
+    "errors": {
+      "byType": {},
+      "bySeverity": {},
+      "total": 0
+    },
+    "vercel": {
+      "coldStarts": 0,
+      "timeouts": 0,
+      "highMemoryUsage": 0,
+      "totalMetrics": 0
+    },
+    "trends": {},
+    "alerts": []
+  }
+}

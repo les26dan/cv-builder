@@ -1,0 +1,84 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Persistent server logs
+server-persistent.log
+server.pid
+
+# PERMANENT FIX: Enhanced cache and build artifact exclusions
+# Webpack cache
+.webpack/
+.cache/
+node_modules/.cache/
+
+# Build artifacts
+.next/cache/
+.next/server/
+.next/static/
+.next/trace
+
+# TypeScript incremental compilation
+.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Jest cache
+/coverage
+.nyc_output
+
+# Temporary files
+.tmp/
+temp/
+*.tmp
+*.log
+
+# Lock files (when needed for debugging)
+# package-lock.json
+# yarn.lock
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Webpack bundle analyzer
+.webpack-bundle-analyzer/ Projects/
+Workflow Files/
