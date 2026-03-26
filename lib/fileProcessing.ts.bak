@@ -105,6 +105,112 @@ async function extractPDFText(buffer: Buffer): Promise<ProcessedFileResult> {
     // PDF.js disabled for build compatibility - use pdf-parse directly
     console.log('📄 PDF.js disabled for build compatibility - using pdf-parse fallback...');
     return await extractPDFTextWithPdfParse(buffer);
+      
+      // Extract text from each page
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        try {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          
+          // Extract text items with proper positioning and line breaks
+          const allItems = textContent.items;
+          console.log(`🔍 Page ${pageNum}: Found ${allItems.length} total text items`);
+          
+          const textItems = allItems
+            .filter((item: any) => item.str && typeof item.str === 'string')
+            .map((item: any) => ({
+              text: item.str.trim(),
+              x: item.transform[4],
+              y: item.transform[5]
+            }))
+            .filter((item: any) => item.text.length > 0);
+            
+          console.log(`🔍 Page ${pageNum}: ${textItems.length} valid text items after filtering`);
+          console.log('🔍 First 10 text items:', textItems.slice(0, 10).map(item => `"${item.text}" at (${item.x}, ${item.y})`));
+          
+          // Sort by Y position (top to bottom) then X position (left to right)
+          textItems.sort((a, b) => {
+            const yDiff = b.y - a.y; // Reverse Y (PDF coordinates are bottom-up)
+            if (Math.abs(yDiff) > 5) return yDiff; // Different lines
+            return a.x - b.x; // Same line, sort by X
+          });
+          
+          // Group text items by approximate line position
+          const lines: string[] = [];
+          let currentLine = '';
+          let lastY = textItems[0]?.y || 0;
+          
+          for (const item of textItems) {
+            // If Y position changed significantly, start new line
+            if (Math.abs(item.y - lastY) > 5) {
+              if (currentLine.trim()) {
+                lines.push(currentLine.trim());
+              }
+              currentLine = item.text;
+            } else {
+              // Same line, add with space
+              currentLine += (currentLine ? ' ' : '') + item.text;
+            }
+            lastY = item.y;
+          }
+          
+          // Add the last line
+          if (currentLine.trim()) {
+            lines.push(currentLine.trim());
+          }
+          
+          // Join lines with proper line breaks
+          const pageText = lines.join('\n');
+          if (pageText.trim()) {
+            fullText += pageText + '\n\n';
+          }
+          
+          console.log(`📄 Page ${pageNum}: Extracted ${pageText.length} characters`);
+        } catch (pageError) {
+          console.warn(`⚠️ Failed to extract text from page ${pageNum}:`, pageError);
+          // Continue with other pages
+        }
+      }
+      
+      // Clean up the extracted text
+      const cleanedText = fullText
+        .replace(/\n{3,}/g, '\n\n') // Remove excessive line breaks
+        .replace(/\s{2,}/g, ' ')    // Replace multiple spaces with single space
+        .trim();
+      
+      console.log(`✅ PDF.js extraction complete: ${cleanedText.length} characters from ${pdf.numPages} pages`);
+      
+      if (cleanedText.length === 0) {
+        return {
+          success: false,
+          error: 'No text content found in PDF - may be image-based',
+          metadata: {
+            pageCount: pdf.numPages,
+            wordCount: 0,
+            fileType: 'pdf'
+          }
+        };
+      }
+      
+      return {
+        success: true,
+        text: cleanedText,
+        metadata: {
+          pageCount: pdf.numPages,
+          wordCount: cleanedText.split(/\s+/).length,
+          fileType: 'pdf'
+        }
+      };
+      
+    } catch (extractError) {
+      const errorMessage = extractError instanceof Error ? extractError.message : 'Unknown extraction error';
+      console.error('❌ PDF.js text extraction failed:', errorMessage);
+      
+      // Try pdf-parse as fallback
+      console.log('🔄 PDF.js failed, trying pdf-parse fallback...');
+      return await extractPDFTextWithPdfParse(buffer);
+    }
+    
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('❌ PDF text extraction failed:', errorMessage);

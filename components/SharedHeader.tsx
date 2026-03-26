@@ -19,6 +19,7 @@ const FeedbackModal = dynamic(() => import('./common/FeedbackModal').then(mod =>
 });
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 import { getTexts } from '../config/texts/index';
+import AICreditsCounter from './AICreditsCounter';
 
 interface UserSession {
   id: string;
@@ -423,6 +424,14 @@ export default function SharedHeader({
             {/* Elegant Separator */}
             <div className="text-gray-300 text-lg font-light">|</div>
           </div>
+
+          {/* AI Credits Counter */}
+          <AICreditsCounter 
+            userId={user?.id}
+            variant="header"
+            showLabel={true}
+            className="hidden sm:flex"
+          />
 
           {/* Auth Buttons / User Avatar */}
           <div className="flex flex-row justify-center items-center gap-4">
