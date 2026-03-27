@@ -1,5 +1,34 @@
 # Technical Debt Registry
-**Last Updated**: January 2025 (PDF Preview Revamp - CRITICAL FAILURE)
+**Last Updated**: September 2025 (Git Workflow Safety - CRITICAL INCIDENT)
+
+## 🚨 **GIT WORKFLOW SAFETY - CRITICAL INCIDENT** (September 2025)
+**Status**: RESOLVED - SYSTEMIC WORKFLOW ISSUE
+**Priority**: P0 - CRITICAL (Nearly lost 6+ hours of monetization work)
+**Effort**: 2+ hours to investigate and recover
+**Impact**: Silent data loss during merge conflict resolution
+
+### **Issue Description**
+Dangerous Git workflow nearly caused catastrophic loss of 443 files containing AI credits system, local CV storage, and monetization features. Root cause: Misunderstanding of `git checkout --ours` during unrelated history merge.
+
+### **Technical Debt Items**
+1. **No pre-merge backup protocol** - Merges performed without safety nets
+2. **Unclear conflict resolution strategy** - Confusion about `--ours` vs `--theirs` semantics
+3. **No post-merge verification** - Changes not immediately tested after merge
+4. **Missing Git workflow documentation** - No standardized procedures for complex merges
+
+### **Immediate Actions Taken**
+- ✅ Restored all lost files from backup
+- ✅ Documented incident in biggest-lessons.md
+- ✅ Created mandatory pre-merge safety protocol
+- ✅ All changes committed and pushed to origin/monetization
+
+### **Required Long-term Actions**
+1. **Create Git workflow documentation** with mandatory safety protocols
+2. **Implement pre-commit hooks** to prevent dangerous operations
+3. **Add automated backup scripts** for major Git operations
+4. **Training on Git conflict resolution** best practices
+
+**Recovery**: Only possible due to proactive backup creation at session start.
 
 ## 🚨 **PDF PREVIEW REVAMP - CRITICAL FAILURE** (January 2025)
 **Status**: BLOCKER - SYSTEM MALFUNCTION
