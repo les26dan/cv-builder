@@ -23,7 +23,7 @@
 ├── login/           # Authentication pages with OAuth integration
 ├── cv-workspace/    # User dashboard with real database CV loading
 ├── cv-upload/       # Dual-path upload (existing CV + template)
-├── cv-guided-editing/[cvId]/  # Real-time collaborative editing
+├── cv-guided-editing/[cvId]/  # Real-time collaborative editing with PDF preview
 └── api/             # 19 API routes for CV processing and auth
 
 /components/         # React UI components
@@ -38,9 +38,19 @@
 └── fileProcessing.ts # PDF parsing with triple-fallback system
 
 /shared/            # Cross-application services
-├── services/       # AI integration, analytics, data persistence
+├── services/       # AI integration, analytics, data persistence, PDF generation
 ├── contexts/       # React context for CV workflow management
 └── types/          # TypeScript interfaces and schemas
+
+/services/          # PDF Generation Services
+├── pdfGenerationService.ts    # jsPDF-based PDF generation (legacy)
+├── browserPdfService.ts       # HTML-to-PDF browser engine (new)
+└── [other services]
+
+/hooks/             # Custom React Hooks
+├── usePDFPreviewDebounce.ts   # PDF preview with 3-second debouncing
+├── useBrowserPDFPreview.ts    # Browser-based PDF generation hook
+└── [other hooks]
 
 /config/            # Configuration management
 ├── texts/          # Centralized copy management (EN/VI languages)
@@ -438,6 +448,187 @@ cv_data._optimization: {
 - All 9 tables: OPERATIONAL
 - OAuth infrastructure: READY
 - Security systems: ACTIVE
+
+---
+
+## 🏦 **AI CREDITS MONETIZATION SYSTEM** (September 2025)
+
+### **Architecture Overview**
+The monetization system implements a credit-based model where users consume AI credits for advanced features. Built with enterprise-grade security and scalability.
+
+### **Database Schema**
+```sql
+-- Core credits tracking
+ALTER TABLE users ADD COLUMN ai_credits_balance INTEGER DEFAULT 5;
+ALTER TABLE users ADD COLUMN ai_credits_used INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN ai_credits_purchased INTEGER DEFAULT 0;
+
+-- Transaction audit trail
+CREATE TABLE ai_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  transaction_type TEXT NOT NULL, -- 'purchase', 'usage', 'refund'
+  credits_amount INTEGER NOT NULL,
+  feature_used TEXT, -- NULL for purchases
+  payment_method TEXT, -- 'momo', 'vietcombank', 'card', 'paypal'
+  payment_status TEXT DEFAULT 'pending',
+  amount_paid DECIMAL(10,2),
+  currency TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Referral system (future implementation)
+CREATE TABLE user_referrals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  referrer_id UUID REFERENCES users(id),
+  referee_id UUID REFERENCES users(id),
+  credits_awarded INTEGER DEFAULT 5,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### **Service Layer Architecture**
+```typescript
+// Core AI Credits Service - shared/services/aiCreditsService.ts
+class AICreditsService {
+  // Credit management
+  async getCreditsBalance(userId: string): Promise<number>
+  async deductCredits(userId: string, amount: number): Promise<boolean>
+  async addCredits(userId: string, amount: number): Promise<boolean>
+  
+  // Feature gating
+  async executeWithCredits<T>(
+    userId: string, 
+    feature: AIFeature, 
+    operation: () => Promise<T>
+  ): Promise<AIResult<T>>
+  
+  // Payment processing
+  async processPurchase(userId: string, package: CreditPackage): Promise<PaymentResult>
+}
+
+// AI Feature Gating Hook - hooks/useAIFeatureGating.ts
+const useAIFeatureGating = (userId?: string) => {
+  const [credits, setCredits] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  
+  const executeAIFeature = async (feature: AIFeature, operation: () => Promise<any>) => {
+    // Credit validation and deduction logic
+  };
+  
+  return { credits, executeAIFeature, loading };
+};
+```
+
+### **UI Components**
+```typescript
+// AI Credits Counter (Header) - components/AICreditsCounter.tsx
+<AICreditsCounter 
+  userId={user?.id}
+  variant="header"
+  showLabel={true}
+  className="hidden sm:flex"
+/>
+
+// AI Credits Paywall - components/AICreditsPaywall.tsx
+<AICreditsPaywall
+  isOpen={showPaywallModal}
+  onClose={closePaywallModal}
+  currentCredits={userCredits}
+  userId={userId}
+  reason="no_credits" | "low_credits" | "guest_user"
+/>
+```
+
+### **Credit Packages & Pricing**
+```typescript
+// Geographic pricing with automatic detection
+const CREDIT_PACKAGES = {
+  vietnam: [
+    { credits: 10, price: 249000, currency: 'VND', popular: false },
+    { credits: 25, price: 369000, currency: 'VND', popular: true },
+    { credits: 50, price: 869000, currency: 'VND', popular: false }
+  ],
+  international: [
+    { credits: 10, price: 9.99, currency: 'USD', popular: false },
+    { credits: 25, price: 14.99, currency: 'USD', popular: true },
+    { credits: 50, price: 34.99, currency: 'USD', popular: false }
+  ]
+};
+```
+
+### **AI Feature Gating Implementation**
+```typescript
+// Gated AI Features (1 credit each)
+const AI_FEATURES = {
+  SUMMARY_GENERATION: 'Generate with AI',
+  SUMMARY_IMPROVEMENT: 'Improve Summary', 
+  SKILLS_SUGGESTIONS: 'AI Skill Suggestions',
+  WORK_EXPERIENCE_WIZARD: 'Add Experience Wizard',
+  ACHIEVEMENT_WIZARD: 'Add Achievement Wizard',
+  BULLET_IMPROVEMENT: 'Individual bullet AI improvement'
+};
+
+// Integration in components
+const handleAIFeature = async (feature: AIFeature) => {
+  if (!userId) {
+    // Show login requirement for guest users
+    setShowLoginModal(true);
+    return;
+  }
+  
+  const result = await executeAIFeature(feature, () => callAIService());
+  if (result.success) {
+    // Update UI with AI-generated content
+  } else if (result.error === 'insufficient_credits') {
+    // Show paywall modal
+    setShowPaywallModal(true);
+  }
+};
+```
+
+### **Payment System Integration**
+```typescript
+// Vietnam Payment Methods
+const VIETNAM_PAYMENTS = {
+  momo: {
+    display: 'MoMo QR Code',
+    instructions: 'Scan QR code with MoMo app'
+  },
+  vietcombank: {
+    display: 'Vietcombank Transfer',
+    account: '1234567890',
+    instructions: 'Transfer with order ID as reference'
+  }
+};
+
+// International Payment Methods  
+const INTERNATIONAL_PAYMENTS = {
+  stripe: {
+    display: 'Credit/Debit Card',
+    processor: 'Stripe',
+    currencies: ['USD', 'EUR', 'GBP']
+  },
+  paypal: {
+    display: 'PayPal',
+    processor: 'PayPal',
+    currencies: ['USD']
+  }
+};
+```
+
+### **Security & Compliance**
+- **Row Level Security**: All credit operations protected by RLS policies
+- **Server-side validation**: Credit deduction only on successful AI operations  
+- **Audit trail**: Complete transaction history for compliance
+- **Payment security**: Secure tokenization for card payments
+- **Data privacy**: Minimal collection, GDPR-compliant design
+
+### **Local CV Storage Integration**
+The AI Credits system builds on the local CV storage foundation:
+- **Guest users**: See 5 credits but require login to use AI features
+- **Seamless upgrade**: Login triggers instant credit access with data sync
+- **Zero data loss**: All CV progress preserved during authentication transition
 
 ---
 

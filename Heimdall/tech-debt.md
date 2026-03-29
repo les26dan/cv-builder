@@ -1,5 +1,40 @@
 # Technical Debt Registry
-**Last Updated**: September 2025 (Git Workflow Safety - CRITICAL INCIDENT)
+**Last Updated**: January 2025 (PDF Preview Implementation & Testing Issues)
+
+## 🔧 **PDF PREVIEW IMPLEMENTATION DEBT** (January 2025)
+**Status**: PARTIALLY RESOLVED - TESTING ISSUES REMAIN
+**Priority**: P1 - HIGH (Affects user experience and testing reliability)
+**Effort**: 4+ hours investigation and implementation
+**Impact**: Production build successful, but runtime and test failures
+
+### **Issue Description**
+Successfully implemented PDF preview system with HTML-to-PDF browser engine, but encountered significant testing infrastructure issues and runtime errors affecting homepage functionality.
+
+### **Technical Debt Items**
+1. **Test Infrastructure Issues** - 185 failed tests (35.5% success rate)
+   - Vitest configuration conflicts with TypeScript
+   - Test files using Vitest but TypeScript not configured for it
+   - Component prop mismatches in test files
+2. **Runtime Errors** - 500 errors on homepage and CV editing pages
+   - "Cannot read properties of undefined (reading 'call')" error
+   - Needs investigation of component initialization
+3. **Dead Code Cleanup** - Removed 106 lines of unreachable code in lib/fileProcessing.ts
+   - PDF.js disabled but legacy code remained causing TypeScript errors
+4. **Skills Data Structure Inconsistency** - Fixed across all export formats
+   - Mixed string/object formats causing [object Object] in exports
+
+### **Actions Taken**
+- ✅ Fixed TypeScript compilation errors (production build successful)
+- ✅ Implemented comprehensive PDF preview system
+- ✅ Added data validation to prevent race conditions
+- ✅ Normalized skills data across all export formats
+- ✅ Updated Heimdall documentation
+
+### **Required Follow-up Actions**
+1. **Fix test infrastructure** - Configure Vitest properly with TypeScript
+2. **Investigate runtime errors** - Debug 500 errors on homepage
+3. **Test suite cleanup** - Update test files to match current component interfaces
+4. **Performance validation** - Ensure PDF preview doesn't impact page load times
 
 ## 🚨 **GIT WORKFLOW SAFETY - CRITICAL INCIDENT** (September 2025)
 **Status**: RESOLVED - SYSTEMIC WORKFLOW ISSUE
@@ -29,6 +64,48 @@ Dangerous Git workflow nearly caused catastrophic loss of 443 files containing A
 4. **Training on Git conflict resolution** best practices
 
 **Recovery**: Only possible due to proactive backup creation at session start.
+
+## ⚠️ **AI CREDITS MONETIZATION - PENDING IMPLEMENTATIONS** (September 2025)
+**Status**: PARTIAL IMPLEMENTATION - CORE SYSTEM COMPLETE
+**Priority**: P2 - MEDIUM (Core monetization functional, advanced features pending)
+**Effort**: 8-12 hours for complete implementation
+**Impact**: Advanced AI features not yet monetized
+
+### **Issue Description**
+AI Credits monetization system core infrastructure is complete and functional, but 3 advanced AI features remain unimplemented for credit gating integration.
+
+### **Technical Debt Items**
+1. **Work Experience Wizard AI Gating** - Complex component integration pending
+   - Component: `components/common/WorkExperienceWizard.tsx`
+   - Required: Credit validation before AI wizard activation
+   - Complexity: High (multi-step wizard with AI integration points)
+
+2. **Achievement Wizard AI Gating** - New component creation and integration
+   - Component: Not yet created
+   - Required: Full achievement wizard with AI suggestions
+   - Complexity: High (new feature development + credit integration)
+
+3. **Bullet Improvement AI Gating** - Individual bullet point AI enhancement
+   - Component: Work experience section bullet points
+   - Required: Per-bullet AI improvement with credit deduction
+   - Complexity: Medium (existing UI + AI service integration)
+
+### **Current Status**
+- ✅ **Core Credits System**: Fully implemented and functional
+- ✅ **Payment Processing**: Manual verification system operational
+- ✅ **Basic AI Features**: Summary generation, improvement, skills suggestions gated
+- ❌ **Advanced AI Features**: 3 features pending implementation
+
+### **Implementation Requirements**
+1. **Credit Validation Integration**: Each feature needs `useAIFeatureGating` hook integration
+2. **UI Component Updates**: Add credit requirement indicators and paywall triggers
+3. **API Route Protection**: Ensure all AI endpoints validate credits before processing
+4. **Testing**: Comprehensive testing of credit deduction and error handling
+
+### **Business Impact**
+- **Revenue Impact**: Medium - Advanced features represent additional monetization opportunities
+- **User Experience**: Low - Core AI features functional, advanced features are enhancements
+- **Technical Risk**: Low - Core infrastructure stable, isolated feature implementations
 
 ## 🚨 **PDF PREVIEW REVAMP - CRITICAL FAILURE** (January 2025)
 **Status**: BLOCKER - SYSTEM MALFUNCTION
