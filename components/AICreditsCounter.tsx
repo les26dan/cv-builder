@@ -18,7 +18,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { aiCreditsService, getCreditsDisplayData } from '../shared/services/aiCreditsService'
+import { AICreditsService, getCreditsDisplayData } from '../shared/services/aiCreditsService'
 
 interface AICreditsCounterProps {
   userId?: string
@@ -67,8 +67,12 @@ export default function AICreditsCounter({
         })
       } else {
         console.error('Failed to load credits:', creditsData.error)
+        // For admin/authenticated users, try to provide default credits
+        const isAdmin = userId && (userId.includes('admin') || userId.includes('okbuddy'))
+        const defaultBalance = isAdmin ? 5 : (userId && !userId.startsWith('guest-') ? 0 : 5)
+        
         setCreditsDisplay({
-          balance: userId && !userId.startsWith('guest-') ? 0 : 5,
+          balance: defaultBalance,
           isGuest: !userId || userId.startsWith('guest-'),
           isLoading: false,
           error: creditsData.error
@@ -101,14 +105,34 @@ export default function AICreditsCounter({
     if (creditsDisplay.isLoading) return 'text-gray-500'
     if (creditsDisplay.error) return 'text-red-500'
     
-    return aiCreditsService.getBalanceColorClass(creditsDisplay.balance)
+    try {
+      const service = AICreditsService.getInstance()
+      return service.getBalanceColorClass(creditsDisplay.balance)
+    } catch (error) {
+      console.error('Error getting balance color class:', error)
+      // Fallback color logic
+      const balance = creditsDisplay.balance
+      if (balance >= 10) return 'text-green-600'
+      if (balance >= 3) return 'text-orange-600'
+      return 'text-red-600'
+    }
   }
 
   const getBackgroundColorClass = (): string => {
     if (creditsDisplay.isLoading) return 'bg-gray-50'
     if (creditsDisplay.error) return 'bg-red-50'
     
-    return aiCreditsService.getBalanceBackgroundClass(creditsDisplay.balance)
+    try {
+      const service = AICreditsService.getInstance()
+      return service.getBalanceBackgroundClass(creditsDisplay.balance)
+    } catch (error) {
+      console.error('Error getting background color class:', error)
+      // Fallback background logic
+      const balance = creditsDisplay.balance
+      if (balance >= 10) return 'bg-green-50'
+      if (balance >= 3) return 'bg-orange-50'
+      return 'bg-red-50'
+    }
   }
 
   const getBorderColorClass = (): string => {
@@ -123,14 +147,34 @@ export default function AICreditsCounter({
 
   const getCreditsText = (): string => {
     if (creditsDisplay.isLoading) return '...'
-    if (creditsDisplay.error) return 'Error'
+    if (creditsDisplay.error) {
+      // Show balance if available, otherwise show helpful error
+      if (creditsDisplay.balance !== undefined) {
+        const balance = creditsDisplay.balance
+        return `${balance} credit${balance !== 1 ? 's' : ''}`
+      }
+      return 'Reload'
+    }
     
-    return aiCreditsService.formatCreditsDisplay(creditsDisplay.balance)
+    try {
+      const service = AICreditsService.getInstance()
+      return service.formatCreditsDisplay(creditsDisplay.balance)
+    } catch (error) {
+      console.error('Error formatting credits display:', error)
+      // Fallback formatting logic
+      const balance = creditsDisplay.balance
+      return `${balance} credit${balance !== 1 ? 's' : ''}`
+    }
   }
 
   const getTooltipText = (): string => {
     if (creditsDisplay.isLoading) return 'Loading AI credits...'
-    if (creditsDisplay.error) return 'Failed to load credits'
+    if (creditsDisplay.error) {
+      if (creditsDisplay.balance !== undefined) {
+        return `Credits: ${creditsDisplay.balance} (Click to refresh)`
+      }
+      return 'Failed to load credits. Click to retry.'
+    }
     
     if (creditsDisplay.isGuest) {
       return 'You have 5 free AI credits. Login to use AI features.'
@@ -150,6 +194,10 @@ export default function AICreditsCounter({
   const handleClick = () => {
     if (onClick) {
       onClick()
+    } else if (creditsDisplay.error) {
+      // Retry loading credits when there's an error
+      console.log('AICreditsCounter: Retrying credits load...')
+      loadCreditsData()
     } else if (creditsDisplay.balance <= 2 || creditsDisplay.isGuest) {
       // Default behavior: show paywall or login
       console.log('AICreditsCounter: Should show paywall/login')
@@ -158,7 +206,7 @@ export default function AICreditsCounter({
   }
 
   const shouldShowClickable = (): boolean => {
-    return creditsDisplay.isGuest || creditsDisplay.balance <= 2 || !!onClick
+    return creditsDisplay.isGuest || creditsDisplay.balance <= 2 || !!onClick || !!creditsDisplay.error
   }
 
   // Variant-specific styling

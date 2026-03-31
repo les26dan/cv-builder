@@ -3,6 +3,8 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { AIAssistButton } from '../common/AIAssistButton';
 import { SuccessNotification } from '../common/SuccessNotification';
+import { useAIFeatureGating } from '../../hooks/useAIFeatureGating';
+import { AIFeature } from '../../shared/services/aiCreditsService';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports for performance optimization - these are heavy AI components
@@ -70,6 +72,10 @@ export const WorkExperienceSection = ({
   
   // Success notification state
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  
+  // AI Feature Gating - Get userId from cvData
+  const userId = cvData?.userId;
+  const { executeAIFeature } = useAIFeatureGating(userId);
   
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
@@ -419,9 +425,36 @@ export const WorkExperienceSection = ({
           responsibility: experienceData.responsibility || ''
         };
 
-        const result = await aiService.generateBulletFromWizard(request);
+        // 🔐 AI CREDITS GATING: Execute AI feature with credit validation
+        console.log('💰 Executing Work Experience Wizard with credits gating...');
+        const gatedResult = await executeAIFeature(
+          AIFeature.EXPERIENCE_WIZARD,
+          async () => {
+            console.log('💰 Credits validated, executing Work Experience Wizard AI...');
+            return await aiService.generateBulletFromWizard(request);
+          }
+        );
 
-        if (result.success && result.data) {
+        // Handle the result from AI feature gating
+        if (!gatedResult.success) {
+          if (gatedResult.needsLogin) {
+            console.log('🔑 User needs to login for AI features');
+            alert(experienceTexts?.messages?.loginRequired || 'Please login to use AI features');
+            return;
+          } else if (gatedResult.needsPayment) {
+            console.log('💳 User needs to purchase credits');
+            alert(experienceTexts?.messages?.creditsRequired || 'You need AI credits to use this feature. Please purchase credits to continue.');
+            return;
+          } else {
+            console.error('❌ AI feature execution failed:', gatedResult.error);
+            alert(experienceTexts?.messages?.generateError || 'An error occurred while generating content. Please try again.');
+            return;
+          }
+        }
+
+        // Process successful AI result
+        const result = gatedResult.data;
+        if (result && result.success && result.data) {
           const newExperience = {
             ...experienceData,
             bullets: [result.data]
@@ -443,7 +476,7 @@ export const WorkExperienceSection = ({
             [newExperience.id]: true
           }));
         } else {
-          console.error('Failed to generate bullet:', result.error);
+          console.error('Failed to generate bullet:', result?.error || 'Unknown error');
           const newExperience = {
             ...experienceData,
             bullets: ['']
@@ -990,10 +1023,36 @@ export const WorkExperienceSection = ({
 
 
       
-      // Use the new dedicated single bullet improvement method
-      const result = await aiService.improveSingleBullet(bulletToImprove, contextData);
+      // 🔐 AI CREDITS GATING: Execute AI feature with credit validation
+      console.log('💰 Executing bullet improvement with credits gating...');
+      const gatedResult = await executeAIFeature(
+        AIFeature.BULLET_IMPROVE,
+        async () => {
+          console.log('💰 Credits validated, executing bullet improvement AI...');
+          return await aiService.improveSingleBullet(bulletToImprove, contextData);
+        }
+      );
 
-      if (result.success && result.data) {
+      // Handle the result from AI feature gating
+      if (!gatedResult.success) {
+        if (gatedResult.needsLogin) {
+          console.log('🔑 User needs to login for AI features');
+          alert(experienceTexts?.messages?.loginRequired || 'Please login to use AI features');
+          return;
+        } else if (gatedResult.needsPayment) {
+          console.log('💳 User needs to purchase credits');
+          alert(experienceTexts?.messages?.creditsRequired || 'You need AI credits to use this feature. Please purchase credits to continue.');
+          return;
+        } else {
+          console.error('❌ AI feature execution failed:', gatedResult.error);
+          alert(experienceTexts?.messages?.improveDescriptionGeneralError || 'An error occurred while improving description. Please try again.');
+          return;
+        }
+      }
+
+      // Process successful AI result
+      const result = gatedResult.data;
+      if (result && result.success && result.data) {
         const updatedItems = [...data.items];
         updatedItems[experienceIndex].bullets[bulletIndex] = result.data;
         onUpdate({
@@ -1008,7 +1067,7 @@ export const WorkExperienceSection = ({
         // Mark AI as used for score calculation (will be implemented)
         // markAIUsed('workExperience');
       } else {
-        console.error('Failed to improve bullet:', result.error);
+        console.error('Failed to improve bullet:', result?.error || 'Unknown error');
         alert(experienceTexts?.messages?.improveDescriptionError || 'Unable to improve description. Please try again.');
       }
     } catch (error) {
