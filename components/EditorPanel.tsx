@@ -93,7 +93,7 @@ export const EditorPanel = ({
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [editorTexts, setEditorTexts] = useState<any>(null);
   
   // Load language configuration
@@ -102,16 +102,24 @@ export const EditorPanel = ({
       try {
         const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
         const effectiveLanguage = language || savedLanguage || detectLanguage().language;
-        
+
+        console.log('🌐 EditorPanel loading language:', {
+          prop: language,
+          saved: savedLanguage,
+          effective: effectiveLanguage
+        });
+
         setCurrentLanguage(effectiveLanguage);
         const texts = await getTexts('cvEditor', effectiveLanguage);
         setEditorTexts(texts);
+
+        console.log('📝 EditorPanel loaded texts for language:', effectiveLanguage);
       } catch (error) {
         console.error('Failed to load editor texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
-    
+
     loadLanguage();
   }, [language]);
   
@@ -657,48 +665,49 @@ export const EditorPanel = ({
     const commonProps = {
       cvData,
       onNavigateToSection: handleNavigateToSection,
-      isActive: activeSection === sectionId
+      isActive: activeSection === sectionId,
+      language: currentLanguage
     };
 
     switch (sectionId) {
       case 'contact':
         return (
-          <ContactSection 
-            data={cvData.contact} 
-            onUpdate={(data: any) => onUpdateSection('contact', data)} 
+          <ContactSection
+            data={cvData.contact}
+            onUpdate={(data: any) => onUpdateSection('contact', data)}
             {...commonProps}
           />
         );
       case 'summary':
         return (
-          <SummarySection 
-            data={cvData.summary} 
-            onUpdate={(data: any) => onUpdateSection('summary', data)} 
+          <SummarySection
+            data={cvData.summary}
+            onUpdate={(data: any) => onUpdateSection('summary', data)}
             {...commonProps}
           />
         );
       case 'experience':
         return (
-          <WorkExperienceSection 
-            data={cvData.experience} 
-            onUpdate={(data: any) => onUpdateSection('experience', data)} 
+          <WorkExperienceSection
+            data={cvData.experience}
+            onUpdate={(data: any) => onUpdateSection('experience', data)}
             onProvideAddFunction={setAddWorkExperienceFunction}
             {...commonProps}
           />
         );
       case 'skills':
         return (
-          <SkillsSection 
-            data={cvData.skills} 
-            onUpdate={(data: any) => onUpdateSection('skills', data)} 
+          <SkillsSection
+            data={cvData.skills}
+            onUpdate={(data: any) => onUpdateSection('skills', data)}
             {...commonProps}
           />
         );
       case 'education':
         return (
-          <EducationSection 
-            data={cvData.education} 
-            onUpdate={(data: any) => onUpdateSection('education', data)} 
+          <EducationSection
+            data={cvData.education}
+            onUpdate={(data: any) => onUpdateSection('education', data)}
             {...commonProps}
           />
         );
@@ -940,7 +949,7 @@ export const EditorPanel = ({
             <div className="p-4 space-y-4">
               {(cvData?.sectionOrder || []).map((sectionId: string) => (
                 <div key={sectionId} id={`section-${sectionId}`}>
-                  <DraggableSection 
+                  <DraggableSection
                     id={sectionId}
                     onActivate={() => setActiveSection(sectionId)}
                     isActive={activeSection === sectionId}
@@ -952,6 +961,7 @@ export const EditorPanel = ({
                     onDismissSuggestion={handleDismissSuggestionInternal}
                     onAddItem={sectionId === 'experience' ? addWorkExperienceFunction || undefined : undefined}
                     experienceCount={sectionId === 'experience' ? cvData.experience?.items?.length || 0 : undefined}
+                    language={currentLanguage}
                   >
                     {renderSection(sectionId)}
                   </DraggableSection>

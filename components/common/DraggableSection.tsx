@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ChevronUpIcon, ChevronDownIcon, GripVerticalIcon, Trash2Icon, WandIcon, EditIcon, PlusIcon } from 'lucide-react';
+import { getTexts } from '../../config/texts/index';
+import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
 interface DraggableSectionProps {
   id: string;
@@ -16,16 +18,20 @@ interface DraggableSectionProps {
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
   onAddItem?: () => void; // Optional function to add new items to the section
   experienceCount?: number; // Number of experience items (for conditional Add Experience button)
+  language?: SupportedLanguage;
 }
 
-// Section labels are now passed as props from parent components with dynamic language loading
-// This object serves as fallback only
-const sectionLabels: Record<string, string> = {
-  contact: 'Contact Information',
-  summary: 'Professional Summary',
-  experience: 'Work Experience',
-  skills: 'Skills',
-  education: 'Education'
+// Section labels fallback - Vietnamese (default language)
+const fallbackSectionLabels: Record<string, string> = {
+  contact: 'Thông tin liên hệ',
+  summary: 'Tóm tắt chuyên môn',
+  experience: 'Kinh nghiệm làm việc',
+  skills: 'Kỹ năng',
+  education: 'Học vấn',
+  projects: 'Dự án',
+  achievements: 'Thành tích',
+  languages: 'Ngôn ngữ',
+  certifications: 'Chứng chỉ'
 };
 
 // Core sections that cannot be deleted
@@ -51,7 +57,8 @@ export const DraggableSection = ({
   onApplySuggestion,
   onDismissSuggestion,
   onAddItem,
-  experienceCount
+  experienceCount,
+  language
 }: DraggableSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
@@ -63,6 +70,39 @@ export const DraggableSection = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const suggestionsButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Language-specific section labels and button text
+  const [sectionLabels, setSectionLabels] = useState<Record<string, string>>(fallbackSectionLabels);
+  const [addExperienceLabel, setAddExperienceLabel] = useState<string>('Thêm kinh nghiệm làm việc');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
+
+  // Load language-specific texts (client-side only)
+  useEffect(() => {
+    // Skip if not in browser
+    if (typeof window === 'undefined') return;
+
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
+        const effectiveLanguage = language || savedLanguage || detectLanguage().language;
+
+        setCurrentLanguage(effectiveLanguage);
+
+        const texts = await getTexts('cvEditor', effectiveLanguage);
+
+        if (texts?.sectionTitles) {
+          setSectionLabels(texts.sectionTitles);
+        }
+        if (texts?.sections?.experience?.addExperience) {
+          setAddExperienceLabel(texts.sections.experience.addExperience);
+        }
+      } catch (error) {
+        console.error('Failed to load section labels:', error);
+      }
+    };
+
+    loadLanguage();
+  }, [language]);
 
   const actions = aiActions[id] || aiActions.default;
   
@@ -208,25 +248,32 @@ export const DraggableSection = ({
   };
 
   const getSectionTitle = () => {
-    // Use custom title if available and not empty after trimming
+    // For core sections (contact, summary, experience, skills, education), always prefer
+    // localized labels so Vietnamese users never see English "Contact Information", etc.
+    if (coreSections.includes(id) && sectionLabels[id]) {
+      return sectionLabels[id];
+    }
+
+    // For custom sections, use custom title if available
     if (customTitle !== undefined && customTitle.trim() !== '') {
       return customTitle;
     }
-    
-    // For core sections, use predefined labels
+
+    // Fallback for custom sections to predefined labels
     if (sectionLabels[id]) {
       return sectionLabels[id];
     }
-    
-    // For custom sections, create a readable title
-    if (id.startsWith('projects-')) return 'Dự án';
-    if (id.startsWith('volunteer-')) return 'Hoạt động tình nguyện';
-    if (id.startsWith('certifications-')) return 'Chứng chỉ';
-    if (id.startsWith('languages-')) return 'Ngôn ngữ';
-    if (id.startsWith('hobbies-')) return 'Sở thích';
-    if (id.startsWith('custom-')) return 'Phần tùy chỉnh';
-    
-    return 'Phần khác';
+
+    // For custom sections, create a readable title based on language
+    const isVietnamese = currentLanguage === 'vi';
+    if (id.startsWith('projects-')) return isVietnamese ? 'Dự án' : 'Projects';
+    if (id.startsWith('volunteer-')) return isVietnamese ? 'Hoạt động tình nguyện' : 'Volunteer Work';
+    if (id.startsWith('certifications-')) return isVietnamese ? 'Chứng chỉ' : 'Certifications';
+    if (id.startsWith('languages-')) return isVietnamese ? 'Ngôn ngữ' : 'Languages';
+    if (id.startsWith('hobbies-')) return isVietnamese ? 'Sở thích' : 'Hobbies';
+    if (id.startsWith('custom-')) return isVietnamese ? 'Phần tùy chỉnh' : 'Custom Section';
+
+    return isVietnamese ? 'Phần khác' : 'Other Section';
   };
 
   const handleStartEdit = () => {
@@ -490,11 +537,11 @@ export const DraggableSection = ({
                 onAddItem();
               }}
               className="px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              title="Add Experience"
-              aria-label="Add Experience"
+              title={addExperienceLabel}
+              aria-label={addExperienceLabel}
             >
               <PlusIcon size={16} />
-              Add Experience
+              {addExperienceLabel}
             </button>
           )}
 

@@ -31,10 +31,10 @@ export interface LanguageConfiguration {
   browserLocaleEnabled: boolean;
 }
 
-// Default configuration - optimized for international market with English as default
+// Default configuration - optimized for Vietnamese market with Vietnamese as default
 export const defaultLanguageConfig: LanguageConfiguration = {
-  defaultLanguage: 'en',
-  fallbackLanguage: 'en',
+  defaultLanguage: 'vi',
+  fallbackLanguage: 'vi',
   detectionThreshold: 0.6,
   autoDetectionEnabled: true,
   userPreferenceEnabled: true,
@@ -149,6 +149,7 @@ export class LanguageConfigManager {
   clearUserPreference(): void {
     this.userPreference = null;
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('okbuddy_language');
       localStorage.removeItem('okbuddy-language-preference');
       localStorage.removeItem('okbuddy-language-preference-meta');
     }
@@ -228,8 +229,9 @@ export class LanguageConfigManager {
     const viConfidence = viMatches / totalMatches;
     const enConfidence = enMatches / totalMatches;
 
-    // Determine language with bias towards English (default market)
-    const detectedLanguage: SupportedLanguage = enConfidence >= viConfidence ? 'en' : 'vi';
+    // Determine language with bias towards Vietnamese (default market)
+    // Use strict greater than (>) so Vietnamese wins when scores are equal
+    const detectedLanguage: SupportedLanguage = enConfidence > viConfidence ? 'en' : 'vi';
     const confidence = Math.max(viConfidence, enConfidence);
 
     return {
@@ -333,13 +335,27 @@ export class LanguageConfigManager {
     if (typeof window === 'undefined') return;
 
     try {
+      // First check for the UI-level preference (okbuddy_language)
+      const uiLanguage = localStorage.getItem('okbuddy_language');
+      if (uiLanguage && ['vi', 'en'].includes(uiLanguage)) {
+        this.userPreference = {
+          language: uiLanguage as SupportedLanguage,
+          source: 'manual',
+          confidence: 1.0,
+          timestamp: new Date().toISOString(),
+          userId: this.getCurrentUserId()
+        };
+        return;
+      }
+
+      // Fallback to the system-level preference
       const stored = localStorage.getItem('okbuddy-language-preference');
       const meta = localStorage.getItem('okbuddy-language-preference-meta');
-      
+
       if (stored && meta) {
         const preference = JSON.parse(stored);
         const metadata = JSON.parse(meta);
-        
+
         // Validate stored preference
         if (preference && ['vi', 'en'].includes(preference) && metadata?.timestamp) {
           this.userPreference = {
@@ -364,6 +380,8 @@ export class LanguageConfigManager {
     if (typeof window === 'undefined' || !this.userPreference) return;
 
     try {
+      // Save to both UI-level and system-level keys for consistency
+      localStorage.setItem('okbuddy_language', this.userPreference.language);
       localStorage.setItem('okbuddy-language-preference', JSON.stringify(this.userPreference.language));
       localStorage.setItem('okbuddy-language-preference-meta', JSON.stringify({
         source: this.userPreference.source,

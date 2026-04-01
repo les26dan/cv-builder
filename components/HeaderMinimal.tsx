@@ -27,7 +27,7 @@ export default function HeaderMinimal({
 }: HeaderMinimalProps) {
   const [user, setUser] = useState<UserSession | null>(null)
   const [showUserDrawer, setShowUserDrawer] = useState(false)
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi')
   const [workspaceTexts, setWorkspaceTexts] = useState<any>(null)
 
   useEffect(() => {
@@ -67,8 +67,8 @@ export default function HeaderMinimal({
         setWorkspaceTexts(texts)
       } catch (error) {
         console.error('Failed to load workspace texts:', error)
-        // Fallback to English
-        const fallbackTexts = await getTexts('workspace', 'en')
+        // Fallback to Vietnamese
+        const fallbackTexts = await getTexts('workspace', 'vi')
         setWorkspaceTexts(fallbackTexts)
       }
     }

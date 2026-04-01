@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import MathCaptcha from "./MathCaptcha";
 import SocialLoginButton from "./SocialLoginButton";
 import { account } from "../../config/texts/index";
 
@@ -17,9 +16,6 @@ interface RegisterFormData {
 }
 
 export default function RegisterPageContent() {
-  const [captchaValue, setCaptchaValue] = useState("");
-  const [captchaValid, setCaptchaValid] = useState(false);
-  const [captchaSessionId, setCaptchaSessionId] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -64,19 +60,7 @@ export default function RegisterPageContent() {
 
   const password = watch("password");
 
-  const handleCaptchaValidation = (isValid: boolean, sessionId?: string) => {
-    setCaptchaValid(isValid);
-    if (sessionId) {
-      setCaptchaSessionId(sessionId);
-    }
-  };
-
   const onSubmit = async (data: RegisterFormData) => {
-    if (!captchaValid || !captchaSessionId) {
-      setError("root", { message: account.errors.captchaIncorrect });
-      return;
-    }
-
     setIsSubmitting(true);
     
     try {
@@ -87,8 +71,6 @@ export default function RegisterPageContent() {
         },
         body: JSON.stringify({
           ...data,
-          captchaAnswer: captchaValue,
-          captchaSessionId: captchaSessionId,
         }),
       });
 
@@ -248,16 +230,6 @@ export default function RegisterPageContent() {
             )}
           </div>
 
-          {/* CAPTCHA */}
-          <div className="flex justify-center py-2">
-            <MathCaptcha
-              value={captchaValue}
-              onChange={setCaptchaValue}
-              onValidation={handleCaptchaValidation}
-              error={errors.root?.message}
-            />
-          </div>
-
           {/* Terms of Service Checkbox */}
           <div className="flex items-start gap-3 pt-2">
             <input
@@ -293,7 +265,7 @@ export default function RegisterPageContent() {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting || !captchaValid}
+            disabled={isSubmitting}
             className="w-full h-11 sm:h-12 bg-primary text-white font-semibold rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base mt-6"
           >
             {isSubmitting ? account.register.form.loading : account.register.form.submitButton}

@@ -26,10 +26,17 @@ import { compressCVData, decompressCVData } from '../../utils/compression'
  * CV Workflow Data Service Class
  * Handles all data operations for the CV workflow integration
  */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export class CVWorkflowDataService {
   private static instance: CVWorkflowDataService
   private cache = new Map<string, WorkflowCVData>()
   private cacheExpiry = new Map<string, number>()
+
+  /** Returns true if id is a valid UUID (guest-*, template-* etc. are not). */
+  private static isValidUuid(id: string | undefined): boolean {
+    return !!id && UUID_REGEX.test(id)
+  }
 
   /**
    * Singleton pattern for consistent service instance
@@ -40,6 +47,7 @@ export class CVWorkflowDataService {
     }
     return CVWorkflowDataService.instance
   }
+
 
   /**
    * Save draft CV data
@@ -55,6 +63,22 @@ export class CVWorkflowDataService {
           success: false,
           error: `Validation failed: ${validationResult.errors.join(', ')}`
         }
+      }
+
+      // Guest/template CVs (non-UUID id) — skip DB to avoid invalid uuid error
+      if (!CVWorkflowDataService.isValidUuid(cvData.id)) {
+        const now = new Date().toISOString()
+        const updatedCVData: WorkflowCVData = {
+          ...cvData,
+          metadata: {
+            ...cvData.metadata,
+            updatedAt: now,
+            lastSavedAt: now,
+            version: (cvData.metadata?.version ?? 0) + 1
+          }
+        }
+        this.updateCache(updatedCVData.id, updatedCVData)
+        return { success: true, data: updatedCVData }
       }
 
       const client = await databaseService.getClient()
@@ -129,6 +153,11 @@ export class CVWorkflowDataService {
         }
       }
 
+      // Guest/template IDs are not UUIDs — do not query Supabase (would cause 22P02)
+      if (cvId && !CVWorkflowDataService.isValidUuid(cvId)) {
+        return { success: false, error: 'No draft found' }
+      }
+
       const client = await databaseService.getClient()
       if (!client) {
         return {
@@ -155,12 +184,23 @@ export class CVWorkflowDataService {
       const { data, error } = await query
 
       if (error) {
-        console.error('Database load error:', error)
-        return {
-          success: false,
-          error: `Database load failed: ${error.message}`,
-          code: error.code
+        // Only log real errors (not empty error objects)
+        const isEmptyObject = error && typeof error === 'object' && Object.keys(error).length === 0
+        const code = error?.code
+        const msg = error?.message
+
+        // Skip logging if it's an empty error object
+        const shouldLog = !isEmptyObject && (code || msg)
+
+        if (shouldLog) {
+          console.error('Database load error:', error)
+          return {
+            success: false,
+            error: `Database load failed: ${error.message}`,
+            code: error.code
+          }
         }
+        // If it's an empty error object, continue to data check below
       }
 
       if (!data || data.length === 0) {
@@ -197,11 +237,14 @@ export class CVWorkflowDataService {
    * @returns Promise<DatabaseResult<boolean>>
    */
   public async updateStatus(
-    cvId: string, 
-    status: WorkflowStatus, 
+    cvId: string,
+    status: WorkflowStatus,
     step?: WorkflowStep
   ): Promise<DatabaseResult<boolean>> {
     try {
+      if (!CVWorkflowDataService.isValidUuid(cvId)) {
+        return { success: true, data: true }
+      }
       const client = await databaseService.getClient()
       if (!client) {
         return {
@@ -303,9 +346,12 @@ export class CVWorkflowDataService {
    */
   public async deleteCV(cvId: string, userId: string): Promise<DatabaseResult<boolean>> {
     try {
+      if (!CVWorkflowDataService.isValidUuid(cvId)) {
+        this.invalidateCache(cvId)
+        return { success: true, data: true }
+      }
       const client = await databaseService.getClient()
       if (!client) {
-        // No database client available
         return { success: false, error: 'Database not available' }
       }
 
@@ -345,8 +391,15 @@ export class CVWorkflowDataService {
    */
   public async createBackup(cvId: string): Promise<DatabaseResult<any>> {
     try {
-      const loadResult = await this.loadDraft('', cvId)
-      if (!loadResult.success || !loadResult.data) {
+      let cvData: WorkflowCVData | null = null
+      if (CVWorkflowDataService.isValidUuid(cvId)) {
+        const loadResult = await this.loadDraft('', cvId)
+        if (loadResult.success && loadResult.data) cvData = loadResult.data
+      } else {
+        const cached = this.cache.get(cvId)
+        if (cached) cvData = cached
+      }
+      if (!cvData) {
         return {
           success: false,
           error: 'Failed to load CV for backup'
@@ -356,8 +409,8 @@ export class CVWorkflowDataService {
       const backup = {
         id: cvId,
         timestamp: new Date().toISOString(),
-        data: loadResult.data,
-        version: loadResult.data.metadata.version
+        data: cvData,
+        version: cvData.metadata?.version ?? 0
       }
 
       // Store backup (could be localStorage, database, or external storage)
@@ -386,14 +439,32 @@ export class CVWorkflowDataService {
    */
   public async saveJDAnalysis(cvId: string, analysisResults: any): Promise<DatabaseResult<any>> {
     try {
+      const storagePayload = {
+        analysisResults,
+        timestamp: new Date().toISOString()
+      }
+      const storageKey = `okbuddy_jd_analysis_${cvId}`
+
+      if (!CVWorkflowDataService.isValidUuid(cvId)) {
+        localStorage.setItem(storageKey, JSON.stringify(storagePayload))
+        const cachedCV = this.cache.get(cvId)
+        if (cachedCV) {
+          cachedCV.analysisResults = analysisResults
+          if (analysisResults.jobMatch) {
+            cachedCV.jobDescription = {
+              text: analysisResults.originalJobDescription || '',
+              keywords: analysisResults.jobMatch.missingKeywords || [],
+              url: ''
+            }
+          }
+          this.updateCache(cvId, cachedCV)
+        }
+        return { success: true, data: analysisResults }
+      }
+
       const client = await databaseService.getClient()
       if (!client) {
-        // Use localStorage fallback
-        const storageKey = `okbuddy_jd_analysis_${cvId}`
-        localStorage.setItem(storageKey, JSON.stringify({
-          analysisResults,
-          timestamp: new Date().toISOString()
-        }))
+        localStorage.setItem(storageKey, JSON.stringify(storagePayload))
         return { success: true, data: analysisResults }
       }
 
@@ -462,9 +533,23 @@ export class CVWorkflowDataService {
    */
   public async loadJDAnalysis(cvId: string): Promise<DatabaseResult<any>> {
     try {
+      if (!CVWorkflowDataService.isValidUuid(cvId)) {
+        const storageKey = `okbuddy_jd_analysis_${cvId}`
+        try {
+          const stored = localStorage.getItem(storageKey)
+          if (stored) {
+            const { analysisResults } = JSON.parse(stored)
+            return { success: true, data: analysisResults }
+          }
+        } catch {
+          // ignore parse errors
+        }
+        return { success: false, error: 'No JD analysis found' }
+      }
+
       const client = await databaseService.getClient()
       if (!client) {
-        // Use localStorage fallback
+        // Use localStorage fallback when DB not available
         const storageKey = `okbuddy_jd_analysis_${cvId}`
         const savedData = localStorage.getItem(storageKey)
         if (savedData) {
@@ -474,14 +559,25 @@ export class CVWorkflowDataService {
         return { success: false, error: 'No analysis found' }
       }
 
+      // Use maybeSingle() so missing row returns data: null without an error (avoids PGRST116 / empty DB noise)
       const { data, error } = await client
         .from('cv_workflow')
         .select('analysis_results, job_description_text, job_description_keywords')
         .eq('id', cvId)
-        .single()
+        .maybeSingle()
 
       if (error) {
-        console.error('Load JD analysis error:', error)
+        // Only log real errors (not "no rows" which maybeSingle avoids; guard against empty error object)
+        const isEmptyObject = error && typeof error === 'object' && Object.keys(error).length === 0
+        const code = error?.code
+        const msg = error?.message
+
+        // Skip logging if: empty object, or PGRST116 (no rows found)
+        const shouldLog = !isEmptyObject && code && code !== 'PGRST116'
+
+        if (shouldLog) {
+          console.error('Load JD analysis error:', error)
+        }
         // Fallback to localStorage
         const storageKey = `okbuddy_jd_analysis_${cvId}`
         const savedData = localStorage.getItem(storageKey)
@@ -496,10 +592,21 @@ export class CVWorkflowDataService {
         return { success: true, data: data.analysis_results }
       }
 
+      // No row or row has no analysis_results (e.g. empty DB) — try localStorage, then "no analysis"
+      const storageKey = `okbuddy_jd_analysis_${cvId}`
+      const savedData = localStorage.getItem(storageKey)
+      if (savedData) {
+        const parsed = JSON.parse(savedData)
+        return { success: true, data: parsed.analysisResults }
+      }
       return { success: false, error: 'No analysis found' }
 
     } catch (error) {
-      console.error('Load JD analysis error:', error)
+      // Only log meaningful errors (not empty objects)
+      const isEmptyObject = error && typeof error === 'object' && Object.keys(error).length === 0
+      if (!isEmptyObject) {
+        console.error('Load JD analysis error:', error)
+      }
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Load JD analysis failed'

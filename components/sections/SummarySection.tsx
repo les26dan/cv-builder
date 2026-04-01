@@ -25,7 +25,7 @@ export const SummarySection = ({
   const [isGenerating, setIsGenerating] = useState(false);
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [summaryTexts, setSummaryTexts] = useState<any>(null);
   
   // Load language configuration
@@ -40,7 +40,7 @@ export const SummarySection = ({
         setSummaryTexts(texts.sections.summary);
       } catch (error) {
         console.error('Failed to load summary texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
     

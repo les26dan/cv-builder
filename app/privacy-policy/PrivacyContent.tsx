@@ -31,8 +31,8 @@ export default function PrivacyContent() {
         setPrivacyTexts(texts.privacy);
       } catch (error) {
         console.error('Failed to load privacy texts:', error);
-        // Fallback to English
-        const fallbackTexts = await getTexts('account', 'en');
+        // Fallback to Vietnamese
+        const fallbackTexts = await getTexts('account', 'vi');
         setPrivacyTexts(fallbackTexts.privacy);
       }
     };

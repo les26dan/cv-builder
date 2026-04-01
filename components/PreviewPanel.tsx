@@ -27,7 +27,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   const cvPreviewRef = useRef<HTMLDivElement>(null);
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [previewTexts, setPreviewTexts] = useState<any>(null);
   
   // Load language configuration
@@ -42,7 +42,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
         setPreviewTexts(texts.preview);
       } catch (error) {
         console.error('Failed to load preview texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
     

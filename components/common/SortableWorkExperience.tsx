@@ -38,7 +38,7 @@ export const SortableWorkExperience: React.FC<SortableWorkExperienceProps> = ({
   const [isExpandIconHovered, setIsExpandIconHovered] = useState(false);
   
   // Language configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   
   useEffect(() => {
     const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;

@@ -33,9 +33,9 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         setTexts(feedbackTexts);
       } catch (error) {
         console.error('Failed to load feedback texts:', error);
-        // Fallback to English
+        // Fallback to Vietnamese
         try {
-          const feedbackTexts = await getTexts('feedback', 'en');
+          const feedbackTexts = await getTexts('feedback', 'vi');
           setTexts(feedbackTexts);
         } catch (fallbackError) {
           console.error('Failed to load fallback texts:', fallbackError);

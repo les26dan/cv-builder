@@ -23,7 +23,7 @@ export default function CVCard({
   onTitleUpdate 
 }: CVCardProps) {
   const [workspace, setWorkspace] = useState<any>(null)
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi')
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [editedTitle, setEditedTitle] = useState(cv.title)
   const [isUpdatingTitle, setIsUpdatingTitle] = useState(false)
@@ -35,15 +35,15 @@ export default function CVCard({
   const loadTexts = async () => {
     try {
       // Check for saved language preference
-      const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en' || 'en'
+      const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en' || 'vi'
       setCurrentLanguage(savedLanguage)
       
       const workspaceTexts = await getTexts('workspace', savedLanguage)
       setWorkspace(workspaceTexts)
     } catch (error) {
       console.error('Failed to load texts:', error)
-      // Fallback to English
-      const workspaceTexts = await getTexts('workspace', 'en')
+      // Fallback to Vietnamese
+      const workspaceTexts = await getTexts('workspace', 'vi')
       setWorkspace(workspaceTexts)
     }
   }

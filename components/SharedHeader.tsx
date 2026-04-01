@@ -57,7 +57,7 @@ export default function SharedHeader({
   const [isLoading, setIsLoading] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi');
   const [workspaceTexts, setWorkspaceTexts] = useState<any>(null);
   const [feedbackTexts, setFeedbackTexts] = useState<any>(null);
   const [accountTexts, setAccountTexts] = useState<any>(null);
@@ -101,8 +101,8 @@ export default function SharedHeader({
         setWorkspaceTexts(texts);
       } catch (error) {
         console.error('Failed to load workspace texts:', error);
-        // Fallback to English
-        const fallbackTexts = await getTexts('workspace', 'en');
+        // Fallback to Vietnamese
+        const fallbackTexts = await getTexts('workspace', 'vi');
         setWorkspaceTexts(fallbackTexts);
       }
       
@@ -112,8 +112,8 @@ export default function SharedHeader({
         setFeedbackTexts(feedbackTexts);
       } catch (error) {
         console.error('Failed to load feedback texts:', error);
-        // Fallback to English
-        const fallbackFeedbackTexts = await getTexts('feedback', 'en');
+        // Fallback to Vietnamese
+        const fallbackFeedbackTexts = await getTexts('feedback', 'vi');
         setFeedbackTexts(fallbackFeedbackTexts);
       }
       
@@ -123,8 +123,8 @@ export default function SharedHeader({
         setAccountTexts(accountTexts);
       } catch (error) {
         console.error('Failed to load account texts:', error);
-        // Fallback to English
-        const fallbackAccountTexts = await getTexts('account', 'en');
+        // Fallback to Vietnamese
+        const fallbackAccountTexts = await getTexts('account', 'vi');
         setAccountTexts(fallbackAccountTexts);
       }
     };

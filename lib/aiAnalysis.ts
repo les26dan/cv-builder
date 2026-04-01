@@ -107,24 +107,22 @@ interface ChatCompletionRequest {
   top_p?: number
 }
 
-// Language detection
+// Prompt language: always Vietnamese for this repo
+const PROMPT_LANGUAGE: 'vi' | 'en' = 'vi'
+
+// Language detection (used for cache key and fallback text only; prompts always use PROMPT_LANGUAGE)
 function detectLanguage(text: string): 'vi' | 'en' {
   const vietnamesePatterns = [
     /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i,
     /\b(và|của|trong|với|để|cho|từ|về|có|được|sẽ|đã|kinh nghiệm|kỹ năng|công việc)\b/i
   ]
-  
   const englishPatterns = [
     /\b(experience|skills|education|work|job|company|project|manage|develop|implement)\b/i
   ]
-  
   const viMatch = vietnamesePatterns.some(pattern => pattern.test(text))
   const enMatch = englishPatterns.some(pattern => pattern.test(text))
-  
   if (viMatch && !enMatch) return 'vi'
   if (enMatch && !viMatch) return 'en'
-  
-  // Default to Vietnamese for Vietnamese market
   return 'vi'
 }
 
@@ -253,7 +251,7 @@ export async function analyzeCVWithAI(cvText: string, jobDescription?: string): 
   }
 
   try {
-    const promptTemplate = AI_PROMPTS[language].cvAnalysis
+    const promptTemplate = AI_PROMPTS[PROMPT_LANGUAGE].cvAnalysis
     const userPrompt = promptTemplate.user.replace('{cvText}', cvText)
 
     const messages: ChatMessage[] = [
@@ -343,7 +341,7 @@ export async function analyzeJobDescriptionWithAI(jobDescription: string): Promi
   }
 
   try {
-    const promptTemplate = AI_PROMPTS[language].jobAnalysis
+    const promptTemplate = AI_PROMPTS[PROMPT_LANGUAGE].jobAnalysis
     const userPrompt = promptTemplate.user.replace('{jobDescription}', jobDescription)
 
     const messages: ChatMessage[] = [
@@ -414,7 +412,7 @@ export async function performCVJDMatching(cvContent: string, jobDescription: str
   }
 
   try {
-    const promptTemplate = AI_PROMPTS[language].cvjdMatch
+    const promptTemplate = AI_PROMPTS[PROMPT_LANGUAGE].cvjdMatch
     const userPrompt = promptTemplate.user
       .replace('{cvContent}', cvContent)
       .replace('{jobDescription}', jobDescription)

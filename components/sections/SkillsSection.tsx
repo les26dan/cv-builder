@@ -32,7 +32,7 @@ export const SkillsSection = ({
   const [isGenerating, setIsGenerating] = useState(false);
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [skillsTexts, setSkillsTexts] = useState<any>(null);
   
   // Load language configuration
@@ -47,7 +47,7 @@ export const SkillsSection = ({
         setSkillsTexts(texts.sections.skills);
       } catch (error) {
         console.error('Failed to load skills texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
     

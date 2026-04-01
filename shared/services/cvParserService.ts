@@ -383,7 +383,7 @@ Mandatory requirements for your response:
     console.log('🚀 CV Parser: Starting optimized hybrid parsing');
     
     try {
-      const systemLanguage: SupportedLanguage = userLanguage || 'en';
+      const systemLanguage: SupportedLanguage = userLanguage || 'vi';
       
       // Step 1: Try Hybrid Parser (Primary approach)
       console.log('🔄 Step 1: Attempting hybrid parsing for token efficiency');
@@ -439,8 +439,8 @@ Mandatory requirements for your response:
         { role: 'user', content: prompts.user }
       ];
 
-      // Check cache for full parsing
-      const cacheKey = `cv_parse_full_${systemLanguage}_${btoa(cvText.substring(0, 100))}`;
+      // Check cache for full parsing (Buffer base64 supports UTF-8; btoa does not)
+      const cacheKey = `cv_parse_full_${systemLanguage}_${Buffer.from(cvText.substring(0, 100), 'utf8').toString('base64')}`;
       const cached = this.cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
         console.log('🎯 CV Parser: Using cached full parsing result');

@@ -67,8 +67,7 @@ async function setupDatabase() {
         email: 'admin@example.com',
         password_hash: passwordHash,
         email_verified: true,
-        oauth_provider: null,
-        oauth_id: null
+        signup_method: 'email'
       })
       .select()
       .single();
