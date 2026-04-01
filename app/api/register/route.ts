@@ -13,8 +13,6 @@ interface RegisterData {
   password: string;
   confirmPassword: string;
   tosAccepted: boolean;
-  captchaAnswer: string;
-  captchaSessionId: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -80,50 +78,6 @@ export async function POST(request: NextRequest) {
       return addHeaders(NextResponse.json(
         { error: "Bạn phải đồng ý với điều khoản dịch vụ" },
         { status: 400 }
-      ));
-    }
-
-    // Validate CAPTCHA with server-side verification
-    if (!data.captchaAnswer || !data.captchaSessionId) {
-      return addHeaders(NextResponse.json(
-        { error: "Vui lòng hoàn thành CAPTCHA" },
-        { status: 400 }
-      ));
-    }
-
-    // Verify CAPTCHA with the CAPTCHA API
-    try {
-      const captchaResponse = await fetch(`${request.nextUrl.origin}/api/captcha`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sessionId: data.captchaSessionId,
-          answer: data.captchaAnswer,
-        }),
-      });
-
-      if (!captchaResponse.ok) {
-        const captchaError = await captchaResponse.json();
-        return addHeaders(NextResponse.json(
-          { error: captchaError.error || "CAPTCHA không hợp lệ" },
-          { status: 400 }
-        ));
-      }
-
-      const captchaResult = await captchaResponse.json();
-      if (!captchaResult.valid) {
-        return addHeaders(NextResponse.json(
-          { error: "CAPTCHA không chính xác" },
-          { status: 400 }
-        ));
-      }
-    } catch (captchaError) {
-      console.error('❌ CAPTCHA validation failed:', captchaError);
-      return addHeaders(NextResponse.json(
-        { error: "Có lỗi xảy ra khi xác thực CAPTCHA. Vui lòng thử lại." },
-        { status: 500 }
       ));
     }
 

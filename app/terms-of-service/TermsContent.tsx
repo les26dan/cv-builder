@@ -31,8 +31,8 @@ export default function TermsContent() {
         setTermsTexts(texts.terms);
       } catch (error) {
         console.error('Failed to load terms texts:', error);
-        // Fallback to English
-        const fallbackTexts = await getTexts('account', 'en');
+        // Fallback to Vietnamese
+        const fallbackTexts = await getTexts('account', 'vi');
         setTermsTexts(fallbackTexts.terms);
       }
     };

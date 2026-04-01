@@ -22,7 +22,7 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [showUserDrawer, setShowUserDrawer] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi');
 
   useEffect(() => {
     // Check authentication status on component mount

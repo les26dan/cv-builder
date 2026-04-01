@@ -24,14 +24,8 @@ const nextConfig: NextConfig = {
     };
 
     // Fix: Improved caching for stability
-    if (!isServer) {
-      config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
-      };
-    }
+    // Note: Removed explicit cache config to prevent next.config.compiled.js resolution issues
+    // Next.js handles filesystem caching automatically
 
     return config;
   },

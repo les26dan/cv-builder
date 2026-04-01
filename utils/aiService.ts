@@ -10,7 +10,6 @@ import { enAIPrompts, formatEnglishPrompt } from '../config/texts/en/aiPrompts';
 import { viSummaryAIPrompts, formatViSummaryPrompt } from '../config/texts/vi/summaryAI';
 import { enSummaryAIPrompts, formatEnSummaryPrompt } from '../config/texts/en/summaryAI';
 import { viWorkExperienceAIPrompts, formatViWorkExperiencePrompt } from '../config/texts/vi/workExperienceAI';
-import { enWorkExperienceAIPrompts, formatEnWorkExperiencePrompt } from '../config/texts/en/workExperienceAI';
 import { viSkillsAIPrompts, formatViSkillsPrompt } from '../config/texts/vi/skillsAI';
 import { enSkillsAIPrompts, formatEnSkillsPrompt } from '../config/texts/en/skillsAI';
 import { viJDAnalysisAIPrompts, formatViJDAnalysisPrompt } from '../config/texts/vi/jdAnalysisAI';
@@ -208,33 +207,67 @@ class AIService {
   }
 
   /**
-   * Detect language for request with enhanced context
+   * Detect language for request with enhanced context.
+   * Priority: explicit request > user's saved UI preference > content detection > default.
+   * User's saved preference (okbuddy_language) wins over content so that e.g. pasting English JD
+   * into wizard still produces Vietnamese output when user has chosen Vietnamese UI.
    */
   private detectRequestLanguage(request: any, context?: LanguageDetectionContext): SupportedLanguage {
     if (request.language) {
       return request.language;
     }
 
-    // Use the new language configuration system
+    // User's explicit UI language preference (okbuddy_language) - if set, use for output language.
+    const savedUiLanguage = typeof window !== 'undefined' ? (localStorage.getItem('okbuddy_language') as SupportedLanguage) : null;
+    if (savedUiLanguage === 'vi' || savedUiLanguage === 'en') {
+      return savedUiLanguage;
+    }
+
+    // Default to Vietnamese when no preference set (Vietnamese market). Avoid content-based
+    // detection which returns 'en' when bullets/CV are in English, causing English output.
+    if (typeof window !== 'undefined') {
+      return 'vi';
+    }
+
+    const content = {
+      text: request.content || '',
+      jobTitle: request.jobTitle || '',
+      company: request.company || '',
+      project: request.project || '',
+      impact: request.impact || '',
+      responsibility: request.responsibility || '',
+      workExperience: request.workExperience || [],
+      skills: request.skills || [],
+      existingCV: request.cvData || context?.cvContent || {}
+    };
+
+    // Content-based detection: when user has typed substantial content and NO saved preference
+    const combinedLength = [content.text, content.jobTitle, content.company, content.project, content.impact, content.responsibility]
+      .filter(Boolean)
+      .join(' ').trim().length;
+
+    if (combinedLength >= 15) {
+      const contentResult = languageConfig.detectLanguageFromContent(content);
+      if (contentResult.confidence >= 0.5) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🌐 Language Detection (content):', {
+            detected: contentResult.language,
+            confidence: contentResult.confidence
+          });
+        }
+        return contentResult.language;
+      }
+    }
+
+    // Fallback: standard priority (manual override > user preference > content > browser > default)
     const detectionContext = {
-      content: {
-        text: request.content || '',
-        jobTitle: request.jobTitle || '',
-        company: request.company || '',
-        project: request.project || '',
-        impact: request.impact || '',
-        responsibility: request.responsibility || '',
-        workExperience: request.workExperience || [],
-        skills: request.skills || [],
-        existingCV: request.cvData || context?.cvContent || {}
-      },
+      content,
       browserLocale: languageConfig.getBrowserLocale(),
       manualOverride: request.manualLanguage
     };
 
     const result = detectLanguage(detectionContext);
     
-    // Debug logging for development
     if (process.env.NODE_ENV === 'development') {
       console.log('🌐 Language Detection:', {
         detected: result.language,
@@ -247,39 +280,42 @@ class AIService {
     return result.language;
   }
 
+  /** All AI prompts use Vietnamese (repo default for Vietnamese market). */
+  private static readonly PROMPT_LANGUAGE: SupportedLanguage = 'vi';
+
   /**
-   * Get prompt templates for language (generic) - English as default
+   * Get prompt templates - always Vietnamese for this repo
    */
-  private getPromptTemplates(language: SupportedLanguage) {
-    return language === 'en' ? enAIPrompts : viAIPrompts;
+  private getPromptTemplates(_language?: SupportedLanguage) {
+    return viAIPrompts;
   }
 
   /**
-   * Get section-specific prompt templates for language - English as default
+   * Get section-specific prompt templates - always Vietnamese
    */
-  private getSummaryPromptTemplates(language: SupportedLanguage) {
-    return language === 'en' ? enSummaryAIPrompts : viSummaryAIPrompts;
+  private getSummaryPromptTemplates(_language?: SupportedLanguage) {
+    return viSummaryAIPrompts;
   }
 
   /**
-   * Get work experience prompt templates for language - English as default
+   * Get work experience prompt templates - always Vietnamese
    */
-  private getWorkExperiencePromptTemplates(language: SupportedLanguage) {
-    return language === 'en' ? enWorkExperienceAIPrompts : viWorkExperienceAIPrompts;
+  private getWorkExperiencePromptTemplates(_language?: SupportedLanguage) {
+    return viWorkExperienceAIPrompts;
   }
 
   /**
-   * Get skills prompt templates for language
+   * Get skills prompt templates - always Vietnamese
    */
-  private getSkillsPromptTemplates(language: SupportedLanguage) {
-    return language === 'en' ? enSkillsAIPrompts : viSkillsAIPrompts;
+  private getSkillsPromptTemplates(_language?: SupportedLanguage) {
+    return viSkillsAIPrompts;
   }
 
   /**
-   * Get JD analysis prompt templates for language - English as default
+   * Get JD analysis prompt templates - always Vietnamese
    */
-  private getJDAnalysisPromptTemplates(language: SupportedLanguage) {
-    return language === 'en' ? enJDAnalysisAIPrompts : viJDAnalysisAIPrompts;
+  private getJDAnalysisPromptTemplates(_language?: SupportedLanguage) {
+    return viJDAnalysisAIPrompts;
   }
 
   /**
@@ -288,83 +324,45 @@ class AIService {
   private formatPromptForLanguage(
     templateKey: string,
     context: PromptContext,
-    language: SupportedLanguage
+    _language?: SupportedLanguage
   ): { system: string; user: string } {
-    // Check if this is a summary-specific template
+    // All prompts use Vietnamese templates (repo default)
     const summaryKeys = ['enhancedSummaryGeneration', 'summaryImprovement', 'contextBasedGeneration', 'emptyStateGuidance'];
-    
     if (summaryKeys.includes(templateKey)) {
-      const summaryTemplates = this.getSummaryPromptTemplates(language);
+      const summaryTemplates = this.getSummaryPromptTemplates();
       const template = summaryTemplates[templateKey as keyof typeof summaryTemplates] as AIPromptTemplate;
-      
-      if (!template) {
-        throw new Error(`Summary template '${templateKey}' not found for language '${language}'`);
-      }
-
-      return language === 'en' 
-        ? formatEnSummaryPrompt(template, context)
-        : formatViSummaryPrompt(template, context);
+      if (!template) throw new Error(`Summary template '${templateKey}' not found`);
+      return formatViSummaryPrompt(template, context);
     }
 
-    // Check if this is a work experience-specific template
     const workExperienceKeys = ['enhancedBulletGeneration', 'contextAwareBulletGeneration', 'wizardEnhancedGeneration', 'bulletImprovement'];
-    
     if (workExperienceKeys.includes(templateKey)) {
-      const workExperienceTemplates = this.getWorkExperiencePromptTemplates(language);
+      const workExperienceTemplates = this.getWorkExperiencePromptTemplates();
       const template = workExperienceTemplates[templateKey as keyof typeof workExperienceTemplates] as AIPromptTemplate;
-      
-      if (!template) {
-        throw new Error(`Work experience template '${templateKey}' not found for language '${language}'`);
-      }
-
-      return language === 'en' 
-        ? formatEnWorkExperiencePrompt(template, context)
-        : formatViWorkExperiencePrompt(template, context);
+      if (!template) throw new Error(`Work experience template '${templateKey}' not found`);
+      return formatViWorkExperiencePrompt(template, context);
     }
 
-    // Check if this is a skills-specific template (removed skillsPrioritization)
     const skillsKeys = ['enhancedSkillSuggestions', 'contextAwareSkillAnalysis', 'industrySpecificSkills', 'skillsGapAnalysis'];
-    
     if (skillsKeys.includes(templateKey)) {
-      const skillsTemplates = this.getSkillsPromptTemplates(language);
+      const skillsTemplates = this.getSkillsPromptTemplates();
       const template = skillsTemplates[templateKey as keyof typeof skillsTemplates] as AIPromptTemplate;
-      
-      if (!template) {
-        throw new Error(`Skills template '${templateKey}' not found for language '${language}'`);
-      }
-
-      return language === 'en' 
-        ? formatEnSkillsPrompt(template, context)
-        : formatViSkillsPrompt(template, context);
+      if (!template) throw new Error(`Skills template '${templateKey}' not found`);
+      return formatViSkillsPrompt(template, context);
     }
 
-    // Check if this is a JD analysis-specific template
     const jdAnalysisKeys = ['comprehensiveJobAnalysis', 'keywordExtractionAnalysis', 'sectionSpecificOptimization', 'competitiveAnalysis', 'industrySpecificAnalysis'];
-    
     if (jdAnalysisKeys.includes(templateKey)) {
-      const jdAnalysisTemplates = this.getJDAnalysisPromptTemplates(language);
+      const jdAnalysisTemplates = this.getJDAnalysisPromptTemplates();
       const template = jdAnalysisTemplates[templateKey as keyof typeof jdAnalysisTemplates] as AIPromptTemplate;
-      
-      if (!template) {
-        throw new Error(`JD Analysis template '${templateKey}' not found for language '${language}'`);
-      }
-
-      return language === 'en' 
-        ? formatEnJDAnalysisPrompt(template, context)
-        : formatViJDAnalysisPrompt(template, context);
+      if (!template) throw new Error(`JD Analysis template '${templateKey}' not found`);
+      return formatViJDAnalysisPrompt(template, context);
     }
 
-    // Fall back to generic templates
-    const templates = this.getPromptTemplates(language);
+    const templates = this.getPromptTemplates();
     const template = templates[templateKey as keyof typeof templates] as AIPromptTemplate;
-    
-    if (!template) {
-      throw new Error(`Template '${templateKey}' not found for language '${language}'`);
-    }
-
-    return language === 'en' 
-      ? formatEnglishPrompt(template, context)
-      : formatPrompt(template, context);
+    if (!template) throw new Error(`Template '${templateKey}' not found`);
+    return formatPrompt(template, context);
   }
 
   /**
@@ -497,20 +495,29 @@ class AIService {
     }
   }
 
+  /** Appended to every system prompt so output is always Vietnamese. */
+  private static readonly VIETNAMESE_ONLY_INSTRUCTION =
+    '\n\nQUY TẮC BẮT BUỘC: Bạn PHẢI trả lời 100% bằng tiếng Việt. KHÔNG được dùng tiếng Anh trong câu trả lời. Mọi nội dung output phải là tiếng Việt.';
+  /** Appended to every user message to reinforce Vietnamese-only output. */
+  private static readonly VIETNAMESE_ONLY_USER_SUFFIX =
+    '\n\n[QUAN TRỌNG: Chỉ trả lời bằng tiếng Việt. Không dùng tiếng Anh trong bất kỳ câu nào.]';
+
   /**
-   * Execute AI request
+   * Execute AI request. Prompt language is always Vietnamese (repo default).
    */
   private async executeAIRequest<T>(
     templateKey: string,
     context: PromptContext,
-    language: SupportedLanguage,
+    _language: SupportedLanguage,
     processor?: (content: string) => T
   ): Promise<T> {
-    const prompt = this.formatPromptForLanguage(templateKey, context, language);
-    
+    const prompt = this.formatPromptForLanguage(templateKey, context, 'vi');
+    const systemContent = prompt.system + AIService.VIETNAMESE_ONLY_INSTRUCTION;
+    const userContent = prompt.user + AIService.VIETNAMESE_ONLY_USER_SUFFIX;
+
     const messages: ChatMessage[] = [
-      { role: 'system', content: prompt.system },
-      { role: 'user', content: prompt.user }
+      { role: 'system', content: systemContent },
+      { role: 'user', content: userContent }
     ];
 
     const response = await this.makeOpenAIRequest(messages);

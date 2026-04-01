@@ -558,13 +558,12 @@ export class HybridCVParserService {
   }
 
   /**
-   * Generate ChatGPT prompt specifically for work experience parsing
+   * Generate ChatGPT prompt for work experience parsing - always Vietnamese (repo default)
    */
-  private generateWorkExperiencePrompt(experienceText: string, language: SupportedLanguage): { system: string; user: string } {
-    if (language === 'vi') {
-      const system = `Bạn là chuyên gia trích xuất kinh nghiệm làm việc từ CV. Bạn CHỈ TRÍCH XUẤT thông tin có sẵn, KHÔNG tạo mới hay suy đoán. Bạn TUYỆT ĐỐI KHÔNG được sửa đổi, viết lại hay tóm tắt nội dung gốc.`;
-      
-      const user = `Trích xuất TOÀN BỘ thông tin kinh nghiệm làm việc từ văn bản sau và cấu trúc theo JSON:
+  private generateWorkExperiencePrompt(experienceText: string, _language?: SupportedLanguage): { system: string; user: string } {
+    const system = `Bạn là chuyên gia trích xuất kinh nghiệm làm việc từ CV. Bạn CHỈ TRÍCH XUẤT thông tin có sẵn, KHÔNG tạo mới hay suy đoán. Bạn TUYỆT ĐỐI KHÔNG được sửa đổi, viết lại hay tóm tắt nội dung gốc.`;
+    
+    const user = `Trích xuất TOÀN BỘ thông tin kinh nghiệm làm việc từ văn bản sau và cấu trúc theo JSON:
 
 {
   "work_experience": [
@@ -587,35 +586,7 @@ YÊU CẦU BẮT BUỘC:
 Văn bản kinh nghiệm làm việc:
 ${experienceText}`;
 
-      return { system, user };
-    } else {
-      const system = `You are a work experience extraction expert. You ONLY EXTRACT information that is explicitly available. You NEVER fabricate, infer, rewrite, summarize, or modify the original content.`;
-      
-      const user = `Extract ALL work experience information from the text below and structure it in JSON format:
-
-{
-  "work_experience": [
-    {
-      "position": "",
-      "company": "",
-      "location": "",
-      "start_date": "",
-      "end_date": "",
-      "bullets": ["extract ALL bullet points from original CV", "preserve ALL details", "add bullets as needed for actual content", "no limit on number"]
-    }
-  ]
-}
-
-MANDATORY REQUIREMENTS:
-- ONLY EXTRACT: Do NOT modify, rewrite, summarize, or alter original content
-- PRESERVE ALL: Responsibilities, achievements, metrics, and details from original CV
-- NO LIMITS: Add all bullets necessary to fully reflect the original CV content
-
-Work experience text:
-${experienceText}`;
-
-      return { system, user };
-    }
+    return { system, user };
   }
 
   /**
@@ -683,10 +654,10 @@ ${experienceText}`;
     console.log('🔄 Hybrid CV Parser: Starting optimized parsing');
     
     try {
-      const systemLanguage: SupportedLanguage = userLanguage || 'en';
+      const systemLanguage: SupportedLanguage = userLanguage || 'vi';
       
-      // Check cache
-      const cacheKey = `hybrid_cv_parse_${systemLanguage}_${btoa(cvText.substring(0, 100))}`;
+      // Check cache (Buffer base64 supports UTF-8; btoa does not)
+      const cacheKey = `hybrid_cv_parse_${systemLanguage}_${Buffer.from(cvText.substring(0, 100), 'utf8').toString('base64')}`;
       const cached = this.cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
         console.log('🎯 Hybrid CV Parser: Using cached result');
@@ -788,7 +759,7 @@ ${experienceText}`;
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown parsing error',
-        language: userLanguage || 'en',
+        language: userLanguage || 'vi',
         source: 'hybrid',
         processingTime: Date.now() - startTime
       };

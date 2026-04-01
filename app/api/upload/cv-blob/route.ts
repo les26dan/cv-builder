@@ -76,9 +76,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
       console.log(`🔧 Generated proper UUID for user: ${userId}`);
     }
 
-    // 2. Parse uploaded file
+    // 2. Parse uploaded file and optional language preference
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const userLanguage = (formData.get('language') as string) || 'vi';
+    const language = userLanguage === 'en' ? 'en' : 'vi';
 
     if (!file) {
       return NextResponse.json(
@@ -160,8 +162,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
     let llmParsedData: CVParsingResponse | null = null;
     if (extractedText && extractedText.length > 50) {
       try {
-        console.log('🤖 Starting LLM-based CV parsing...');
-        const parseResult = await cvParserService.parseCV(extractedText);
+        console.log('🤖 Starting LLM-based CV parsing...', { language });
+        const parseResult = await cvParserService.parseCV(extractedText, language);
         if (parseResult.success && parseResult.data) {
           llmParsedData = parseResult.data;
           console.log(`✅ LLM CV parsing completed. Possibility score: ${llmParsedData.possibility_score}`);

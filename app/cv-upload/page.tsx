@@ -16,7 +16,7 @@ export default function CVUploadPage() {
   
   // Dynamic text loading based on user language preference
   const [texts, setTexts] = useState<any>(null)
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en')
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi')
 
   useEffect(() => {
     const loadTexts = async () => {
@@ -32,10 +32,10 @@ export default function CVUploadPage() {
         setTexts(cvUploadTexts)
       } catch (error) {
         console.error('Failed to load texts:', error)
-        // Fallback to English texts
-        const { cvUpload } = await import('@/config/texts/en/cvUpload')
+        // Fallback to Vietnamese texts
+        const { cvUpload } = await import('@/config/texts/vi/cvUpload')
         setTexts(cvUpload)
-        setCurrentLanguage('en')
+        setCurrentLanguage('vi')
       }
     }
 
@@ -184,6 +184,7 @@ export default function CVUploadPage() {
       // Upload CV file to extract text and structured data
       const formData = new FormData()
       formData.append('file', uploadedFile)
+      formData.append('language', currentLanguage || 'vi')
 
       const response = await fetch('/api/upload/cv-blob', {
         method: 'POST',

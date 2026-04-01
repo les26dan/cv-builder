@@ -1,6 +1,6 @@
 /**
  * Dynamic Text Loading System
- * Loads text based on language configuration with English as default
+ * Loads text based on language configuration with Vietnamese as default
  * Following OkBuddy development tenets: centralized, configurable, scalable
  */
 
@@ -64,9 +64,9 @@ export async function getTexts(
       return texts;
     }
     
-    // Fallback to English if Vietnamese module not found
-    if (effectiveLanguage !== 'en' && textModules.en[module]) {
-      const texts = await textModules.en[module]();
+    // Fallback to Vietnamese if English module not found
+    if (effectiveLanguage !== 'vi' && textModules.vi[module]) {
+      const texts = await textModules.vi[module]();
       textCache.set(cacheKey, texts);
       return texts;
     }
@@ -75,14 +75,14 @@ export async function getTexts(
   } catch (error) {
     console.warn(`Failed to load text module ${module} for ${effectiveLanguage}:`, error);
     
-    // Ultimate fallback - try English if we weren't already trying English
-    if (effectiveLanguage !== 'en') {
+    // Ultimate fallback - try Vietnamese if we weren't already trying Vietnamese
+    if (effectiveLanguage !== 'vi') {
       try {
-        const texts = await textModules.en[module]();
+        const texts = await textModules.vi[module]();
         textCache.set(cacheKey, texts);
         return texts;
       } catch (fallbackError) {
-        console.error(`Fallback to English also failed for ${module}:`, fallbackError);
+        console.error(`Fallback to Vietnamese also failed for ${module}:`, fallbackError);
         throw fallbackError;
       }
     }
@@ -96,21 +96,21 @@ export async function getTexts(
  * These are the main exports that components will use
  */
 
-// Default English texts (synchronous access)
-export { landingPage } from './en/landingPage';
-export { account } from './en/account';
-export { workspace } from './en/workspace';
-export { cvUpload } from './en/cvUpload';
-export { userDrawer } from './en/userDrawer';
-export { feedback } from './en/feedback';
-export { jdAnalysisTexts } from './en/jdAnalysis';
-export { enJDOptimizationTexts as jdOptimization } from './en/jdOptimization';
-export { default as workExperienceWizard } from './en/workExperienceWizard';
-export { enAIPrompts as aiPrompts } from './en/aiPrompts';
-export { mobileBlockingTexts } from './en/mobileBlocking';
+// Default Vietnamese texts (synchronous access)
+export { landingPage } from './vi/landingPage';
+export { account } from './vi/account';
+export { workspace } from './vi/workspace';
+export { cvUpload } from './vi/cvUpload';
+export { userDrawer } from './vi/userDrawer';
+export { feedback } from './vi/feedback';
+export { jdAnalysisTexts } from './vi/jdAnalysis';
+export { viJDOptimizationTexts as jdOptimization } from './vi/jdOptimization';
+export { default as workExperienceWizard } from './vi/workExperienceWizard';
+export { viAIPrompts as aiPrompts } from './vi/aiPrompts';
+export { mobileBlockingTexts } from './vi/mobileBlocking';
 
-// Legacy export for backward compatibility
-export { cvUpload as cvUploadLegacy } from './vi/cvUpload';
+// Legacy export for backward compatibility (English)
+export { cvUpload as cvUploadLegacy } from './en/cvUpload';
 
 /**
  * Utility functions for text management

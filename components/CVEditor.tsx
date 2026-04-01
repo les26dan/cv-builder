@@ -42,7 +42,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
   const hasLoadedDataRef = useRef(false);
   
   // Language and text configuration state
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [cvEditorTexts, setCvEditorTexts] = useState<any>(null);
 
   // Local state management
@@ -64,11 +64,11 @@ export const CVEditor: React.FC<CVEditorProps> = ({
       education: { items: [] },
       sectionOrder: ['contact', 'summary', 'experience', 'skills', 'education'],
       sectionTitles: {
-                        contact: cvEditorTexts?.sectionTitles?.contact || 'Contact Information',
-                summary: cvEditorTexts?.sectionTitles?.summary || 'Professional Summary',
-                experience: cvEditorTexts?.sectionTitles?.experience || 'Work Experience',
-                skills: cvEditorTexts?.sectionTitles?.skills || 'Skills',
-                education: cvEditorTexts?.sectionTitles?.education || 'Education'
+        contact: 'Thông tin liên hệ',
+        summary: 'Tóm tắt chuyên môn',
+        experience: 'Kinh nghiệm làm việc',
+        skills: 'Kỹ năng',
+        education: 'Học vấn'
       }
     };
   });
@@ -80,23 +80,40 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         // Get user's language preference or detect from browser
         const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
         const detectedLanguage = language || savedLanguage || detectLanguage().language;
-        
+
+        console.log('🌐 CVEditor: Loading language:', {
+          prop: language,
+          saved: savedLanguage,
+          detected: detectedLanguage
+        });
+
         setCurrentLanguage(detectedLanguage);
-        
+
         // Load CV Editor text configuration
         const texts = await getTexts('cvEditor', detectedLanguage);
         setCvEditorTexts(texts);
-        
-        console.log('🌐 CVEditor: Language loaded:', detectedLanguage);
+
+        // Update section titles when language loads
+        if (texts?.sectionTitles) {
+          setCvData(prevData => ({
+            ...prevData,
+            sectionTitles: {
+              ...prevData.sectionTitles,
+              ...texts.sectionTitles
+            }
+          }));
+        }
+
+        console.log('✅ CVEditor: Language loaded successfully:', detectedLanguage);
       } catch (error) {
         console.error('Failed to load language configuration:', error);
-        // Fallback to English
-        setCurrentLanguage('en');
-        const fallbackTexts = await getTexts('cvEditor', 'en');
+        // Fallback to Vietnamese
+        setCurrentLanguage('vi');
+        const fallbackTexts = await getTexts('cvEditor', 'vi');
         setCvEditorTexts(fallbackTexts);
       }
     };
-    
+
     loadLanguageAndTexts();
   }, [language]);
   

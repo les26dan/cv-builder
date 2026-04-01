@@ -29,7 +29,7 @@ export const EducationSection = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [educationTexts, setEducationTexts] = useState<any>(null);
   
   // Load language configuration
@@ -44,7 +44,7 @@ export const EducationSection = ({
         setEducationTexts(texts.sections.education);
       } catch (error) {
         console.error('Failed to load education texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
     

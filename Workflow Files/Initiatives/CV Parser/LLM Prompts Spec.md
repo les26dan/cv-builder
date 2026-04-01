@@ -100,11 +100,24 @@ Yêu cầu khi cải thiện:
 9. Chỉ trả về chính xác các bullet points đã được cải thiện, không thêm bất kỳ nội dung giới thiệu hay kết luận nào khác."
 ```
 
-#### ChatGPT Prompt (English)
-```
-System: "You are a top-tier expert in enhancing and optimizing CV bullet points, transforming existing work descriptions into concise, highly professional, and compelling achievements. You consistently and effectively utilize the STAR (Situation–Task–Action–Result) methodology to restructure content, emphasizing key accomplishments, skills, and quantified outcomes (numbers, percentages). Your improved bullet points always begin with strong action verbs, are specifically optimized for ATS keywords, closely aligned to the target job requirements, and are designed to strongly impress global recruiters."
+#### ChatGPT Prompt — Dùng tiếng Việt (mặc định repo)
 
-User: "Using the information below, improve the existing bullet points to be significantly more professional, impactful, and compelling for inclusion in my CV:
+Code luôn dùng prompt tiếng Việt. Tham chiếu: `config/texts/vi/workExperienceAI.ts` → `bulletImprovement`.
+
+**System:** (giữ nguyên bản tiếng Việt trong spec từ dòng 72–73.)
+
+**User:** (giữ nguyên bản tiếng Việt trong spec từ dòng 75–99.)
+
+---
+
+#### ~~ChatGPT Prompt (English)~~ — Không dùng / Legacy
+
+Repo mặc định tiếng Việt. File `config/texts/en/workExperienceAI.ts` hiện re-export bản Việt, không còn prompt tiếng Anh.
+
+```
+System: "You are a top-tier expert in enhancing and optimizing CV bullet points..."
+
+User: "Using the information below, improve the existing bullet points...
 
 Current bullet points:
 - Manage sales team

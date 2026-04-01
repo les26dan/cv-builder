@@ -46,7 +46,7 @@ export const WorkExperienceSection = ({
   const [isGenerating, setIsGenerating] = useState(false);
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [experienceTexts, setExperienceTexts] = useState<any>(null);
   
   // Load language configuration
@@ -61,7 +61,7 @@ export const WorkExperienceSection = ({
         setExperienceTexts(texts.sections.experience);
       } catch (error) {
         console.error('Failed to load experience texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
     
@@ -137,25 +137,33 @@ export const WorkExperienceSection = ({
     setActiveId(null);
   };
 
-  const handleAddExperience = () => {
+  // Provide the add function to parent component
+  const addExperienceCallback = useCallback(() => {
+    console.log('🔍 TRACE: addExperienceCallback called, stack:', new Error().stack);
+
     // Prevent automatic wizard opening for template users during initial load
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
-    
+
     if (isTemplateUser && !isInitialLoadComplete) {
       console.log('🎯 Guest Session: Preventing wizard popup during initial load for template user');
       return;
     }
-    
-    console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
-    // Open the new comprehensive wizard instead of creating empty entry
-    setNewExperienceWizard(true);
-  };
 
-  // Provide the add function to parent component
-  const addExperienceCallback = useCallback(() => {
-    console.log('🔍 TRACE: addExperienceCallback called, stack:', new Error().stack);
-    handleAddExperience();
+    console.log('🎯 Guest Session: Opening work experience wizard (user action or initial load complete)');
+    // Defer state update to after current render cycle to avoid React warning
+    setTimeout(() => {
+      setNewExperienceWizard(true);
+    }, 0);
   }, [cvData?.id, isInitialLoadComplete]);
+
+  const handleAddExperience = addExperienceCallback;
+
+  // Use ref to avoid re-rendering issues
+  const callbackRef = useRef(addExperienceCallback);
+
+  useEffect(() => {
+    callbackRef.current = addExperienceCallback;
+  }, [addExperienceCallback]);
 
   useEffect(() => {
     // Only block auto-triggering for actual guest users, not all uploaded CVs
@@ -164,26 +172,23 @@ export const WorkExperienceSection = ({
       !cvData.userId || // Users without proper authentication
       cvData.userId.startsWith('guest-') // Explicit guest users
     );
-    
+
     // Only block during initial load to prevent auto-popup, but allow manual use after
     const shouldBlockFunction = isGuestUser && !isInitialLoadComplete;
-    
+
     if (onProvideAddFunction) {
-      // Defer the state update to after the current render cycle to prevent React violation
-      setTimeout(() => {
-        if (!shouldBlockFunction) {
-          console.log('🔧 Providing add experience function to parent (user can manually add)');
-          onProvideAddFunction(addExperienceCallback);
-        } else {
-          console.log('🎯 Guest Session: Temporarily blocking add function during initial load');
-          // Provide a no-op function during initial load only
-          onProvideAddFunction(() => {
-            console.log('🎯 Guest Session: Add function blocked during initial load');
-          });
-        }
-      }, 0);
+      if (!shouldBlockFunction) {
+        console.log('🔧 Providing add experience function to parent (user can manually add)');
+        onProvideAddFunction(() => callbackRef.current());
+      } else {
+        console.log('🎯 Guest Session: Temporarily blocking add function during initial load');
+        // Provide a no-op function during initial load only
+        onProvideAddFunction(() => {
+          console.log('🎯 Guest Session: Add function blocked during initial load');
+        });
+      }
     }
-  }, [onProvideAddFunction, addExperienceCallback, cvData?.id, isInitialLoadComplete]);
+  }, [onProvideAddFunction, cvData?.id, isInitialLoadComplete]);
 
   const handleWizardSave = async (experienceData: any) => {
     // Store the experience data temporarily
@@ -194,13 +199,15 @@ export const WorkExperienceSection = ({
       setIsGenerating(true);
       
       try {
-        // Prepare AI request from wizard data
-        const request: WizardBulletGenerationRequest = {
+        // Prepare AI request from wizard data - include cvData/workExperience for language + context
+        const request: WizardBulletGenerationRequest & { cvData?: any; workExperience?: any[] } = {
           jobTitle: experienceData.title,
           company: experienceData.company,
           project: experienceData.project || '',
           impact: experienceData.impact || '',
-          responsibility: experienceData.responsibility || ''
+          responsibility: experienceData.responsibility || '',
+          cvData,
+          workExperience: data.items
         };
 
         const result = await aiService.generateBulletFromWizard(request);
@@ -431,6 +438,7 @@ export const WorkExperienceSection = ({
       const otherExperiences = data.items.filter((_, index) => index !== wizardModal.experienceIndex);
       
       const request: WizardBulletGenerationRequest & {
+        cvData?: any;
         workExperience?: any[];
         skills?: string[];
         education?: any[];
@@ -441,6 +449,7 @@ export const WorkExperienceSection = ({
         project: wizardData.project,
         impact: wizardData.impact,
         responsibility: wizardData.responsibility,
+        cvData,
         workExperience: otherExperiences,
         skills: cvData?.skills?.items || [],
         education: cvData?.education?.items || [],
@@ -517,7 +526,8 @@ export const WorkExperienceSection = ({
         workExperience: otherExperiences,
         skills: cvData?.skills?.items || [],
         education: cvData?.education?.items || [],
-        targetJobDescription: cvData?.targetJobDescription || ''
+        targetJobDescription: cvData?.targetJobDescription || '',
+        language: currentLanguage
       });
 
       if (result.success && result.data) {
@@ -561,7 +571,8 @@ export const WorkExperienceSection = ({
         company: experience.company,
         workExperience: otherExperiences,
         skills: cvData?.skills?.items || [],
-        targetJob: cvData?.targetJobDescription || ''
+        targetJob: cvData?.targetJobDescription || '',
+        language: currentLanguage
       });
 
       if (result.success && result.data) {

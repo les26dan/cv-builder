@@ -21,7 +21,7 @@ export default function WorkspacePage() {
   const [user, setUser] = useState<User | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [workspace, setWorkspace] = useState<any>(null)
-  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('en')
+  const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi')
   const [isUpdating, setIsUpdating] = useState(false) // For auto-save status
   const [lastUpdate, setLastUpdate] = useState<string | null>(null)
   const router = useRouter()
@@ -34,15 +34,15 @@ export default function WorkspacePage() {
   const loadTexts = async () => {
     try {
       // Check for saved language preference
-      const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en' || 'en'
+      const savedLanguage = localStorage.getItem('okbuddy_language') as 'vi' | 'en' || 'vi'
       setCurrentLanguage(savedLanguage)
       
       const workspaceTexts = await getTexts('workspace', savedLanguage)
       setWorkspace(workspaceTexts)
     } catch (error) {
       console.error('Failed to load texts:', error)
-      // Fallback to English
-      const workspaceTexts = await getTexts('workspace', 'en')
+      // Fallback to Vietnamese
+      const workspaceTexts = await getTexts('workspace', 'vi')
       setWorkspace(workspaceTexts)
     }
   }

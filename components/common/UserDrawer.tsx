@@ -38,8 +38,8 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
         setUserDrawer(texts)
       } catch (error) {
         console.error('Failed to load userDrawer texts:', error)
-        // Fallback to English
-        const fallbackTexts = await getTexts('userDrawer', 'en')
+        // Fallback to Vietnamese
+        const fallbackTexts = await getTexts('userDrawer', 'vi')
         setUserDrawer(fallbackTexts)
       }
     }

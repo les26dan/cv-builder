@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DatabaseService } from '@/lib/database';
-import { verifyPassword } from '@/lib/auth/password';
+import { verifyPassword } from '@/lib/password';
 import { checkRateLimit, createRateLimitResponse, addRateLimitHeaders } from '@/lib/rateLimit';
 import { getTexts } from '@/config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '@/config/languageConfig';

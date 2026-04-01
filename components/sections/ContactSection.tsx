@@ -39,7 +39,7 @@ export const ContactSection = ({
   const [emailSuggestion, setEmailSuggestion] = useState<EmailSuggestion | null>(null);
   
   // Language and text configuration
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [contactTexts, setContactTexts] = useState<any>(null);
   
   // Load language configuration
@@ -54,7 +54,7 @@ export const ContactSection = ({
         setContactTexts(texts.sections.contact);
       } catch (error) {
         console.error('Failed to load contact texts:', error);
-        setCurrentLanguage('en');
+        setCurrentLanguage('vi');
       }
     };
     
