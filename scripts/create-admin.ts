@@ -12,11 +12,19 @@ import { DatabaseService } from '../lib/database'
 
 async function createAdminAccount() {
   console.log('🔧 Creating admin account...')
-  
+
+  const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim()
+  const password = process.env.BOOTSTRAP_ADMIN_PASSWORD
+
+  if (!email || !password) {
+    console.error('❌ Set BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD (e.g. in .env.local)')
+    process.exit(1)
+  }
+
   const adminData = {
-    fullName: 'Admin User',
-    email: 'adminbuddy@okbuddy.com',
-    password: '[REDACTED_PASSWORD]',
+    fullName: process.env.BOOTSTRAP_ADMIN_FULL_NAME?.trim() || 'Admin User',
+    email,
+    password,
     tosAccepted: true,
     role: 'admin' // Admin role
   }

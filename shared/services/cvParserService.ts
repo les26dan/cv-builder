@@ -102,7 +102,7 @@ export class CVParserService {
 
   private constructor() {
     // Use the same OpenAI API key configuration as other services
-    this.openaiApiKey = process.env.OPENAI_API_KEY || '[REDACTED_OPENAI_KEY]';
+    this.openaiApiKey = process.env.OPENAI_API_KEY || '';
     console.log('🔧 CV Parser Service initialized with OpenAI API key:', this.openaiApiKey ? 'configured' : 'missing');
   }
 
@@ -439,8 +439,8 @@ Mandatory requirements for your response:
         { role: 'user', content: prompts.user }
       ];
 
-      // Check cache for full parsing (Buffer base64 supports UTF-8; btoa does not)
-      const cacheKey = `cv_parse_full_${systemLanguage}_${Buffer.from(cvText.substring(0, 100), 'utf8').toString('base64')}`;
+      // Check cache for full parsing
+      const cacheKey = `cv_parse_full_${systemLanguage}_${btoa(cvText.substring(0, 100))}`;
       const cached = this.cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
         console.log('🎯 CV Parser: Using cached full parsing result');

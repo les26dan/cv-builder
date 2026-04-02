@@ -76,15 +76,18 @@ export async function POST(request: NextRequest) {
       ));
     }
 
-    // Handle special admin username "adminbuddy"
+    const bootstrapEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim();
+    const bootstrapPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD;
+    const loginAlias = process.env.BOOTSTRAP_ADMIN_LOGIN_ALIAS?.trim() || 'adminbuddy';
+
     let emailToLookup = body.email;
-    if (body.email === 'adminbuddy') {
-      emailToLookup = 'admin@example.com'; // Updated to Gmail address
-      console.log('🔑 Admin username detected, converting to email:', emailToLookup);
+    if (loginAlias && body.email === loginAlias && bootstrapEmail) {
+      emailToLookup = bootstrapEmail;
+      console.log('🔑 Admin login alias detected, resolving to configured admin email');
     }
 
-    // Validate email format (skip for adminbuddy username)
-    if (body.email !== 'adminbuddy') {
+    // Validate email format (skip for configured login alias)
+    if (!(loginAlias && body.email === loginAlias && bootstrapEmail)) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(body.email)) {
         return addHeaders(NextResponse.json(
@@ -100,47 +103,57 @@ export async function POST(request: NextRequest) {
     // Find user in database
     userResult = await DatabaseService.getUserByEmail(emailToLookup);
     
-    // Auto-create admin account if using adminbuddy credentials or Gmail email
+    // Auto-create bootstrap admin when env is set (local/staging only — never commit secrets)
     if (!userResult.success || !userResult.user) {
-      if ((body.email === 'adminbuddy' || body.email === 'admin@example.com') && body.password === '[REDACTED_PASSWORD]') {
-        console.log('🔧 Auto-creating adminbuddy account with Gmail email...');
+      const bootstrapLoginOk =
+        Boolean(bootstrapEmail && bootstrapPassword) &&
+        body.password === bootstrapPassword &&
+        ((body.email === bootstrapEmail) || (loginAlias && body.email === loginAlias));
+
+      if (bootstrapLoginOk) {
+        console.log('🔧 Auto-creating bootstrap admin account from env...');
         try {
           const { hashPassword } = await import('@/lib/password');
           const passwordResult = await hashPassword(body.password);
-          
+
           if (passwordResult.success && passwordResult.hashedPassword) {
             const createResult = await DatabaseService.createUser({
-              full_name: 'Admin Buddy',
-              email: 'admin@example.com', // Always use Gmail email
+              full_name: 'Admin',
+              email: bootstrapEmail!,
               password_hash: passwordResult.hashedPassword,
               email_verified: true
             });
-            
+
             if (createResult.success) {
-              console.log('✅ Admin Buddy account auto-created successfully with Gmail email');
-              userResult = await DatabaseService.getUserByEmail('admin@example.com');
+              console.log('✅ Bootstrap admin account auto-created');
+              userResult = await DatabaseService.getUserByEmail(bootstrapEmail!);
             }
           }
         } catch (error) {
-          console.error('❌ Failed to auto-create adminbuddy account:', error);
+          console.error('❌ Failed to auto-create bootstrap admin account:', error);
         }
       }
-      
-      // Auto-create master admin account if needed (development mode only)
-      if (emailToLookup === 'masteradmin@okbuddy.com' && process.env.NODE_ENV === 'development') {
-        console.log('🔧 Auto-creating master admin account...');
+
+      const devMasterEmail = process.env.DEV_MASTERADMIN_EMAIL?.trim() || 'masteradmin@okbuddy.com';
+      const devMasterPassword = process.env.DEV_MASTERADMIN_PASSWORD;
+      if (
+        devMasterPassword &&
+        emailToLookup === devMasterEmail &&
+        process.env.NODE_ENV === 'development'
+      ) {
+        console.log('🔧 Auto-creating master admin account (development)...');
         try {
           const { hashPassword } = await import('@/lib/password');
-          const passwordResult = await hashPassword('[REDACTED_DEV_PASSWORD]');
-          
+          const passwordResult = await hashPassword(devMasterPassword);
+
           if (passwordResult.success && passwordResult.hashedPassword) {
             const createResult = await DatabaseService.createUser({
               full_name: 'Master Admin - Full Access',
-              email: 'masteradmin@okbuddy.com',
+              email: devMasterEmail,
               password_hash: passwordResult.hashedPassword,
               email_verified: true
             });
-            
+
             if (createResult.success) {
               console.log('✅ Master admin account auto-created successfully');
               userResult = await DatabaseService.getUserByEmail(emailToLookup);
@@ -180,7 +193,8 @@ export async function POST(request: NextRequest) {
     });
 
     // Create session data
-    const userRole = userResult.user.email === 'admin@example.com' ? 'admin' : 'user';
+    const userRole =
+      bootstrapEmail && userResult.user.email === bootstrapEmail ? 'admin' : 'user';
     const sessionData = {
       id: userResult.user.id,
       email: userResult.user.email,
