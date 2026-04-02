@@ -1290,9 +1290,7 @@ performance_metrics:
   - **Runtime**: Fast role detection and session management
 
 admin_credentials:
-  username: adminbuddy
-  email: admin@example.com
-  password: [REDACTED_PASSWORD]
+  note: Use BOOTSTRAP_ADMIN_EMAIL, BOOTSTRAP_ADMIN_PASSWORD, BOOTSTRAP_ADMIN_LOGIN_ALIAS in .env.local (see ADMIN_ACCESS.md)
   role: admin
   auto_verified: true
 

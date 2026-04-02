@@ -56,15 +56,22 @@ async function setupDatabase() {
       return;
     }
     
+    const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim();
+    const adminPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD;
+    if (!adminEmail || !adminPassword) {
+      console.error('❌ Set BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD in .env.local');
+      process.exit(1);
+    }
+
     // Create admin user
     console.log('🔨 Creating admin user...');
-    const passwordHash = await bcrypt.hash('[REDACTED_PASSWORD]', 12);
-    
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+
     const { data: newUser, error: createError } = await supabase
       .from('users')
       .insert({
-        full_name: 'Admin Buddy',
-        email: 'admin@example.com',
+        full_name: process.env.BOOTSTRAP_ADMIN_FULL_NAME?.trim() || 'Admin',
+        email: adminEmail,
         password_hash: passwordHash,
         email_verified: true,
         signup_method: 'email'
@@ -83,10 +90,7 @@ async function setupDatabase() {
     console.log('👤 Name:', newUser.full_name);
     console.log('✅ Email verified:', newUser.email_verified);
     
-    console.log('\\n🔐 Admin Credentials:');
-    console.log('Email: admin@example.com');
-    console.log('Password: [REDACTED_PASSWORD]');
-    console.log('Username: adminbuddy (alias for email)');
+    console.log('\\n🔐 Admin user created. Use BOOTSTRAP_ADMIN_EMAIL / BOOTSTRAP_ADMIN_PASSWORD from .env.local to sign in.');
     
   } catch (error) {
     console.error('💥 Setup error:', error);

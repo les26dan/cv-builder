@@ -51,7 +51,7 @@
    - Redirects to Google successfully
 
 4. **Email/Password Authentication**:
-   - Admin login works: `admin@example.com` / `[REDACTED_PASSWORD]`
+   - Admin login works when `BOOTSTRAP_ADMIN_*` env vars are set (see `ADMIN_ACCESS.md`)
    - Database connection confirmed
    - Session cookies set properly
    - `/api/auth/me` returns correct user data

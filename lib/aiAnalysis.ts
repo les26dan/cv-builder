@@ -7,7 +7,7 @@
 import { NextApiRequest } from 'next'
 
 // Environment configuration
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '[REDACTED_OPENAI_KEY]'
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ''
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 // Response interfaces

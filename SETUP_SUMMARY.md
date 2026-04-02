@@ -1,129 +1,52 @@
 # OkBuddy App - Setup Summary
 
-## ✅ Completed Setup Steps
+## Completed setup steps (high level)
 
-### 1. Repository & Dependencies
-- ✅ Cloned repo from GitHub using personal SSH key
-- ✅ Installed all npm dependencies (941 packages)
-- ✅ All required packages present and working
+### 1. Repository and dependencies
 
-### 2. Environment Configuration
-- ✅ Created `.env.local` with all required variables
-- ✅ Supabase credentials configured:
-  - URL: https://YOUR_PROJECT_REF.supabase.co
-  - Anon key: Configured
-  - Service role key: Configured
-- ✅ JWT secrets generated
-- ✅ OAuth credentials (LinkedIn pre-configured)
+- Dependencies installed via `npm install`.
 
-### 3. Database Setup
-- ✅ Supabase project created
-- ✅ Main schema deployed (`users` table with OAuth support)
-- ✅ CV tables created (`cv_workflow`, `cv_drafts`)
-- ✅ Row Level Security (RLS) enabled
-- ✅ Admin user created: admin@example.com
+### 2. Environment configuration
 
-### 4. Language Configuration
-- ✅ Vietnamese set as default language
-- ✅ All text exports point to Vietnamese (vi) files
-- ✅ Fallbacks updated to Vietnamese
-- ✅ Complete Vietnamese translations available for:
-  - Landing page
-  - Registration/Login
-  - CV Editor
-  - Workspace
-  - All forms and messages
+- Copy `docs/env-template.txt` to `.env.local` and fill in:
+  - Supabase URL and keys
+  - JWT / session secrets
+  - OAuth client IDs and secrets
+  - `OPENAI_API_KEY` (and related AI keys) as needed
+  - Bootstrap admin: `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`, optional `BOOTSTRAP_ADMIN_LOGIN_ALIAS`
 
-### 5. Authentication
-- ✅ CAPTCHA completely removed from registration
-- ✅ Password hashing/verification fixed (using scrypt)
-- ✅ Login working correctly
-- ✅ Session management active
+### 3. Database
 
-### 6. User Account Created
-- ✅ Email: [REDACTED_EMAIL]
-- ✅ Name: Đan Lê Sỹ
-- ✅ Password: [REDACTED_PASSWORD]
-- ✅ Status: Active, can log in successfully
+- Apply SQL from `docs/` and `scripts/` as documented in `SUPABASE_SETUP_INSTRUCTIONS.md`.
+- Run `setup-database.js` or `POST /api/admin/create/` after env is set (see `ADMIN_ACCESS.md`).
 
-## 🚀 Application Status
+### 4. Language and auth
 
-### Running Server
-- **Local**: http://localhost:3000
-- **Network**: http://192.168.1.12:3000
-- **Status**: Running successfully on port 3000
+- Vietnamese / English configuration lives under `config/texts/`.
+- Email/password and OAuth flows require correct env vars; see `OAUTH_SETUP_INSTRUCTIONS.md`.
 
-### Working Features
-- ✅ Landing page (Vietnamese)
-- ✅ User registration (no CAPTCHA)
-- ✅ User login/logout
-- ✅ CV Workspace
-- ✅ CV Upload
-- ✅ CV Guided Editor
-- ✅ OAuth (Google, LinkedIn ready)
+## How to run
 
-## 📝 Known Non-Issues
-
-### Webpack Cache Warning
-```
-Can't resolve '/Users/dale/pmf/next.config.compiled.js'
-```
-- **Status**: Harmless webpack caching warning
-- **Impact**: None - doesn't affect functionality
-- **Action**: Can be ignored
-
-## 🔧 How to Run
-
-### Start Development Server
 ```bash
 cd /Users/dale/pmf
 npm run dev
 ```
 
-### Access Application
-- Open browser: http://localhost:3000
-- Login with: [REDACTED_EMAIL] / [REDACTED_PASSWORD]
+Open http://localhost:3000 and sign in with accounts you create in your own Supabase project.
 
-### Other Commands
-```bash
-npm run build         # Build for production
-npm run start         # Start production server
-npm run test          # Run tests
-node check-users.js   # Check database users
-```
+## Credentials (never commit)
 
-## 📊 Database Tables
+- **Do not** store real passwords, API keys, or personal emails in tracked markdown.
+- Use `.env.local` (gitignored) and your password manager.
+- Rotate any secret that was ever committed or pushed; see repository history scrub if needed.
 
-### Users & Auth
-- `users` - Main user accounts
-- `user_oauth_providers` - OAuth connections (Google, LinkedIn)
-- `oauth_sessions` - Temporary OAuth sessions
-- `user_sessions` - User login sessions
+## Database tables (overview)
 
-### CV Management
-- `cv_workflow` - Main CV data with full workflow
-- `cv_drafts` - Draft CVs from uploads
+- Users, OAuth, CV workflow, drafts, and audit tables as defined in project SQL migrations and docs.
 
-### Security & Audit
-- `security_audit_log` - Security events
-- `account_linking_attempts` - OAuth linking monitoring
-- `audit_logs` - General audit trail
+## Reference docs
 
-## 🔐 Credentials
-
-### Admin Account
-- Email: admin@example.com
-- Password: [REDACTED_PASSWORD]
-- Username: adminbuddy (alias)
-
-### Your Account
-- Email: [REDACTED_EMAIL]
-- Password: [REDACTED_PASSWORD]
-
-### Supabase
-- Dashboard: https://supabase.com/dashboard/project/REDACTED_SUPABASE_PROJECT_ID_2gwwmxrcrpnk
-- SQL Editor: https://supabase.com/dashboard/project/REDACTED_SUPABASE_PROJECT_ID_2gwwmxrcrpnk/sql
-
-## ✨ Everything is Working!
-
-The application is fully functional and ready to use. All features are working as expected.
+- `SUPABASE_SETUP_INSTRUCTIONS.md`
+- `OAUTH_SETUP_INSTRUCTIONS.md`
+- `docs/env-template.txt`
+- `ADMIN_ACCESS.md`

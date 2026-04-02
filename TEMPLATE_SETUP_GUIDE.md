@@ -111,14 +111,14 @@ Add to `.env.local`:
 ```bash
 # Supabase (required for database persistence)
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 # Authentication (required for non-template CVs)
-JWT_SECRET=[REDACTED_JWT_SECRET]
-NEXTAUTH_SECRET=[REDACTED_NEXTAUTH_SECRET]
+JWT_SECRET=generate-with-openssl-rand-base64-32
+NEXTAUTH_SECRET=generate-a-separate-secret
 
 # OpenAI (optional, for CV parsing)
-NEXT_PUBLIC_OPENAI_API_KEY=sk-proj-...
+OPENAI_API_KEY=sk-proj-your-key
 ```
 
 ## Architecture: Template Flow

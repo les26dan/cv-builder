@@ -87,7 +87,7 @@ async function createTables() {
 
   console.log('\n📌 IMPORTANT: If tables were not created automatically,');
   console.log('please run the SQL manually in Supabase SQL Editor:');
-  console.log('https://supabase.com/dashboard/project/REDACTED_SUPABASE_PROJECT_ID_2gwwmxrcrpnk/sql\n');
+  console.log('Open your Supabase dashboard → SQL Editor for this project.\n');
   console.log('Make sure EXPLAIN mode is OFF (toggle in the editor)');
   console.log('Then paste the contents of create-cv-tables.sql and click Run\n');
 }
