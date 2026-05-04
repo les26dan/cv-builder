@@ -1,11 +1,53 @@
 node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+*.tsbuildinfo
+
+# Env & secrets
 .env
 .env.*
 !.env.example
-.next/
 .oauth-sessions.json
-*.tsbuildinfo
-.DS_Store
 
-# Local-only credential notes (keep examples in repo, not real secrets)
-Heimdall/credentials.local.md
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local artifacts
+uploads/
+
+# Large datasets — Kaggle CSVs (keep README only)
+data/kaggle/*.csv
+
+# Loose binaries / archives at repo root
+/*.zip
+/*.docx
+/*.pdf
+
+# LaTeX build artifacts (thesis/)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.bcf
+thesis/DoAn.pdf
+thesis/DoAn-blx.bib
+thesis/lstlisting.tex
+thesis/so_sanh_cv_tools.docx

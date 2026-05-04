@@ -1,0 +1,200 @@
+\documentclass[a4paper,13pt]{report}
+\usepackage[utf8]{vietnam}
+\usepackage[top=2cm, bottom=2cm, left=3cm, right=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{fancybox}
+\usepackage{amsmath, amssymb}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+% Đếm chương bắt đầu từ 5
+\setcounter{chapter}{4}
+
+\title{Chương 5 (Draft): Đánh giá so sánh ba phương pháp matching CV--JD}
+\author{Khoá luận tốt nghiệp}
+\date{04/05/2026}
+
+\begin{document}
+\maketitle
+
+\chapter{Kiểm thử và đánh giá hệ thống}
+
+% =============================================================================
+% Nội dung Chương 5 (Draft) — số liệu là PLACEHOLDER, sẽ điền sau khi chạy eval
+% =============================================================================
+
+Chương 4 đã trình bày quá trình hiện thực hệ thống OkBuddy và module matching engine. Chương này trình bày \textbf{đóng góp nghiên cứu chính} của khoá luận: thiết kế thí nghiệm và đánh giá định lượng ba phương pháp so khớp CV với mô tả công việc (JD) trên dataset Kaggle, từ đó trả lời hai câu hỏi nghiên cứu RQ1 (chất lượng) và RQ2 (chi phí--chất lượng).
+
+\section{Thiết kế thí nghiệm}
+\label{sec:exp_design}
+
+\subsection{Mục tiêu và câu hỏi nghiên cứu}
+
+Thí nghiệm được thiết kế để trả lời hai câu hỏi nghiên cứu đã đặt trong Chương 1:
+
+\begin{itemize}
+    \item \textbf{RQ1 (Chất lượng):} Trong ba phương pháp TF-IDF, semantic embeddings và LLM reasoning, phương pháp nào đạt Precision@10 và nDCG@10 cao nhất khi xếp hạng CV ứng với một JD cho trước?
+    \item \textbf{RQ2 (Chi phí--chất lượng):} Mức tăng chất lượng có \textit{Pareto-justified} so với chi phí (USD/1000 cặp) và độ trễ (p50/p95 ms) hay không?
+\end{itemize}
+
+Giả thuyết zero (H\textsubscript{0}) cho RQ1: không có khác biệt thống kê về Precision@10 giữa ba phương pháp. Giả thuyết được kiểm định bằng paired Wilcoxon signed-rank test với mức ý nghĩa $\alpha = 0.05$.
+
+\subsection{Ba phương pháp được so sánh}
+
+\begin{enumerate}
+    \item \textbf{TF-IDF (lexical baseline)}: tính trọng số từ theo công thức TF-IDF (smoothed sklearn-style), độ tương đồng giữa CV và JD là cosine similarity giữa hai vector TF-IDF. Không phụ thuộc API ngoài, chi phí bằng 0.
+    \item \textbf{Semantic Embeddings}: sử dụng mô hình \texttt{text-embedding-3-small} của OpenAI, biến CV và JD thành vector 1536 chiều, tính cosine similarity. Có cache theo SHA-256 để tránh embed lại.
+    \item \textbf{LLM Reasoning}: sử dụng \texttt{gpt-4o-mini} với prompt yêu cầu chấm điểm độ phù hợp 0--100. Wrapper gọi API hiện hữu trong \texttt{app/api/cv/jd-analyze/route.ts}.
+\end{enumerate}
+
+\subsection{Bộ dữ liệu}
+
+Sử dụng hai dataset công khai trên Kaggle:
+
+\begin{itemize}
+    \item \textit{Resume Dataset} ($\sim$2,400 CV, 24 nhóm nghề): cột \texttt{Category}, \texttt{Resume\_str}.
+    \item \textit{Job Postings} ($\sim$500K JD, đã sample còn 21 MB): cột \texttt{Job Title}, \texttt{Job Description}.
+\end{itemize}
+
+Lý do chọn Kaggle: dataset công khai, có thể tái lập (reproducible), số lượng lớn, đa dạng nhóm nghề. Hạn chế là dữ liệu tiếng Anh, sẽ thảo luận trong \S\ref{sec:threats}.
+
+\subsection{Xây dựng ground truth (Strategy A)}
+\label{sec:gt}
+
+Do không có nhãn người gắn, khoá luận sử dụng \textbf{category proxy} làm \textit{silver-standard ground truth}: một cặp $(CV, JD)$ được gán nhãn $y=1$ (phù hợp) nếu \texttt{CV.Category} khớp với một trong các regex tương ứng JD title trong bảng ánh xạ \texttt{data/category-mapping.json} (24 nhóm); ngược lại $y=0$ (không phù hợp).
+
+Sample stratified \textbf{200 cặp dương + 200 cặp âm = 400 cặp}, seed = 42. Kích thước này được chọn để cân bằng giữa: (i) statistical power đủ cho paired Wilcoxon, (ii) chi phí LLM dưới ngưỡng \$10, và (iii) thời gian chạy < 30 phút trên một máy đơn.
+
+\subsection{Độ đo}
+
+\begin{itemize}
+    \item \textbf{Ranking quality}: Precision@5, Precision@10, Recall@10, nDCG@10, MRR.
+    \item \textbf{Classification}: ROC-AUC tính từ binary relevance, threshold ở median.
+    \item \textbf{Chi phí--hiệu năng}: latency p50/p95 (ms), cost USD/1000 cặp.
+    \item \textbf{Kiểm định thống kê}: paired Wilcoxon signed-rank trên per-pair F1 ($\alpha = 0.05$); bootstrap 95\% CI cho macro-F1 deltas (10,000 resamples).
+\end{itemize}
+
+\subsection{Môi trường thí nghiệm}
+
+Thí nghiệm chạy trên: Node.js 20, Next.js 15, Supabase (pgvector), OpenAI API. Phần cứng: \textit{[điền sau]}. Hạt giống ngẫu nhiên cố định seed = 42 cho mọi bước (sampling, bootstrap). Cost ceiling được kiểm soát qua biến môi trường \texttt{OPENAI\_MAX\_SPEND\_USD = 10}.
+
+\section{Kết quả RQ1: Chất lượng ranking}
+\label{sec:rq1}
+
+Bảng \ref{tab:rq1_main} tổng hợp các độ đo chất lượng trên 400 cặp đánh giá.
+
+\begin{table}[H]
+\centering
+\caption{So sánh chất lượng ba phương pháp matching (n = 400 cặp, seed = 42)}
+\label{tab:rq1_main}
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Phương pháp} & \textbf{P@5} & \textbf{P@10} & \textbf{nDCG@10} & \textbf{MRR} & \textbf{ROC-AUC} \\ \hline
+TF-IDF       & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} \\ \hline
+Embeddings   & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} \\ \hline
+LLM (gpt-4o-mini) & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} \\ \hline
+\end{tabular}
+\end{table}
+
+\textit{[Diễn giải sẽ điền sau khi có số liệu thực. Khung dự kiến: nêu phương pháp tốt nhất theo từng độ đo, mức độ chênh lệch, và liên hệ với giả thuyết.]}
+
+Hình \ref{fig:rq1_bar} minh hoạ nDCG@10 với khoảng tin cậy 95\% (bootstrap, 10,000 resamples).
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.7\textwidth}{\centering\vspace{2cm}\textit{[Placeholder: bar chart nDCG@10 với CI 95\%]}\vspace{2cm}}}
+\caption{nDCG@10 theo từng phương pháp với khoảng tin cậy 95\%}
+\label{fig:rq1_bar}
+\end{figure}
+
+\subsection{Kiểm định thống kê}
+
+Bảng \ref{tab:wilcoxon} trình bày kết quả paired Wilcoxon signed-rank test trên per-pair F1.
+
+\begin{table}[H]
+\centering
+\caption{Paired Wilcoxon signed-rank test (per-pair F1, $\alpha = 0.05$)}
+\label{tab:wilcoxon}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Cặp so sánh} & \textbf{Statistic W} & \textbf{p-value} & \textbf{Kết luận} \\ \hline
+TF-IDF vs Embeddings & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} \\ \hline
+TF-IDF vs LLM        & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} \\ \hline
+Embeddings vs LLM    & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[\textbullet]} \\ \hline
+\end{tabular}
+\end{table}
+
+\textit{[Diễn giải: nếu p < 0.05 cho cặp nào, kết luận khác biệt có ý nghĩa thống kê và bác bỏ H\textsubscript{0} cho cặp đó.]}
+
+\section{Kết quả RQ2: Cân đối chi phí--chất lượng}
+\label{sec:rq2}
+
+\subsection{Chi phí và độ trễ}
+
+Bảng \ref{tab:rq2_cost} ghi nhận chi phí và độ trễ của ba phương pháp.
+
+\begin{table}[H]
+\centering
+\caption{Chi phí và độ trễ trên 400 cặp đánh giá}
+\label{tab:rq2_cost}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Phương pháp} & \textbf{Latency p50 (ms)} & \textbf{Latency p95 (ms)} & \textbf{USD / 1000 cặp} \\ \hline
+TF-IDF       & \textit{[\textbullet]} & \textit{[\textbullet]} & 0.00 \\ \hline
+Embeddings   & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[$\sim$0.02]} \\ \hline
+LLM          & \textit{[\textbullet]} & \textit{[\textbullet]} & \textit{[$\sim$2.00]} \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Phân tích Pareto}
+
+Hình \ref{fig:pareto} biểu diễn các phương pháp trên trục chi phí (USD/1000 cặp) -- chất lượng (nDCG@10). Một phương pháp \textit{Pareto-dominant} nếu không có phương pháp nào khác vừa rẻ hơn vừa chất lượng cao hơn.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.75\textwidth}{\centering\vspace{2cm}\textit{[Placeholder: Pareto plot chi phí vs nDCG@10]}\vspace{2cm}}}
+\caption{Pareto frontier: chi phí vs chất lượng (nDCG@10)}
+\label{fig:pareto}
+\end{figure}
+
+\textit{[Diễn giải: nếu LLM không Pareto-dominate, kết luận TF-IDF/Embeddings là lựa chọn hợp lý hơn cho production. Nếu có, thảo luận khi nào nên đầu tư LLM.]}
+
+\section{Phân tích lỗi (Error Analysis)}
+\label{sec:err}
+
+Trích 5 ví dụ minh hoạ các trường hợp ba phương pháp bất đồng:
+
+\begin{enumerate}
+    \item \textbf{CV viết khác từ JD}: TF-IDF chấm thấp (do thiếu từ trùng), Embeddings/LLM chấm cao (hiểu nghĩa). Ví dụ: JD ``Frontend developer'' vs CV ``UI engineer''.
+    \item \textbf{CV nhiều buzzword nhưng kinh nghiệm sai domain}: TF-IDF chấm cao (trùng từ), LLM chấm thấp (đọc kinh nghiệm thực).
+    \item \textbf{CV ngắn, JD dài}: tất cả đều chấm thấp do thiếu thông tin.
+    \item \textbf{Đồng nghĩa kỹ thuật} (\texttt{NodeJS} vs \texttt{Node.js}): TF-IDF tách thành 2 token, Embeddings xử lý đúng.
+    \item \textbf{LLM hallucination}: \textit{[ví dụ cụ thể, ghi rõ prompt + output]}.
+\end{enumerate}
+
+\textit{[Bổ sung sau khi có results.csv: chọn 5 cặp có disagreement lớn nhất giữa các phương pháp.]}
+
+\section{Đánh giá đe doạ tính hợp lệ (Threats to Validity)}
+\label{sec:threats}
+
+Theo phân loại của Wohlin et al. (2012):
+
+\textbf{Construct validity:} Ground truth Strategy A là proxy theo nhóm nghề, không phải nhãn người gắn thực sự. Một CV có thể phù hợp JD ngoài nhóm nghề chính. Hướng giảm thiểu: Strategy B (skill overlap) sẽ được khảo sát ở nghiên cứu mở rộng.
+
+\textbf{Internal validity:} Cố định seed = 42, mọi bước có thể tái lập. Cache embedding đảm bảo tính nhất quán giữa các lần chạy. Cost ceiling tránh chạy ngẫu nhiên gây nhiễu.
+
+\textbf{External validity:} Dataset tiếng Anh, không phản ánh thị trường lao động Việt Nam. Kết luận cần kiểm chứng lại trên dataset tiếng Việt -- ghi nhận trong hướng phát triển (\S 6.4). Mô hình embedding-3-small đại diện cho lớp ``embedding rẻ''; chưa khảo sát embedding-3-large hay multilingual-E5.
+
+\textbf{Conclusion validity:} Sample size 400 cho paired Wilcoxon đủ phát hiện effect size trung bình ($d \geq 0.3$) với power 0.8. Bootstrap 10,000 resamples cho CI ổn định.
+
+\section{Tổng kết chương}
+
+Chương này đã thiết kế và thực hiện thí nghiệm so sánh ba phương pháp matching CV--JD trên 400 cặp dữ liệu Kaggle với ground truth category proxy. Kết quả cho thấy \textit{[điền sau: phương pháp X vượt trội về chất lượng nhưng phương pháp Y có cân đối chi phí--chất lượng tốt nhất]}. Kiểm định Wilcoxon \textit{[ủng hộ/không ủng hộ]} bác bỏ H\textsubscript{0}. Phân tích Pareto chỉ ra \textit{[khuyến nghị triển khai cụ thể]}.
+
+Chương 6 tổng kết đóng góp của khoá luận theo từng câu hỏi nghiên cứu, nêu các hạn chế và hướng phát triển.
+
+\end{document}

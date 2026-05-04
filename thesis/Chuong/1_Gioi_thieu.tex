@@ -1,0 +1,68 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+
+Chương này trình bày bối cảnh và động lực thực hiện đồ án, phân tích các giải pháp hiện có cùng những hạn chế của chúng, từ đó đề xuất mục tiêu, hướng tiếp cận và các đóng góp chính của đồ án.
+
+\section{Đặt vấn đề}
+\label{sec:dvd}
+
+Trong bối cảnh thị trường lao động Việt Nam và quốc tế ngày càng cạnh tranh, hồ sơ việc làm (Curriculum Vitae -- CV) là công cụ đầu tiên và quan trọng nhất để ứng viên tạo ấn tượng với nhà tuyển dụng. Theo báo cáo của Jobscan \cite{jobscan2023}, hơn 98\% các công ty trong danh sách Fortune 500 sử dụng hệ thống theo dõi ứng viên (Applicant Tracking System -- ATS) để tự động sàng lọc hồ sơ trước khi đến tay nhà tuyển dụng. Các hệ thống ATS phân tích cấu trúc và nội dung CV, so khớp từ khóa với yêu cầu tuyển dụng, và loại bỏ những hồ sơ không đáp ứng tiêu chí -- thường là trước khi bất kỳ con người nào đọc chúng.
+
+Tuy nhiên, phần lớn người tìm việc, đặc biệt là sinh viên mới tốt nghiệp tại Việt Nam, chưa nhận thức đầy đủ về vai trò của ATS và cách tối ưu CV để vượt qua vòng sàng lọc tự động. Một khảo sát của TopCV \cite{topcv2023} cho thấy hơn 75\% CV của ứng viên Việt Nam bị loại ngay ở vòng ATS do lỗi định dạng, thiếu từ khóa phù hợp, hoặc cấu trúc không chuẩn. Bên cạnh đó, việc viết CV bằng tiếng Việt còn gặp thêm thách thức về xử lý ngôn ngữ do đặc thù về dấu thanh và cấu trúc câu.
+
+Sự phát triển vượt bậc của các Mô hình Ngôn ngữ lớn (Large Language Model -- LLM) như GPT-4 \cite{openai2023gpt4} đã mở ra cơ hội mới trong việc phân tích, hiểu và cấu trúc hóa nội dung văn bản phi cấu trúc. Khả năng hiểu ngữ cảnh sâu và sinh văn bản tự nhiên của LLM đặc biệt phù hợp với bài toán trích xuất thông tin từ CV, vốn đòi hỏi sự linh hoạt trong việc nhận dạng các mục như kinh nghiệm làm việc, học vấn, kỹ năng từ nhiều định dạng trình bày khác nhau.
+
+Xuất phát từ những phân tích trên, đồ án đặt ra bài toán: \textit{Xây dựng một ứng dụng web toàn diện hỗ trợ người dùng tạo, phân tích và tối ưu hồ sơ việc làm bằng cách ứng dụng Mô hình Ngôn ngữ lớn, phục vụ đặc biệt cho thị trường Việt Nam với khả năng hỗ trợ song ngữ Việt--Anh.}
+
+\section{Các giải pháp hiện tại và hạn chế}
+\label{sec:giaiphap}
+
+Hiện nay, trên thị trường đã tồn tại nhiều công cụ và dịch vụ hỗ trợ người dùng xây dựng CV. Các giải pháp này có thể được phân thành ba nhóm chính.
+
+Nhóm thứ nhất là các công cụ xây dựng CV trực tuyến như Canva, Zety, NovoResume và FlowCV. Các nền tảng này cung cấp thư viện mẫu CV đa dạng với giao diện kéo thả trực quan. Ưu điểm của chúng nằm ở tính dễ sử dụng và khả năng tạo CV có thiết kế đẹp mắt. Tuy nhiên, các công cụ này chủ yếu tập trung vào khía cạnh trình bày mà thiếu khả năng phân tích nội dung thông minh. Chúng không thể đánh giá mức độ phù hợp của CV với yêu cầu tuyển dụng cụ thể, không hỗ trợ trích xuất dữ liệu từ CV có sẵn, và hầu hết không hỗ trợ tốt cho tiếng Việt.
+
+Nhóm thứ hai là các dịch vụ phân tích CV thương mại như Sovren, Textkernel và DaXtra. Đây là các bộ phân tích CV (CV parser) chuyên nghiệp sử dụng công nghệ xử lý ngôn ngữ tự nhiên (NLP) để trích xuất thông tin có cấu trúc từ CV dạng tự do. Nhược điểm chính của nhóm này là chi phí cao (thường tính theo số lượng CV xử lý), giao diện hướng đến doanh nghiệp chứ không phải người dùng cuối, và khả năng hỗ trợ tiếng Việt còn hạn chế.
+
+Nhóm thứ ba là các nền tảng mạng nghề nghiệp như LinkedIn. Mặc dù LinkedIn cho phép người dùng xây dựng hồ sơ nghề nghiệp trực tuyến đầy đủ, khả năng xuất CV sang các định dạng truyền thống (PDF, DOCX) còn hạn chế và người dùng ít có khả năng tùy chỉnh nội dung và bố cục theo nhu cầu cá nhân.
+
+Tổng hợp lại, các giải pháp hiện có tồn tại ba hạn chế chính: (i) thiếu khả năng phân tích nội dung CV bằng AI để đưa ra gợi ý cải thiện, (ii) không hỗ trợ quy trình tải lên CV có sẵn rồi cấu trúc hóa và chỉnh sửa, và (iii) thiếu hỗ trợ song ngữ Việt--Anh phù hợp cho thị trường Việt Nam.
+
+\section{Mục tiêu và định hướng giải pháp}
+
+Từ phân tích các hạn chế nêu trên, đồ án đề ra các mục tiêu cụ thể sau:
+
+\begin{enumerate}
+\item Xây dựng hệ thống web cho phép người dùng tải lên CV dạng PDF hoặc DOCX, tự động trích xuất văn bản và phân tích nội dung bằng phương pháp kết hợp giữa kỹ thuật xử lý văn bản truyền thống và Mô hình Ngôn ngữ lớn.
+\item Phát triển trình soạn thảo CV có hướng dẫn (guided editor) cho phép chỉnh sửa trực quan theo từng phần với khả năng xem trước trong thời gian thực.
+\item Hỗ trợ xuất CV ra nhiều định dạng (PDF, DOCX, LaTeX, TXT) đáp ứng nhu cầu đa dạng của người dùng.
+\item Xây dựng hệ thống xác thực đa phương thức (email, Google OAuth, LinkedIn OAuth) và quản lý CV trực tuyến.
+\item Đảm bảo hỗ trợ song ngữ Việt--Anh xuyên suốt toàn bộ hệ thống.
+\end{enumerate}
+
+Định hướng giải pháp là xây dựng ứng dụng web toàn diện mang tên OkBuddy, sử dụng kiến trúc hiện đại dựa trên Next.js với React, tích hợp OpenAI ChatGPT API cho khả năng phân tích CV thông minh. Điểm khác biệt chính so với các giải pháp hiện có là cách tiếp cận \textit{hybrid} trong phân tích CV: kết hợp phương pháp phân tích trực tiếp bằng biểu thức chính quy (regex) cho các phần dễ trích xuất (thông tin liên hệ, kỹ năng) với LLM cho các phần phức tạp hơn (kinh nghiệm làm việc), giúp tiết kiệm chi phí API mà vẫn đảm bảo độ chính xác.
+
+\section{Đóng góp của đồ án}
+
+Đồ án này có ba đóng góp chính như sau:
+
+\begin{enumerate}
+\item Đồ án đề xuất và hiện thực phương pháp phân tích CV lai (hybrid CV parser) kết hợp giữa xử lý văn bản truyền thống bằng regex và Mô hình Ngôn ngữ lớn. Phương pháp này giúp tiết kiệm đáng kể lượng token API sử dụng (ước tính giảm 40--60\% so với phương pháp sử dụng hoàn toàn LLM) mà vẫn duy trì độ chính xác cao trong việc trích xuất thông tin có cấu trúc từ CV.
+\item Đồ án xây dựng hệ thống soạn thảo CV tương tác với khả năng chỉnh sửa theo từng phần (section-based editing), hỗ trợ kéo thả để sắp xếp thứ tự các mục, tự động lưu theo thời gian thực, và xem trước định dạng chuẩn A4. Hệ thống hỗ trợ xuất CV ra bốn định dạng khác nhau (PDF, DOCX, LaTeX, TXT).
+\item Đồ án phát triển nền tảng web hoàn chỉnh với hệ thống xác thực đa phương thức, quản lý CV trực tuyến, và hỗ trợ song ngữ Việt--Anh, phục vụ cho cả sinh viên và người đi làm tại Việt Nam.
+\end{enumerate}
+
+\section{Bố cục đồ án}
+
+Phần còn lại của báo cáo đồ án tốt nghiệp này được tổ chức như sau.
+
+Chương 2 trình bày cơ sở lý thuyết liên quan đến đồ án, bao gồm tổng quan về Mô hình Ngôn ngữ lớn và kiến trúc Transformer, các kỹ thuật xử lý ngôn ngữ tự nhiên trong phân tích CV, kiến trúc ứng dụng web hiện đại với Next.js và React, cơ chế hoạt động của hệ thống ATS, cùng các công nghệ nền tảng được sử dụng trong hệ thống.
+
+Chương 3 trình bày quá trình phân tích yêu cầu và thiết kế hệ thống OkBuddy, bao gồm đặc tả yêu cầu chức năng và phi chức năng, kiến trúc tổng thể ba lớp, thiết kế cơ sở dữ liệu với sáu bảng chính, thiết kế các API endpoint, thiết kế giao diện người dùng, và đặc biệt là thiết kế pipeline phân tích CV hybrid.
+
+Chương 4 mô tả chi tiết quá trình hiện thực các module chính của hệ thống, từ module xác thực đa phương thức, module tải lên và phân tích CV bằng phương pháp hybrid, trình soạn thảo CV tương tác, module xuất CV đa định dạng, đến hệ thống quản lý CV workspace và các cơ chế bảo mật.
+
+Chương 5 trình bày kết quả kiểm thử và đánh giá hệ thống, bao gồm kiểm thử chức năng các module chính, đánh giá hiệu năng của phương pháp phân tích CV hybrid, đánh giá trải nghiệm người dùng, so sánh với các giải pháp hiện có, và thảo luận về các hạn chế còn tồn tại.
+
+Chương 6 tổng kết các kết quả đã đạt được của đồ án và đề xuất các hướng phát triển trong tương lai.
+
+\end{document}

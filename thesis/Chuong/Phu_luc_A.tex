@@ -1,0 +1,98 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+
+Phụ lục này hướng dẫn chi tiết cách cài đặt và chạy hệ thống OkBuddy trên môi trường phát triển cục bộ.
+
+\section{Yêu cầu hệ thống}
+
+\begin{itemize}
+\item Node.js phiên bản 18.x trở lên
+\item npm phiên bản 9.x trở lên
+\item Tài khoản Supabase (miễn phí tại \url{https://supabase.com})
+\item Tài khoản OpenAI với API key (tại \url{https://platform.openai.com})
+\item (Tùy chọn) Tài khoản Google Cloud Console cho Google OAuth
+\item (Tùy chọn) Tài khoản LinkedIn Developer cho LinkedIn OAuth
+\end{itemize}
+
+\section{Cài đặt dự án}
+
+\begin{lstlisting}[language=bash, caption={Các bước cài đặt dự án}]
+# Clone repository
+git clone <repository-url>
+cd pmf
+
+# Cai dat dependencies
+npm install
+
+# Tao file cau hinh moi truong
+cp docs/env-template.txt .env.local
+\end{lstlisting}
+
+\section{Cấu hình biến môi trường}
+
+Chỉnh sửa file \texttt{.env.local} với các thông tin sau:
+
+\begin{lstlisting}[language=bash, caption={Các biến môi trường cần cấu hình}]
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# JWT
+JWT_SECRET=your-jwt-secret
+NEXTAUTH_SECRET=your-nextauth-secret
+
+# OpenAI
+NEXT_PUBLIC_OPENAI_API_KEY=your-openai-api-key
+
+# Vercel Blob
+BLOB_READ_WRITE_TOKEN=your-blob-token
+
+# Google OAuth (tuy chon)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback/
+
+# LinkedIn OAuth (tuy chon)
+LINKEDIN_CLIENT_ID=your-linkedin-client-id
+LINKEDIN_CLIENT_SECRET=your-linkedin-client-secret
+LINKEDIN_REDIRECT_URI=http://localhost:3000/api/auth/linkedin/callback/
+\end{lstlisting}
+
+\section{Thiết lập cơ sở dữ liệu}
+
+\begin{enumerate}
+\item Tạo dự án mới trên Supabase Dashboard
+\item Mở SQL Editor trong Supabase Dashboard
+\item Chạy nội dung file \texttt{docs/database-schema.sql} để tạo các bảng, index, RLS policies và functions
+\item Xác nhận tất cả các bảng đã được tạo thành công: \texttt{users}, \texttt{cv\_workflow}, \texttt{cv\_drafts}, \texttt{cvs}, \texttt{user\_sessions}, \texttt{audit\_logs}
+\end{enumerate}
+
+\section{Chạy ứng dụng}
+
+\begin{lstlisting}[language=bash, caption={Khởi động ứng dụng}]
+# Chay moi truong phat trien
+npm run dev
+
+# Truy cap ung dung tai
+# http://localhost:3000
+
+# Build cho production
+npm run build
+npm run start
+
+# Chay kiem thu
+npm run test
+\end{lstlisting}
+
+\section{Tạo tài khoản admin}
+
+\begin{lstlisting}[language=bash, caption={Tạo tài khoản quản trị}]
+# Tao tai khoan admin tu dong
+curl -X POST http://localhost:3000/api/admin/create/ \
+  -H "Content-Type: application/json"
+\end{lstlisting}
+
+Sau khi tạo thành công, truy cập trang quản trị tại \url{http://localhost:3000/admin/}.
+
+\end{document}

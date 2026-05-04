@@ -1,0 +1,138 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+
+Chương 1 đã trình bày bối cảnh, động lực và mục tiêu của đồ án. Chương này giới thiệu các kiến thức nền tảng và lý thuyết liên quan, bao gồm Mô hình Ngôn ngữ lớn, các kỹ thuật xử lý ngôn ngữ tự nhiên trong phân tích CV, kiến trúc ứng dụng web hiện đại, hệ thống ATS, và các công nghệ nền tảng được sử dụng trong đồ án.
+
+\section{Mô hình Ngôn ngữ lớn}
+\label{sec:llm}
+
+\subsection{Kiến trúc Transformer}
+
+Transformer \cite{vaswani2017attention} là kiến trúc mạng nơ-ron được Vaswani và cộng sự đề xuất vào năm 2017, đánh dấu bước ngoặt trong lĩnh vực xử lý ngôn ngữ tự nhiên. Khác với các mô hình tuần tự truyền thống như RNN (Recurrent Neural Network) và LSTM (Long Short-Term Memory), Transformer sử dụng cơ chế \textit{tự chú ý} (self-attention) cho phép mô hình xử lý toàn bộ chuỗi đầu vào đồng thời thay vì tuần tự, từ đó cải thiện đáng kể hiệu quả tính toán và khả năng nắm bắt các phụ thuộc xa trong văn bản.
+
+Kiến trúc Transformer gồm hai thành phần chính: bộ mã hóa (encoder) và bộ giải mã (decoder). Bộ mã hóa chuyển chuỗi đầu vào thành biểu diễn liên tục, trong khi bộ giải mã sinh chuỗi đầu ra dựa trên biểu diễn này. Mỗi lớp trong encoder và decoder bao gồm cơ chế multi-head attention và mạng nơ-ron truyền thẳng (feed-forward network), kết hợp với kết nối tắt (residual connection) và chuẩn hóa lớp (layer normalization).
+
+Cơ chế self-attention tính toán trọng số chú ý cho mỗi cặp vị trí trong chuỗi đầu vào theo công thức:
+
+\begin{equation}\label{eq:attention}
+    \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+
+trong đó $Q$, $K$, $V$ lần lượt là các ma trận truy vấn (query), khóa (key) và giá trị (value), $d_k$ là chiều của vector khóa. Phép chia cho $\sqrt{d_k}$ giúp ổn định gradient trong quá trình huấn luyện.
+
+% Placeholder cho hình minh họa kiến trúc Transformer
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=0.7\linewidth]{Hinh_ve/transformer_architecture.png}
+% \caption{Kiến trúc Transformer \cite{vaswani2017attention}}
+% \label{fig:transformer}
+% \end{figure}
+
+\subsection{Họ mô hình GPT}
+
+GPT (Generative Pre-trained Transformer) là họ mô hình ngôn ngữ do OpenAI phát triển, sử dụng phần decoder của kiến trúc Transformer. Mô hình được huấn luyện qua hai giai đoạn: (i) \textit{tiền huấn luyện} (pre-training) trên lượng lớn dữ liệu văn bản không gắn nhãn theo phương pháp tự hồi quy (autoregressive), và (ii) \textit{tinh chỉnh} (fine-tuning) cho các tác vụ cụ thể.
+
+GPT-3 \cite{brown2020language} với 175 tỷ tham số đã chứng minh khả năng \textit{học trong ngữ cảnh} (in-context learning), cho phép mô hình thực hiện nhiều tác vụ NLP chỉ thông qua vài ví dụ (few-shot) hoặc không cần ví dụ (zero-shot) trong prompt. GPT-4 \cite{openai2023gpt4} tiếp tục cải thiện khả năng suy luận và hiểu ngữ cảnh phức tạp. ChatGPT, phiên bản của GPT được tối ưu cho hội thoại thông qua kỹ thuật RLHF (Reinforcement Learning from Human Feedback) \cite{ouyang2022training}, là mô hình được sử dụng trong đồ án này thông qua API của OpenAI.
+
+\subsection{Prompt Engineering}
+
+Prompt engineering là kỹ thuật thiết kế câu lệnh đầu vào (prompt) để hướng dẫn LLM tạo ra kết quả mong muốn \cite{white2023prompt}. Trong đồ án này, prompt engineering đóng vai trò quan trọng trong việc hướng dẫn mô hình GPT trích xuất thông tin có cấu trúc từ văn bản CV. Các kỹ thuật prompt engineering được áp dụng bao gồm:
+
+\begin{enumerate}[label=(\roman*)]
+\item \textit{System prompt}: Thiết lập vai trò và ngữ cảnh cho mô hình (ví dụ: ``Bạn là chuyên gia phân tích CV chuyên nghiệp'').
+\item \textit{Structured output}: Yêu cầu mô hình trả về kết quả theo định dạng JSON cụ thể, giúp dễ dàng xử lý bằng chương trình.
+\item \textit{Few-shot examples}: Cung cấp một vài ví dụ mẫu về đầu vào và đầu ra mong muốn để mô hình học cách trích xuất chính xác.
+\end{enumerate}
+
+\section{Xử lý ngôn ngữ tự nhiên trong phân tích CV}
+
+\subsection{Bài toán trích xuất thông tin từ CV}
+
+Phân tích CV (resume/CV parsing) là bài toán trích xuất thông tin có cấu trúc từ tài liệu CV dạng tự do \cite{chen2016resume}. Đầu vào là văn bản CV ở dạng không cấu trúc hoặc bán cấu trúc, đầu ra là dữ liệu có cấu trúc bao gồm các trường thông tin như: họ tên, email, số điện thoại, kinh nghiệm làm việc (vị trí, công ty, thời gian, mô tả công việc), trình độ học vấn, và kỹ năng.
+
+Thách thức chính của bài toán này bao gồm: (i) sự đa dạng về định dạng và bố cục CV (mỗi người viết CV theo cách khác nhau), (ii) sự mơ hồ trong ranh giới giữa các phần (ví dụ: phần kinh nghiệm và phần dự án có thể chồng chéo), (iii) sự khác biệt về ngôn ngữ và văn hóa (CV tiếng Việt có cấu trúc khác CV tiếng Anh), và (iv) nhiễu từ quá trình trích xuất văn bản từ PDF/DOCX.
+
+\subsection{Các phương pháp phân tích CV}
+
+Phương pháp dựa trên quy tắc (rule-based) sử dụng biểu thức chính quy (regex) và các mẫu (pattern) được định nghĩa trước để trích xuất thông tin. Ưu điểm là tốc độ nhanh, không cần gọi API bên ngoài, và kết quả ổn định cho các trường hợp phổ biến. Phương pháp này hoạt động hiệu quả với các thông tin có định dạng tương đối cố định như email, số điện thoại, và URL LinkedIn.
+
+Phương pháp dựa trên học máy (machine learning) sử dụng các mô hình NLP như Named Entity Recognition (NER) \cite{lample2016neural} để nhận dạng và phân loại các thực thể trong văn bản CV. Mô hình NER có thể được huấn luyện để nhận biết các loại thực thể đặc thù trong CV như tên công ty, chức vụ, bằng cấp. Tuy nhiên, phương pháp này đòi hỏi dữ liệu huấn luyện có gắn nhãn và khó mở rộng cho nhiều ngôn ngữ.
+
+Phương pháp dựa trên LLM tận dụng khả năng hiểu ngữ cảnh của các mô hình ngôn ngữ lớn để trích xuất thông tin mà không cần dữ liệu huấn luyện chuyên biệt. LLM có thể xử lý linh hoạt nhiều định dạng CV khác nhau và hỗ trợ đa ngôn ngữ tự nhiên. Nhược điểm chính là chi phí API và độ trễ khi gọi mô hình.
+
+Đồ án này áp dụng phương pháp \textit{hybrid} (lai), kết hợp ưu điểm của cả phương pháp dựa trên quy tắc và LLM. Cụ thể, các trường thông tin có định dạng rõ ràng (thông tin liên hệ, kỹ năng) được trích xuất bằng regex, trong khi các phần phức tạp hơn (kinh nghiệm làm việc) được xử lý bằng ChatGPT API.
+
+\section{Kiến trúc ứng dụng web hiện đại}
+
+\subsection{Ứng dụng trang đơn và kết xuất phía máy chủ}
+
+Ứng dụng trang đơn (Single Page Application -- SPA) là mô hình kiến trúc web trong đó ứng dụng tải toàn bộ mã nguồn một lần và cập nhật nội dung động thông qua JavaScript mà không cần tải lại trang. SPA mang lại trải nghiệm mượt mà cho người dùng nhưng có nhược điểm về thời gian tải ban đầu (initial load) và SEO (Search Engine Optimization).
+
+Kết xuất phía máy chủ (Server-Side Rendering -- SSR) giải quyết các hạn chế của SPA bằng cách sinh HTML hoàn chỉnh trên máy chủ trước khi gửi đến trình duyệt. Next.js \cite{nextjs2024} là framework React hỗ trợ SSR, SSG (Static Site Generation), và ISR (Incremental Static Regeneration), cho phép lựa chọn chiến lược kết xuất phù hợp cho từng trang.
+
+\subsection{Next.js và React}
+
+Next.js 15 sử dụng hệ thống App Router cho phép tổ chức các tuyến đường (route) dựa trên cấu trúc thư mục. Mỗi thư mục trong thư mục \texttt{app/} tương ứng với một tuyến đường URL, với các file đặc biệt như \texttt{page.tsx} (nội dung trang), \texttt{layout.tsx} (bố cục), và \texttt{route.ts} (API endpoint). Kiến trúc này cho phép tách biệt rõ ràng giữa các trang giao diện và API backend trong cùng một dự án.
+
+React 19 \cite{react2024} là thư viện JavaScript để xây dựng giao diện người dùng dựa trên mô hình component. Các khái niệm cốt lõi bao gồm: (i) \textit{component} -- đơn vị tái sử dụng của giao diện, (ii) \textit{state} -- dữ liệu nội bộ của component có thể thay đổi theo thời gian, (iii) \textit{props} -- dữ liệu truyền từ component cha sang component con, và (iv) \textit{hooks} -- cơ chế cho phép sử dụng state và các tính năng React trong các function component.
+
+\subsection{API Routes trong Next.js}
+
+Next.js cung cấp cơ chế tạo API backend thông qua các file \texttt{route.ts} trong thư mục \texttt{app/api/}. Các API route này chạy trên máy chủ (server-side), hỗ trợ các phương thức HTTP chuẩn (GET, POST, PUT, DELETE), và có thể truy cập trực tiếp cơ sở dữ liệu, dịch vụ bên ngoài mà không lo ngại về bảo mật phía máy khách. Cơ chế này cho phép xây dựng ứng dụng fullstack trong một dự án duy nhất mà không cần tách biệt backend thành một dịch vụ riêng.
+
+\section{Hệ thống Applicant Tracking System}
+
+Applicant Tracking System (ATS) là phần mềm quản lý quy trình tuyển dụng được sử dụng rộng rãi bởi các doanh nghiệp để tự động hóa việc thu nhận, sàng lọc và theo dõi hồ sơ ứng viên \cite{sanchez2020ats}. ATS phân tích CV bằng cách trích xuất văn bản, nhận dạng các phần (section), và so khớp từ khóa với yêu cầu tuyển dụng (job description).
+
+Các yếu tố ảnh hưởng đến khả năng vượt qua ATS của một CV bao gồm: (i) \textit{định dạng} -- ATS ưu tiên các định dạng chuẩn, tránh bảng phức tạp, hình ảnh và font chữ đặc biệt; (ii) \textit{từ khóa} -- CV cần chứa các từ khóa phù hợp với mô tả công việc; (iii) \textit{cấu trúc} -- các phần tiêu chuẩn (kinh nghiệm, học vấn, kỹ năng) cần được đặt tên rõ ràng; và (iv) \textit{thông tin liên hệ} -- cần đặt ở vị trí dễ trích xuất.
+
+Hiểu biết về cách ATS hoạt động là nền tảng quan trọng để thiết kế hệ thống OkBuddy, đảm bảo CV được tạo ra có cấu trúc phù hợp với tiêu chuẩn ATS.
+
+\section{Các công nghệ nền tảng}
+
+\subsection{TypeScript}
+
+TypeScript \cite{typescript2024} là ngôn ngữ lập trình mở rộng từ JavaScript, bổ sung hệ thống kiểu tĩnh (static type system). Kiểm tra kiểu tại thời điểm biên dịch giúp phát hiện lỗi sớm, cải thiện khả năng bảo trì mã nguồn, và hỗ trợ các công cụ phát triển (IDE) cung cấp gợi ý thông minh hơn. Trong đồ án này, TypeScript được sử dụng xuyên suốt cho cả frontend và backend.
+
+\subsection{Supabase}
+
+Supabase \cite{supabase2024} là nền tảng backend-as-a-service mã nguồn mở, cung cấp cơ sở dữ liệu PostgreSQL cùng các dịch vụ đi kèm bao gồm: xác thực (authentication), lưu trữ tệp (storage), và API thời gian thực (realtime). Tính năng nổi bật của Supabase được sử dụng trong đồ án là Row Level Security (RLS) -- cơ chế bảo mật cấp hàng cho phép định nghĩa các chính sách truy cập dữ liệu trực tiếp tại tầng cơ sở dữ liệu, đảm bảo mỗi người dùng chỉ truy cập được dữ liệu của chính mình.
+
+\subsection{Vercel Blob Storage}
+
+Vercel Blob \cite{vercel2024} là dịch vụ lưu trữ đối tượng (object storage) được tối ưu cho các ứng dụng triển khai trên nền tảng Vercel. Dịch vụ này cung cấp API đơn giản để tải lên, tải xuống và quản lý tệp tin, phù hợp cho việc lưu trữ các tệp CV mà người dùng tải lên.
+
+\subsection{Giao thức OAuth 2.0}
+
+OAuth 2.0 \cite{hardt2012oauth} là giao thức ủy quyền tiêu chuẩn cho phép ứng dụng bên thứ ba truy cập tài nguyên của người dùng trên một dịch vụ khác mà không cần biết mật khẩu. Trong đồ án, OAuth 2.0 được sử dụng để cho phép người dùng đăng nhập bằng tài khoản Google hoặc LinkedIn. Luồng OAuth bao gồm các bước: (i) chuyển hướng người dùng đến trang xác thực của nhà cung cấp, (ii) nhận mã ủy quyền (authorization code) sau khi người dùng đồng ý, (iii) đổi mã ủy quyền lấy mã truy cập (access token), và (iv) sử dụng access token để lấy thông tin người dùng.
+
+\section{Các công trình liên quan}
+
+Bảng \ref{tab:comparison} tổng hợp so sánh các giải pháp xây dựng và phân tích CV hiện có với hệ thống OkBuddy được đề xuất trong đồ án.
+
+\begin{table}[H]
+\centering
+\caption{So sánh các giải pháp xây dựng CV hiện có}
+\label{tab:comparison}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Canva} & \textbf{Zety} & \textbf{Sovren} & \textbf{LinkedIn} & \textbf{OkBuddy} \\ \hline
+Phân tích CV bằng AI & Không & Hạn chế & Có & Không & Có \\ \hline
+Upload CV có sẵn & Không & Không & Có & Không & Có \\ \hline
+Guided editor & Không & Có & Không & Có & Có \\ \hline
+Xuất đa định dạng & PDF & PDF, DOCX & JSON & PDF & PDF, DOCX, LaTeX, TXT \\ \hline
+Hỗ trợ tiếng Việt & Hạn chế & Không & Hạn chế & Hạn chế & Đầy đủ \\ \hline
+Chi phí & Miễn phí/Trả phí & Trả phí & Trả phí cao & Miễn phí & Miễn phí \\ \hline
+Mã nguồn mở & Không & Không & Không & Không & Có \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+Chen và cộng sự \cite{chen2016resume} đề xuất phương pháp phân tích CV dựa trên CRF (Conditional Random Field) kết hợp với các đặc trưng ngữ pháp. Phương pháp này đạt kết quả tốt trên tập dữ liệu tiếng Anh nhưng đòi hỏi dữ liệu huấn luyện lớn và khó mở rộng sang ngôn ngữ khác. Jiechieu và Tsatsral \cite{jiechieu2021skills} sử dụng BERT để trích xuất kỹ năng từ CV, đạt F1-score cao nhưng chỉ tập trung vào một thành phần duy nhất của CV.
+
+Gần đây, nhiều nghiên cứu \cite{white2023prompt} đã chứng minh hiệu quả của LLM trong các tác vụ trích xuất thông tin mà không cần dữ liệu huấn luyện chuyên biệt. Đồ án này đóng góp thêm vào hướng nghiên cứu này bằng phương pháp hybrid kết hợp regex và LLM, tối ưu cho cả chi phí lẫn độ chính xác.
+
+Chương này đã trình bày các kiến thức nền tảng về LLM, NLP, kiến trúc web hiện đại, hệ thống ATS, và các công nghệ sử dụng trong đồ án. Các kiến thức này tạo cơ sở lý thuyết vững chắc cho việc phân tích, thiết kế và hiện thực hệ thống OkBuddy ở các chương tiếp theo. Chương 3 sẽ trình bày chi tiết quá trình phân tích yêu cầu và thiết kế hệ thống.
+
+\end{document}
