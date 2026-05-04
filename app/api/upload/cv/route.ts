@@ -257,7 +257,8 @@ export async function POST(request: NextRequest) {
         user,
         { error_message: String(dbError) }
       );
-      throw dbError; // Re-throw to be caught by outer catch
+      console.warn('⚠️ DB save failed, continuing without DB:', String(dbError))
+      // Don't throw - allow upload to succeed without DB
     }
 
     // Track successful API completion

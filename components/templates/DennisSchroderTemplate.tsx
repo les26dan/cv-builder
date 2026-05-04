@@ -1,15 +1,14 @@
+/**
+ * Classic CV Template — Professional single-column
+ * Clean, ATS-friendly, strong typography hierarchy
+ */
 import React, { memo } from 'react';
 import { detectLanguage } from '../../config/languageConfig';
+import type { CVTemplateProps } from './templateRegistry';
+import { injectThemeVars } from './colorThemes';
+import { cvType, cvSpace, cvBullet, cvClass } from './designTokens';
 
-interface DennisSchroderTemplateProps {
-  cvData: any;
-  activeSection?: string | null;
-  onSectionClick: (sectionId: string) => void;
-  currentPage?: number;
-  totalPages?: number;
-  isPreview?: boolean; // New prop to distinguish preview from PDF generation
-  language?: string;
-}
+interface DennisSchroderTemplateProps extends CVTemplateProps {}
 
 export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   cvData,
@@ -18,595 +17,334 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
   currentPage = 1,
   totalPages = 1,
   isPreview = false,
-  language
-}: DennisSchroderTemplateProps) => {
-  // Get current language
-  const currentLanguage = language || (typeof window !== 'undefined' ? localStorage.getItem('okbuddy_language') : null) || detectLanguage().language;
-  
-  const getSectionClass = (section: string) => {
-    return `p-2 -mx-2 cv-section ${activeSection === section ? 'bg-blue-50 rounded-sm' : ''}`;
-  };
+  language,
+  colorTheme,
+}) => {
+  const currentLanguage = language ||
+    (typeof window !== 'undefined' ? localStorage.getItem('okbuddy_language') : null) ||
+    detectLanguage().language;
 
-  // Default section titles - EXACTLY matching PDF output
+  const primary   = colorTheme?.primary ?? '#1a56db';
+  const accent    = colorTheme?.accent  ?? '#e8f0fe';
+  const textColor = colorTheme?.text    ?? '#1e293b';
+  const muted     = colorTheme?.muted   ?? '#64748b';
+
+  const themeVars = colorTheme ? injectThemeVars(colorTheme) : {};
+
+  const getSectionClass = (section: string) =>
+    `cv-section${activeSection === section ? ' bg-blue-50 rounded-sm' : ''}`;
+
   const defaultSectionTitles: Record<string, string> = {
-    summary: '', // Summary doesn't show a title in PDF
-    experience: 'KINH NGHIỆM LÀM VIỆC',
-    skills: 'KỸ NĂNG',
-    education: 'HỌC VẤN',
-    projects: 'DỰ ÁN',
-    volunteer: 'HOẠT ĐỘNG TÌNH NGUYỆN',
+    summary:        'MỤC TIÊU NGHỀ NGHIỆP',
+    experience:     'KINH NGHIỆM LÀM VIỆC',
+    skills:         'KỸ NĂNG',
+    education:      'HỌC VẤN',
+    projects:       'DỰ ÁN',
+    volunteer:      'HOẠT ĐỘNG TÌNH NGUYỆN',
     certifications: 'CHỨNG CHỈ',
-    languages: 'NGÔN NGỮ',
-    hobbies: 'SỞ THÍCH'
+    languages:      'NGÔN NGỮ',
+    hobbies:        'SỞ THÍCH',
   };
 
-  // Get section title (custom or default) - EXACTLY matching PDF
   const getSectionTitle = (sectionId: string) => {
-    if (cvData.sectionTitles?.[sectionId]) {
-      return cvData.sectionTitles[sectionId].toUpperCase();
-    }
-    
-    // For custom sections, extract base type
-    if (sectionId.startsWith('projects-')) return defaultSectionTitles.projects;
-    if (sectionId.startsWith('volunteer-')) return defaultSectionTitles.volunteer;
+    if (cvData.sectionTitles?.[sectionId]) return cvData.sectionTitles[sectionId].toUpperCase();
+    if (sectionId.startsWith('projects-'))       return defaultSectionTitles.projects;
+    if (sectionId.startsWith('volunteer-'))      return defaultSectionTitles.volunteer;
     if (sectionId.startsWith('certifications-')) return defaultSectionTitles.certifications;
-    if (sectionId.startsWith('languages-')) return defaultSectionTitles.languages;
-    if (sectionId.startsWith('hobbies-')) return defaultSectionTitles.hobbies;
-    if (sectionId.startsWith('custom-')) return 'PHẦN TÙY CHỈNH';
-    
+    if (sectionId.startsWith('languages-'))      return defaultSectionTitles.languages;
+    if (sectionId.startsWith('hobbies-'))        return defaultSectionTitles.hobbies;
+    if (sectionId.startsWith('custom-'))         return 'PHẦN TÙY CHỈNH';
     return defaultSectionTitles[sectionId] || 'PHẦN KHÁC';
   };
 
-  // Check if section has content
-  const hasContent = (sectionId: string, data: any) => {
-    
-    if (!data) {
-      return false;
-    }
-    
-    let result = false;
+  const hasContent = (sectionId: string, data: any): boolean => {
+    if (!data) return false;
     switch (sectionId) {
-      case 'contact':
-        result = data.fullName || data.email || data.phone || data.location;
-        break;
-      case 'summary':
-        result = data.content && typeof data.content === 'string' && data.content.trim();
-        break;
-      case 'experience':
-        result = data.items && data.items.length > 0 && data.items.some((item: any) => item.title || item.company);
-        break;
-      case 'skills':
-        result = data.items && data.items.length > 0;
-        break;
-      case 'education':
-        result = data.items && data.items.length > 0 && data.items.some((item: any) => item.degree || item.institution);
-        break;
+      case 'contact':    return !!(data.fullName || data.email || data.phone || data.location);
+      case 'summary':    return !!(data.content?.trim());
+      case 'experience': return !!(data.items?.length && data.items.some((i: any) => i.title || i.company));
+      case 'skills':     return !!(data.items?.length);
+      case 'education':  return !!(data.items?.length && data.items.some((i: any) => i.degree || i.institution));
       default:
-        // For custom sections
-        if (data.items) {
-          result = data.items.length > 0;
-        } else if (data.content) {
-          result = data.content.trim();
-        } else {
-          result = false;
-        }
-    }
-    
-    return result;
-  };
-
-  // PDF-exact styling constants
-  const styles = {
-    // Contact section - EXACTLY matching PDF
-    contactName: {
-      fontSize: '20px',
-      fontWeight: 'bold' as const,
-      marginBottom: '12px',
-      color: '#111827',
-      textAlign: 'center' as const,
-      lineHeight: '1.2'
-    },
-    contactInfo: {
-      fontSize: '12px',
-      color: '#6b7280',
-      textAlign: 'center' as const,
-      marginBottom: '5px',
-      lineHeight: '1.4'
-    },
-    // Summary section - EXACTLY matching PDF
-    summaryText: {
-      fontSize: '14px',
-      color: '#374151',
-      lineHeight: '1.5',
-      marginBottom: '20px',
-      textAlign: 'justify' as const
-    },
-    // Section headers - EXACTLY matching PDF
-    sectionHeader: {
-      fontSize: '16px',
-      fontWeight: 'bold' as const,
-      textTransform: 'uppercase' as const,
-      borderBottom: '2px solid #d1d5db',
-      marginBottom: '16px',
-      paddingBottom: '8px',
-      color: '#111827',
-      letterSpacing: '0.5px'
-    },
-    // Job entries - EXACTLY matching PDF
-    jobHeader: {
-      fontWeight: '600' as const,
-      fontSize: '14px',
-      marginBottom: '5px',
-      lineHeight: '1.3'
-    },
-    jobDates: {
-      fontSize: '14px',
-      color: '#6b7280',
-      marginBottom: '5px',
-      lineHeight: '1.3'
-    },
-    jobBullets: {
-      fontSize: '14px',
-      color: '#374151',
-      lineHeight: '1.4',
-      marginLeft: '0px',
-      marginBottom: '3px'
-    },
-    // Skills section - EXACTLY matching PDF
-    skillsText: {
-      fontSize: '14px',
-      color: '#374151',
-      lineHeight: '1.4'
-    },
-    // Education section - EXACTLY matching PDF
-    educationEntry: {
-      fontSize: '14px',
-      marginBottom: '10px',
-      lineHeight: '1.3'
+        if (data.items) return data.items.length > 0;
+        if (data.content) return !!data.content.trim();
+        return false;
     }
   };
 
-  // Render contact section - EXACTLY matching PDF
-  const renderContactSection = () => {
-    if (!hasContent('contact', cvData.contact)) return null;
-    
-    return (
-      <div className={`mb-5 ${getSectionClass('contact')}`} onClick={() => onSectionClick('contact')} data-section="contact">
-        <div style={styles.contactName}>
-          {cvData.contact.fullName}
-        </div>
-        <div style={styles.contactInfo}>
-          {[
-            cvData.contact.email,
-            cvData.contact.phone,
-            cvData.contact.location,
-            cvData.contact.linkedin
-          ].filter(Boolean).join(' | ')}
-        </div>
-      </div>
-    );
-  };
+  const skillName = (s: any) => typeof s === 'object' && s.name ? s.name : String(s);
 
-  // Render summary section - EXACTLY matching PDF
-  const renderSummarySection = () => {
-    if (!hasContent('summary', cvData.summary)) return null;
-    
-    return (
-      <div className={`mb-5 ${getSectionClass('summary')}`} onClick={() => onSectionClick('summary')} data-section="summary">
-        <div style={styles.summaryText}>
-          {cvData.summary.content}
-        </div>
-      </div>
-    );
-  };
-
-  // Render experience section - EXACTLY matching PDF
-  const renderExperienceSection = (sectionId: string) => {
-    const data = cvData[sectionId] || cvData.experience;
-    
-    if (!hasContent(sectionId, data)) {
-      return null;
-    }
-
-    // Simple hardcoded fix: Only show header on page 1 for experience section
-    const shouldShowHeader = sectionId === 'experience' ? currentPage === 1 : true;
-
-    return (
-      <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
-        {shouldShowHeader && (
-          <div style={styles.sectionHeader}>
-            {getSectionTitle(sectionId)}
-          </div>
-        )}
-        {getExperienceItemsForPage(data.items, currentPage).map((exp: any) => (
-          <div key={exp.id} style={{ marginBottom: '15px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-              <div style={styles.jobHeader}>
-                <strong>{exp.title}</strong>
-                {exp.company && <span>, {exp.company}</span>}
-                {exp.location && <span> – {exp.location}</span>}
-              </div>
-              <div style={styles.jobDates}>
-                {exp.startDate} – {exp.current ? (currentLanguage === 'vi' ? 'Hiện tại' : 'Current') : exp.endDate}
-              </div>
-            </div>
-            {exp.bullets?.length > 0 && (
-              <div style={{ marginLeft: '0px' }}>
-                {exp.bullets.map((bullet: string, index: number) => 
-                  bullet && bullet.trim() ? (
-                    <div key={index} style={styles.jobBullets}>
-                      • {bullet}
-                    </div>
-                  ) : null
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  // Render skills section - EXACTLY matching PDF
-  const renderSkillsSection = (sectionId: string) => {
-    const data = cvData[sectionId] || cvData.skills;
-    
-    if (!hasContent(sectionId, data)) {
-      return null;
-    }
-
-    return (
-      <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
-        <div style={styles.sectionHeader}>
-          {getSectionTitle(sectionId)}
-        </div>
-        <div style={styles.skillsText}>
-          {/* Handle both string arrays and skill objects */}
-          {data.items.map((skill: any) => {
-            // If skill is an object with name property, use name
-            if (typeof skill === 'object' && skill.name) {
-              return skill.name;
-            }
-            // If skill is a string, use it directly
-            return skill;
-          }).join(' | ')}
-        </div>
-      </div>
-    );
-  };
-
-  // Render education section - EXACTLY matching PDF
-  const renderEducationSection = (sectionId: string) => {
-    const data = cvData[sectionId] || cvData.education;
-    
-    if (!hasContent(sectionId, data)) {
-      return null;
-    }
-
-    return (
-      <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
-        <div style={styles.sectionHeader}>
-          {getSectionTitle(sectionId)}
-        </div>
-        {data.items.map((edu: any) => (
-          <div key={edu.id} style={styles.educationEntry}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-              <div>
-                <strong>{edu.degree}</strong>
-                {edu.institution && <span>, {edu.institution}</span>}
-                {edu.location && <span> – {edu.location}</span>}
-              </div>
-              <div style={{ fontSize: '14px', color: '#6b7280' }}>
-                {edu.graduationDate}
-              </div>
-            </div>
-            {edu.description && (
-              <div style={{ fontSize: '14px', color: '#374151', marginTop: '5px' }}>
-                {edu.description}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  // Render custom section with content - EXACTLY matching PDF
-  const renderCustomSection = (sectionId: string) => {
-    const data = cvData[sectionId];
-    if (!hasContent(sectionId, data)) return null;
-
-    return (
-      <div className={`mb-5 ${getSectionClass(sectionId)}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId}>
-        <div style={styles.sectionHeader}>
-          {getSectionTitle(sectionId)}
-        </div>
-        {data.content && (
-          <div style={{ fontSize: '14px', whiteSpace: 'pre-wrap', color: '#374151', lineHeight: '1.5' }}>
-            {data.content}
-          </div>
-        )}
-        {data.items && data.items.length > 0 && (
-          <div style={{ marginTop: '10px' }}>
-            {data.items.map((item: any, index: number) => (
-              <div key={item.id || index} style={{ fontSize: '14px', marginBottom: '8px' }}>
-                {item.title && <div style={{ fontWeight: '600' }}>{item.title}</div>}
-                {item.description && <div style={{ color: '#374151' }}>{item.description}</div>}
-                {item.organization && <div style={{ color: '#374151' }}>{item.organization}</div>}
-                {item.name && <div style={{ color: '#374151' }}>{item.name}</div>}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // Render section based on type
-  const renderSection = (sectionId: string) => {
-    switch (sectionId) {
-      case 'contact':
-        return renderContactSection();
-      case 'summary':
-        return renderSummarySection();
-      case 'experience':
-        return renderExperienceSection(sectionId);
-      case 'skills':
-        return renderSkillsSection(sectionId);
-      case 'education':
-        return renderEducationSection(sectionId);
-      default:
-        // Handle custom sections
-        if (sectionId.startsWith('projects-') || sectionId.startsWith('volunteer-') || 
-            sectionId.startsWith('certifications-') || sectionId.startsWith('languages-') ||
-            sectionId.includes('experience')) {
-          return renderExperienceSection(sectionId);
-        } else if (sectionId.startsWith('skills-') || sectionId.includes('skills')) {
-          return renderSkillsSection(sectionId);
-        } else {
-          return renderCustomSection(sectionId);
-        }
-    }
-  };
-
-  // Microsoft Word/Google Docs style item-level pagination for experience section
-  const getExperienceItemsForPage = (experienceItems: any[], targetPage: number) => {
-    if (!experienceItems || experienceItems.length === 0) return [];
-    if (totalPages === 1) return experienceItems;
-    
-    // Industry-standard logic: Split experience items naturally across pages
-    // For 5 experience items with detailed bullets:
-    // Page 1: Contact + Summary + Experience items 1-3 (fits within page height)
-    // Page 2: Experience items 4-5 + Skills + Education
-    
-    if (targetPage === 1) {
-      const items = experienceItems.slice(0, 3); // First 3 experience items
-      if (typeof window !== 'undefined') {
-        console.log(`🔧 Page ${targetPage} Experience Items:`, items.map(item => item.title));
-      }
-      return items;
-    } else if (targetPage === 2) {
-      const items = experienceItems.slice(3); // Remaining experience items (4-5)
-      if (typeof window !== 'undefined') {
-        console.log(`🔧 Page ${targetPage} Experience Items:`, items.map(item => item.title));
-      }
-      return items;
-    }
-    
+  // ── Pagination ──────────────────────────────────────────────────────────────
+  const getExperienceItemsForPage = (items: any[], targetPage: number) => {
+    if (!items?.length) return [];
+    if (totalPages === 1) return items;
+    if (targetPage === 1) return items.slice(0, 3);
+    if (targetPage === 2) return items.slice(3);
     return [];
   };
 
-  // Check if experience section header should be shown on current page
-  const shouldShowExperienceHeader = (targetPage: number) => {
-    const sectionsOnPage = getSectionsForPage(targetPage);
-    return sectionsOnPage.includes('experience');
-  };
-
-  // Industry-standard pagination like Microsoft Word/Google Docs
-  const getSectionsForPage = (page: number) => {
-    const allSections = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
-    
-    // Filter to only sections with content
-    const sectionsWithContent = allSections.filter((sectionId: string) => {
-      return hasContent(sectionId, cvData[sectionId]);
-    });
-    
-    if (totalPages === 1) {
-      return sectionsWithContent;
-    }
-
-    // FIXED: Microsoft Word/Google Docs logic - experience section spans multiple pages
-    // For CVs with 5+ experience items, the experience section should appear on both pages
-    if (totalPages === 2) {
-      if (page === 1) {
-        // Page 1: Contact + Summary + Experience (items 1-3)
-        return ['contact', 'summary', 'experience'].filter(sId => sectionsWithContent.includes(sId));
-      } else if (page === 2) {
-        // Page 2: Experience (items 4-5) + Skills + Education
-        return ['experience', 'skills', 'education'].filter(sId => sectionsWithContent.includes(sId));
-      }
-    }
-
-    // Fallback to original logic for other cases
-    const pageContentHeight = 850;
-    const sectionHeights = calculateSectionHeights(sectionsWithContent);
-    
-    // Distribute sections across pages intelligently
-    const pages: string[][] = [];
-    let currentPageSections: string[] = [];
-    let currentPageHeight = 0;
-    
-    for (const sectionId of sectionsWithContent) {
-      const sectionHeight = sectionHeights[sectionId] || 0;
-      
-      // Microsoft Word/Google Docs logic: If adding this section would overflow the page
-      if (currentPageHeight + sectionHeight > pageContentHeight && currentPageSections.length > 0) {
-        // Finish current page and start new page
-        pages.push(currentPageSections);
-        currentPageSections = [sectionId];
-        currentPageHeight = sectionHeight;
-      } else {
-        // Add section to current page
-        currentPageSections.push(sectionId);
-        currentPageHeight += sectionHeight;
-      }
-    }
-    
-    // Add the last page
-    if (currentPageSections.length > 0) {
-      pages.push(currentPageSections);
-    }
-    
-    // Debug logging for pagination
-    if (typeof window !== 'undefined' && page === 1) {
-      console.log('🔧 Pagination Debug:', {
-        totalPages,
-        pageContentHeight,
-        sectionHeights,
-        pages: pages.map((pageContent, idx) => ({
-          page: idx + 1,
-          sections: pageContent,
-          totalHeight: pageContent.reduce((sum, sId) => sum + (sectionHeights[sId] || 0), 0)
-        }))
-      });
-    }
-    
-    // Return sections for the requested page (1-indexed)
-    return pages[page - 1] || [];
-  };
-
-  // Calculate realistic section heights for pagination
   const calculateSectionHeights = (sections: string[]) => {
-    const heights: Record<string, number> = {};
-    
-    sections.forEach(sectionId => {
-      switch (sectionId) {
-        case 'contact':
-          heights[sectionId] = 100; // Fixed height for contact info
-          break;
-        case 'summary':
-          if (cvData.summary?.content) {
-            const textLength = cvData.summary.content.length;
-            const lines = Math.ceil(textLength / 85); // chars per line
-            heights[sectionId] = Math.max(80, lines * 20 + 40); // line height + margins
-          } else {
-            heights[sectionId] = 0;
-          }
-          break;
+    const h: Record<string, number> = {};
+    sections.forEach(id => {
+      switch (id) {
+        case 'contact':  h[id] = 110; break;
+        case 'summary':  h[id] = cvData.summary?.content ? Math.max(70, Math.ceil(cvData.summary.content.length / 85) * 20 + 40) : 0; break;
         case 'experience':
           if (cvData.experience?.items?.length) {
-            let expHeight = 60; // Section header
+            let v = 50;
             cvData.experience.items.forEach((exp: any) => {
-              expHeight += 70; // Job title, company, dates
-              if (exp.bullets?.length) {
-                exp.bullets.forEach((bullet: string) => {
-                  if (bullet?.trim()) {
-                    const bulletLines = Math.ceil(bullet.length / 90);
-                    expHeight += bulletLines * 18;
-                  }
-                });
-              }
-              expHeight += 15; // Gap between jobs
+              v += 65;
+              exp.bullets?.forEach((b: string) => { if (b?.trim()) v += Math.ceil(b.length / 88) * 18; });
+              v += 12;
             });
-            heights[sectionId] = expHeight;
-            
-            // If experience section is very large (>600px), it should be considered splittable
-            if (expHeight > 600) {
-              // Large experience sections can be distributed across pages
-              heights[sectionId] = Math.min(expHeight, 500); // Cap at reasonable height per page
-            }
-          } else {
-            heights[sectionId] = 0;
-          }
+            h[id] = Math.min(v, 500);
+          } else h[id] = 0;
           break;
         case 'skills':
           if (cvData.skills?.items?.length) {
-            const skillsText = cvData.skills.items.join(' | ');
-            const lines = Math.ceil(skillsText.length / 85);
-            heights[sectionId] = 60 + (lines * 20);
-          } else {
-            heights[sectionId] = 0;
-          }
+            h[id] = 50 + Math.ceil(cvData.skills.items.length / 3) * 28;
+          } else h[id] = 0;
           break;
         case 'education':
           if (cvData.education?.items?.length) {
-            let eduHeight = 60; // Section header
-            cvData.education.items.forEach((edu: any) => {
-              eduHeight += 50; // Each education entry
-              if (edu.description) {
-                const lines = Math.ceil(edu.description.length / 85);
-                eduHeight += lines * 18;
-              }
-            });
-            heights[sectionId] = eduHeight;
-          } else {
-            heights[sectionId] = 0;
-          }
+            let v = 50;
+            cvData.education.items.forEach((edu: any) => { v += 50 + (edu.description ? Math.ceil(edu.description.length / 85) * 18 : 0); });
+            h[id] = v;
+          } else h[id] = 0;
           break;
-        default:
-          heights[sectionId] = 60; // Default height for custom sections
+        default: h[id] = 55;
       }
     });
-    
-    return heights;
+    return h;
+  };
+
+  const getSectionsForPage = (page: number) => {
+    const all = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
+    const withContent = all.filter((id: string) => hasContent(id, cvData[id]));
+    if (totalPages === 1) return withContent;
+    if (totalPages === 2) {
+      if (page === 1) return ['contact', 'summary', 'experience'].filter((id: string) => withContent.includes(id));
+      if (page === 2) return ['experience', 'skills', 'education'].filter((id: string) => withContent.includes(id));
+    }
+    const maxH = 850;
+    const heights = calculateSectionHeights(withContent);
+    const pages: string[][] = [];
+    let cur: string[] = [], curH = 0;
+    for (const id of withContent) {
+      const sh = heights[id] || 0;
+      if (curH + sh > maxH && cur.length > 0) { pages.push(cur); cur = [id]; curH = sh; }
+      else { cur.push(id); curH += sh; }
+    }
+    if (cur.length) pages.push(cur);
+    return pages[page - 1] || [];
+  };
+
+  // ── Section renderers ────────────────────────────────────────────────────────
+
+  // Section header: left colored bar + uppercase bold text (template identity)
+  const SectionHeader = ({ title }: { title: string }) => (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: cvSpace.headerGap,
+      marginTop: 4,
+    }}>
+      <div style={{ width: 4, height: 16, backgroundColor: primary, borderRadius: 2, flexShrink: 0 }} />
+      <span style={{ ...cvType.sectionHeader, color: primary }}>{title}</span>
+      <div style={{ flex: 1, height: 1, backgroundColor: accent }} />
+    </div>
+  );
+
+  const contact = cvData.contact || {};
+
+  const renderContact = () => {
+    if (!hasContent('contact', contact)) return null;
+    const infoLine = [contact.email, contact.phone, contact.location, contact.linkedin].filter(Boolean);
+    return (
+      <div
+        className={getSectionClass('contact')}
+        onClick={() => onSectionClick('contact')}
+        data-section="contact"
+        style={{
+          backgroundColor: primary,
+          margin: '-57px -76px 0 -76px',
+          padding: '28px 76px 22px',
+          marginBottom: cvSpace.sectionGap + 6,
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ ...cvType.name, fontSize: 24, color: '#fff', marginBottom: 6 }}>
+          {contact.fullName}
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0 16px' }}>
+          {infoLine.map((info, i) => (
+            <span key={i} style={{ ...cvType.contact, color: 'rgba(255,255,255,0.88)' }}>
+              {i > 0 && <span style={{ marginRight: 16, opacity: 0.4 }}>|</span>}{info}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderSummary = () => {
+    if (!hasContent('summary', cvData.summary)) return null;
+    return (
+      <div className={`${getSectionClass('summary')} ${cvClass.section}`} onClick={() => onSectionClick('summary')} data-section="summary" style={{ marginBottom: cvSpace.sectionGap }}>
+        <SectionHeader title={getSectionTitle('summary')} />
+        <p style={{ ...cvType.body, color: textColor, margin: 0 }}>
+          {cvData.summary.content}
+        </p>
+      </div>
+    );
+  };
+
+  const renderExperience = (sectionId: string) => {
+    const data = cvData[sectionId] || cvData.experience;
+    if (!hasContent(sectionId, data)) return null;
+    const items = getExperienceItemsForPage(data.items, currentPage);
+    const showHeader = sectionId !== 'experience' || currentPage === 1 || totalPages === 1;
+    return (
+      <div className={`${getSectionClass(sectionId)} ${cvClass.section}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId} style={{ marginBottom: cvSpace.sectionGap }}>
+        {showHeader && <SectionHeader title={getSectionTitle(sectionId)} />}
+        {items.map((exp: any) => (
+          <div key={exp.id} className={cvClass.experienceItem} style={{ marginBottom: cvSpace.itemGap, paddingLeft: 12, borderLeft: `2px solid ${accent}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: cvSpace.rowGap, marginBottom: 2 }}>
+              <div style={{ minWidth: 0 }}>
+                <span style={{ ...cvType.itemTitle, color: textColor }}>{exp.title}</span>
+                {exp.company && <span style={{ ...cvType.itemSubtitle, color: primary }}> · {exp.company}</span>}
+              </div>
+              <span style={{ ...cvType.date, color: muted, flexShrink: 0, backgroundColor: accent, padding: '1px 8px', borderRadius: 10 }}>
+                {exp.startDate} – {exp.current ? (currentLanguage === 'vi' ? 'Hiện tại' : 'Current') : exp.endDate}
+              </span>
+            </div>
+            {exp.location && <div style={{ ...cvType.contact, color: muted, marginBottom: 4 }}>{exp.location}</div>}
+            {exp.bullets?.length > 0 && (
+              <ul style={{ ...cvBullet.ul, marginTop: 5 }}>
+                {exp.bullets.map((b: string, i: number) => b?.trim() ? (
+                  <li key={i} style={{ ...cvBullet.li, color: textColor }}>
+                    <span style={{ ...cvBullet.marker, color: primary }}>{cvBullet.defaultGlyph}</span>
+                    {b}
+                  </li>
+                ) : null)}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderSkills = (sectionId: string) => {
+    const data = cvData[sectionId] || cvData.skills;
+    if (!hasContent(sectionId, data)) return null;
+    return (
+      <div className={`${getSectionClass(sectionId)} ${cvClass.section}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId} style={{ marginBottom: cvSpace.sectionGap }}>
+        <SectionHeader title={getSectionTitle(sectionId)} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {data.items.map((skill: any, i: number) => (
+            <span key={i} style={{
+              ...cvType.contact,
+              color: primary,
+              backgroundColor: accent,
+              border: `1px solid ${primary}22`,
+              borderRadius: 4,
+              padding: '3px 10px',
+              fontWeight: 500,
+            }}>
+              {skillName(skill)}
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderEducation = (sectionId: string) => {
+    const data = cvData[sectionId] || cvData.education;
+    if (!hasContent(sectionId, data)) return null;
+    return (
+      <div className={`${getSectionClass(sectionId)} ${cvClass.section}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId} style={{ marginBottom: cvSpace.sectionGap }}>
+        <SectionHeader title={getSectionTitle(sectionId)} />
+        {data.items.map((edu: any) => (
+          <div key={edu.id} className={cvClass.educationItem} style={{ marginBottom: cvSpace.itemGap, paddingLeft: 12, borderLeft: `2px solid ${accent}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: cvSpace.rowGap }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ ...cvType.itemTitle, color: textColor }}>{edu.degree}</div>
+                {edu.institution && <div style={{ ...cvType.itemSubtitle, color: primary }}>{edu.institution}{edu.location && ` – ${edu.location}`}</div>}
+              </div>
+              {edu.graduationDate && (
+                <span style={{ ...cvType.date, color: muted, flexShrink: 0, backgroundColor: accent, padding: '1px 8px', borderRadius: 10 }}>
+                  {edu.graduationDate}
+                </span>
+              )}
+            </div>
+            {edu.description && <p style={{ ...cvType.body, color: muted, margin: '4px 0 0' }}>{edu.description}</p>}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderCustomSection = (sectionId: string) => {
+    const data = cvData[sectionId];
+    if (!hasContent(sectionId, data)) return null;
+    return (
+      <div className={`${getSectionClass(sectionId)} ${cvClass.section}`} onClick={() => onSectionClick(sectionId)} data-section={sectionId} style={{ marginBottom: cvSpace.sectionGap }}>
+        <SectionHeader title={getSectionTitle(sectionId)} />
+        {data.content && <p style={{ ...cvType.body, color: textColor, whiteSpace: 'pre-wrap', margin: 0 }}>{data.content}</p>}
+        {data.items?.length > 0 && data.items.map((item: any, i: number) => (
+          <div key={item.id || i} style={{ ...cvType.body, color: textColor, marginBottom: 6 }}>
+            {item.title && <span style={{ fontWeight: 600 }}>{item.title}</span>}
+            {item.description && <span style={{ color: muted }}> — {item.description}</span>}
+            {item.name && <span>{item.name}</span>}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderSection = (sectionId: string) => {
+    switch (sectionId) {
+      case 'contact':    return renderContact();
+      case 'summary':    return renderSummary();
+      case 'experience': return renderExperience(sectionId);
+      case 'skills':     return renderSkills(sectionId);
+      case 'education':  return renderEducation(sectionId);
+      default:
+        if (sectionId.includes('experience') || sectionId.startsWith('projects-') || sectionId.startsWith('volunteer-')) return renderExperience(sectionId);
+        if (sectionId.includes('skills') || sectionId.startsWith('certifications-') || sectionId.startsWith('languages-')) return renderSkills(sectionId);
+        return renderCustomSection(sectionId);
+    }
   };
 
   const sectionsToShow = getSectionsForPage(currentPage);
 
-  // EXTENSIVE DEBUG: Final rendering summary for Kien Vu CV
-  if (typeof window !== 'undefined') {
-    console.log('\n🎭 ===== FINAL CV TEMPLATE RENDER DEBUG =====');
-    console.log('🎭 CV Template: Rendering with currentPage:', currentPage, 'of', totalPages);
-    console.log('🎭 CV Template: sectionsToShow:', sectionsToShow);
-    console.log('🎭 CV Template: cvData.experience?.items count:', cvData.experience?.items?.length || 0);
-    console.log('🎭 CV Template: Component props:', { currentPage, totalPages, isPreview, activeSection });
-    console.log('🎭 ===== END FINAL CV TEMPLATE RENDER DEBUG =====\n');
-  }
-
   return (
-    <div 
-      className="bg-white text-gray-900 overflow-hidden w-full h-full cv-content" 
-      style={{ 
-        minHeight: '100%',
-        // EXACTLY matching PDF margins and spacing
-        padding: '57px 76px', // 0.75in top/bottom, 1in left/right at 96 DPI
-        fontSize: '12px', // Base font size matching PDF
-        lineHeight: '1.4',
-        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        // Ensure consistent text rendering
+    <div
+      className="bg-white overflow-hidden w-full h-full cv-content"
+      style={{
+        padding: '57px 76px',
+        fontSize: '12px',
+        lineHeight: '1.5',
+        fontFamily: 'Inter, "Segoe UI", system-ui, -apple-system, sans-serif',
+        color: textColor,
         textRendering: 'optimizeLegibility',
         WebkitFontSmoothing: 'antialiased',
-        MozOsxFontSmoothing: 'grayscale'
+        ...themeVars,
       }}
     >
-      {sectionsToShow.map((sectionId: string) => {
-        const renderedSection = renderSection(sectionId);
-        return (
-          <div key={sectionId}>
-            {renderedSection}
-          </div>
-        );
-      })}
-      
-      {/* Page indicator for multi-page documents - matching PDF */}
+      {sectionsToShow.map((id: string) => (
+        <div key={id}>{renderSection(id)}</div>
+      ))}
       {totalPages > 1 && (
-        <div 
-          style={{
-            position: 'absolute',
-            bottom: '20px',
-            left: '0',
-            right: '0',
-            textAlign: 'center',
-            fontSize: '10px',
-            color: '#9ca3af'
-          }}
-        >
-          {currentPage}
+        <div style={{ position: 'absolute', bottom: '18px', right: '76px', fontSize: '10px', color: muted }}>
+          {currentPage} / {totalPages}
         </div>
       )}
     </div>
   );
 });
 
-// Display name for React DevTools
 DennisSchroderTemplate.displayName = 'DennisSchroderTemplate';

@@ -303,7 +303,7 @@ features:
   - **Privacy Policy Page**: Comprehensive 8-section privacy document with GDPR/CCPA compliance ✅ NEW
   - **Dynamic Language Switching**: Legal content updates based on stored language preference ✅ NEW
   - **Register Flow Enhancement**: Checkbox includes both Terms of Service and Privacy Policy links ✅ NEW
-  - **Contact Email Standardization**: All legal documents use admin@example.com ✅ NEW
+  - **Contact Email Standardization**: All legal documents use okbuddy2025@gmail.com ✅ NEW
 
 affected_components:
   - **app/terms-of-service/page.tsx**: Main Terms of Service page component ✅ NEW
@@ -326,7 +326,7 @@ legal_coverage:
   - **Terms of Service Sections**: Acceptance, Accounts, IP Rights, Conduct, Third-Party, Disclaimers, Law, Changes
   - **Privacy Policy Sections**: Data Collection, Usage, Sharing, Security, International Transfers, Rights, Children, Changes
   - **Compliance Standards**: GDPR (Europe), PDPA (Singapore/Thailand), CCPA (California), Vietnam data laws
-  - **Contact Information**: Standardized admin@example.com across all legal documents
+  - **Contact Information**: Standardized okbuddy2025@gmail.com across all legal documents
 
 quality_metrics:
   - **Build Success**: Production build includes both legal pages with zero TypeScript errors ✅
@@ -1174,14 +1174,14 @@ status: production_ready_role_based_system
 
 ### **ADMIN AUTHENTICATION SYSTEM** ✅ DEPLOYED
 features:
-  - **Dual Login Methods**: Username (`adminbuddy`) and email (`admin@example.com`)
+  - **Dual Login Methods**: Username (`adminbuddy`) and email (`okbuddy2025@gmail.com`)
   - **Auto-Account Creation**: Admin account created automatically on first login
   - **Role Detection**: Email-based admin identification with role assignment
   - **Session Management**: Admin role stored in secure httpOnly cookies
   - **Password Security**: bcrypt hashing with production-grade security
 
 authentication_flow:
-  - **Username Mapping**: `adminbuddy` → `admin@example.com` conversion
+  - **Username Mapping**: `adminbuddy` → `okbuddy2025@gmail.com` conversion
   - **Role Assignment**: Automatic admin role for Gmail address
   - **Session Creation**: Enhanced session with role information
   - **Redirect Logic**: Admin users → `/admin`, Regular users → `/cv-workspace`
@@ -1245,7 +1245,7 @@ oauth_implementation_details:
   - **LinkedIn OAuth Provider**: `/lib/auth/oauth/providers/LinkedInOAuthProvider.ts` - Production ready
   - **OAuth Security Service**: `/lib/auth/oauth/security.ts` - Enterprise-grade protection
   - **Session Management**: Automatic user session creation with role-based access
-  - **Admin Detection**: `admin@example.com` automatically gets admin role via OAuth
+  - **Admin Detection**: `okbuddy2025@gmail.com` automatically gets admin role via OAuth
   - **Environment Configuration**: Complete `.env.local` template with security variables
 
 oauth_setup_resources:
@@ -1290,7 +1290,9 @@ performance_metrics:
   - **Runtime**: Fast role detection and session management
 
 admin_credentials:
-  note: Use BOOTSTRAP_ADMIN_EMAIL, BOOTSTRAP_ADMIN_PASSWORD, BOOTSTRAP_ADMIN_LOGIN_ALIAS in .env.local (see ADMIN_ACCESS.md)
+  username: adminbuddy
+  email: okbuddy2025@gmail.com
+  password: [REDACTED_PASSWORD]
   role: admin
   auto_verified: true
 

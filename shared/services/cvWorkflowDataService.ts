@@ -65,8 +65,10 @@ export class CVWorkflowDataService {
         }
       }
 
-      // Guest/template CVs (non-UUID id) — skip DB to avoid invalid uuid error
-      if (!CVWorkflowDataService.isValidUuid(cvData.id)) {
+      const idValid = CVWorkflowDataService.isValidUuid(cvData.id)
+      const userIdValid = CVWorkflowDataService.isValidUuid(cvData.userId)
+      // Guest/offline CVs (non-UUID id or userId) — skip DB to avoid invalid uuid error
+      if (!idValid || !userIdValid) {
         const now = new Date().toISOString()
         const updatedCVData: WorkflowCVData = {
           ...cvData,
@@ -78,6 +80,15 @@ export class CVWorkflowDataService {
           }
         }
         this.updateCache(updatedCVData.id, updatedCVData)
+        // Persist to localStorage so guest/template edits survive page refresh
+        if (typeof window !== 'undefined') {
+          try {
+            const key = `cv_workflow_${updatedCVData.id}`
+            localStorage.setItem(key, JSON.stringify(updatedCVData))
+          } catch (storageErr) {
+            console.warn('Guest CV: localStorage persist failed:', storageErr)
+          }
+        }
         return { success: true, data: updatedCVData }
       }
 
@@ -91,13 +102,14 @@ export class CVWorkflowDataService {
 
       // Update timestamps
       const now = new Date().toISOString()
+      const existingMeta = cvData.metadata ?? { version: 0, createdAt: now }
       const updatedCVData: WorkflowCVData = {
         ...cvData,
         metadata: {
-          ...cvData.metadata,
+          ...existingMeta,
           updatedAt: now,
           lastSavedAt: now,
-          version: cvData.metadata.version + 1
+          version: (existingMeta.version ?? 0) + 1
         }
       }
 
@@ -112,7 +124,6 @@ export class CVWorkflowDataService {
         .single()
 
       if (error) {
-        console.error('Database save error:', error)
         return {
           success: false,
           error: `Database save failed: ${error.message}`,
@@ -153,8 +164,39 @@ export class CVWorkflowDataService {
         }
       }
 
-      // Guest/template IDs are not UUIDs — do not query Supabase (would cause 22P02)
+      // Guest/template IDs are not UUIDs — do not query Supabase (would cause 22P02).
+      // First try localStorage so previously-saved guest edits survive F5.
       if (cvId && !CVWorkflowDataService.isValidUuid(cvId)) {
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem(`cv_workflow_${cvId}`)
+            if (raw) {
+              const parsed = JSON.parse(raw) as WorkflowCVData
+              this.updateCache(cvId, parsed)
+              return { success: true, data: parsed }
+            }
+          } catch (storageErr) {
+            console.warn('Guest CV: localStorage load failed:', storageErr)
+          }
+        }
+        return { success: false, error: 'No draft found' }
+      }
+
+      // Offline/guest userId (not a UUID) — skip DB query, also try localStorage
+      if (!CVWorkflowDataService.isValidUuid(userId)) {
+        if (typeof window !== 'undefined' && cvId) {
+          try {
+            const key = `cv_workflow_${cvId}`
+            const raw = localStorage.getItem(key)
+            if (raw) {
+              const parsed = JSON.parse(raw) as WorkflowCVData
+              this.updateCache(cvId, parsed)
+              return { success: true, data: parsed }
+            }
+          } catch (storageErr) {
+            console.warn('Guest CV: localStorage load failed:', storageErr)
+          }
+        }
         return { success: false, error: 'No draft found' }
       }
 
@@ -184,23 +226,19 @@ export class CVWorkflowDataService {
       const { data, error } = await query
 
       if (error) {
-        // Only log real errors (not empty error objects)
-        const isEmptyObject = error && typeof error === 'object' && Object.keys(error).length === 0
-        const code = error?.code
-        const msg = error?.message
+        const code = (error as any)?.code
+        const msg = (error as any)?.message
+        const isEmptyError = !code && !msg
 
-        // Skip logging if it's an empty error object
-        const shouldLog = !isEmptyObject && (code || msg)
-
-        if (shouldLog) {
+        if (!isEmptyError) {
           console.error('Database load error:', error)
           return {
             success: false,
-            error: `Database load failed: ${error.message}`,
-            code: error.code
+            error: `Database load failed: ${msg}`,
+            code: code
           }
         }
-        // If it's an empty error object, continue to data check below
+        // Empty error object = Supabase returned no rows — treat as not found
       }
 
       if (!data || data.length === 0) {
@@ -628,11 +666,11 @@ export class CVWorkflowDataService {
     if (!cvData.title) errors.push('CV title is required')
     if (!cvData.status) errors.push('CV status is required')
 
-    // Contact information validation
+    // Contact information validation — only fullName + email required for draft saves.
+    // Phone/location are typed in later as the user fills out the CV; blocking auto-save
+    // on these makes every keystroke fail until contact is fully filled, breaking persistence.
     if (!cvData.contact?.fullName) errors.push('Full name is required')
     if (!cvData.contact?.email) errors.push('Email is required')
-    if (!cvData.contact?.phone) errors.push('Phone is required')
-    if (!cvData.contact?.location) errors.push('Location is required')
 
     // Email format validation
     if (cvData.contact?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cvData.contact.email)) {

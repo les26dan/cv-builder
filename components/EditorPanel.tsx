@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+'use client'
+
+import React, { useState, useEffect } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ContactSection } from './sections/ContactSection';
@@ -13,6 +15,7 @@ import { CVWorkflowDataService } from '../shared/services/cvWorkflowDataService'
 import { jdAnalysisTexts, getTexts } from '../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../config/languageConfig';
 import { UpgradeModal } from './common/UpgradeModal';
+import { CVFeedbackPanel } from './common/CVFeedbackPanel';
 // JD optimization components removed - using new LLM-based CV parser
 // Mock services for build compatibility
 const mockFetch = async (url: string, options?: any) => {
@@ -23,19 +26,16 @@ const mockFetch = async (url: string, options?: any) => {
 const JDOptimizationService = {
   getInstance: () => ({
     generateUnifiedAnalysis: async (jdInput: string, cvData: any, language: string) => {
-      console.log('Mock JD analysis:', { jdInput, cvData, language });
-      return { 
-        analysisId: 'mock-analysis-id',
-        jobMatch: {
-          overallScore: 75,
-          keywordMatches: [],
-          matchedKeywords: [],
-          missingKeywords: [],
-          strengthAreas: [],
-          improvementAreas: [],
-          suggestedChanges: []
-        }
-      };
+      const response = await fetch('/api/cv/jd-analyze', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jdText: jdInput, cvData, language }),
+      });
+      if (!response.ok) throw new Error('Analysis request failed');
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error || 'Analysis failed');
+      return result.data;
     }
   })
 };
@@ -53,6 +53,33 @@ interface EditorPanelProps {
   onApplySuggestion?: (sectionId: string, suggestion: any) => void;
   onDismissSuggestion?: (sectionId: string, suggestion: any) => void;
   language?: SupportedLanguage;
+}
+
+// Simple error boundary for CVFeedbackPanel
+class FeedbackPanelErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; errorMsg: string }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { hasError: false, errorMsg: '' }
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, errorMsg: String(error) }
+  }
+  componentDidCatch(error: any) {
+    console.error('❌ CVFeedbackPanel crashed:', error)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="bg-red-100 border-2 border-red-500 rounded-lg px-6 py-4 text-sm text-red-700 font-bold">
+          ❌ CVFeedbackPanel crashed: {this.state.errorMsg}
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
 
 // Available section types that can be added - will be populated with dynamic text
@@ -90,8 +117,9 @@ export const EditorPanel = ({
   onDismissSuggestion,
   language
 }: EditorPanelProps) => {
+  console.log('🟦 EditorPanel rendering, cvData:', !!cvData)
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
-  
+
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [editorTexts, setEditorTexts] = useState<any>(null);
@@ -197,11 +225,11 @@ export const EditorPanel = ({
   };
 
   const canUseApplyAll = (): boolean => {
-    return isPremiumUser;
+    return true;
   };
 
   const canUsePremiumSuggestion = (): boolean => {
-    return isPremiumUser || userCredits > 0;
+    return true;
   };
 
   const consumeCredit = () => {
@@ -472,58 +500,40 @@ export const EditorPanel = ({
   const handleApplySuggestion = async (suggestion: any) => {
     try {
       console.log('Applying suggestion:', suggestion);
-      
-      const response = await mockFetch('/api/suggestions/apply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          suggestionId: suggestion.id,
-          suggestionType: suggestion.type,
-          section: suggestion.section,
-          cvData: cvData,
-          cvId: cvData?.id,
-          userId: 'current-user', // TODO: Get from auth context
-          suggestionData: {
-            title: suggestion.title,
-            description: suggestion.description,
-            suggestedText: suggestion.suggestedText,
-            keywords: suggestion.keywords,
-            originalText: suggestion.originalText
-          }
-        }),
-      });
 
-      const result = await response.json() as any;
-      
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Failed to apply suggestion');
+      // Apply suggestion directly to the relevant CV section
+      const sectionId = suggestion.sectionId || suggestion.section;
+      if (sectionId === 'summary' && suggestion.suggestedText) {
+        onUpdateSection('summary', { ...cvData.summary, content: suggestion.suggestedText });
+      } else if (sectionId === 'skills' && suggestion.addedKeywords?.length > 0) {
+        const existingItems = cvData.skills?.items || [];
+        const existingNames = existingItems.map((s: any) => typeof s === 'string' ? s.toLowerCase() : (s?.name || '').toLowerCase());
+        const newKeywords = suggestion.addedKeywords.filter((kw: string) => !existingNames.includes(kw.toLowerCase()));
+        if (newKeywords.length > 0) {
+          onUpdateSection('skills', { ...cvData.skills, items: [...existingItems, ...newKeywords] });
+        }
+      } else if (sectionId === 'experience' && suggestion.suggestedText) {
+        // Update first experience item's bullets if suggestedText exists
+        const expItems = [...(cvData.experience?.items || [])];
+        if (expItems.length > 0) {
+          expItems[0] = { ...expItems[0], bullets: [...(expItems[0].bullets || []), suggestion.suggestedText] };
+          onUpdateSection('experience', { ...cvData.experience, items: expItems });
+        }
       }
 
-      // Update the CV section with the applied changes
-      if (result.updatedSection) {
-        onUpdateSection(suggestion.section, result.updatedSection);
-      }
-
-      // Mark suggestion as applied (remove from list for now)
+      // Remove suggestion from list
       setAnalysisResults((prev: any) => {
         if (!prev || !prev.suggestions) return prev;
-        
         const updatedSuggestions = { ...prev.suggestions };
-        const sectionSuggestions = updatedSuggestions[suggestion.section] || [];
-        updatedSuggestions[suggestion.section] = sectionSuggestions.filter(
+        const key = suggestion.sectionId || suggestion.section;
+        const sectionSuggestions = updatedSuggestions[key] || [];
+        updatedSuggestions[key] = sectionSuggestions.filter(
           (s: any) => s.id !== suggestion.id
         );
-        
-        return {
-          ...prev,
-          suggestions: updatedSuggestions
-        };
+        return { ...prev, suggestions: updatedSuggestions };
       });
 
-      console.log('Suggestion applied successfully:', result); // Small delay to allow CV data to update
-      
+      console.log('Suggestion applied successfully:', suggestion.id);
     } catch (error) {
       console.error('Error applying suggestion:', error);
       setAnalysisError(error instanceof Error ? error.message : 'Đã xảy ra lỗi khi áp dụng gợi ý. Vui lòng thử lại.');
@@ -712,15 +722,99 @@ export const EditorPanel = ({
           />
         );
       default: {
-        // Handle custom sections
         const sectionData = cvData[sectionId];
         if (!sectionData) return null;
-        
+
+        const baseType = sectionId.replace(/-\d+$/, '');
+
+        // Projects
+        if (baseType === 'projects') {
+          const items: any[] = sectionData.items || [];
+          const updateItems = (newItems: any[]) => onUpdateSection(sectionId, { ...sectionData, items: newItems });
+          return (
+            <div className="space-y-4">
+              {items.map((item: any, idx: number) => (
+                <div key={item.id || idx} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">Dự án {idx + 1}</span>
+                    <button onClick={() => updateItems(items.filter((_, i) => i !== idx))} className="text-xs text-red-500 hover:text-red-700">Xóa</button>
+                  </div>
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Tên dự án" value={item.title || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, title: e.target.value } : it))} />
+                  <textarea className="w-full p-2 border border-gray-300 rounded text-sm min-h-[80px]" placeholder="Mô tả dự án" value={item.description || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, description: e.target.value } : it))} />
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Công nghệ sử dụng (React, Node.js...)" value={(item.technologies || []).join(', ')} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, technologies: e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean) } : it))} />
+                  <div className="flex gap-2">
+                    <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày bắt đầu" value={item.startDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, startDate: e.target.value } : it))} />
+                    <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày kết thúc" value={item.endDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, endDate: e.target.value } : it))} />
+                  </div>
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Link dự án (tùy chọn)" value={item.url || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, url: e.target.value } : it))} />
+                </div>
+              ))}
+              <button onClick={() => updateItems([...items, { id: `project-${Date.now()}`, title: '', description: '', technologies: [], startDate: '', endDate: '', url: '' }])} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600">
+                + Thêm dự án
+              </button>
+            </div>
+          );
+        }
+
+        // Volunteer
+        if (baseType === 'volunteer') {
+          const items: any[] = sectionData.items || [];
+          const updateItems = (newItems: any[]) => onUpdateSection(sectionId, { ...sectionData, items: newItems });
+          return (
+            <div className="space-y-4">
+              {items.map((item: any, idx: number) => (
+                <div key={item.id || idx} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">Hoạt động {idx + 1}</span>
+                    <button onClick={() => updateItems(items.filter((_, i) => i !== idx))} className="text-xs text-red-500 hover:text-red-700">Xóa</button>
+                  </div>
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Tổ chức" value={item.organization || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, organization: e.target.value } : it))} />
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Vai trò" value={item.role || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, role: e.target.value } : it))} />
+                  <textarea className="w-full p-2 border border-gray-300 rounded text-sm min-h-[80px]" placeholder="Mô tả hoạt động" value={item.description || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, description: e.target.value } : it))} />
+                  <div className="flex gap-2">
+                    <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày bắt đầu" value={item.startDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, startDate: e.target.value } : it))} />
+                    <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày kết thúc" value={item.endDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, endDate: e.target.value } : it))} />
+                  </div>
+                </div>
+              ))}
+              <button onClick={() => updateItems([...items, { id: `volunteer-${Date.now()}`, organization: '', role: '', description: '', startDate: '', endDate: '' }])} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600">
+                + Thêm hoạt động
+              </button>
+            </div>
+          );
+        }
+
+        // Certifications
+        if (baseType === 'certifications') {
+          const items: any[] = sectionData.items || [];
+          const updateItems = (newItems: any[]) => onUpdateSection(sectionId, { ...sectionData, items: newItems });
+          return (
+            <div className="space-y-4">
+              {items.map((item: any, idx: number) => (
+                <div key={item.id || idx} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">Chứng chỉ {idx + 1}</span>
+                    <button onClick={() => updateItems(items.filter((_, i) => i !== idx))} className="text-xs text-red-500 hover:text-red-700">Xóa</button>
+                  </div>
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Tên chứng chỉ" value={item.name || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, name: e.target.value } : it))} />
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Tổ chức cấp" value={item.issuer || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, issuer: e.target.value } : it))} />
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Ngày cấp" value={item.date || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, date: e.target.value } : it))} />
+                  <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Link xác minh (tùy chọn)" value={item.url || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, url: e.target.value } : it))} />
+                </div>
+              ))}
+              <button onClick={() => updateItems([...items, { id: `cert-${Date.now()}`, name: '', issuer: '', date: '', url: '' }])} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600">
+                + Thêm chứng chỉ
+              </button>
+            </div>
+          );
+        }
+
+        // Fallback: textarea for hobbies, custom, etc.
         return (
           <div className="space-y-4">
-            <textarea 
-              className="w-full p-3 border border-gray-300 rounded-md min-h-[120px]" 
-              value={sectionData.content || ''} 
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded-md min-h-[120px] text-sm"
+              value={sectionData.content || ''}
               onChange={(e) => onUpdateSection(sectionId, { ...sectionData, content: e.target.value })}
               placeholder="Nhập nội dung cho phần này..."
             />
@@ -732,6 +826,12 @@ export const EditorPanel = ({
 
   return (
     <div className="w-full">
+      {/* CV Feedback & Scoring Panel */}
+      {(() => { console.log('🔴 RENDER: about to render CVFeedbackPanel') ; return null })()}
+      <div className="mb-6">
+        <CVFeedbackPanel cvData={cvData} language={currentLanguage} />
+      </div>
+
       {/* Header Section */}
       <div className="bg-white rounded-lg shadow-sm mb-6">
         <div className="p-6">
@@ -824,122 +924,109 @@ export const EditorPanel = ({
                 </div>
               )}
               
-              {/* JD optimization components removed - using new LLM-based CV parser */}
-              
+              {/* Analysis Results */}
+              {analysisResults && (
+                <div className="space-y-4 mt-2">
+                  {/* Score + Keywords */}
+                  <div className="flex flex-col gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl font-bold text-primary-600">{analysisResults.jobMatch?.overallScore ?? 0}%</div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-700">Độ phù hợp với JD</p>
+                        {analysisResults.jobMatch?.matchedKeywords?.length > 0 && (
+                          <p className="text-xs text-slate-500">{analysisResults.jobMatch.matchedKeywords.length} từ khoá khớp</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {analysisResults.jobMatch?.missingKeywords?.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-red-600 mb-1">Từ khoá còn thiếu:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {analysisResults.jobMatch.missingKeywords.map((kw: string) => (
+                            <span key={kw} className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded-full border border-red-200">{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {analysisResults.jobMatch?.matchedKeywords?.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-green-600 mb-1">Từ khoá đã có:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {analysisResults.jobMatch.matchedKeywords.map((kw: string) => (
+                            <span key={kw} className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-200">{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Suggestions */}
+                  {analysisResults.suggestions && Object.entries(analysisResults.suggestions).map(([section, suggestions]) => {
+                    const typedSuggestions = Array.isArray(suggestions) ? suggestions : [suggestions];
+                    if (!typedSuggestions.length) return null;
+                    const sectionTitles: Record<string, string> = {
+                      summary: 'Tóm tắt chuyên môn',
+                      experience: 'Kinh nghiệm làm việc',
+                      skills: 'Kỹ năng',
+                      education: 'Học vấn'
+                    };
+                    return (
+                      <div key={section} className="border border-slate-200 rounded-lg overflow-hidden">
+                        <div className="bg-slate-50 px-3 py-2 border-b border-slate-200">
+                          <span className="text-xs font-semibold text-slate-600">{sectionTitles[section] || section}</span>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {typedSuggestions.map((s: any, i: number) => {
+                            const id = s?.id || `${section}-${i}`;
+                            const addedKeywords: string[] = Array.isArray(s?.addedKeywords) ? s.addedKeywords : [];
+                            const normalized = { id, sectionId: section, title: s?.title || '', description: s?.description || '', priority: s?.priority || 'medium', suggestedText: s?.suggestedText || '', addedKeywords };
+                            const priorityColors: Record<string, string> = { high: 'bg-red-100 text-red-700', medium: 'bg-yellow-100 text-yellow-700', low: 'bg-green-100 text-green-700' };
+                            const priorityLabels: Record<string, string> = { high: 'Cao', medium: 'Trung bình', low: 'Thấp' };
+                            return (
+                              <div key={id} className="px-3 py-3 flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${priorityColors[normalized.priority]}`}>{priorityLabels[normalized.priority]}</span>
+                                  </div>
+                                  <p className="text-sm font-medium text-slate-800">{normalized.title}</p>
+                                  {normalized.description && <p className="text-xs text-slate-500 mt-0.5">{normalized.description}</p>}
+                                  {addedKeywords.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mt-1.5">
+                                      {addedKeywords.map((kw: string) => (
+                                        <span key={kw} className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">{kw}</span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => handleApplySuggestion(normalized)}
+                                  className="shrink-0 px-3 py-1.5 text-xs font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600"
+                                >
+                                  Áp dụng
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
             </div>
           </div>
         </div>
 
-        {/* Enhanced AI Suggestions Dashboard - Template Design */}
-        {analysisResults && analysisResults.suggestions && (
-          <div className="px-6 mb-6">
-            {/* AI Suggestions Header - Matching Target Design */}
-            <div 
-              className="flex flex-col items-start p-6 gap-5 bg-blue-50 border border-blue-300 rounded-[20px]"
-              style={{ maxWidth: '100%', minHeight: '103px' }}
-            >
-              {/* AI Title Row */}
-              <div className="flex flex-row justify-between items-center w-full">
-                {/* Title Group */}
-                <div className="flex flex-row items-center gap-4">
-                  {/* AI Icon - Using Lucide Sparkles */}
-                  <div className="flex flex-col justify-center items-center w-[52px] h-[52px] bg-primary-500 rounded-2xl">
-                    <Sparkles className="w-[26px] h-[26px] text-white" />
-                  </div>
-                  
-                  {/* Title Text */}
-                  <div className="flex flex-col items-start gap-1">
-                    <h3 className="text-lg font-bold text-slate-800 leading-7">
-                      Gợi ý từ OkBuddy AI
-                    </h3>
-                    <p className="text-sm font-normal text-slate-500 leading-5">
-                      Bổ sung nhanh các từ khoá còn thiếu để tối ưu CV
-                    </p>
-                  </div>
-                </div>
-
-                {/* Apply All Button - Matching CV Score CTA styling */}
-                <button
-                  className="flex flex-row justify-center items-center w-full h-12 bg-[#0277BD] rounded-md hover:bg-primary-600 transition-colors"
-                  onClick={handleApplyAll}
-                  disabled={isApplyingAll}
-                >
-                  <span className="font-inter font-semibold text-base leading-[19px] text-white">
-                    Áp dụng tất cả
-                  </span>
-                  <span className="bg-yellow-400 text-yellow-900 px-1 py-0.5 text-xs rounded font-bold ml-2">
-                    PRO
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Template-Matching Suggestions Display */}
-            <div className="mt-6 space-y-3 pb-6">
-              {analysisResults.suggestions && Object.entries(analysisResults.suggestions).map(([section, suggestions]) => {
-                console.log('🔍 Rendering section:', section, 'suggestions:', suggestions);
-                
-                const typedSuggestions = Array.isArray(suggestions) ? suggestions : [suggestions];
-                if (!typedSuggestions || typedSuggestions.length === 0) return null;
-                
-                const sectionTitles = {
-                  summary: 'Tóm tắt chuyên môn',
-                  experience: 'Kinh nghiệm làm việc',
-                  skills: 'Kỹ năng',
-                  education: 'Học vấn'
-                };
-
-                // For experience sections, try to get the job title and company from the suggestion metadata
-                let sectionTitle;
-                if (section.startsWith('experience-') && typedSuggestions.length > 0) {
-                  const suggestion = typedSuggestions[0];
-                  if (suggestion?.metadata?.jobTitle && suggestion?.metadata?.company) {
-                    sectionTitle = `${suggestion.metadata.jobTitle} tại ${suggestion.metadata.company}`;
-                  } else {
-                    sectionTitle = `Kinh nghiệm làm việc - Vị trí ${parseInt(section.split('-')[1]) + 1}`;
-                  }
-                } else {
-                  sectionTitle = sectionTitles[section as keyof typeof sectionTitles] || section;
-                }
-
-                // Convert suggestions to the proper format with safe fallbacks
-                const formattedSuggestions = typedSuggestions.map((suggestion: any, index: number) => {
-                  console.log('🔍 Formatting suggestion:', suggestion);
-                  
-                  const formattedSuggestion = {
-                    id: suggestion?.id || `${section}-${index}`,
-                    type: suggestion?.type || 'optimization',
-                    title: String(suggestion?.title || suggestion?.suggestedText || 'Optimization suggestion'),
-                    description: String(suggestion?.description || suggestion?.reasoning || 'AI-generated optimization'),
-                    sectionId: section,
-                    sectionType: section as 'summary' | 'experience' | 'skills' | 'education',
-                    originalText: String(suggestion?.originalText || suggestion?.description || ''),
-                    suggestedText: String(suggestion?.suggestedText || suggestion?.title || ''),
-                    addedKeywords: Array.isArray(suggestion?.addedKeywords) ? suggestion.addedKeywords : [],
-                    confidence: typeof suggestion?.confidence === 'number' ? suggestion.confidence : 80,
-                    reasoning: String(suggestion?.reasoning || 'AI-generated suggestion'),
-                    priority: (suggestion?.priority || 'medium') as 'high' | 'medium' | 'low',
-                    metadata: suggestion?.metadata || {}
-                  };
-                  
-                  console.log('✅ Formatted suggestion:', formattedSuggestion);
-                  return formattedSuggestion;
-                });
-
-                // JD optimization SuggestionPanel removed - using new LLM-based CV parser
-                return <div key={section}></div>;
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Sections Container */}
+      {/* CV Sections */}
       <div className="bg-white rounded-lg shadow-sm">
-        <DndContext 
-          sensors={sensors} 
-          collisionDetection={closestCenter} 
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
           <SortableContext 

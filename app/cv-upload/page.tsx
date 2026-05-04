@@ -40,6 +40,11 @@ export default function CVUploadPage() {
     }
 
     loadTexts()
+
+    // Check auth — redirect to login if not authenticated
+    fetch('/api/auth/me', { credentials: 'include' }).then(res => {
+      if (!res.ok) window.location.href = '/login?redirect=/cv-upload'
+    })
   }, [])
 
   const handleFileSelect = (file: File) => {
@@ -188,8 +193,14 @@ export default function CVUploadPage() {
 
       const response = await fetch('/api/upload/cv-blob', {
         method: 'POST',
+        credentials: 'include',
         body: formData
       })
+
+      if (response.status === 401) {
+        window.location.href = '/login?redirect=/cv-upload'
+        return
+      }
 
       const result = await response.json()
       console.log('📤 Upload API Response:', response.status, result)

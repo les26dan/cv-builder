@@ -18,45 +18,34 @@ export interface TestAccountResult {
   accounts: TestAccount[];
 }
 
-function getTestAccounts(): Omit<TestAccount, 'id' | 'created' | 'error' | 'loginUrl'>[] {
-  const masterPassword =
-    process.env.DEV_MASTERADMIN_PASSWORD ||
-    process.env.DEV_TEST_ACCOUNTS_MASTER_PASSWORD;
-  const accounts: Omit<TestAccount, 'id' | 'created' | 'error' | 'loginUrl'>[] = [];
-
-  if (masterPassword) {
-    accounts.push({
-      email: process.env.DEV_MASTERADMIN_EMAIL?.trim() || 'masteradmin@okbuddy.com',
-      password: masterPassword,
-      fullName: 'Master Admin - Full Access'
-    });
+// Pre-defined test accounts
+const TEST_ACCOUNTS: Omit<TestAccount, 'id' | 'created' | 'error' | 'loginUrl'>[] = [
+  {
+    email: 'masteradmin@okbuddy.com',
+    password: 'okbuddy25!',
+    fullName: 'Master Admin - Full Access'
+  },
+  {
+    email: 'okbuddy.test.user@gmail.com',
+    password: 'OkBuddy2025!',
+    fullName: 'OkBuddy Test User'
+  },
+  {
+    email: 'user1@okbuddy.com',
+    password: 'test123',
+    fullName: 'Test User 1'
+  },
+  {
+    email: 'user2@okbuddy.com',
+    password: 'test123',
+    fullName: 'Test User 2'
+  },
+  {
+    email: 'demo@okbuddy.com',
+    password: 'demo123',
+    fullName: 'Demo User'
   }
-
-  accounts.push(
-    {
-      email: 'okbuddy.test.user@gmail.com',
-      password: 'OkBuddy2025!',
-      fullName: 'OkBuddy Test User'
-    },
-    {
-      email: 'user1@okbuddy.com',
-      password: 'test123',
-      fullName: 'Test User 1'
-    },
-    {
-      email: 'user2@okbuddy.com',
-      password: 'test123',
-      fullName: 'Test User 2'
-    },
-    {
-      email: 'demo@okbuddy.com',
-      password: 'demo123',
-      fullName: 'Demo User'
-    }
-  );
-
-  return accounts;
-}
+];
 
 /**
  * Create test accounts for development and testing
@@ -67,7 +56,7 @@ export async function createTestAccounts(): Promise<TestAccountResult> {
   const results: TestAccount[] = [];
   let successCount = 0;
 
-  for (const accountData of getTestAccounts()) {
+  for (const accountData of TEST_ACCOUNTS) {
     try {
       // Check if account already exists
       const existingUser = await DatabaseService.getUserByEmail(accountData.email);

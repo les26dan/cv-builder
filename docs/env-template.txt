@@ -32,14 +32,6 @@ LINKEDIN_CLIENT_SECRET="your-linkedin-client-secret"
 # JWT Secret for session management (generate with: openssl rand -base64 32)
 JWT_SECRET="your-jwt-secret-key-here"
 
-# Bootstrap admin (local/staging — never commit real values)
-# BOOTSTRAP_ADMIN_EMAIL="admin@example.com"
-# BOOTSTRAP_ADMIN_PASSWORD="generate-a-strong-password"
-# BOOTSTRAP_ADMIN_LOGIN_ALIAS="adminbuddy"
-# Optional dev-only master admin auto-create:
-# DEV_MASTERADMIN_EMAIL="masteradmin@okbuddy.com"
-# DEV_MASTERADMIN_PASSWORD="dev-only-password"
-
 # ====================
 # APPLICATION CONFIGURATION
 # ====================

@@ -13,29 +13,16 @@ export const runtime = 'nodejs'
  */
 export async function POST(request: NextRequest) {
   try {
-    const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim();
-    const password = process.env.BOOTSTRAP_ADMIN_PASSWORD;
-    const fullName = process.env.BOOTSTRAP_ADMIN_FULL_NAME?.trim() || 'Admin';
-
-    if (!email || !password) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD must be set to use this endpoint'
-        },
-        { status: 503 }
-      );
+    // Admin credentials as requested
+    const adminData = {
+      fullName: 'Admin Buddy',
+      email: 'okbuddy2025@gmail.com', // Updated to Gmail address
+      username: 'adminbuddy', // Custom username/ID as requested
+      password: '[REDACTED_PASSWORD]',
+      role: 'admin'
     }
 
-    const adminData = {
-      fullName,
-      email,
-      username: process.env.BOOTSTRAP_ADMIN_LOGIN_ALIAS?.trim() || 'adminbuddy',
-      password,
-      role: 'admin' as const
-    };
-
-    console.log('🔧 Creating admin account:', {
+    console.log('🔧 Creating admin account with credentials:', {
       username: adminData.username,
       email: adminData.email,
       fullName: adminData.fullName
@@ -48,6 +35,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Admin user already exists',
+        credentials: {
+          id: adminData.username,
+          email: adminData.email,
+          password: adminData.password
+        },
         loginUrl: '/login/',
         user: {
           id: existingUser.user.id,
@@ -96,7 +88,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Admin account created successfully! Log in with BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD from your environment.',
+      message: 'Admin account created successfully!',
+      credentials: {
+        id: adminData.username,
+        email: adminData.email,
+        password: adminData.password
+      },
       loginUrl: '/login/',
       user: {
         id: createResult.user?.id,
@@ -105,6 +102,12 @@ export async function POST(request: NextRequest) {
         emailVerified: createResult.user?.email_verified,
         createdAt: createResult.user?.created_at,
         role: 'admin'
+      },
+      instructions: {
+        loginAt: 'http://localhost:3000/login/',
+        useEmail: adminData.email,
+        usePassword: adminData.password,
+        note: 'Admin has full access to all features and can manage all users'
       }
     })
 

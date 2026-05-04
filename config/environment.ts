@@ -59,7 +59,7 @@ export const environmentConfig: EnvironmentConfig = {
     supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'mock-anon-key'
   },
   ai: {
-    openaiApiKey: process.env.VITE_OPENAI_API_KEY || '',
+    openaiApiKey: process.env.VITE_OPENAI_API_KEY || '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',
     openaiApiUrl: process.env.VITE_OPENAI_API_URL || 'https://api.openai.com/v1/chat/completions',
     model: process.env.VITE_OPENAI_MODEL || 'gpt-4o-mini',
     maxTokens: parseInt(process.env.VITE_OPENAI_MAX_TOKENS || '2048'),

@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Removed output: 'export' to support API routes
-  trailingSlash: true,
+  // trailingSlash: true, // Disabled — causes 308 redirect on API POST routes, breaking login/auth
   images: {
     unoptimized: true
   },

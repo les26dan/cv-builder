@@ -75,9 +75,9 @@ SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 # ====================
 # OAUTH PROVIDERS
 # ====================
-# LinkedIn OAuth
-LINKEDIN_CLIENT_ID="your-linkedin-client-id"
-LINKEDIN_CLIENT_SECRET="your-linkedin-client-secret"
+# LinkedIn OAuth (Already configured)
+LINKEDIN_CLIENT_ID="86nk5co06976t5"
+LINKEDIN_CLIENT_SECRET="WPL_AP1.NUO9OJbl6poNNfNU.tmRKYA=="
 LINKEDIN_REDIRECT_URI="http://localhost:3000/api/auth/linkedin/callback"
 
 # Google OAuth (Add when ready)
@@ -205,7 +205,7 @@ WHERE created_at < NOW() - INTERVAL '90 days';
 
 #### **LinkedIn OAuth Setup**
 ✅ **Already configured** with your credentials:
-- Client ID: (set `LINKEDIN_CLIENT_ID` in `.env.local`)
+- Client ID: `86nk5co06976t5`
 - Redirect URI: `http://localhost:3000/api/auth/linkedin/callback`
 
 #### **Google OAuth Setup** (When ready)

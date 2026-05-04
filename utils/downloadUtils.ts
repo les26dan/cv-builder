@@ -52,6 +52,12 @@ const defaultSectionTitles: Record<string, string> = {
   hobbies: 'SỞ THÍCH'
 };
 
+// Normalize a skill item (string or object) to a plain string
+const skillName = (item: any): string => {
+  if (typeof item === 'string') return item;
+  return item?.name || item?.label || item?.skill || String(item);
+};
+
 // Get section title (custom or default) - EXACTLY matching preview
 const getSectionTitle = (sectionId: string, sectionTitles?: Record<string, string>) => {
   if (sectionTitles?.[sectionId]) {
@@ -165,7 +171,7 @@ export const generateTxtContent = (cvData: CVData): string => {
       case 'skills':
         content += `${getSectionTitle(sectionId, cvData.sectionTitles)}\n`;
         content += '-'.repeat(getSectionTitle(sectionId, cvData.sectionTitles).length) + '\n';
-        content += sectionData.items.join(' | ') + '\n\n';
+        content += sectionData.items.map(skillName).join(' | ') + '\n\n';
         break;
         
       case 'education':
@@ -333,7 +339,7 @@ ${escapeLatex(cvData.summary.content)}\n`;
       case 'skills':
         if (cvData.skills?.items && cvData.skills.items.length > 0) {
           latex += `\n\\section{${escapeLatex(sectionTitle)}}
-\\cvitem{}{${escapeLatex(cvData.skills.items.join(', '))}}\n`;
+\\cvitem{}{${escapeLatex(cvData.skills.items.map(skillName).join(', '))}}\n`;
         }
         break;
         
@@ -438,31 +444,29 @@ const escapeLatex = (text: string): string => {
 
 
 // Main download function
-export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' | 'latex') => {
+export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' | 'latex', templateSetting?: string) => {
   const filename = generateFilename(cvData, format);
-  
+
   switch (format) {
     case 'txt': {
       const txtContent = generateTxtContent(cvData);
       downloadFile(txtContent, filename, 'text/plain;charset=utf-8');
       break;
     }
-      
+
     case 'pdf': {
-      // For now, we'll create a simple HTML representation and print it
-      // In a real implementation, you'd use a library like jsPDF or Puppeteer
-      const htmlContent = generateHTMLForPrint(cvData);
+      const htmlContent = await generateHTMLForPrintFromReact(cvData, templateSetting);
       const printWindow = window.open('', '_blank');
       if (printWindow) {
         printWindow.document.write(htmlContent);
         printWindow.document.close();
         printWindow.focus();
-        
+
         // Wait for content to load, then trigger print dialog
         setTimeout(() => {
           printWindow.print();
           printWindow.close();
-        }, 250);
+        }, 400);
       }
       break;
     }
@@ -486,8 +490,473 @@ export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' 
   }
 };
 
-// Generate HTML for printing (PDF simulation) - EXACTLY matching preview
-const generateHTMLForPrint = (cvData: CVData): string => {
+// Render the actual React template to static HTML for printing.
+// Single source of truth — preview and print share the same component tree.
+const generateHTMLForPrintFromReact = async (cvData: CVData, templateSetting?: string): Promise<string> => {
+  const React = (await import('react')).default;
+  const { renderToStaticMarkup } = await import('react-dom/server');
+  const { parseTemplateSetting, templateRegistry, DEFAULT_TEMPLATE_ID } = await import('../components/templates/templateRegistry');
+  const { injectThemeVars } = await import('../components/templates/colorThemes');
+
+  const { templateId, themeId } = parseTemplateSetting(templateSetting);
+  const def = templateRegistry[templateId] ?? templateRegistry[DEFAULT_TEMPLATE_ID];
+  const ActiveTemplate = def.component;
+  const theme = def.themes.find((t: any) => t.id === themeId) ?? def.themes[0];
+
+  // We render every page sequentially. Templates already accept currentPage/totalPages.
+  // Heuristic: render up to 4 pages; templates that paginate themselves stop emitting content.
+  const MAX_PAGES = 4;
+  const pageMarkup: string[] = [];
+  for (let p = 1; p <= MAX_PAGES; p++) {
+    const html = renderToStaticMarkup(
+      React.createElement(ActiveTemplate, {
+        cvData,
+        activeSection: null,
+        onSectionClick: () => {},
+        currentPage: p,
+        totalPages: MAX_PAGES,
+        isPreview: false,
+        language: undefined,
+        colorTheme: theme,
+      })
+    );
+    pageMarkup.push(html);
+    // Quick exit: if rendered output is essentially empty, stop.
+    if (p > 1 && html.replace(/<[^>]+>/g, '').trim().length < 5) {
+      pageMarkup.pop();
+      break;
+    }
+  }
+
+  const themeStyle = injectThemeVars(theme);
+  const cssVars = Object.entries(themeStyle as Record<string, string>)
+    .map(([k, v]) => `${k}:${v}`).join(';');
+
+  const pages = pageMarkup.map(m => `<div class="cv-page" style="${cssVars}">${m}</div>`).join('');
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CV</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; background: #fff; font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif; }
+  .cv-page { width: 210mm; min-height: 297mm; background: #fff; page-break-after: always; overflow: hidden; }
+  .cv-page:last-child { page-break-after: auto; }
+  .cv-experience-item, .cv-education-item, .cv-project-item { page-break-inside: avoid; }
+  @media print { .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+${pages}
+</body>
+</html>`;
+};
+
+// Resolve theme colors from templateSetting string ("templateId:themeId")
+const resolveThemeColors = (templateSetting?: string): { primary: string; accent: string; text: string; muted: string; templateId: string } => {
+  const defaults = { primary: '#1a56db', accent: '#e8f0fe', text: '#1e293b', muted: '#64748b', templateId: 'classic' }
+  if (!templateSetting || templateSetting === 'default') return defaults
+  const [templateId, themeId = 'default'] = templateSetting.split(':')
+
+  const palettes: Record<string, Record<string, { primary: string; accent: string; text: string; muted: string }>> = {
+    classic: {
+      default: { primary: '#1a56db', accent: '#e8f0fe', text: '#1e293b', muted: '#64748b' },
+      navy:    { primary: '#1e3a8a', accent: '#bfdbfe', text: '#111827', muted: '#6b7280' },
+      forest:  { primary: '#166534', accent: '#bbf7d0', text: '#111827', muted: '#6b7280' },
+      rose:    { primary: '#9f1239', accent: '#fecdd3', text: '#111827', muted: '#6b7280' },
+    },
+    sidebar: {
+      slate:  { primary: '#334155', accent: '#f1f5f9', text: '#0f172a', muted: '#64748b' },
+      navy:   { primary: '#1e3a8a', accent: '#dbeafe', text: '#1e293b', muted: '#64748b' },
+      forest: { primary: '#166534', accent: '#dcfce7', text: '#14532d', muted: '#6b7280' },
+      rose:   { primary: '#9f1239', accent: '#ffe4e6', text: '#1f2937', muted: '#6b7280' },
+    },
+    minimal: {
+      slate:  { primary: '#334155', accent: '#f1f5f9', text: '#0f172a', muted: '#64748b' },
+      navy:   { primary: '#1e3a8a', accent: '#dbeafe', text: '#1e293b', muted: '#64748b' },
+      forest: { primary: '#166534', accent: '#dcfce7', text: '#14532d', muted: '#6b7280' },
+      rose:   { primary: '#9f1239', accent: '#ffe4e6', text: '#1f2937', muted: '#6b7280' },
+    },
+    timeline: {
+      blue:   { primary: '#1e3a8a', accent: '#dbeafe', text: '#1e293b', muted: '#64748b' },
+      teal:   { primary: '#0f766e', accent: '#ccfbf1', text: '#134e4a', muted: '#6b7280' },
+      violet: { primary: '#5b21b6', accent: '#ede9fe', text: '#1e1b4b', muted: '#6b7280' },
+      slate:  { primary: '#334155', accent: '#f1f5f9', text: '#0f172a', muted: '#64748b' },
+    },
+    executive: {
+      midnight: { primary: '#0f2942', accent: '#e8eef7', text: '#1a202c', muted: '#718096' },
+      charcoal: { primary: '#1c1c2e', accent: '#f0f0f5', text: '#1a1a2e', muted: '#6b7280' },
+      wine:     { primary: '#6b1c3f', accent: '#fce7ef', text: '#1f1020', muted: '#6b7280' },
+      forest:   { primary: '#14532d', accent: '#f0fdf4', text: '#052e16', muted: '#6b7280' },
+    },
+  }
+  const colors = palettes[templateId]?.[themeId] || defaults
+  return { ...colors, templateId }
+}
+
+// Dispatch to the correct HTML generator based on templateSetting
+const generateHTMLForPrintByTemplate = (cvData: CVData, templateSetting?: string): string => {
+  const { templateId, ...colors } = resolveThemeColors(templateSetting)
+  switch (templateId) {
+    case 'sidebar':   return generateHTMLForPrint_sidebar(cvData, colors)
+    case 'minimal':   return generateHTMLForPrint_minimal(cvData, colors)
+    case 'timeline':  return generateHTMLForPrint_timeline(cvData, colors)
+    case 'executive': return generateHTMLForPrint_executive(cvData, colors)
+    default:          return generateHTMLForPrint(cvData, colors)
+  }
+}
+
+type Colors = { primary: string; accent: string; text: string; muted: string }
+
+// ── Sidebar template HTML ────────────────────────────────────────────────────
+const generateHTMLForPrint_sidebar = (cvData: CVData, colors: Colors): string => {
+  const { primary, accent, text: textColor, muted } = colors
+  const contact = cvData.contact || {}
+  const skills = cvData.skills?.items || []
+  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education']
+  const skillStr = (s: any) => typeof s === 'object' && s.name ? s.name : String(s)
+  const mainSections = sectionOrder.filter((id: string) => id !== 'contact' && id !== 'skills')
+
+  const sectionHeaderStyle = `display:flex;align-items:center;gap:10px;margin-bottom:14px;`
+  const sectionHeaderInner = (title: string) =>
+    `<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:${primary};white-space:nowrap;">${title}</span><div style="flex:1;height:1.5px;background:${accent};"></div>`
+
+  const renderMainSection = (sectionId: string): string => {
+    const header = `<div style="${sectionHeaderStyle}">${sectionHeaderInner(getSectionTitle(sectionId, cvData.sectionTitles))}</div>`
+    switch (sectionId) {
+      case 'summary': {
+        if (!cvData.summary?.content?.trim()) return ''
+        return `<div style="margin-bottom:20px;">${header}<p style="font-size:12px;color:${textColor};line-height:1.75;margin:0;">${cvData.summary.content}</p></div>`
+      }
+      case 'experience': {
+        const items = cvData.experience?.items
+        if (!items?.length) return ''
+        const jobs = items.map(exp => {
+          const bullets = (exp.bullets || []).filter((b: string) => b?.trim())
+            .map((b: string) => `<li style="font-size:12px;color:${textColor};line-height:1.6;margin-bottom:3px;padding-left:12px;position:relative;list-style:none;"><span style="position:absolute;left:0;color:${primary};font-weight:700;">›</span>${b}</li>`).join('')
+          const dateBadge = `<span style="font-size:10.5px;color:${primary};background:${accent};padding:2px 8px;border-radius:10px;white-space:nowrap;font-weight:500;">${exp.startDate} – ${exp.current ? 'Hiện tại' : (exp.endDate || '')}</span>`
+          return `<div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid ${accent};">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">
+              <div><div style="font-size:13px;font-weight:700;color:${textColor};line-height:1.3;">${exp.title}</div>${exp.company ? `<div style="font-size:12px;color:${primary};font-weight:600;margin-top:1px;">${exp.company}${exp.location ? `<span style="color:${muted};font-weight:400;"> · ${exp.location}</span>` : ''}</div>` : ''}</div>
+              ${dateBadge}
+            </div>
+            ${bullets ? `<ul style="margin:6px 0 0;padding:0;">${bullets}</ul>` : ''}
+          </div>`
+        }).join('')
+        return `<div style="margin-bottom:20px;">${header}${jobs}</div>`
+      }
+      case 'education': {
+        const items = cvData.education?.items
+        if (!items?.length) return ''
+        const edus = items.map(edu => {
+          const dateBadge = edu.graduationDate ? `<span style="font-size:10.5px;color:${primary};background:${accent};padding:2px 8px;border-radius:10px;white-space:nowrap;font-weight:500;">${edu.graduationDate}</span>` : ''
+          return `<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid ${accent};">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div><div style="font-size:13px;font-weight:700;color:${textColor};">${edu.degree}</div>${edu.institution ? `<div style="font-size:12px;color:${primary};font-weight:500;">${edu.institution}${edu.location ? `<span style="color:${muted};font-weight:400;"> · ${edu.location}</span>` : ''}</div>` : ''}</div>
+              ${dateBadge}
+            </div>
+            ${edu.description ? `<p style="font-size:12px;color:${muted};margin:5px 0 0;line-height:1.5;">${edu.description}</p>` : ''}
+          </div>`
+        }).join('')
+        return `<div style="margin-bottom:20px;">${header}${edus}</div>`
+      }
+      default: {
+        const data = cvData[sectionId]
+        if (!data) return ''
+        return `<div style="margin-bottom:20px;">${header}${data.content ? `<p style="font-size:12px;color:${textColor};line-height:1.6;margin:0;">${data.content}</p>` : ''}</div>`
+      }
+    }
+  }
+
+  const initials = contact.fullName ? contact.fullName.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase() : ''
+  const sidebarContent = `
+    <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.15);border:3px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:24px;font-weight:700;color:rgba(255,255,255,0.9);">${initials}</div>
+    ${contact.fullName ? `<div style="font-size:17px;font-weight:700;color:#fff;line-height:1.25;word-break:break-word;margin-bottom:20px;">${contact.fullName}</div>` : ''}
+    <div style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.55);border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:5px;margin-bottom:10px;">LIÊN HỆ</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      ${contact.email ? `<div style="font-size:11px;color:rgba(255,255,255,0.85);word-break:break-all;">✉ ${contact.email}</div>` : ''}
+      ${contact.phone ? `<div style="font-size:11px;color:rgba(255,255,255,0.85);">✆ ${contact.phone}</div>` : ''}
+      ${contact.location ? `<div style="font-size:11px;color:rgba(255,255,255,0.85);">⌖ ${contact.location}</div>` : ''}
+      ${contact.linkedin ? `<div style="font-size:11px;color:rgba(255,255,255,0.85);word-break:break-all;">in ${contact.linkedin}</div>` : ''}
+    </div>
+    ${skills.length > 0 ? `
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.55);border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:5px;margin-bottom:10px;">${getSectionTitle('skills', cvData.sectionTitles)}</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${skills.map((s: any) => `<div style="font-size:11px;color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.12);border-radius:3px;padding:4px 8px;">${skillStr(s)}</div>`).join('')}
+      </div>` : ''}
+  `
+
+  return `<!DOCTYPE html><html><head><title>${contact.fullName || 'CV'}</title><meta charset="utf-8">
+  <style>
+    @page { margin:0; size:A4; }
+    @media print { html,body { margin:0;padding:0; } }
+    body { font-family:'Inter','Segoe UI',sans-serif;font-size:12px;line-height:1.5;margin:0;padding:0;background:white;text-rendering:optimizeLegibility; }
+    .cv-wrap { display:table;width:794px;min-height:1123px;table-layout:fixed; }
+    .sidebar { display:table-cell;width:238px;background:${primary};padding:44px 22px 40px;vertical-align:top; }
+    .main { display:table-cell;padding:44px 36px 40px;vertical-align:top;background:white; }
+  </style>
+  </head><body><div class="cv-wrap"><div class="sidebar">${sidebarContent}</div><div class="main">${mainSections.map(renderMainSection).join('')}</div></div></body></html>`
+}
+
+// ── Minimal template HTML ────────────────────────────────────────────────────
+const generateHTMLForPrint_minimal = (cvData: CVData, colors: Colors): string => {
+  const { primary, accent, text: textColor, muted } = colors
+  const contact = cvData.contact || {}
+  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education']
+  const skillStr = (s: any) => typeof s === 'object' && s.name ? s.name : String(s)
+
+  const sectionHeader = (title: string) =>
+    `<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:${primary};flex-shrink:0;"></div>
+      <span style="font-size:12.5px;font-weight:700;color:${primary};letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;">${title}</span>
+      <div style="flex:1;height:1px;background:${accent};"></div>
+    </div>`
+
+  const renderSection = (sectionId: string): string => {
+    switch (sectionId) {
+      case 'contact': {
+        if (!contact.fullName && !contact.email) return ''
+        const info = [contact.email, contact.phone, contact.location, contact.linkedin].filter(Boolean)
+        const infoHtml = info.map((v, i) => `${i > 0 ? `<span style="margin:0 8px;color:${accent};font-weight:700;">·</span>` : ''}${v}`).join('')
+        return `<div style="margin-bottom:28px;padding-bottom:20px;border-bottom:3px solid ${primary};">
+          ${contact.fullName ? `<div style="font-size:28px;font-weight:800;color:${textColor};letter-spacing:-0.5px;line-height:1.15;margin-bottom:6px;">${contact.fullName}</div>` : ''}
+          <div style="font-size:11.5px;color:${muted};line-height:1.6;">${infoHtml}</div>
+        </div>`
+      }
+      case 'summary': {
+        if (!cvData.summary?.content?.trim()) return ''
+        return `<div style="margin-bottom:22px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}<p style="font-size:12px;color:${textColor};line-height:1.8;margin:0;padding-left:18px;">${cvData.summary.content}</p></div>`
+      }
+      case 'experience': {
+        const items = cvData.experience?.items
+        if (!items?.length) return ''
+        const jobs = items.map(exp => {
+          const bullets = (exp.bullets || []).filter((b: string) => b?.trim())
+            .map((b: string) => `<li style="font-size:12px;color:${textColor};line-height:1.65;margin-bottom:3px;padding-left:14px;position:relative;list-style:none;"><span style="position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:50%;background:${primary};display:inline-block;"></span>${b}</li>`).join('')
+          return `<div style="margin-bottom:16px;padding-left:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+              <div><span style="font-size:13px;font-weight:700;color:${textColor};">${exp.title}</span>${exp.company ? `<span style="font-size:12.5px;color:${primary};font-weight:600;"> · ${exp.company}</span>` : ''}${exp.location ? `<span style="font-size:11.5px;color:${muted};"> · ${exp.location}</span>` : ''}</div>
+              <span style="font-size:11px;color:${muted};white-space:nowrap;margin-left:10px;">${exp.startDate} – ${exp.current ? 'Hiện tại' : (exp.endDate || '')}</span>
+            </div>
+            ${bullets ? `<ul style="margin:5px 0 0;padding:0;">${bullets}</ul>` : ''}
+          </div>`
+        }).join('')
+        return `<div style="margin-bottom:22px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${jobs}</div>`
+      }
+      case 'skills': {
+        const items = cvData.skills?.items
+        if (!items?.length) return ''
+        const tags = items.map((s: any) => `<span style="font-size:11.5px;color:${primary};background:${accent};border-radius:4px;padding:3px 10px;font-weight:500;border:1px solid ${primary}22;">${skillStr(s)}</span>`).join('')
+        return `<div style="margin-bottom:22px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}<div style="padding-left:18px;display:flex;flex-wrap:wrap;gap:6px;">${tags}</div></div>`
+      }
+      case 'education': {
+        const items = cvData.education?.items
+        if (!items?.length) return ''
+        const edus = items.map(edu => `<div style="margin-bottom:12px;padding-left:18px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div><div style="font-size:13px;font-weight:700;color:${textColor};">${edu.degree}</div>${edu.institution ? `<div style="font-size:12px;color:${primary};font-weight:500;">${edu.institution}${edu.location ? `<span style="color:${muted};font-weight:400;"> · ${edu.location}</span>` : ''}</div>` : ''}</div>
+            ${edu.graduationDate ? `<span style="font-size:11px;color:${muted};white-space:nowrap;margin-left:10px;">${edu.graduationDate}</span>` : ''}
+          </div>
+          ${edu.description ? `<p style="font-size:12px;color:${muted};margin:4px 0 0;line-height:1.5;">${edu.description}</p>` : ''}
+        </div>`).join('')
+        return `<div style="margin-bottom:22px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${edus}</div>`
+      }
+      default: {
+        const data = cvData[sectionId]
+        if (!data) return ''
+        return `<div style="margin-bottom:22px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${data.content ? `<p style="font-size:12px;color:${textColor};line-height:1.65;margin:0;padding-left:18px;">${data.content}</p>` : ''}</div>`
+      }
+    }
+  }
+
+  return `<!DOCTYPE html><html><head><title>${contact.fullName || 'CV'}</title><meta charset="utf-8">
+  <style>
+    @page { margin:0; size:A4; }
+    @media print { html,body { margin:0;padding:0; } }
+    body { font-family:'Inter','Segoe UI',sans-serif;font-size:12px;line-height:1.5;color:${textColor};margin:0;padding:52px 68px;background:white;text-rendering:optimizeLegibility; }
+  </style>
+  </head><body>${sectionOrder.map(renderSection).join('')}</body></html>`
+}
+
+// ── Timeline template HTML ───────────────────────────────────────────────────
+const generateHTMLForPrint_timeline = (cvData: CVData, colors: Colors): string => {
+  const { primary, accent, text: textColor, muted } = colors
+  const contact = cvData.contact || {}
+  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education']
+  const skillStr = (s: any) => typeof s === 'object' && s.name ? s.name : String(s)
+
+  const pillHeader = (title: string) =>
+    `<div style="display:inline-flex;align-items:center;background:${primary};color:#fff;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:16px;">${title}</div>`
+
+  const timelineItem = (dateStr: string, title: string, subtitle: string, bullets: string[], isLast: boolean) => {
+    const bulletHtml = bullets.length
+      ? `<ul style="margin:6px 0 0;padding:0;">${bullets.map(b => `<li style="font-size:12px;color:${textColor};line-height:1.6;margin-bottom:3px;padding-left:12px;position:relative;list-style:none;"><span style="position:absolute;left:0;color:${primary};font-weight:700;">›</span>${b}</li>`).join('')}</ul>`
+      : ''
+    return `<div style="display:flex;gap:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0;padding-top:3px;">
+        <div style="width:10px;height:10px;border-radius:50%;background:${primary};border:2px solid ${accent};flex-shrink:0;"></div>
+        ${!isLast ? `<div style="width:2px;flex:1;background:${accent};margin-top:3px;min-height:20px;"></div>` : ''}
+      </div>
+      <div style="flex:1;padding-bottom:${isLast ? '0' : '16px'};">
+        <div style="font-size:10.5px;color:${primary};font-weight:600;margin-bottom:3px;">${dateStr}</div>
+        <div style="font-size:13px;font-weight:700;color:${textColor};line-height:1.3;">${title}</div>
+        ${subtitle ? `<div style="font-size:12px;color:${primary};font-weight:500;margin-top:1px;">${subtitle}</div>` : ''}
+        ${bulletHtml}
+      </div>
+    </div>`
+  }
+
+  const renderSection = (sectionId: string): string => {
+    switch (sectionId) {
+      case 'contact': {
+        if (!contact.fullName && !contact.email) return ''
+        const info = [contact.email, contact.phone, contact.location, contact.linkedin].filter(Boolean)
+          .map((v, i) => `${i > 0 ? `<span style="margin:0 10px;opacity:0.4;">·</span>` : ''}${v}`).join('')
+        return `<div style="margin-bottom:22px;padding:22px 28px;background:${primary};border-radius:8px;">
+          ${contact.fullName ? `<div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:8px;line-height:1.2;">${contact.fullName}</div>` : ''}
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.8;">${info}</div>
+        </div>`
+      }
+      case 'summary': {
+        if (!cvData.summary?.content?.trim()) return ''
+        return `<div style="margin-bottom:22px;">${pillHeader(getSectionTitle(sectionId, cvData.sectionTitles))}<p style="font-size:12px;color:${textColor};line-height:1.75;margin:0;padding:10px 14px;background:${accent};border-radius:6px;border-left:3px solid ${primary};">${cvData.summary.content}</p></div>`
+      }
+      case 'experience': {
+        const items = cvData.experience?.items
+        if (!items?.length) return ''
+        const rows = items.map((exp, idx) => {
+          const dateStr = `${exp.startDate} – ${exp.current ? 'Hiện tại' : (exp.endDate || '')}`
+          const subtitle = [exp.company, exp.location].filter(Boolean).join(' · ')
+          const bullets = (exp.bullets || []).filter((b: string) => b?.trim())
+          return timelineItem(dateStr, exp.title, subtitle, bullets, idx === items.length - 1)
+        }).join('')
+        return `<div style="margin-bottom:22px;">${pillHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${rows}</div>`
+      }
+      case 'skills': {
+        const items = cvData.skills?.items
+        if (!items?.length) return ''
+        const tags = items.map((s: any) => `<span style="font-size:11.5px;color:${primary};background:${accent};border:1px solid ${primary}30;border-radius:20px;padding:4px 12px;font-weight:500;">${skillStr(s)}</span>`).join('')
+        return `<div style="margin-bottom:22px;">${pillHeader(getSectionTitle(sectionId, cvData.sectionTitles))}<div style="display:flex;flex-wrap:wrap;gap:7px;">${tags}</div></div>`
+      }
+      case 'education': {
+        const items = cvData.education?.items
+        if (!items?.length) return ''
+        const rows = items.map((edu, idx) => {
+          const subtitle = [edu.institution, edu.location].filter(Boolean).join(' · ')
+          return timelineItem(edu.graduationDate || '', edu.degree, subtitle, [], idx === items.length - 1)
+        }).join('')
+        return `<div style="margin-bottom:22px;">${pillHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${rows}</div>`
+      }
+      default: {
+        const data = cvData[sectionId]
+        if (!data) return ''
+        return `<div style="margin-bottom:22px;">${pillHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${data.content ? `<p style="font-size:12px;color:${textColor};margin:0;line-height:1.65;">${data.content}</p>` : ''}</div>`
+      }
+    }
+  }
+
+  return `<!DOCTYPE html><html><head><title>${contact.fullName || 'CV'}</title><meta charset="utf-8">
+  <style>
+    @page { margin:0; size:A4; }
+    @media print { html,body { margin:0;padding:0; } }
+    body { font-family:'Inter','Segoe UI',sans-serif;font-size:12px;line-height:1.5;color:${textColor};margin:0;padding:40px 52px;background:white;text-rendering:optimizeLegibility; }
+  </style>
+  </head><body>${sectionOrder.map(renderSection).join('')}</body></html>`
+}
+
+// ── Executive template HTML ──────────────────────────────────────────────────
+const generateHTMLForPrint_executive = (cvData: CVData, colors: Colors): string => {
+  const { primary, accent, text: textColor, muted } = colors
+  const contact = cvData.contact || {}
+  const skills = cvData.skills?.items || []
+  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education']
+  const skillStr = (s: any) => typeof s === 'object' && s.name ? s.name : String(s)
+  const mainSections = sectionOrder.filter((id: string) => id !== 'contact' && id !== 'skills')
+
+  const sectionHeader = (title: string) =>
+    `<div style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:${primary};border-bottom:2px solid ${primary};padding-bottom:5px;margin-bottom:14px;">${title}</div>`
+
+  const renderMainSection = (sectionId: string): string => {
+    switch (sectionId) {
+      case 'summary': {
+        if (!cvData.summary?.content?.trim()) return ''
+        return `<div style="margin-bottom:20px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}<p style="font-size:12px;color:${textColor};line-height:1.75;margin:0;">${cvData.summary.content}</p></div>`
+      }
+      case 'experience': {
+        const items = cvData.experience?.items
+        if (!items?.length) return ''
+        const jobs = items.map(exp => {
+          const bullets = (exp.bullets || []).filter((b: string) => b?.trim())
+            .map((b: string) => `<li style="font-size:12px;color:${textColor};line-height:1.6;margin-bottom:3px;padding-left:14px;position:relative;list-style:none;"><span style="position:absolute;left:0;color:${primary};font-weight:700;">›</span>${b}</li>`).join('')
+          return `<div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px;">
+              <div><span style="font-size:13px;font-weight:700;color:${textColor};">${exp.title}</span>${exp.company ? `<span style="font-size:12.5px;color:${primary};font-weight:600;"> · ${exp.company}</span>` : ''}${exp.location ? `<span style="font-size:11.5px;color:${muted};"> · ${exp.location}</span>` : ''}</div>
+              <span style="font-size:10.5px;color:#fff;background:${primary};padding:2px 8px;border-radius:3px;white-space:nowrap;margin-left:10px;font-weight:500;">${exp.startDate} – ${exp.current ? 'Hiện tại' : (exp.endDate || '')}</span>
+            </div>
+            ${bullets ? `<ul style="margin:5px 0 0;padding:0;">${bullets}</ul>` : ''}
+          </div>`
+        }).join('')
+        return `<div style="margin-bottom:20px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${jobs}</div>`
+      }
+      case 'education': {
+        const items = cvData.education?.items
+        if (!items?.length) return ''
+        const edus = items.map(edu => `<div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div><div style="font-size:13px;font-weight:700;color:${textColor};">${edu.degree}</div>${edu.institution ? `<div style="font-size:12px;color:${primary};font-weight:500;">${edu.institution}${edu.location ? `<span style="color:${muted};font-weight:400;"> · ${edu.location}</span>` : ''}</div>` : ''}</div>
+            ${edu.graduationDate ? `<span style="font-size:10.5px;color:#fff;background:${primary};padding:2px 8px;border-radius:3px;white-space:nowrap;margin-left:10px;font-weight:500;">${edu.graduationDate}</span>` : ''}
+          </div>
+          ${edu.description ? `<p style="font-size:12px;color:${muted};margin:4px 0 0;line-height:1.5;">${edu.description}</p>` : ''}
+        </div>`).join('')
+        return `<div style="margin-bottom:20px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${edus}</div>`
+      }
+      default: {
+        const data = cvData[sectionId]
+        if (!data) return ''
+        return `<div style="margin-bottom:20px;">${sectionHeader(getSectionTitle(sectionId, cvData.sectionTitles))}${data.content ? `<p style="font-size:12px;color:${textColor};margin:0;line-height:1.65;">${data.content}</p>` : ''}</div>`
+      }
+    }
+  }
+
+  const jobTitle = cvData.experience?.items?.[0]?.title || ''
+  const infoLine = [contact.email, contact.phone, contact.location, contact.linkedin].filter(Boolean)
+    .map((v, i) => `${i > 0 ? `<span style="margin:0 12px;opacity:0.35;">|</span>` : ''}${v}`).join('')
+
+  const sidebarContent = `
+    ${skills.length > 0 ? `
+      <div style="font-size:9.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.55);border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:5px;margin-bottom:10px;">${getSectionTitle('skills', cvData.sectionTitles)}</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${skills.map((s: any) => `<div style="font-size:11px;color:rgba(255,255,255,0.88);background:rgba(255,255,255,0.1);border-radius:3px;padding:4px 8px;">${skillStr(s)}</div>`).join('')}
+      </div>` : ''}
+  `
+
+  return `<!DOCTYPE html><html><head><title>${contact.fullName || 'CV'}</title><meta charset="utf-8">
+  <style>
+    @page { margin:0; size:A4; }
+    @media print { html,body { margin:0;padding:0; } }
+    body { font-family:'Inter','Segoe UI',sans-serif;font-size:12px;line-height:1.5;margin:0;padding:0;background:white;text-rendering:optimizeLegibility; }
+    .cv-wrap { width:794px;min-height:1123px; }
+    .header { background:${primary};padding:32px 44px 28px; }
+    .body { display:table;width:100%;table-layout:fixed; }
+    .sidebar { display:table-cell;width:207px;background:${primary};padding:28px 18px;vertical-align:top;border-top:1px solid rgba(255,255,255,0.1); }
+    .main { display:table-cell;padding:28px 36px;vertical-align:top;background:white; }
+  </style>
+  </head><body><div class="cv-wrap">
+    <div class="header">
+      ${contact.fullName ? `<div style="font-size:30px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1.15;margin-bottom:4px;">${contact.fullName}</div>` : ''}
+      ${jobTitle ? `<div style="font-size:14px;color:rgba(255,255,255,0.65);">${jobTitle}</div>` : ''}
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);border-top:1px solid rgba(255,255,255,0.15);padding-top:12px;margin-top:14px;line-height:1.6;">${infoLine}</div>
+    </div>
+    <div class="body"><div class="sidebar">${sidebarContent}</div><div class="main">${mainSections.map(renderMainSection).join('')}</div></div>
+  </div></body></html>`
+}
+
+// Generate HTML for printing (PDF simulation) - EXACTLY matching preview (Classic template)
+const generateHTMLForPrint = (cvData: CVData, colors?: { primary: string; accent: string; text: string; muted: string }): string => {
+  const { primary = '#111827', accent = '#d1d5db', text: textColor = '#111827', muted = '#6b7280' } = colors || {}
   const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
   
   let html = `
@@ -531,61 +1000,61 @@ const generateHTMLForPrint = (cvData: CVData): string => {
         
         /* Contact section - EXACTLY matching preview */
         .contact-section { margin-bottom: 20px; }
-        .contact-name { 
+        .contact-name {
           font-size: 20px;
-          font-weight: bold; 
-          margin-bottom: 12px; 
-          color: #111827; 
+          font-weight: bold;
+          margin-bottom: 12px;
+          color: ${primary};
           text-align: center;
           line-height: 1.2;
         }
-        .contact-info { 
+        .contact-info {
           font-size: 12px;
-          margin-bottom: 5px; 
-          color: #6b7280; 
+          margin-bottom: 5px;
+          color: ${muted};
           text-align: center;
           line-height: 1.4;
         }
-        
+
         /* Summary section - EXACTLY matching preview */
         .summary-section { margin-bottom: 20px; }
-        .summary-text { 
-          font-size: 14px; 
-          color: #374151; 
-          line-height: 1.5; 
+        .summary-text {
+          font-size: 14px;
+          color: ${textColor};
+          line-height: 1.5;
           margin-bottom: 20px;
           text-align: justify;
         }
-        
+
         /* Section headers - EXACTLY matching preview */
         .section { margin-bottom: 20px; }
-        .section-title { 
-          font-size: 16px; 
-          font-weight: bold; 
-          text-transform: uppercase; 
-          border-bottom: 2px solid #d1d5db; 
-          margin-bottom: 16px; 
+        .section-title {
+          font-size: 16px;
+          font-weight: bold;
+          text-transform: uppercase;
+          border-bottom: 2px solid ${accent};
+          margin-bottom: 16px;
           padding-bottom: 8px;
-          color: #111827;
+          color: ${primary};
           letter-spacing: 0.5px;
         }
-        
+
         /* Experience section - EXACTLY matching preview */
         .job { margin-bottom: 15px; }
-        .job-header-row { 
-          display: flex; 
-          justify-content: space-between; 
-          margin-bottom: 5px; 
+        .job-header-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
         }
-        .job-header { 
-          font-weight: 600; 
-          font-size: 14px; 
-          line-height: 1.3; 
+        .job-header {
+          font-weight: 600;
+          font-size: 14px;
+          line-height: 1.3;
         }
-        .job-dates { 
-          font-size: 14px; 
-          color: #6b7280; 
-          line-height: 1.3; 
+        .job-dates {
+          font-size: 14px;
+          color: ${muted};
+          line-height: 1.3;
         }
         .job-bullets { 
           margin-left: 20px; 
@@ -702,7 +1171,7 @@ const generateHTMLForPrint = (cvData: CVData): string => {
       case 'skills':
         html += `<div class="section">`;
         html += `<div class="section-title">${getSectionTitle(sectionId, cvData.sectionTitles).toUpperCase()}</div>`;
-        html += `<div class="skills-text">${sectionData.items.join(' | ')}</div>`;
+        html += `<div class="skills-text">${sectionData.items.map(skillName).join(' | ')}</div>`;
         html += `</div>`;
         break;
         
@@ -813,7 +1282,7 @@ const generateRTFContent = (cvData: CVData): string => {
         
       case 'skills':
         rtf += `\\b ${getSectionTitle(sectionId, cvData.sectionTitles)}\\b0\\par`;
-        rtf += `${sectionData.items.join(' | ')}\\par\\par`;
+        rtf += `${sectionData.items.map(skillName).join(' | ')}\\par\\par`;
         break;
         
       case 'education': {

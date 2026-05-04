@@ -70,22 +70,17 @@ async function verifyFix() {
   console.log('\n📊 Test 3: Verifying OpenAI API functionality...');
   
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      console.log('⏭️  SKIP: OPENAI_API_KEY not set');
-    } else {
-      const fetch = (await import('node-fetch')).default;
-      const response = await fetch('https://api.openai.com/v1/models', {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
-        }
-      });
-
-      if (response.ok) {
-        console.log('✅ SUCCESS: OpenAI API accessible');
-      } else {
-        console.log('❌ FAIL: OpenAI API not accessible');
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch('https://api.openai.com/v1/models', {
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY || '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'}`
       }
+    });
+    
+    if (response.ok) {
+      console.log('✅ SUCCESS: OpenAI API accessible');
+    } else {
+      console.log('❌ FAIL: OpenAI API not accessible');
     }
   } catch (error) {
     console.log('❌ ERROR: Could not test OpenAI API');

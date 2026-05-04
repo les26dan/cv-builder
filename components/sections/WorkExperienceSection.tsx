@@ -2,12 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { AIAssistButton } from '../common/AIAssistButton';
+import { AIAlternativesPicker } from '../common/AIAlternativesPicker';
 import { AIWizardModal } from '../common/AIWizardModal';
 import { TemplateSelectionModal } from '../common/TemplateSelectionModal';
 import { WorkExperienceWizard } from '../common/WorkExperienceWizard';
 import { SortableWorkExperience } from '../common/SortableWorkExperience';
-import { PlusIcon, GripVerticalIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, FileTextIcon } from 'lucide-react';
-import { aiService, WizardBulletGenerationRequest } from '../../utils/aiService';
+import { PlusIcon, GripVerticalIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, FileTextIcon, Loader2 } from 'lucide-react';
+import { aiService } from '../../utils/aiService';
 import { formatDateRange } from '../../utils/dateUtils';
 import { getTexts } from '../../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
@@ -44,6 +45,21 @@ export const WorkExperienceSection = ({
 }: WorkExperienceSectionProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
+  // Track which bullets are being rewritten: key = "expIndex-bulletIndex"
+  const [rewritingBullets, setRewritingBullets] = useState<Record<string, boolean>>({});
+  // Inline picker state — at most one open at a time. When a new picker opens
+  // for a different bullet, the previous one auto-closes via single-state-object.
+  const [bulletPicker, setBulletPicker] = useState<{
+    experienceIndex: number;
+    bulletIndex: number;
+    alternatives: string[];
+    mode: 'rewrite' | 'wizard';
+    // Data needed to regenerate
+    rewriteSource?: { bullet: string; jobTitle: string; company: string };
+    wizardSource?: { project: string; impact: string; responsibility?: string };
+    isLoading?: boolean;
+    error?: string | null;
+  } | null>(null);
   
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
@@ -139,8 +155,6 @@ export const WorkExperienceSection = ({
 
   // Provide the add function to parent component
   const addExperienceCallback = useCallback(() => {
-    console.log('🔍 TRACE: addExperienceCallback called, stack:', new Error().stack);
-
     // Prevent automatic wizard opening for template users during initial load
     const isTemplateUser = cvData?.id && cvData.id.startsWith('template-');
 
@@ -199,29 +213,32 @@ export const WorkExperienceSection = ({
       setIsGenerating(true);
       
       try {
-        // Prepare AI request from wizard data - include cvData/workExperience for language + context
-        const request: WizardBulletGenerationRequest & { cvData?: any; workExperience?: any[] } = {
-          jobTitle: experienceData.title,
-          company: experienceData.company,
-          project: experienceData.project || '',
-          impact: experienceData.impact || '',
-          responsibility: experienceData.responsibility || '',
-          cvData,
-          workExperience: data.items
-        };
+        // Call server route — keeps OpenAI key server-side and lets local-Claude fallback fire.
+        const res = await fetch('/api/cv/wizard-bullet', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jobTitle: experienceData.title,
+            company: experienceData.company,
+            project: experienceData.project || '',
+            impact: experienceData.impact || '',
+            responsibility: experienceData.responsibility || '',
+            language: currentLanguage,
+          }),
+        });
+        const result = await res.json();
 
-        const result = await aiService.generateBulletFromWizard(request);
-
-        if (result.success && result.data) {
-          // Add the experience with AI-generated bullet
+        if (result.success && Array.isArray(result.alternatives) && result.alternatives.length > 0) {
+          // Add the experience with the first AI-generated alternative as the bullet
           const newExperience = {
             ...experienceData,
-            bullets: [result.data]
+            bullets: [result.alternatives[0]]
           };
-          
+
           // Add to the end of the list (no sorting)
           const updatedItems = [...data.items, newExperience];
-          
+
           onUpdate({
             ...data,
             items: updatedItems
@@ -434,48 +451,56 @@ export const WorkExperienceSection = ({
     setIsGenerating(true);
 
     try {
-      // Prepare enhanced context with full CV data
-      const otherExperiences = data.items.filter((_, index) => index !== wizardModal.experienceIndex);
-      
-      const request: WizardBulletGenerationRequest & {
-        cvData?: any;
-        workExperience?: any[];
-        skills?: string[];
-        education?: any[];
-        targetJobDescription?: string;
-      } = {
-        jobTitle: experience.title,
-        company: experience.company,
-        project: wizardData.project,
-        impact: wizardData.impact,
-        responsibility: wizardData.responsibility,
-        cvData,
-        workExperience: otherExperiences,
-        skills: cvData?.skills?.items || [],
-        education: cvData?.education?.items || [],
-        targetJobDescription: cvData?.targetJobDescription || ''
-      };
+      // Call server route so OpenAI key stays server-side and local-Claude
+      // fallback can fire if quota is exhausted.
+      const res = await fetch('/api/cv/wizard-bullet', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: experience.title,
+          company: experience.company,
+          project: wizardData.project,
+          impact: wizardData.impact,
+          responsibility: wizardData.responsibility,
+          language: currentLanguage,
+        }),
+      });
+      const result = await res.json();
 
-      const result = await aiService.generateBulletFromWizard(request);
-
-      if (result.success && result.data) {
+      if (result.success && Array.isArray(result.alternatives) && result.alternatives.length > 0) {
+        const alternatives: string[] = result.alternatives;
+        const expIndex = wizardModal.experienceIndex;
+        // Insert first alt as new bullet so user has something visible immediately;
+        // then open picker on that bullet so they can swap to a different alt.
         const updatedItems = [...data.items];
-        const newBullets = [...updatedItems[wizardModal.experienceIndex].bullets];
-        
-        // Add the new bullet to the list
-        newBullets.push(result.data);
-        updatedItems[wizardModal.experienceIndex].bullets = newBullets;
-        
+        const newBullets = [...updatedItems[expIndex].bullets];
+        newBullets.push(alternatives[0]);
+        updatedItems[expIndex].bullets = newBullets;
+        const newBulletIndex = newBullets.length - 1;
+
         onUpdate({
           ...data,
           items: updatedItems
         });
 
-        // Mark AI as used for score calculation (will be implemented)
-        // markAIUsed('workExperience');
-
         // Close the wizard
         setWizardModal({ isOpen: false, experienceIndex: -1 });
+
+        // Open picker so user can pick a different alternative if they prefer
+        setBulletPicker({
+          experienceIndex: expIndex,
+          bulletIndex: newBulletIndex,
+          alternatives,
+          mode: 'wizard',
+          wizardSource: {
+            project: wizardData.project,
+            impact: wizardData.impact,
+            responsibility: wizardData.responsibility,
+          },
+          isLoading: false,
+          error: null,
+        });
       } else {
         console.error('Failed to generate bullet:', result.error);
         alert('Không thể tạo gạch đầu dòng. Vui lòng thử lại.');
@@ -596,6 +621,120 @@ export const WorkExperienceSection = ({
       setIsGenerating(false);
     }
   };
+
+  const fetchBulletAlternatives = async (
+    bullet: string,
+    jobTitle: string,
+    company: string,
+  ): Promise<string[]> => {
+    const res = await fetch('/api/cv/rewrite-bullet', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bullet, jobTitle, company, language: currentLanguage }),
+    })
+    const json = await res.json()
+    if (json.success && Array.isArray(json.alternatives) && json.alternatives.length > 0) {
+      return json.alternatives
+    }
+    if (json.success && typeof json.rewritten === 'string' && json.rewritten.trim()) {
+      return [json.rewritten]
+    }
+    throw new Error(json.error || 'AI did not return alternatives')
+  }
+
+  const handleRewriteSingleBullet = async (experienceIndex: number, bulletIndex: number) => {
+    const experience = data.items[experienceIndex]
+    const bullet = experience.bullets[bulletIndex]
+    if (!bullet?.trim()) return
+
+    const key = `${experienceIndex}-${bulletIndex}`
+    setRewritingBullets(prev => ({ ...prev, [key]: true }))
+    // Open picker in loading state immediately so user sees the skeleton
+    setBulletPicker({
+      experienceIndex,
+      bulletIndex,
+      alternatives: [],
+      mode: 'rewrite',
+      rewriteSource: { bullet, jobTitle: experience.title, company: experience.company },
+      isLoading: true,
+      error: null,
+    })
+
+    try {
+      const alternatives = await fetchBulletAlternatives(bullet, experience.title, experience.company)
+      setBulletPicker(prev => {
+        // If user already cancelled or moved on, don't overwrite
+        if (!prev || prev.experienceIndex !== experienceIndex || prev.bulletIndex !== bulletIndex) return prev
+        return { ...prev, alternatives, isLoading: false, error: null }
+      })
+    } catch (err: any) {
+      console.error('Rewrite bullet error:', err)
+      setBulletPicker(prev => {
+        if (!prev || prev.experienceIndex !== experienceIndex || prev.bulletIndex !== bulletIndex) return prev
+        return { ...prev, isLoading: false, error: err?.message || 'AI lỗi, thử lại sau.' }
+      })
+    } finally {
+      setRewritingBullets(prev => ({ ...prev, [key]: false }))
+    }
+  }
+
+  const handleRegenerateBulletPicker = async () => {
+    if (!bulletPicker) return
+    const { experienceIndex, bulletIndex, mode, rewriteSource, wizardSource } = bulletPicker
+    setBulletPicker(prev => prev ? { ...prev, isLoading: true, error: null } : prev)
+    try {
+      let alternatives: string[] = []
+      if (mode === 'rewrite' && rewriteSource) {
+        alternatives = await fetchBulletAlternatives(
+          rewriteSource.bullet,
+          rewriteSource.jobTitle,
+          rewriteSource.company,
+        )
+      } else if (mode === 'wizard' && wizardSource) {
+        const experience = data.items[experienceIndex]
+        const res = await fetch('/api/cv/wizard-bullet', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jobTitle: experience.title,
+            company: experience.company,
+            project: wizardSource.project,
+            impact: wizardSource.impact,
+            responsibility: wizardSource.responsibility,
+            language: currentLanguage,
+          }),
+        })
+        const result = await res.json()
+        if (result.success && Array.isArray(result.alternatives)) {
+          alternatives = result.alternatives
+        } else {
+          throw new Error(result.error || 'AI did not return alternatives')
+        }
+      }
+      setBulletPicker(prev => {
+        if (!prev || prev.experienceIndex !== experienceIndex || prev.bulletIndex !== bulletIndex) return prev
+        return { ...prev, alternatives, isLoading: false, error: null }
+      })
+    } catch (err: any) {
+      console.error('Regenerate alternatives error:', err)
+      setBulletPicker(prev => prev ? { ...prev, isLoading: false, error: err?.message || 'AI lỗi, thử lại sau.' } : prev)
+    }
+  }
+
+  const handleSelectAlternative = (text: string) => {
+    if (!bulletPicker) return
+    const { experienceIndex, bulletIndex } = bulletPicker
+    const updatedItems = data.items.map((exp, ei) => {
+      if (ei !== experienceIndex) return exp
+      const newBullets = [...exp.bullets]
+      newBullets[bulletIndex] = text
+      return { ...exp, bullets: newBullets }
+    })
+    onUpdate({ ...data, items: updatedItems })
+    setBulletPicker(null)
+  }
 
   const validateField = (index: number, field: string, value: string) => {
     const errorKey = `${index}-${field}`;
@@ -895,34 +1034,63 @@ export const WorkExperienceSection = ({
                 </div>
               )}
 
-              {(experience.bullets || []).map((bullet, bulletIndex) => (
-                <div key={`${experience.id}-bullet-${bulletIndex}`} className="mb-4">
-                  <div className="flex items-start gap-2 w-full">
-                    <div className="mt-3 text-gray-400 flex-shrink-0 w-4">•</div>
-                    <textarea 
-                      className={`${getBulletClassName(bullet)} flex-1`}
-                      value={bullet} 
-                      onChange={(e) => handleUpdateBullet(index, bulletIndex, e.target.value)}
-                      onBlur={(e) => handleBulletBlur(index, bulletIndex, e.target.value)}
-                      onKeyDown={(e) => handleBulletKeyDown(index, bulletIndex, e)}
-                      placeholder={experienceTexts?.bullets?.placeholder || 'Describe a specific achievement or responsibility...'}
-                      rows={2}
-                      data-experience-index={index}
-                      data-bullet-index={bulletIndex}
-                    />
-                    {experience.bullets.length > 1 && (
-                      <button 
-                        className="flex-shrink-0 mt-3 text-error-500 hover:text-error-600 hover:bg-red-50 p-1.5 rounded transition-all duration-200"
-                        onClick={() => handleRemoveBullet(index, bulletIndex)}
-                        title={experienceTexts?.bullets?.remove || 'Remove'}
+              {(experience.bullets || []).map((bullet, bulletIndex) => {
+                const rewriteKey = `${index}-${bulletIndex}`
+                const isRewriting = rewritingBullets[rewriteKey]
+                const showPicker =
+                  bulletPicker &&
+                  bulletPicker.experienceIndex === index &&
+                  bulletPicker.bulletIndex === bulletIndex
+                return (
+                  <div key={`${experience.id}-bullet-${bulletIndex}`} className="mb-4">
+                    <div className="flex items-start gap-2 w-full">
+                      <div className="mt-3 text-gray-400 flex-shrink-0 w-4">•</div>
+                      <textarea
+                        className={`${getBulletClassName(bullet)} flex-1`}
+                        value={bullet}
+                        onChange={(e) => handleUpdateBullet(index, bulletIndex, e.target.value)}
+                        onBlur={(e) => handleBulletBlur(index, bulletIndex, e.target.value)}
+                        onKeyDown={(e) => handleBulletKeyDown(index, bulletIndex, e)}
+                        placeholder={experienceTexts?.bullets?.placeholder || 'Describe a specific achievement or responsibility...'}
+                        rows={2}
+                        data-experience-index={index}
+                        data-bullet-index={bulletIndex}
+                      />
+                      <button
+                        className="flex-shrink-0 mt-3 text-purple-500 hover:text-purple-700 hover:bg-purple-50 p-1.5 rounded transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                        onClick={() => handleRewriteSingleBullet(index, bulletIndex)}
+                        disabled={isRewriting || !bullet?.trim()}
+                        title="AI Viết lại"
                       >
-                        <TrashIcon size={14} />
+                        {isRewriting ? <Loader2 size={14} className="animate-spin" /> : <SparklesIcon size={14} />}
                       </button>
+                      {experience.bullets.length > 1 && (
+                        <button
+                          className="flex-shrink-0 mt-3 text-error-500 hover:text-error-600 hover:bg-red-50 p-1.5 rounded transition-all duration-200"
+                          onClick={() => handleRemoveBullet(index, bulletIndex)}
+                          title={experienceTexts?.bullets?.remove || 'Remove'}
+                        >
+                          <TrashIcon size={14} />
+                        </button>
+                      )}
+                    </div>
+                    {getBulletLengthIndicator(bullet)}
+                    {showPicker && (
+                      <AIAlternativesPicker
+                        alternatives={bulletPicker!.alternatives}
+                        onSelect={handleSelectAlternative}
+                        onRegenerate={handleRegenerateBulletPicker}
+                        onCancel={() => setBulletPicker(null)}
+                        isLoading={bulletPicker!.isLoading}
+                        errorMessage={bulletPicker!.error || null}
+                        label={currentLanguage === 'vi' ? 'Chọn 1 phương án' : 'Pick one alternative'}
+                        regenerateLabel={currentLanguage === 'vi' ? 'Tạo lại' : 'Regenerate'}
+                        cancelLabel={currentLanguage === 'vi' ? 'Hủy' : 'Cancel'}
+                      />
                     )}
                   </div>
-                  {getBulletLengthIndicator(bullet)}
-                </div>
-              ))}
+                )
+              })}
               
               <button 
                 className="flex items-center text-sm text-primary-500 hover:text-primary-500 mt-2" 

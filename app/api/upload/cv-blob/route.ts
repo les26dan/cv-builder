@@ -68,12 +68,25 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
     const userSession: UserSession = JSON.parse(userSessionCookie.value);
     console.log(`👤 Authenticated user: ${userSession.email}`);
 
-    // Fix user ID format for database compatibility
+    // Validate user ID — must be a real UUID
     let userId = userSession.id;
-    if (userId === 'user-123' || !userId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-      // Generate a proper UUID for development mode
-      userId = crypto.randomUUID();
-      console.log(`🔧 Generated proper UUID for user: ${userId}`);
+    const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId);
+    if (!isValidUUID) {
+      // Offline session — resolve real UUID from DB by email
+      console.log(`🔄 Offline session detected (${userId}), resolving real UUID from DB for: ${userSession.email}`);
+      try {
+        const { DatabaseService } = await import('@/lib/database');
+        const userResult = await DatabaseService.getUserByEmail(userSession.email);
+        if (userResult.success && userResult.user?.id) {
+          userId = userResult.user.id;
+          console.log(`✅ Resolved real UUID: ${userId}`);
+        } else {
+          console.warn(`⚠️ Cannot resolve UUID for email: ${userSession.email}`);
+          return NextResponse.json({ success: false, error: 'Session expired. Please log in again.' }, { status: 401 });
+        }
+      } catch {
+        return NextResponse.json({ success: false, error: 'Session expired. Please log in again.' }, { status: 401 });
+      }
     }
 
     // 2. Parse uploaded file and optional language preference
@@ -235,37 +248,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
         console.log('💾 Storing enhanced CV record in database...');
         
         const cvRecord = {
-          id: cvId,
           user_id: userId,
-          title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
-          status: 'new' as const,
-          score: Math.round(llmParsedData.possibility_score), // Use quality score as initial CV score
-          content: {
-            originalFile: {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              blobUrl: blobInfo.url,
-              uploadedAt: new Date().toISOString(),
-            },
-            extractedText,
-            parsingMetadata: {
-              confidence: llmParsedData.possibility_score,
-              qualityScore: llmParsedData.possibility_score,
-              sectionsDetected: Object.keys(llmParsedData.work_experience || {}),
-              skillsExtracted: llmParsedData.skills?.length || 0,
-              parsedAt: new Date().toISOString()
-            },
-            sections: {
-              contact: structuredCV.contact,
-              summary: structuredCV.summary,
-              experience: structuredCV.experience,
-              education: structuredCV.education,
-              skills: structuredCV.skills,
-            },
+          file_id: cvId,
+          file_name: file.name,
+          file_size: file.size,
+          file_path: blobInfo.url,
+          extracted_text: extractedText,
+          analysis_data: {
+            structuredCV,
+            llmParsedData,
+            blobUrl: blobInfo.url,
           },
-          last_updated: new Date().toISOString(),
-          created_at: new Date().toISOString(),
+          status: 'new' as const,
+          score: Math.round(llmParsedData.possibility_score),
         };
 
         // Check if we're in development mode with mock user
@@ -349,7 +344,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
           // Production mode - try database first, fallback to localStorage
           try {
             insertResult = await supabase
-              .from('cvs')
+              .from('cv_drafts')
               .insert(cvRecord)
               .select()
               .single();
@@ -369,52 +364,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CVUploadR
         const { data, error } = insertResult;
         const { data: workflowData, error: workflowError } = workflowInsertResult;
 
-        // Always save to localStorage for persistence regardless of database status
-        console.log('💾 Saving CV to localStorage for persistence...');
-        const localStorageData = {
-          cvId,
-          userId,
-          cvRecord,
-          cvWorkflowRecord,
-          timestamp: new Date().toISOString(),
-          dbSuccess: !error && !workflowError
-        };
-        
-        // Store in multiple localStorage keys for different access patterns
-        const localStorageKeys = [
-          `cv_${cvId}`,
-          `cv_workflow_${cvId}`,
-          `user_cvs_${userId}`,
-          `cv_upload_${cvId}`
-        ];
-        
-        try {
-          // Individual CV storage
-          localStorage.setItem(`cv_${cvId}`, JSON.stringify(cvRecord));
-          localStorage.setItem(`cv_workflow_${cvId}`, JSON.stringify(cvWorkflowRecord));
-          localStorage.setItem(`cv_upload_${cvId}`, JSON.stringify(localStorageData));
-          
-          // User CV list storage - get existing and add new one
-          const existingUserCVs = JSON.parse(localStorage.getItem(`user_cvs_${userId}`) || '[]');
-          const cvListItem = {
-            id: cvId,
-            title: file.name.replace(/\.[^/.]+$/, ''),
-            status: 'draft',
-            score: Math.round(llmParsedData.possibility_score),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          
-          // Add to list if not already present
-          if (!existingUserCVs.find((cv: any) => cv.id === cvId)) {
-            existingUserCVs.push(cvListItem);
-            localStorage.setItem(`user_cvs_${userId}`, JSON.stringify(existingUserCVs));
-          }
-          
-          console.log('✅ CV data saved to localStorage successfully');
-        } catch (storageError) {
-          console.warn('⚠️ localStorage save failed:', storageError);
-        }
+        // localStorage is browser-only — skip on server
 
         if (error || workflowError) {
           console.error('❌ Database error:', error || workflowError);

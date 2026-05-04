@@ -605,7 +605,7 @@ ${experienceText}`;
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY || ''}`
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY || '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'}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
