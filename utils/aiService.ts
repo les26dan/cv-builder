@@ -436,7 +436,8 @@ class AIService {
     templateKey: string,
     context: PromptContext,
     language: SupportedLanguage,
-    processor?: (content: string) => T
+    processor?: (content: string) => T,
+    extraSystemInstruction?: string
   ): Promise<AIResponse<T>> {
     try {
       const cacheKey = this.generateCacheKey(method, request, language);
@@ -464,7 +465,7 @@ class AIService {
       }
 
       // Create new request
-      const requestPromise = this.executeAIRequest(templateKey, context, language, processor);
+      const requestPromise = this.executeAIRequest(templateKey, context, language, processor, extraSystemInstruction);
       this.requestQueue.set(cacheKey, requestPromise);
 
       try {
@@ -502,6 +503,56 @@ class AIService {
   private static readonly VIETNAMESE_ONLY_USER_SUFFIX =
     '\n\n[QUAN TRỌNG: Chỉ trả lời bằng tiếng Việt. Không dùng tiếng Anh trong bất kỳ câu nào.]';
 
+  /** Instruction asking LLM to return 4 distinct alternatives as JSON. */
+  private static readonly FOUR_ALTERNATIVES_INSTRUCTION =
+    '\n\nYÊU CẦU OUTPUT: Hãy tạo 4 phương án KHÁC NHAU về phong cách (1: động từ hành động mạnh + số liệu định lượng, 2: nhấn mạnh tác động kinh doanh, 3: ngắn gọn ≤100 ký tự, 4: chi tiết kỹ thuật ≤180 ký tự). KHÔNG bịa số liệu không có trong dữ liệu gốc. Trả về JSON đúng định dạng: {"alternatives": ["phương án 1", "phương án 2", "phương án 3", "phương án 4"]}';
+
+  /** Parse 4-alternatives output from LLM. Tolerates JSON, fenced JSON,
+   *  JSON-mixed-with-prose (Claude habit), or newline list. */
+  private static parseAlternatives(content: string): string[] {
+    const trimmed = content.trim();
+    const candidates: string[] = [];
+
+    // 1. JSON inside ```json ... ``` fence
+    const fencedJson = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fencedJson) candidates.push(fencedJson[1].trim());
+
+    // 2. First {...} object containing "alternatives"
+    const objMatch = trimmed.match(/\{[\s\S]*?"alternatives"[\s\S]*?\]\s*\}/i);
+    if (objMatch) candidates.push(objMatch[0]);
+
+    // 3. Whole string with fences stripped
+    candidates.push(trimmed.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim());
+
+    for (const cand of candidates) {
+      try {
+        const parsed = JSON.parse(cand);
+        if (Array.isArray(parsed?.alternatives)) {
+          const alts = parsed.alternatives
+            .filter((s: any) => typeof s === 'string' && s.trim())
+            .map((s: string) => s.trim());
+          if (alts.length > 0) return alts;
+        }
+        if (Array.isArray(parsed)) {
+          const alts = parsed
+            .filter((s: any) => typeof s === 'string' && s.trim())
+            .map((s: string) => s.trim());
+          if (alts.length > 0) return alts;
+        }
+      } catch {
+        // try next candidate
+      }
+    }
+
+    // Last-ditch fallback: newline-separated, strip bullet/number prefixes
+    const lines = trimmed
+      .split('\n')
+      .map(l => l.replace(/^\s*[-•*]\s*/, '').replace(/^\s*\d+[.)]\s*/, '').trim())
+      .filter(l => l.length > 0);
+    if (lines.length > 0) return lines;
+    return [trimmed];
+  }
+
   /**
    * Execute AI request. Prompt language is always Vietnamese (repo default).
    */
@@ -509,10 +560,14 @@ class AIService {
     templateKey: string,
     context: PromptContext,
     _language: SupportedLanguage,
-    processor?: (content: string) => T
+    processor?: (content: string) => T,
+    extraSystemInstruction?: string
   ): Promise<T> {
     const prompt = this.formatPromptForLanguage(templateKey, context, 'vi');
-    const systemContent = prompt.system + AIService.VIETNAMESE_ONLY_INSTRUCTION;
+    const systemContent =
+      prompt.system +
+      AIService.VIETNAMESE_ONLY_INSTRUCTION +
+      (extraSystemInstruction ? '\n\n' + extraSystemInstruction : '');
     const userContent = prompt.user + AIService.VIETNAMESE_ONLY_USER_SUFFIX;
 
     const messages: ChatMessage[] = [
@@ -520,8 +575,30 @@ class AIService {
       { role: 'user', content: userContent }
     ];
 
-    const response = await this.makeOpenAIRequest(messages);
-    const content = this.processOpenAIResponse(response);
+    let content: string;
+    try {
+      const response = await this.makeOpenAIRequest(messages);
+      content = this.processOpenAIResponse(response);
+    } catch (err) {
+      // Local Claude CLI fallback — server-only, gated by LOCAL_CLAUDE_FALLBACK=1.
+      // We use an opaque eval'd require so webpack does NOT try to bundle
+      // child_process for the browser. This keeps aiService.ts safe for client use.
+      const isServer = typeof window === 'undefined';
+      const fallbackOn = typeof process !== 'undefined' && process.env?.LOCAL_CLAUDE_FALLBACK === '1';
+      if (isServer && fallbackOn) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const mod = (eval('require') as NodeRequire)('../lib/localClaudeFallback') as typeof import('../lib/localClaudeFallback');
+          console.warn('[aiService] OpenAI failed, falling back to local Claude:', (err as any)?.message);
+          content = await mod.runLocalClaude(`${systemContent}\n\n${userContent}`, { timeoutMs: 60_000 });
+        } catch (fallbackErr) {
+          console.error('[aiService] local Claude fallback failed:', fallbackErr);
+          throw err;
+        }
+      } else {
+        throw err;
+      }
+    }
 
     return processor ? processor(content) : (content as unknown as T);
   }
@@ -592,7 +669,7 @@ class AIService {
   /**
    * Generate enhanced summary with full context
    */
-  async generateEnhancedSummary(request: EnhancedSummaryGenerationRequest): Promise<AIResponse<string>> {
+  async generateEnhancedSummary(request: EnhancedSummaryGenerationRequest): Promise<AIResponse<string[]>> {
     const language = this.detectRequestLanguage(request);
     
     // Prepare work experience string based on language
@@ -628,7 +705,9 @@ class AIService {
       request,
       'enhancedSummaryGeneration',
       context,
-      language
+      language,
+      AIService.parseAlternatives,
+      AIService.FOUR_ALTERNATIVES_INSTRUCTION
     );
   }
 
@@ -683,8 +762,8 @@ class AIService {
     cvData?: any; 
     workExperience?: any[]; 
     skills?: string[]; 
-    education?: any[] 
-  }): Promise<AIResponse<string>> {
+    education?: any[]
+  }): Promise<AIResponse<string[]>> {
     // Enhanced request with all wizard content for accurate language detection
     const enhancedRequest = {
       ...request,
@@ -721,7 +800,9 @@ class AIService {
       request,
       'wizardEnhancedGeneration',
       context,
-      language
+      language,
+      AIService.parseAlternatives,
+      AIService.FOUR_ALTERNATIVES_INSTRUCTION
     );
   }
 
@@ -834,7 +915,7 @@ class AIService {
   /**
    * Improve existing content with enhanced context
    */
-  async improveSummary(request: ContentImprovementRequest): Promise<AIResponse<string>> {
+  async improveSummary(request: ContentImprovementRequest): Promise<AIResponse<string[]>> {
     const language = this.detectRequestLanguage(request);
     
     // Prepare work experience string based on language
@@ -864,7 +945,9 @@ class AIService {
       request,
       'summaryImprovement',
       context,
-      language
+      language,
+      AIService.parseAlternatives,
+      AIService.FOUR_ALTERNATIVES_INSTRUCTION
     );
   }
 
@@ -1025,21 +1108,24 @@ class AIService {
     }
   }
 
-  private async generateEnhancedSummaryFallback(request: EnhancedSummaryGenerationRequest, language: SupportedLanguage): Promise<string> {
-    return this.generateSummaryFallback({
+  private async generateEnhancedSummaryFallback(request: EnhancedSummaryGenerationRequest, language: SupportedLanguage): Promise<string[]> {
+    const single = await this.generateSummaryFallback({
       workExperience: request.workExperience,
       existingContent: request.existingContent,
       targetJobDescription: request.targetJobDescription
     }, language);
+    return [single];
   }
 
-  private async generateBulletFromWizardFallback(request: WizardBulletGenerationRequest, language: SupportedLanguage): Promise<string> {
+  private async generateBulletFromWizardFallback(request: WizardBulletGenerationRequest, language: SupportedLanguage): Promise<string[]> {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     if (language === 'vi') {
-      return `${request.responsibility ? request.responsibility + ' để' : 'Thực hiện'} ${request.project}, đạt được ${request.impact}.`;
+      const base = `${request.responsibility ? request.responsibility + ' để' : 'Thực hiện'} ${request.project}, đạt được ${request.impact}.`;
+      return [base];
     } else {
-      return `${request.responsibility ? request.responsibility + ' to' : 'Executed'} ${request.project}, achieving ${request.impact}.`;
+      const base = `${request.responsibility ? request.responsibility + ' to' : 'Executed'} ${request.project}, achieving ${request.impact}.`;
+      return [base];
     }
   }
 
@@ -1053,9 +1139,9 @@ class AIService {
     }
   }
 
-  private async improveSummaryFallback(request: ContentImprovementRequest, _language: SupportedLanguage): Promise<string> {
+  private async improveSummaryFallback(request: ContentImprovementRequest, _language: SupportedLanguage): Promise<string[]> {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    return request.content; // Return original content as fallback
+    return [request.content]; // Return original content as fallback
   }
 
   private async analyzeJobDescriptionFallback(request: JobAnalysisRequest, language: SupportedLanguage): Promise<JobAnalysisResponse> {

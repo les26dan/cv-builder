@@ -3,13 +3,12 @@ import { cookies } from 'next/headers'
 
 // Define protected routes that require authentication
 const protectedRoutes = [
-  '/cv-workspace'
-  // Note: cv-upload and cv-guided-editing moved to guest-allowed for guest sessions
+  '/cv-workspace',
+  '/cv-upload'
 ]
 
 // GUEST SESSIONS: Routes that allow guest access (no authentication required)
 const guestAllowedRoutes = [
-  '/cv-upload',
   '/cv-guided-editing'
 ]
 
@@ -56,7 +55,8 @@ async function getUserSession(request: NextRequest): Promise<UserSession | null>
     }
     
     // Check if this is an admin user
-    if (userSession.email === 'admin@example.com') {
+    const adminEmail = process.env.BOOTSTRAP_ADMIN_EMAIL || 'okbuddy2025@gmail.com'
+    if (userSession.email === adminEmail || userSession.role === 'admin') {
       userSession.role = 'admin'
     }
     

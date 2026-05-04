@@ -178,7 +178,24 @@ export function CVWorkflowProvider({
       // For template CVs, skip database and load from localStorage directly
       if (cvId.startsWith('template-')) {
         console.log('🎯 CVWorkflowProvider: Template CV detected, loading from localStorage:', cvId)
-        
+
+        // FIRST: check for previously-saved edits at cv_workflow_{cvId}.
+        // Without this, every F5 reloads the original upload snapshot and discards user edits.
+        try {
+          const savedEdits = localStorage.getItem(`cv_workflow_${cvId}`)
+          if (savedEdits) {
+            const parsedEdits = JSON.parse(savedEdits) as WorkflowCVData
+            console.log('💾 CVWorkflowProvider: Restoring saved template edits from cv_workflow_*')
+            dispatch({ type: 'SET_CV_DATA', payload: parsedEdits })
+            lastSavedData.current = parsedEdits
+            dispatch({ type: 'SET_LAST_SAVED', payload: new Date().toISOString() })
+            dispatch({ type: 'SET_SYNC_STATUS', payload: 'offline' })
+            return
+          }
+        } catch (editsErr) {
+          console.warn('CVWorkflowProvider: Failed to parse saved template edits:', editsErr)
+        }
+
         // Try to load template data from upload localStorage
         const uploadData = localStorage.getItem('cv_upload_data') || localStorage.getItem(`cv_upload_${cvId}`)
         
@@ -238,14 +255,63 @@ export function CVWorkflowProvider({
         return
       }
       
-      // For regular CVs, load from database
+      // For regular CVs, load from database first, fallback to localStorage upload data
       const result = await dataService.loadDraft(userId, cvId)
-      
+
       if (result.success && result.data) {
         dispatch({ type: 'SET_CV_DATA', payload: result.data })
         lastSavedData.current = result.data
         dispatch({ type: 'SET_LAST_SAVED', payload: new Date().toISOString() })
       } else {
+        // DB failed or no record — try localStorage upload data (just uploaded CV)
+        const uploadRaw = typeof window !== 'undefined'
+          ? (localStorage.getItem(`cv_upload_${cvId}`) || localStorage.getItem('cv_upload_data'))
+          : null
+
+        if (uploadRaw) {
+          try {
+            const parsed = JSON.parse(uploadRaw)
+            const structuredCV = parsed.structuredCV
+
+            if (structuredCV && (parsed.cvId === cvId || !parsed.cvId)) {
+              const workflowData: WorkflowCVData = {
+                id: cvId,
+                userId,
+                title: parsed.file?.name?.replace(/\.[^/.]+$/, '') || 'CV mới',
+                status: 'draft',
+                score: Math.round(parsed.llmParsedData?.possibility_score || 0),
+                ...structuredCV,
+                workflow: {
+                  currentStep: 'editing',
+                  stepsCompleted: ['upload'],
+                  lastActiveStep: 'editing',
+                  timeSpent: 0
+                },
+                metadata: {
+                  version: 1,
+                  createdAt: new Date(parsed.timestamp || Date.now()).toISOString(),
+                  updatedAt: new Date(parsed.timestamp || Date.now()).toISOString(),
+                  source: 'upload'
+                },
+                settings: {
+                  autoSave: true,
+                  aiAssistance: true,
+                  template: 'default',
+                  language: 'vi'
+                }
+              }
+              console.log('📦 CVWorkflowContext: Loaded from localStorage upload data for cvId:', cvId)
+              dispatch({ type: 'SET_CV_DATA', payload: workflowData })
+              lastSavedData.current = workflowData
+              dispatch({ type: 'SET_LAST_SAVED', payload: new Date().toISOString() })
+              dispatch({ type: 'SET_SYNC_STATUS', payload: 'offline' })
+              return
+            }
+          } catch (parseErr) {
+            console.warn('CVWorkflowContext: Failed to parse localStorage upload data:', parseErr)
+          }
+        }
+
         dispatch({ type: 'SET_ERROR', payload: result.error || 'CV not found' })
       }
     } catch (error) {
@@ -272,7 +338,9 @@ export function CVWorkflowProvider({
 
   // Save CV data to service
   const saveCVData = useCallback(async (data: Partial<WorkflowCVData>): Promise<void> => {
-    if (!state.cvData) return
+    if (!state.cvData) {
+      return
+    }
 
     try {
       dispatch({ type: 'SET_SAVING', payload: true })
@@ -349,12 +417,12 @@ export function CVWorkflowProvider({
   // Update CV data locally (triggers auto-save)
   const updateCVData = useCallback((updates: Partial<WorkflowCVData>): void => {
     dispatch({ type: 'UPDATE_CV_DATA', payload: updates })
-    
+
     // Clear existing auto-save timer
     if (autoSaveTimer.current) {
       clearTimeout(autoSaveTimer.current)
     }
-    
+
     // Set new auto-save timer
     autoSaveTimer.current = setTimeout(() => {
       saveCVData(updates)

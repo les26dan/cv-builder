@@ -126,9 +126,17 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
     // Check for uploaded CV data in localStorage
     if (cvId && typeof window !== 'undefined') {
+      // FIRST: if user previously edited and we persisted to cv_workflow_{cvId},
+      // skip the upload-data path entirely so we don't clobber saved edits.
+      // The workflow-context effect below will hydrate state.cvData from this same key.
+      // If we already have saved edits in cv_workflow_{cvId}, skip the upload-data path
+      // entirely — workflow context will hydrate from that key instead.
+      const savedEdits = localStorage.getItem(`cv_workflow_${cvId}`);
+      if (savedEdits) return;
+
       const uploadDataKey = `cv_upload_${cvId}`;
       const uploadDataGeneric = 'cv_upload_data';
-      
+
       try {
         // First try specific cvId key
         let uploadData = localStorage.getItem(uploadDataKey);
@@ -354,7 +362,10 @@ export const CVEditor: React.FC<CVEditorProps> = ({
     }
   }, [cvId, cvData]); // Run when cvId changes or when cvData is loaded
 
-  // Sync with workflow context when cvData changes
+  // Sync with workflow context when cvData changes.
+  // Call updateCVData directly — it already debounces save internally (2s).
+  // The previous setTimeout(0) wrapper was being cleaned up on every cvData change
+  // before it could fire, so updateCVData never ran during continuous typing.
   useEffect(() => {
     if (updateCVData && mountedRef.current) {
       updateCVData(cvData);
@@ -366,38 +377,27 @@ export const CVEditor: React.FC<CVEditorProps> = ({
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
+    // Re-set on mount: in React 18 StrictMode dev, the effect runs → cleanup → re-runs.
+    // Without resetting here, mountedRef stays false after the first cleanup and the
+    // sync-effect's mountedRef.current check fails for the rest of the session.
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };
   }, []);
 
-  // Enhanced data update handler with auto-save
+  // Enhanced data update handler — local state only.
+  // The effect above (cvData → updateCVData) handles debounced auto-save.
   const handleDataUpdate = useCallback((newData: CVData) => {
     console.log('📝 CVEditor: Updating CV data');
     setCvData(newData);
-    
-    // Auto-save to workflow context
-    if (saveCVData) {
-      try {
-        saveCVData(newData);
-        console.log('💾 CVEditor: Auto-saved to workflow context');
-      } catch (error) {
-        console.error('❌ CVEditor: Auto-save failed:', error);
-      }
-    }
-  }, [saveCVData]);
+  }, []);
 
   // Handle section updates (compatible with existing EditorPanel interface)
   const handleUpdateSection = useCallback((sectionId: string, data: any) => {
     console.log(`🔧 CVEditor: Updating section ${sectionId}`, data);
-    
-    const updatedData = {
-      ...cvData,
-      [sectionId]: data
-    };
-    
-    handleDataUpdate(updatedData);
-  }, [cvData, handleDataUpdate]);
+    setCvData(prev => ({ ...prev, [sectionId]: data } as CVData));
+  }, []);
 
   // Handle section order changes
   const handleSectionOrderChange = useCallback((newOrder: string[]) => {

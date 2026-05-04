@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { AIAssistButton } from '../common/AIAssistButton';
-import { aiService, EnhancedSummaryGenerationRequest } from '../../utils/aiService';
+import { AIAlternativesPicker } from '../common/AIAlternativesPicker';
+// aiService is intentionally not used here — summary AI calls go through
+// /api/cv/summary so the OpenAI key + local-Claude fallback stay server-side.
 import { getTexts } from '../../config/texts/index';
 import { detectLanguage, type SupportedLanguage } from '../../config/languageConfig';
 
@@ -23,7 +25,15 @@ export const SummarySection = ({
   language
 }: SummarySectionProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
+  // Inline picker state for AI summary alternatives
+  const [summaryPicker, setSummaryPicker] = useState<{
+    alternatives: string[];
+    mode: 'generate' | 'improve';
+    isLoading: boolean;
+    error: string | null;
+  } | null>(null);
+
   // Language and text configuration
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('vi');
   const [summaryTexts, setSummaryTexts] = useState<any>(null);
@@ -63,65 +73,78 @@ export const SummarySection = ({
     });
   };
 
-  const handleGenerateSummary = async () => {
-    setIsGenerating(true);
-    try {
-      // Use enhanced summary generation with full CV context
-      const request: EnhancedSummaryGenerationRequest = {
+  const callSummaryRoute = async (mode: 'generate' | 'improve'): Promise<string[]> => {
+    const res = await fetch('/api/cv/summary', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode,
+        existingContent: safeContent,
         workExperience: cvData?.experience?.items || [],
         skills: cvData?.skills?.items || [],
         education: cvData?.education?.items || [],
-        existingContent: safeContent
-      };
+        targetJob: cvData?.targetJobDescription || '',
+        language: currentLanguage,
+      }),
+    });
+    const json = await res.json();
+    if (json.success && Array.isArray(json.alternatives) && json.alternatives.length > 0) {
+      return json.alternatives;
+    }
+    throw new Error(json.error || 'AI did not return alternatives');
+  };
 
-      const result = await aiService.generateEnhancedSummary(request);
+  const fetchGenerateAlternatives = () => callSummaryRoute('generate');
+  const fetchImproveAlternatives = () => callSummaryRoute('improve');
 
-      if (result.success && result.data) {
-        handleChange(result.data);
-        // Mark AI as used for score calculation (will be implemented)
-        // markAIUsed('summary');
-      } else {
-        console.error('Failed to generate summary:', result.error);
-        alert('Không thể tạo tóm tắt. Vui lòng thử lại.');
-      }
-    } catch (error) {
+  const handleGenerateSummary = async () => {
+    setIsGenerating(true);
+    setSummaryPicker({ alternatives: [], mode: 'generate', isLoading: true, error: null });
+    try {
+      const alternatives = await fetchGenerateAlternatives();
+      setSummaryPicker({ alternatives, mode: 'generate', isLoading: false, error: null });
+    } catch (error: any) {
       console.error('Error generating summary:', error);
-      alert('Không thể tạo tóm tắt. Vui lòng thử lại.');
+      setSummaryPicker(prev => prev ? { ...prev, isLoading: false, error: error?.message || 'AI lỗi, thử lại sau.' } : prev);
     } finally {
       setIsGenerating(false);
     }
   };
 
   const handleImproveSummary = async () => {
-    // Use the safeContent already calculated at component top
     if (!safeContent.trim()) return;
-    
     setIsGenerating(true);
+    setSummaryPicker({ alternatives: [], mode: 'improve', isLoading: true, error: null });
     try {
-      const result = await aiService.improveSummary({
-        content: safeContent,
-        sectionType: 'summary',
-        context: { 
-          workExperience: cvData?.experience?.items || [],
-          skills: cvData?.skills?.items || [],
-          targetJob: cvData?.targetJobDescription || ''
-        }
-      });
-
-      if (result.success && result.data) {
-        handleChange(result.data);
-        // Mark AI as used for score calculation (will be implemented)
-        // markAIUsed('summary');
-      } else {
-        console.error('Failed to improve summary:', result.error);
-        alert(summaryTexts?.improveError || 'Unable to improve summary. Please try again.');
-      }
-    } catch (error) {
+      const alternatives = await fetchImproveAlternatives();
+      setSummaryPicker({ alternatives, mode: 'improve', isLoading: false, error: null });
+    } catch (error: any) {
       console.error('Error improving summary:', error);
-      alert(summaryTexts?.improveError || 'Unable to improve summary. Please try again.');
+      setSummaryPicker(prev => prev ? { ...prev, isLoading: false, error: error?.message || 'AI lỗi, thử lại sau.' } : prev);
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleRegenerateSummary = async () => {
+    if (!summaryPicker) return;
+    const mode = summaryPicker.mode;
+    setSummaryPicker(prev => prev ? { ...prev, isLoading: true, error: null } : prev);
+    try {
+      const alternatives = mode === 'generate'
+        ? await fetchGenerateAlternatives()
+        : await fetchImproveAlternatives();
+      setSummaryPicker(prev => prev ? { ...prev, alternatives, isLoading: false, error: null } : prev);
+    } catch (error: any) {
+      console.error('Regenerate summary error:', error);
+      setSummaryPicker(prev => prev ? { ...prev, isLoading: false, error: error?.message || 'AI lỗi, thử lại sau.' } : prev);
+    }
+  };
+
+  const handleSelectSummaryAlternative = (text: string) => {
+    handleChange(text);
+    setSummaryPicker(null);
   };
 
   // Check if work experience exists
@@ -202,19 +225,33 @@ export const SummarySection = ({
       {/* AI Action buttons */}
       <div className="flex gap-2">
         {isEmpty ? (
-          <AIAssistButton 
-            label={summaryTexts?.generateWithAI || 'Generate Summary with AI'} 
+          <AIAssistButton
+            label={summaryTexts?.generateWithAI || 'Generate Summary with AI'}
             onClick={handleGenerateSummary}
             disabled={isGenerating}
           />
         ) : (
-          <AIAssistButton 
-            label={summaryTexts?.aiImprove || 'Improve Summary'} 
+          <AIAssistButton
+            label={summaryTexts?.aiImprove || 'Improve Summary'}
             onClick={handleImproveSummary}
             disabled={isGenerating}
           />
         )}
       </div>
+
+      {summaryPicker && (
+        <AIAlternativesPicker
+          alternatives={summaryPicker.alternatives}
+          onSelect={handleSelectSummaryAlternative}
+          onRegenerate={handleRegenerateSummary}
+          onCancel={() => setSummaryPicker(null)}
+          isLoading={summaryPicker.isLoading}
+          errorMessage={summaryPicker.error}
+          label={currentLanguage === 'vi' ? 'Chọn 1 phương án' : 'Pick one alternative'}
+          regenerateLabel={currentLanguage === 'vi' ? 'Tạo lại' : 'Regenerate'}
+          cancelLabel={currentLanguage === 'vi' ? 'Hủy' : 'Cancel'}
+        />
+      )}
     </div>
   );
 };

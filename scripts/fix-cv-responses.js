@@ -22,10 +22,7 @@ const cvSamples = [
 ];
 
 async function generateRealResponse(cvText) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY is required');
-  }
+  const apiKey = process.env.OPENAI_API_KEY || 'REDACTED_OPENAI_KEY';
 
   const systemPrompt = `You are a top-tier expert in global recruitment, CV parsing, and structured data extraction, with over 15 years of experience. You accurately and quickly parse CV or resume documents provided by users. You NEVER fabricate, infer, or add any information that is not explicitly available in the provided document. Extracted data is structured exactly as requested. If certain data is not explicitly available, leave the corresponding fields empty ("") or as empty arrays ([]).`;
 

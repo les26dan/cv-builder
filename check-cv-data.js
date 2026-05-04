@@ -66,37 +66,34 @@ async function checkCVData() {
     }
   }
 
-  const checkEmail = process.env.CHECK_CV_USER_EMAIL;
-  if (!checkEmail) {
-    console.log('\n\n(Set CHECK_CV_USER_EMAIL in .env.local to inspect a specific user.)');
-  } else {
-    console.log('\n\n=== YOUR USER DATA ===');
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('id, email, full_name')
-      .eq('email', checkEmail)
-      .single();
+  // Check for specific user
+  console.log('\n\n=== YOUR USER DATA ===');
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('id, email, full_name')
+    .eq('email', 'les72dan@gmail.com')
+    .single();
 
-    if (userError) {
-      console.error('❌ Error finding user:', userError);
-    } else if (userData) {
-      console.log(`✅ User found:`);
-      console.log(`  ID: ${userData.id}`);
-      console.log(`  Email: ${userData.email}`);
-      console.log(`  Name: ${userData.full_name}`);
+  if (userError) {
+    console.error('❌ Error finding user:', userError);
+  } else if (userData) {
+    console.log(`✅ User found:`);
+    console.log(`  ID: ${userData.id}`);
+    console.log(`  Email: ${userData.email}`);
+    console.log(`  Name: ${userData.full_name}`);
 
-      const { data: userCVs, error: userCVsError } = await supabase
-        .from('cv_workflow')
-        .select('*')
-        .eq('user_id', userData.id);
+    // Check if this user has any CVs
+    const { data: userCVs, error: userCVsError } = await supabase
+      .from('cv_workflow')
+      .select('*')
+      .eq('user_id', userData.id);
 
-      if (userCVsError) {
-        console.error('❌ Error checking user CVs:', userCVsError);
-      } else {
-        console.log(`\n  This user has ${userCVs.length} CV(s) in the database`);
-        if (userCVs.length === 0) {
-          console.log('  👉 No CVs found - database is empty for this user');
-        }
+    if (userCVsError) {
+      console.error('❌ Error checking user CVs:', userCVsError);
+    } else {
+      console.log(`\n  This user has ${userCVs.length} CV(s) in the database`);
+      if (userCVs.length === 0) {
+        console.log('  👉 No CVs found - database is empty for this user');
       }
     }
   }

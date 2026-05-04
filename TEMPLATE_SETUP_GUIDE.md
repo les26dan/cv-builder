@@ -110,15 +110,15 @@ if (cvId.startsWith('template-')) {
 Add to `.env.local`:
 ```bash
 # Supabase (required for database persistence)
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_URL=https://REDACTED_SUPABASE_PROJECT_ID_2gwwmxrcrpnk.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 
 # Authentication (required for non-template CVs)
-JWT_SECRET=generate-with-openssl-rand-base64-32
-NEXTAUTH_SECRET=generate-a-separate-secret
+JWT_SECRET=vGYbQTiP+W0Ke+LB5XkdSvhH3vgzLwz70ErJf7Nroyw=
+NEXTAUTH_SECRET=UeGhRLHjio3JND4q71n4laRcC9kPHEd3d7GJuRXg02w=
 
 # OpenAI (optional, for CV parsing)
-OPENAI_API_KEY=sk-proj-your-key
+NEXT_PUBLIC_OPENAI_API_KEY=sk-proj-...
 ```
 
 ## Architecture: Template Flow

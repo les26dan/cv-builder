@@ -60,6 +60,7 @@ export default function LoginPageContent() {
     try {
       const response = await fetch("/api/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -170,16 +171,17 @@ export default function LoginPageContent() {
             </label>
             <input
               id="email"
-              type="email"
+              type="text"
               required
               autoComplete="email"
               aria-describedby={errors.email ? "email-error" : undefined}
               aria-invalid={errors.email ? "true" : "false"}
-              {...register("email", { 
+              {...register("email", {
                 required: account.errors.required,
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: account.errors.invalidEmail
+                validate: (value) => {
+                  // Allow plain username (e.g. "adminbuddy") or valid email
+                  if (!value.includes('@')) return true;
+                  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || account.errors.invalidEmail;
                 }
               })}
               className="w-full h-11 sm:h-12 px-3 sm:px-4 bg-gray-50 border border-gray-100 rounded-lg text-sm sm:text-base placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
