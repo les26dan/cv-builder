@@ -1,0 +1,179 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+
+Chương 4 đã trình bày chi tiết quá trình hiện thực các module của hệ thống. Chương này trình bày kết quả kiểm thử và đánh giá hệ thống OkBuddy, bao gồm kiểm thử chức năng, đánh giá hiệu năng phân tích CV, đánh giá giao diện, so sánh với các giải pháp hiện có, và thảo luận các hạn chế.
+
+\section{Kiểm thử chức năng}
+
+Hệ thống được kiểm thử theo phương pháp kiểm thử hộp đen (black-box testing), tập trung vào việc xác minh các chức năng hoạt động đúng theo yêu cầu. Ngoài ra, các unit test được viết bằng Jest và Testing Library cho các component React quan trọng.
+
+\subsection{Kiểm thử module xác thực}
+
+Bảng \ref{tab:test_auth} trình bày các trường hợp kiểm thử cho module xác thực.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử module xác thực}
+\label{tab:test_auth}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
+TC01 & Đăng ký với email hợp lệ & Tạo tài khoản thành công & Đạt \\ \hline
+TC02 & Đăng ký với email đã tồn tại & Thông báo lỗi email trùng & Đạt \\ \hline
+TC03 & Đăng ký với mật khẩu yếu & Thông báo yêu cầu mật khẩu mạnh & Đạt \\ \hline
+TC04 & Đăng nhập bằng email/mật khẩu đúng & Đăng nhập thành công, chuyển hướng & Đạt \\ \hline
+TC05 & Đăng nhập bằng username (admin alias) & Đăng nhập thành công & Đạt \\ \hline
+TC06 & Đăng nhập với mật khẩu sai & Thông báo lỗi xác thực & Đạt \\ \hline
+TC07 & Đăng nhập bằng Google OAuth & Chuyển hướng Google, callback thành công & Đạt \\ \hline
+TC08 & Đăng nhập bằng LinkedIn OAuth & Chuyển hướng LinkedIn, callback thành công & Đạt \\ \hline
+TC09 & Rate limiting (>5 lần sai liên tiếp) & Chặn đăng nhập tạm thời & Đạt \\ \hline
+TC10 & Truy cập trang bảo vệ khi chưa đăng nhập & Chuyển hướng đến trang đăng nhập & Đạt \\ \hline
+TC11 & Truy cập CV editor khi là khách & Cho phép truy cập (guest session) & Đạt \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Kiểm thử module tải lên và phân tích CV}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử module tải lên và phân tích CV}
+\label{tab:test_upload}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
+TC12 & Upload file PDF hợp lệ (<10MB) & Trích xuất văn bản và phân tích thành công & Đạt \\ \hline
+TC13 & Upload file DOCX hợp lệ & Trích xuất và phân tích thành công & Đạt \\ \hline
+TC14 & Upload file không hỗ trợ (.jpg) & Thông báo lỗi định dạng & Đạt \\ \hline
+TC15 & Upload file quá 10MB & Thông báo vượt kích thước cho phép & Đạt \\ \hline
+TC16 & Upload CV tiếng Việt & Nhận diện ngôn ngữ VI, phân tích đúng & Đạt \\ \hline
+TC17 & Upload CV tiếng Anh & Nhận diện ngôn ngữ EN, phân tích đúng & Đạt \\ \hline
+TC18 & Upload file không phải CV & possibility\_score thấp (<30) & Đạt \\ \hline
+TC19 & Phân tích khi OpenAI API lỗi & Chuyển sang fallback parser & Đạt \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Kiểm thử trình soạn thảo CV}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử trình soạn thảo CV}
+\label{tab:test_editor}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
+TC20 & Chỉnh sửa thông tin liên hệ & Cập nhật và hiển thị trên preview & Đạt \\ \hline
+TC21 & Thêm mục kinh nghiệm mới & Thêm thành công, hiển thị trên preview & Đạt \\ \hline
+TC22 & Xóa mục kinh nghiệm & Xóa thành công với xác nhận & Đạt \\ \hline
+TC23 & Kéo thả sắp xếp thứ tự & Thứ tự cập nhật trên cả editor và preview & Đạt \\ \hline
+TC24 & Thêm/xóa kỹ năng dạng tag & Tag thêm/xóa đúng & Đạt \\ \hline
+TC25 & Auto-save sau chỉnh sửa & Dữ liệu lưu tự động sau 2 giây & Đạt \\ \hline
+TC26 & Preview cập nhật real-time & Preview phản ánh ngay khi sửa & Đạt \\ \hline
+TC27 & Thêm section tùy chỉnh & Section mới hiển thị đúng & Đạt \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Kiểm thử module xuất CV}
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử module xuất CV}
+\label{tab:test_export}
+\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
+TC28 & Xuất PDF & Mở print dialog, layout đúng & Đạt \\ \hline
+TC29 & Xuất DOCX & Tải file .docx, mở được bằng Word & Đạt \\ \hline
+TC30 & Xuất LaTeX & Tải file .tex với moderncv & Đạt \\ \hline
+TC31 & Xuất TXT & Tải file .txt có cấu trúc rõ ràng & Đạt \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Đánh giá hiệu năng phân tích CV}
+
+Để đánh giá hiệu quả của phương pháp hybrid parser, thí nghiệm so sánh được thực hiện giữa hai phương pháp: (i) Full-LLM parser (sử dụng hoàn toàn ChatGPT cho toàn bộ CV), và (ii) Hybrid parser (regex + LLM cho phần kinh nghiệm). Bộ dữ liệu thử nghiệm gồm 20 CV mẫu (10 tiếng Việt, 10 tiếng Anh) với độ dài và cấu trúc đa dạng.
+
+\begin{table}[H]
+\centering
+\caption{So sánh hiệu năng Hybrid Parser vs Full-LLM Parser}
+\label{tab:parser_comparison}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Full-LLM} & \textbf{Hybrid} \\ \hline
+Thời gian trung bình (giây) & 8.5 & 4.2 \\ \hline
+Token sử dụng trung bình & 3200 & 1400 \\ \hline
+Chi phí ước tính / CV (USD) & 0.0048 & 0.0021 \\ \hline
+Độ chính xác thông tin liên hệ & 95\% & 93\% \\ \hline
+Độ chính xác kinh nghiệm & 90\% & 88\% \\ \hline
+Độ chính xác kỹ năng & 88\% & 85\% \\ \hline
+Tỷ lệ giảm token & -- & 56\% \\ \hline
+\end{tabular}
+\end{table}
+
+Kết quả trong Bảng \ref{tab:parser_comparison} cho thấy phương pháp hybrid giảm được 56\% lượng token API sử dụng và giảm hơn một nửa thời gian xử lý so với phương pháp Full-LLM. Mức giảm nhẹ về độ chính xác (2--3\%) ở các trường thông tin liên hệ và kỹ năng là chấp nhận được, do phần lớn thông tin này có cấu trúc tương đối cố định và regex hoạt động đủ tốt.
+
+Đối với phần kinh nghiệm làm việc, mức chênh lệch 2\% (90\% vs 88\%) chủ yếu đến từ các trường hợp CV có cấu trúc không chuẩn, nơi LLM có lợi thế hơn trong việc hiểu ngữ cảnh. Tuy nhiên, xét tổng thể, phương pháp hybrid mang lại hiệu quả kinh tế tốt hơn đáng kể mà chỉ hy sinh rất ít về chất lượng.
+
+\section{Đánh giá giao diện người dùng}
+
+Giao diện hệ thống được đánh giá qua các tiêu chí sau:
+
+\textbf{Tính nhất quán:} Hệ thống sử dụng Tailwind CSS với bảng màu và typography thống nhất trên toàn bộ trang. Các component tái sử dụng đảm bảo giao diện nhất quán giữa các module.
+
+\textbf{Hỗ trợ song ngữ:} Toàn bộ văn bản giao diện được tổ chức trong các file cấu hình ngôn ngữ (\texttt{config/texts/vi/} và \texttt{config/texts/en/}), cho phép chuyển đổi linh hoạt giữa tiếng Việt và tiếng Anh. Tiếng Việt được đặt làm ngôn ngữ mặc định.
+
+\textbf{Trải nghiệm soạn thảo:} Layout hai cột (editor -- preview) cho phép người dùng vừa chỉnh sửa vừa xem kết quả ngay lập tức. Chức năng kéo thả mượt mà, auto-save giảm nguy cơ mất dữ liệu, và highlight section đang chỉnh sửa trên preview giúp người dùng dễ theo dõi.
+
+\textbf{Tối ưu hiệu năng:} Bundle size cho trang CV editor đạt khoảng 181KB nhờ sử dụng dynamic import và code splitting. Trang tải trong dưới 2 giây trên kết nối 4G.
+
+\section{So sánh với các giải pháp hiện có}
+
+Bảng \ref{tab:full_comparison} so sánh chi tiết hệ thống OkBuddy với bốn giải pháp phổ biến trên thị trường.
+
+\begin{table}[H]
+\centering
+\caption{So sánh chi tiết OkBuddy với các giải pháp hiện có}
+\label{tab:full_comparison}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|p{3.5cm}|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Canva} & \textbf{Zety} & \textbf{Sovren} & \textbf{LinkedIn} & \textbf{OkBuddy} \\ \hline
+Upload CV có sẵn & Không & Không & Có & Không & Có \\ \hline
+Phân tích bằng AI/LLM & Không & Hạn chế & NLP truyền thống & Không & LLM (GPT) \\ \hline
+Trình soạn thảo tương tác & Template-based & Form-based & Không & Profile-based & Section-based + DnD \\ \hline
+Xem trước real-time & Có & Có & Không & Không & Có \\ \hline
+Xuất PDF & Có & Có & Không & Hạn chế & Có \\ \hline
+Xuất DOCX & Không & Có & Không & Không & Có \\ \hline
+Xuất LaTeX & Không & Không & Không & Không & Có \\ \hline
+Hỗ trợ tiếng Việt & Hạn chế & Không & Hạn chế & Hạn chế & Đầy đủ \\ \hline
+Đa phương thức xác thực & Email & Email & API key & LinkedIn & Email + Google + LinkedIn \\ \hline
+Phiên khách (Guest) & Không & Không & Không & Không & Có \\ \hline
+Auto-save & Có & Có & -- & Có & Có \\ \hline
+Mã nguồn mở & Không & Không & Không & Không & Có \\ \hline
+Chi phí & Freemium & Trả phí & Trả phí cao & Miễn phí & Miễn phí \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+OkBuddy có lợi thế rõ rệt ở các điểm: (i) kết hợp được cả upload + phân tích AI và soạn thảo tương tác trong cùng một hệ thống, (ii) hỗ trợ xuất LaTeX -- định dạng quan trọng trong môi trường học thuật, (iii) hỗ trợ tiếng Việt đầy đủ, (iv) cho phép phiên khách sử dụng mà không cần đăng ký, và (v) mã nguồn mở cho phép cộng đồng đóng góp và tùy chỉnh.
+
+\section{Hạn chế hiện tại}
+
+Mặc dù hệ thống đã đạt được các mục tiêu đề ra, một số hạn chế vẫn tồn tại:
+
+\textbf{Chấm điểm CV (CV Scoring):} Cột \texttt{score} (0--100) đã có trong cơ sở dữ liệu và giao diện hiển thị điểm đã sẵn sàng (component \texttt{ScoreIndicator}), tuy nhiên thuật toán tính điểm thực tế chưa được xây dựng. Hiện tại điểm số mặc định là 0 cho tất cả CV.
+
+\textbf{Đa template:} Hệ thống hiện chỉ hỗ trợ một template CV duy nhất (Dennis Schroeder). Component \texttt{TemplateSelectionModal} đã được xây dựng nhưng chưa tích hợp nhiều template. Người dùng chưa thể chuyển đổi template khi đang chỉnh sửa.
+
+\textbf{So khớp với mô tả công việc (JD Matching):} Giao diện nhập job description và hiển thị kết quả phân tích đã hoàn chỉnh. Tuy nhiên, tính năng so khớp thực sự với OpenAI API mới được tích hợp ở mức cơ bản, chưa có đánh giá định lượng đầy đủ.
+
+\textbf{Hỗ trợ thiết bị di động:} Trình soạn thảo CV không hỗ trợ màn hình nhỏ do bố cục hai cột yêu cầu chiều rộng tối thiểu. Hiện tại, hệ thống hiển thị overlay chặn truy cập trên thiết bị di động.
+
+Chương này đã đánh giá hệ thống qua kiểm thử chức năng (31 test case đều đạt), phân tích hiệu năng parser (hybrid giảm 56\% token), so sánh với giải pháp hiện có, và nhận diện các hạn chế. Chương 6 tiếp theo sẽ tổng kết đồ án và đề xuất hướng phát triển.
+
+\end{document}

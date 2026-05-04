@@ -1,0 +1,86 @@
+{
+  "_meta": {
+    "purpose": "Maps the 24 Kaggle Resume Dataset categories (snehaanbhawal/resume-dataset) to JD title regex patterns. Used by scripts/build-ground-truth.ts to label (CV, JD) pairs as relevant=1 (same category) or 0 (cross-category) for thesis evaluation Strategy A.",
+    "created": "2026-05-03",
+    "source_dataset": "https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset",
+    "categories_count": 24,
+    "matching_rules": "Pattern is a JS-compatible regex tested case-insensitively against the JD's job_title field. First match wins. Patterns kept loose to maximize recall — false positives in title matching are acceptable since Strategy A is acknowledged as a silver-standard proxy in §5.3 of the thesis.",
+    "tuning_notes": "Run scripts/build-ground-truth.ts --inspect after first download to print which JD titles fail to match any category. Adjust patterns iteratively until <10% of JDs are unmapped."
+  },
+  "categories": {
+    "INFORMATION-TECHNOLOGY": {
+      "patterns": ["\\b(IT|information\\s+technology|systems?\\s+admin|sysadmin|tech\\s+support|help\\s*desk|infrastructure)\\b"],
+      "notes": "Generic IT/sysadmin/support roles."
+    },
+    "BUSINESS-DEVELOPMENT": {
+      "patterns": ["\\b(business\\s+development|bd|partnerships?|corporate\\s+strategy)\\b"]
+    },
+    "FINANCE": {
+      "patterns": ["\\b(finance|financial\\s+analyst|treasur|fp\\s*&\\s*a|cfo|controller)\\b"]
+    },
+    "ADVOCATE": {
+      "patterns": ["\\b(advocate|lawyer|attorney|legal\\s+counsel|paralegal|litigation)\\b"]
+    },
+    "ACCOUNTANT": {
+      "patterns": ["\\b(accountant|accounting|bookkeep(er|ing)|auditor|cpa|tax)\\b"]
+    },
+    "ENGINEERING": {
+      "patterns": ["\\b(mechanical|civil|electrical|chemical|industrial|aerospace)\\s+engineer\\b", "\\bengineering\\s+(manager|lead)\\b", "\\b(project\\s+engineer|design\\s+engineer)\\b"],
+      "notes": "Non-software engineering. Excludes 'software engineer' which goes under JAVA-DEVELOPER / generic dev categories."
+    },
+    "CHEF": {
+      "patterns": ["\\b(chef|cook|culinary|kitchen\\s+(staff|manager)|sous\\s+chef|line\\s+cook)\\b"]
+    },
+    "AVIATION": {
+      "patterns": ["\\b(pilot|aviation|aircraft|aerospace\\s+technician|flight\\s+(attendant|engineer)|airline)\\b"]
+    },
+    "FITNESS": {
+      "patterns": ["\\b(fitness|trainer|coach|gym|yoga|pilates|nutritionist|wellness)\\b"]
+    },
+    "SALES": {
+      "patterns": ["\\b(sales|account\\s+(executive|manager)|business\\s+representative|territory\\s+manager)\\b"]
+    },
+    "BANKING": {
+      "patterns": ["\\b(bank|banking|teller|loan\\s+officer|credit\\s+analyst|mortgage|wealth\\s+management)\\b"]
+    },
+    "HEALTHCARE": {
+      "patterns": ["\\b(nurse|nursing|doctor|physician|medical|healthcare|clinical|pharmac(ist|y)|therapist|surgeon|radiolog)\\b"]
+    },
+    "CONSULTANT": {
+      "patterns": ["\\b(consultant|consulting|advisor|advisory)\\b"]
+    },
+    "CONSTRUCTION": {
+      "patterns": ["\\b(construction|contractor|foreman|carpenter|mason|electrician|plumber|site\\s+(super|manager))\\b"]
+    },
+    "PUBLIC-RELATIONS": {
+      "patterns": ["\\b(public\\s+relations|pr\\s+(specialist|manager)|communications|media\\s+relations|press)\\b"]
+    },
+    "HR": {
+      "patterns": ["\\b(hr|human\\s+resources|recruiter|recruiting|talent\\s+(acquisition|management)|people\\s+ops)\\b"]
+    },
+    "DESIGNER": {
+      "patterns": ["\\b(designer|design|ui|ux|graphic|visual|product\\s+designer|creative)\\b"]
+    },
+    "ARTS": {
+      "patterns": ["\\b(artist|illustrator|musician|photographer|videograph|animator|art\\s+(director|teacher))\\b"]
+    },
+    "TEACHER": {
+      "patterns": ["\\b(teacher|teaching|professor|lecturer|instructor|tutor|education|academic)\\b"]
+    },
+    "APPAREL": {
+      "patterns": ["\\b(fashion|apparel|merchandiser|stylist|garment|textile|tailor)\\b"]
+    },
+    "DIGITAL-MEDIA": {
+      "patterns": ["\\b(digital\\s+(media|marketing)|content\\s+(creator|strategist)|seo|social\\s+media|influencer|copywriter)\\b"]
+    },
+    "AGRICULTURE": {
+      "patterns": ["\\b(agriculture|agronomist|farm|crop|livestock|horticultur|veterinarian|veterinary)\\b"]
+    },
+    "AUTOMOBILE": {
+      "patterns": ["\\b(automobile|automotive|mechanic|auto\\s+(technician|service)|vehicle\\s+(repair|inspector))\\b"]
+    },
+    "BPO": {
+      "patterns": ["\\b(bpo|call\\s+center|customer\\s+(service|support)|outsourcing|telecaller|csr)\\b"]
+    }
+  }
+}

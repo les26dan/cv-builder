@@ -1,0 +1,30 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+
+\section{Kết luận}
+
+Đồ án đã hoàn thành việc xây dựng hệ thống OkBuddy -- một ứng dụng web toàn diện hỗ trợ người dùng tạo, phân tích và tối ưu hồ sơ việc làm bằng cách ứng dụng Mô hình Ngôn ngữ lớn. Các kết quả chính đạt được bao gồm:
+
+Thứ nhất, đồ án đã đề xuất và hiện thực thành công phương pháp phân tích CV hybrid, kết hợp giữa kỹ thuật xử lý văn bản truyền thống bằng biểu thức chính quy và Mô hình Ngôn ngữ lớn (ChatGPT API). Phương pháp này giúp giảm 56\% lượng token API sử dụng và giảm hơn một nửa thời gian xử lý so với phương pháp sử dụng hoàn toàn LLM, trong khi chỉ hy sinh 2--3\% độ chính xác. Kết quả này chứng minh tính khả thi của cách tiếp cận hybrid trong các bài toán trích xuất thông tin, nơi một phần dữ liệu có cấu trúc tương đối cố định và có thể xử lý hiệu quả bằng phương pháp truyền thống.
+
+Thứ hai, đồ án đã xây dựng trình soạn thảo CV tương tác với khả năng chỉnh sửa theo từng phần, hỗ trợ kéo thả sắp xếp thứ tự, tự động lưu, và xem trước định dạng A4 trong thời gian thực. Hệ thống hỗ trợ xuất CV ra bốn định dạng (PDF, DOCX, LaTeX, TXT), trong đó xuất LaTeX là tính năng hiếm có ở các công cụ CV builder hiện nay, đặc biệt hữu ích cho người dùng trong môi trường học thuật.
+
+Thứ ba, đồ án đã phát triển nền tảng web hoàn chỉnh với hệ thống xác thực đa phương thức (email, Google OAuth, LinkedIn OAuth), quản lý CV trực tuyến, phiên khách không cần đăng ký, và hỗ trợ song ngữ Việt--Anh. Hệ thống được xây dựng trên nền tảng công nghệ hiện đại (Next.js 15, React 19, TypeScript, Supabase) với nhiều lớp bảo mật (RLS, bcrypt, CSRF, rate limiting).
+
+Tổng cộng 31 trường hợp kiểm thử chức năng đã được thực hiện và đều đạt yêu cầu. So sánh với các giải pháp hiện có trên thị trường (Canva, Zety, Sovren, LinkedIn), OkBuddy có lợi thế ở khả năng kết hợp upload-phân tích-soạn thảo trong một hệ thống duy nhất, hỗ trợ tiếng Việt đầy đủ, xuất LaTeX, và phiên khách.
+
+\section{Hướng phát triển trong tương lai}
+
+Dựa trên các hạn chế đã nhận diện ở Chương 5, đồ án đề xuất các hướng phát triển sau:
+
+\textbf{Thuật toán chấm điểm CV:} Xây dựng thuật toán đánh giá chất lượng CV dựa trên nhiều tiêu chí bao gồm: mức độ đầy đủ thông tin, cấu trúc CV phù hợp ATS, chất lượng nội dung (sử dụng LLM để đánh giá), và mức độ phù hợp với mô tả công việc. Điểm số từ 0 đến 100 sẽ đi kèm gợi ý cải thiện cụ thể cho từng tiêu chí.
+
+\textbf{Hệ thống đa template:} Phát triển thư viện template CV đa dạng phục vụ các ngành nghề khác nhau (kỹ sư phần mềm, marketing, thiết kế, quản lý dự án), cho phép người dùng chuyển đổi template trong khi vẫn giữ nguyên nội dung.
+
+\textbf{So khớp CV với mô tả công việc nâng cao:} Tích hợp sâu hơn khả năng phân tích job description bằng LLM, so khớp từ khóa và kỹ năng, đưa ra gợi ý cụ thể để tối ưu CV cho từng vị trí ứng tuyển, bao gồm điểm phù hợp (match score) và danh sách từ khóa còn thiếu.
+
+\textbf{Hỗ trợ thiết bị di động:} Thiết kế lại giao diện soạn thảo CV theo phương pháp responsive, có thể sử dụng layout một cột với khả năng chuyển đổi giữa chế độ edit và preview trên màn hình nhỏ.
+
+\textbf{Tích hợp nền tảng tuyển dụng:} Kết nối với các nền tảng tuyển dụng phổ biến tại Việt Nam (TopCV, VietnamWorks, LinkedIn) để cho phép người dùng nộp CV trực tiếp từ hệ thống.
+
+\end{document}
