@@ -1,4 +1,4 @@
-# OkBuddy Landing Page – Project Plan
+# CV Builder Landing Page – Project Plan
 
 ## 🎯 Objective
 Build a lean, experiment-driven, cost-efficient landing page MVP that:

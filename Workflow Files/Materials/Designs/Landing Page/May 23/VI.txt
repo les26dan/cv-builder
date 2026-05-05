@@ -1,4 +1,4 @@
-/* OkBuddy Website VN */
+/* CV Builder Website VN */
 
 /* Auto layout */
 display: flex;
@@ -4784,7 +4784,7 @@ order: 1;
 flex-grow: 0;
 
 
-/* "OkBuddy giúp tôi có được phỏng vấn tại 3 công ty công nghệ hàng đầu bằng cách tối ưu hóa CV cho hệ thống ATS. Công cụ tạo thư xin việc đã tiết kiệm cho tôi hàng giờ làm việc!" */
+/* "CV Builder giúp tôi có được phỏng vấn tại 3 công ty công nghệ hàng đầu bằng cách tối ưu hóa CV cho hệ thống ATS. Công cụ tạo thư xin việc đã tiết kiệm cho tôi hàng giờ làm việc!" */
 
 width: 272px;
 height: 116px;
@@ -4931,7 +4931,7 @@ order: 1;
 flex-grow: 0;
 
 
-/* "Tôi đã bỏ sót các từ khóa quan trọng trong CV khiến hồ sơ bị từ chối tự động. OkBuddy đã xác định chúng và giúp tôi điều chỉnh hồ sơ một cách hoàn hảo." */
+/* "Tôi đã bỏ sót các từ khóa quan trọng trong CV khiến hồ sơ bị từ chối tự động. CV Builder đã xác định chúng và giúp tôi điều chỉnh hồ sơ một cách hoàn hảo." */
 
 width: 272px;
 height: 96px;
@@ -5078,7 +5078,7 @@ order: 1;
 flex-grow: 0;
 
 
-/* "Là sinh viên mới ra trường, tôi đã gặp khó khăn trong việc có được phỏng vấn. OkBuddy giúp tôi ứng tuyển hơn 30 vị trí với CV tùy chỉnh chỉ trong một ngày. Tôi nhận được 5 cuộc gọi phản hồi!" */
+/* "Là sinh viên mới ra trường, tôi đã gặp khó khăn trong việc có được phỏng vấn. CV Builder giúp tôi ứng tuyển hơn 30 vị trí với CV tùy chỉnh chỉ trong một ngày. Tôi nhận được 5 cuộc gọi phản hồi!" */
 
 width: 272px;
 height: 116px;

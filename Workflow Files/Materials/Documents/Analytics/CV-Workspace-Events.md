@@ -1,7 +1,7 @@
 # CV Workspace - Event Tracking Specification
 
 ## Overview
-Event tracking for OkBuddy's CV workspace dashboard to measure user engagement, CV management behavior, and optimize the CV workflow experience.
+Event tracking for CV Builder's CV workspace dashboard to measure user engagement, CV management behavior, and optimize the CV workflow experience.
 
 ## Page Load Events
 
@@ -245,7 +245,7 @@ Event tracking for OkBuddy's CV workspace dashboard to measure user engagement, 
 ## Navigation Events
 
 ### 11. Header Logo Clicked
-**Trigger**: User clicks OkBuddy logo in header
+**Trigger**: User clicks CV Builder logo in header
 **Event Name**: `Logo Clicked`
 **Event Properties**:
 ```json

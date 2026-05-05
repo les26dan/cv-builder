@@ -485,7 +485,7 @@ align-self: stretch;
 flex-grow: 0;
 
 
-/* OkBuddy cam kết bảo vệ tuyệt đối thông tin cá nhân của bạn. Mọi dữ liệu cá nhân bạn cung cấp khi sử dụng nền tảng của chúng tôi sẽ được bảo vệ nghiêm ngặt và chỉ lưu trữ nội bộ tại OkBuddy. Chúng tôi tuyệt đối không chia sẻ, bán hoặc tiết lộ bất kỳ thông tin cá nhân nào của bạn cho bên thứ ba dưới bất kỳ hình thức nào, trừ trường hợp có yêu cầu cụ thể từ pháp luật. */
+/* CV Builder cam kết bảo vệ tuyệt đối thông tin cá nhân của bạn. Mọi dữ liệu cá nhân bạn cung cấp khi sử dụng nền tảng của chúng tôi sẽ được bảo vệ nghiêm ngặt và chỉ lưu trữ nội bộ tại CV Builder. Chúng tôi tuyệt đối không chia sẻ, bán hoặc tiết lộ bất kỳ thông tin cá nhân nào của bạn cho bên thứ ba dưới bất kỳ hình thức nào, trừ trường hợp có yêu cầu cụ thể từ pháp luật. */
 
 width: 720px;
 height: 96px;
@@ -550,7 +550,7 @@ align-self: stretch;
 flex-grow: 0;
 
 
-/* Bạn có quyền truy cập, chỉnh sửa và xóa thông tin cá nhân của mình bất kỳ lúc nào. Nếu bạn muốn yêu cầu truy cập hoặc thay đổi dữ liệu cá nhân, vui lòng liên hệ trực tiếp với chúng tôi qua email hoặc hệ thống hỗ trợ khách hàng của OkBuddy. Chúng tôi cam kết tôn trọng và bảo vệ quyền riêng tư của người dùng trong suốt quá trình sử dụng dịch vụ. */
+/* Bạn có quyền truy cập, chỉnh sửa và xóa thông tin cá nhân của mình bất kỳ lúc nào. Nếu bạn muốn yêu cầu truy cập hoặc thay đổi dữ liệu cá nhân, vui lòng liên hệ trực tiếp với chúng tôi qua email hoặc hệ thống hỗ trợ khách hàng của CV Builder. Chúng tôi cam kết tôn trọng và bảo vệ quyền riêng tư của người dùng trong suốt quá trình sử dụng dịch vụ. */
 
 width: 720px;
 height: 96px;
@@ -615,7 +615,7 @@ align-self: stretch;
 flex-grow: 0;
 
 
-/* Thông tin cá nhân thu thập từ bạn sẽ được sử dụng với mục đích hỗ trợ bạn tối ưu hóa hồ sơ ứng tuyển, cung cấp các đề xuất việc làm phù hợp, và cải thiện chất lượng dịch vụ của OkBuddy. Dữ liệu của bạn chỉ được thu thập và xử lý trong phạm vi cần thiết, minh bạch và có sự đồng thuận rõ ràng từ bạn. */
+/* Thông tin cá nhân thu thập từ bạn sẽ được sử dụng với mục đích hỗ trợ bạn tối ưu hóa hồ sơ ứng tuyển, cung cấp các đề xuất việc làm phù hợp, và cải thiện chất lượng dịch vụ của CV Builder. Dữ liệu của bạn chỉ được thu thập và xử lý trong phạm vi cần thiết, minh bạch và có sự đồng thuận rõ ràng từ bạn. */
 
 width: 720px;
 height: 96px;

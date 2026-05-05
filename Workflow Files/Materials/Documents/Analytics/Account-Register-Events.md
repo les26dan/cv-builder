@@ -1,7 +1,7 @@
 # Account Registration - Event Tracking Specification
 
 ## Overview
-Event tracking for OkBuddy's account registration page to measure user conversion, registration funnel performance, and optimize user onboarding experience.
+Event tracking for CV Builder's account registration page to measure user conversion, registration funnel performance, and optimize user onboarding experience.
 
 ## Page Load Events
 

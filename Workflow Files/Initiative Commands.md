@@ -1,5 +1,5 @@
-- Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
-- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy`, carefully analyze the existing components, features, and user flows implemented in their respective codebases, to gain full understanding of the system logic, architecture, and UX patterns of these core pages:
+- Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
+- Review our existing codebase at `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder`, carefully analyze the existing components, features, and user flows implemented in their respective codebases, to gain full understanding of the system logic, architecture, and UX patterns of these core pages:
    - Landing Page
    - Account Creation & Login
    - CV Workspace
@@ -34,34 +34,34 @@ Network Error Handling:
 
 *Careful Documentation*
 - Then, ensure what we have implemented passes Heimdall Compliance:
-    - New changes in flows, modules & components are documented in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/system-architecture.md`
-    - New changes in components, features & their use are registered in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/features.yaml`
-    - If your implementation touched sensitive flows (PII, auth, input validation ...), update `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/security-audit.md`
-    - Any technical debt, skipped test, ad-hoc workaround or quick fix noted in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/tech-debt.md`. This serves as a dictionary/ audit log for all of our accumulated known code smell, TODOs, skipped tests.
+    - New changes in flows, modules & components are documented in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/system-architecture.md`
+    - New changes in components, features & their use are registered in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/features.yaml`
+    - If your implementation touched sensitive flows (PII, auth, input validation ...), update `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/security-audit.md`
+    - Any technical debt, skipped test, ad-hoc workaround or quick fix noted in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/tech-debt.md`. This serves as a dictionary/ audit log for all of our accumulated known code smell, TODOs, skipped tests.
 
 *Progress Update*
-- Then, update the `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/Projects Working Directory/chatgpt-ai-integration/tasks.md'` [//] marking what we have implemented being completed. Then, if the entire task is completed, move it down to the Completed Tasks section. [//]
-- Then, update the `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/Projects Working Directory/chatgpt-ai-integration/progress.md'` [//] to reflect the current state of the project, including all of the lessons, experiences, tips & tricks you've learned during implementing this task, troubleshooting bugs ...
+- Then, update the `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/Projects Working Directory/chatgpt-ai-integration/tasks.md'` [//] marking what we have implemented being completed. Then, if the entire task is completed, move it down to the Completed Tasks section. [//]
+- Then, update the `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/Projects Working Directory/chatgpt-ai-integration/progress.md'` [//] to reflect the current state of the project, including all of the lessons, experiences, tips & tricks you've learned during implementing this task, troubleshooting bugs ...
 - Stop and we will open a new chat for the next task.
 
 ----------
 **Project working files creation**
-- Read the master Product Brief at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Materials/Documents/Product Brief.md`.
-- Read the Product Spec of the project at `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-suggestions-ai/JD–CV Optimization & “Apply All” Enhanced Workflow (Desktop) – Product Specification.md'`. [//]
-- Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
+- Read the master Product Brief at `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Materials/Documents/Product Brief.md`.
+- Read the Product Spec of the project at `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/cv-suggestions-ai/JD–CV Optimization & “Apply All” Enhanced Workflow (Desktop) – Product Specification.md'`. [//]
+- Read & understand Heimdall at `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall`. This is our system's gatekeeper: monitor all flows, features, and dependencies without implementing features directly. System-level architecture is maintained via Heimdall.
 - This project aims to 
 - Review these previous projects and carefully analyze the existing components, features, and user flows implemented in their respective codebases, as well as the associated Product Specifications, to gain full understanding of the system logic, architecture, and UX patterns:
-   - Landing Page at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/landing-page`.
-   - Account Creation & Login at `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/Fundamental Services/Account Creation & Login'`
-   - CV Workspace page at `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-workspace-navigation'`
-   - CV & JD Upload page at `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-jd-upload'`
-   - CV Guided Editing page at `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-guided-editing'`
-   - CV Workflow Integration at `'/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-workflow-integration'`
+   - Landing Page at `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/landing-page`.
+   - Account Creation & Login at `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/Fundamental Services/Account Creation & Login'`
+   - CV Workspace page at `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/cv-workspace-navigation'`
+   - CV & JD Upload page at `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/cv-jd-upload'`
+   - CV Guided Editing page at `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/cv-guided-editing'`
+   - CV Workflow Integration at `'/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/cv-workflow-integration'`
 - Pay special attention to the technical stack development workflows file structure and project organization patterns used across all previous projects to ensure consistency and correctness in implementation.
 - Always check carefully to confirm that you are working inside the correct project directory before executing any implementation or modification tasks.
 - Let the user know once you have finished.
 
-- With all context fully loaded and verified, prepare the following working files for this project in: `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/CV Workflow/cv-workflow-integration/` [//]
+- With all context fully loaded and verified, prepare the following working files for this project in: `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/CV Workflow/cv-workflow-integration/` [//]
 
 ### 1. Project Plan
 - Create a context-rich `project-plan.md` that clearly defines:
@@ -70,7 +70,7 @@ Network Error Handling:
   - UX principles, user goals, and interaction patterns
   - What is in scope vs. out of scope
   - Success criteria and completion benchmarks
-- Ensure the plan closely aligns with the Product Spec and system structure used in previous OkBuddy projects.
+- Ensure the plan closely aligns with the Product Spec and system structure used in previous CV Builder projects.
 
 ### 2. Tasks
 - Create a `tasks.md` file with two sections:
@@ -120,9 +120,9 @@ Network Error Handling:
    - Ensure tasks are specific and actionable
 
 **Heimdall**
-- Act as the system architect for OkBuddy.
+- Act as the system architect for CV Builder.
 - Maintain a live understanding of the full system structure — APIs, features, configs, flows, component boundaries, test coverage, and accummulated tech debt.
-- Track and update `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/system/` with:
+- Track and update `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/system/` with:
   - `system-architecture.md` → data flows, components, high-level interfaces
   - `features.yaml` → features-to-components registry
   - `security-audit.md` → security policies, sensitive flows, auth checks

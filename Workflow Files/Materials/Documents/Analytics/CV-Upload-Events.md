@@ -1,7 +1,7 @@
 # CV Upload - Event Tracking Specification
 
 ## Overview
-Event tracking for OkBuddy's CV & JD upload page to measure file upload success, user interaction patterns, and optimize the CV analysis workflow.
+Event tracking for CV Builder's CV & JD upload page to measure file upload success, user interaction patterns, and optimize the CV analysis workflow.
 
 ## Page Load Events
 

@@ -1,4 +1,4 @@
-# OkBuddy System Architecture
+# CV Builder System Architecture
 
 ## Status: ✅ PRODUCTION READY - DATABASE INTEGRATION COMPLETE ✅
 
@@ -10,7 +10,7 @@
 **Core Implementation:**
 1. **Test User Architecture**: Secure test user creation system with bcrypt password hashing and Supabase integration
 2. **Production Database**: Test user successfully created in production Supabase with ID `94cf34cf-9788-435c-b411-88b3dc6958f7`
-3. **Authentication Testing**: Complete test credentials (`okbuddy.test.user@gmail.com` / `OkBuddy2025!`) for OAuth flow verification
+3. **Authentication Testing**: Complete test credentials (`okbuddy.test.user@gmail.com` / `CV Builder2025!`) for OAuth flow verification
 4. **Non-Admin Security**: Test user properly configured without admin privileges for secure testing environment
 5. **System Analysis**: Comprehensive Heimdall system analysis and user flow documentation completed
 
@@ -325,7 +325,7 @@
 - **CV Workspace**: Fixed mixed language issues and applied new color scheme
 
 **Color Changes Applied:**
-- ✅ **OkBuddy Logo**: #0277BD color across all headers
+- ✅ **CV Builder Logo**: #0277BD color across all headers
 - ✅ **CTA Buttons**: Try Free Now, Apply suggestions, Fix issues, Add keywords, Start applications
 - ✅ **Auth Buttons**: Login, Sign Up, Create Account buttons
 - ✅ **Interactive Elements**: Skill tags, hover states, progress indicators
@@ -333,7 +333,7 @@
 
 **Shared Header Features:**
 - ✅ **Authentication Logic**: Shows Login/Register when logged out, user avatar when logged in
-- ✅ **Brand Consistency**: Unified OkBuddy logo styling across all page types
+- ✅ **Brand Consistency**: Unified CV Builder logo styling across all page types
 - ✅ **Page Variants**: Supports landing, auth, and app page layouts
 - ✅ **Language Support**: Maintains existing internationalization
 
@@ -390,7 +390,7 @@
 
 **Results:**
 - ✅ **Consistent English Language**: Landing page now displays uniform English text
-- ✅ **Professional Button Design**: All CTAs use identical OkBuddy blue styling (`bg-[#0288D1]`)
+- ✅ **Professional Button Design**: All CTAs use identical CV Builder blue styling (`bg-[#0288D1]`)
 - ✅ **Cleaner Visual Flow**: Removed visual distractions and improved content hierarchy
 - ✅ **Production Build Ready**: All changes tested and verified through build process
 
@@ -633,7 +633,7 @@
 │   └── [Other components...]
 ```
 
-### **🎯 OkBuddy Button Style System** ✅ **CRITICAL UX CONSISTENCY** 
+### **🎯 CV Builder Button Style System** ✅ **CRITICAL UX CONSISTENCY** 
 **Purpose**: Standardized button styling for consistent user experience across all components
 
 #### **Two Core Button Styles**
@@ -701,7 +701,7 @@ CV Workflow Data Flow:
 **Centralized Color Scheme** (`tailwind.config.js`):
 ```
 primary: {
-  DEFAULT: '#0288D1',    # OkBuddy brand blue
+  DEFAULT: '#0288D1',    # CV Builder brand blue
   50: '#E0F7FA',         # Light background
   100: '#B2EBF2',        # Secondary accents
   500: '#0288D1',        # Primary actions
@@ -711,7 +711,7 @@ background: '#E0F7FA',   # Page backgrounds
 ```
 
 **Header Component Strategy**:
-1. **Landing Page Header** (`/components/Header.tsx`): Professional marketing header with OkBuddy branding
+1. **Landing Page Header** (`/components/Header.tsx`): Professional marketing header with CV Builder branding
 2. **Authentication Header** (`/components/auth/Header.tsx`): Simplified header for login/register flows
 3. **CV Editor Header** (`/components/HeaderCVEditor.tsx`): Specialized header for CV editing interface
 
@@ -745,7 +745,7 @@ User Authentication Status → Dynamic Header UI → User Drawer Access
 ### **Page Rendering Architecture**
 **Server-Side Rendering (SSR) Requirements**: ✅ **MANDATORY FOR ALL PAGES**
 
-All OkBuddy pages follow these architectural principles:
+All CV Builder pages follow these architectural principles:
 
 **1. Direct Component Rendering**:
 ```typescript
@@ -787,7 +787,7 @@ export default function RootLayout({ children }) {
 ## 📁 **UNIFIED FILE STRUCTURE**
 
 ```
-/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/
+/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/
 ├── app/                           # Next.js 15 App Router
 │   ├── page.tsx                   # Landing page ✅ Production Ready + UI Restored
 │   ├── login/page.tsx             # Login page ✅ Production Ready + Enhanced UI
@@ -890,7 +890,7 @@ export default function RootLayout({ children }) {
 **Status**: ✅ **PRODUCTION READY**
 
 **Restored Features**:
-- **Professional Branding**: OkBuddy logo with proper styling and hover effects
+- **Professional Branding**: CV Builder logo with proper styling and hover effects
 - **Navigation Buttons**: Login and Register buttons with proper routing
 - **Responsive Design**: Mobile-first approach with proper breakpoints
 - **Design System**: Consistent with legacy UI specifications
@@ -1391,7 +1391,7 @@ if (parsedData.possibility_score >= 5) {
 ### **Unified Port 3000 Architecture** ✅ COMPLETED
 **Status**: ✅ **PRODUCTION READY - PORT CONFLICTS ELIMINATED**
 
-The OkBuddy application now operates on a **completely unified port 3000 architecture**, eliminating the previous port conflicts between localhost:3000 and 3001 that were causing server startup issues and OAuth redirect failures.
+The CV Builder application now operates on a **completely unified port 3000 architecture**, eliminating the previous port conflicts between localhost:3000 and 3001 that were causing server startup issues and OAuth redirect failures.
 
 #### **Port Conflict Resolution Implementation**
 ```typescript
@@ -1459,7 +1459,7 @@ Total Startup Time: ~12-18 seconds
 ### **PERSISTENT BACKGROUND SERVER SYSTEM** ✅ IMPLEMENTED
 **Status**: ✅ **BULLETPROOF SERVER PERSISTENCE - NEVER DIES**
 
-The OkBuddy application now features a **completely redesigned server management system** that ensures 100% reliable background operation, eliminating the persistent server death issues.
+The CV Builder application now features a **completely redesigned server management system** that ensures 100% reliable background operation, eliminating the persistent server death issues.
 
 #### **Persistent Server Architecture**
 ```bash
@@ -1712,7 +1712,7 @@ curl testing    # ✅ All endpoints responding correctly
 
 ---
 
-*This document serves as the authoritative reference for OkBuddy's unified system architecture.* 
+*This document serves as the authoritative reference for CV Builder's unified system architecture.* 
 
 ## CV Parser & Auto-Population System
 

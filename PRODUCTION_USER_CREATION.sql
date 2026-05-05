@@ -27,7 +27,7 @@ BEGIN
         ) VALUES (
             gen_random_uuid(),
             'okbuddy.test.user@gmail.com',
-            'OkBuddy Test User',
+            'CV Builder Test User',
             '$2b$12$IHIuUMCC5xMw5MdzD6vIR.5csLp9T.e/GhCMv7QoyTpxPp5hGT.UW',
             true,
             'email',
@@ -37,7 +37,7 @@ BEGIN
         );
         
         RAISE NOTICE 'Successfully created test user: okbuddy.test.user@gmail.com';
-        RAISE NOTICE 'Password: OkBuddy2025!';
+        RAISE NOTICE 'Password: CV Builder2025!';
         RAISE NOTICE 'User has standard permissions (no admin access)';
     END IF;
 END $$;

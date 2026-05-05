@@ -62,7 +62,7 @@ order: 0;
 flex-grow: 0;
 
 
-/* OkBuddy */
+/* CV Builder */
 
 width: 109px;
 height: 29px;

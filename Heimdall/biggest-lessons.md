@@ -1,4 +1,4 @@
-# OkBuddy Development: Biggest Lessons Learned
+# CV Builder Development: Biggest Lessons Learned
 
 ## Last Updated: February 8, 2025
 ## Status: Production-Ready System - Guest User Logic & Conditional UI Lessons Added
@@ -874,7 +874,7 @@ const testData = {
 ---
 
 *"The biggest lessons are learned from the problems that don't look like problems until they cost you a day."*  
-*— OkBuddy Development Team, January 2025* 
+*— CV Builder Development Team, January 2025* 
 
 ---
 

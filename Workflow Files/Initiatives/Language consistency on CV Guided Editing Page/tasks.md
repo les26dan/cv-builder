@@ -139,7 +139,7 @@ WHILE IMPLEMENTING THIS TASK, YOU MUST BE EXTREMELY CAREFUL:
 
 ### 9. **Header Components with Vietnamese aria-labels**
 **Files:** `components/SharedHeader.tsx`, `components/Header.tsx`, `components/auth/Header.tsx`
-- **Various lines:** `aria-label="OkBuddy - Trang chủ"`
+- **Various lines:** `aria-label="CV Builder - Trang chủ"`
 - **Priority:** MEDIUM - Accessibility
 
 ### 10. **Template Selection Modal**

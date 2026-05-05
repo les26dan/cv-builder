@@ -1,4 +1,4 @@
-# OkBuddy App - Setup Summary
+# CV Builder App - Setup Summary
 
 ## ✅ Completed Setup Steps
 

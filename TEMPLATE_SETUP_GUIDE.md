@@ -1,7 +1,7 @@
 # CV Template Setup Guide
 
 ## Overview
-This guide explains how to set up template CV persistence in the database for the OkBuddy application.
+This guide explains how to set up template CV persistence in the database for the CV Builder application.
 
 ## Current State
 - ✅ Template CVs work in localStorage (browser-only)

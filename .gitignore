@@ -51,3 +51,18 @@ thesis/DoAn.pdf
 thesis/DoAn-blx.bib
 thesis/lstlisting.tex
 thesis/so_sanh_cv_tools.docx
+
+# Python venv for thesis evaluation scripts
+.venv/
+
+# Reference theses from other people (large PDFs, not user's own work)
+thesis/sample-thesis-other-people/
+
+# Local dev server log
+dev-server.log
+
+# Secrets — local-only credential notes (DO NOT COMMIT)
+Workflow Files/Materials/Documents/GitHub Token.md
+Workflow Files/Materials/Documents/ChatGPT Token.md
+Workflow Files/Materials/Documents/Claude API.md
+Heimdall/credentials.md

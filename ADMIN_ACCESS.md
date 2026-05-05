@@ -1,4 +1,4 @@
-# Admin Account Access - OkBuddy
+# Admin Account Access - CV Builder
 
 ## 🔑 Admin Credentials
 
