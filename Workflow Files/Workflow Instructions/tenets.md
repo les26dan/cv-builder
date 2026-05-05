@@ -151,7 +151,7 @@
 - ❌ Implementing based on visual similarity rather than code specifications
 
 #### Design File Location Patterns
-- Look for design files in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Materials/Designs` directories
+- Look for design files in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Materials/Designs` directories
 - Common file extensions: `.txt`, `.css`, `.md`, `.json`
 - Always check for project-specific design folders
 - When in doubt, ask for design file location before implementing anything related to frontend/ UI

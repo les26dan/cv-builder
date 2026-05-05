@@ -8,7 +8,7 @@
 
 ## 📋 **OVERVIEW**
 
-OkBuddy now uses **Vercel Blob** for reliable, scalable CV file storage. This integration provides:
+CV Builder now uses **Vercel Blob** for reliable, scalable CV file storage. This integration provides:
 
 - ✅ **Serverless File Storage**: No infrastructure management required
 - ✅ **Global CDN**: Fast file access worldwide via Vercel's Edge Network
@@ -291,7 +291,7 @@ Based on [Vercel Storage pricing](https://vercel.com/storage):
 - **Bandwidth**: $0.40/GB egress
 - **Operations**: $0.45 per 1M operations
 
-### **Estimated Costs for OkBuddy**
+### **Estimated Costs for CV Builder**
 - **1,000 users**: ~$5-10/month
 - **10,000 users**: ~$30-60/month
 - **100,000 users**: ~$200-400/month

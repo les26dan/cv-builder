@@ -412,7 +412,7 @@
             },
             {
               "id": "1:1088",
-              "name": "\"OkBuddy helped me land interviews at 3 top tech companies by optimizing my resume for ATS systems. The cover letter generator saved me hours of work!\"",
+              "name": "\"CV Builder helped me land interviews at 3 top tech companies by optimizing my resume for ATS systems. The cover letter generator saved me hours of work!\"",
               "type": "TEXT",
               "x": 24,
               "y": 88,
@@ -743,7 +743,7 @@
             },
             {
               "id": "1:1095",
-              "name": "\"I was missing critical keywords in my resume that were causing automatic rejections. OkBuddy identified them and helped me tailor my applications perfectly.\"",
+              "name": "\"I was missing critical keywords in my resume that were causing automatic rejections. CV Builder identified them and helped me tailor my applications perfectly.\"",
               "type": "TEXT",
               "x": 24,
               "y": 88,
@@ -1074,7 +1074,7 @@
             },
             {
               "id": "1:1102",
-              "name": "\"As a new graduate, I was struggling to get interviews. OkBuddy helped me apply to 30+ positions with customized resumes in just one day. I got 5 callbacks!\"",
+              "name": "\"As a new graduate, I was struggling to get interviews. CV Builder helped me apply to 30+ positions with customized resumes in just one day. I got 5 callbacks!\"",
               "type": "TEXT",
               "x": 24,
               "y": 88,

@@ -1,4 +1,4 @@
-# OkBuddy Product Brief
+# CV Builder Product Brief
 
 # Overview
 
@@ -90,7 +90,7 @@ Goal: Get to interview stage
 | :---- | :---- | :---- | :---- | :---- | :---- |
 | Apply | As a job searcher who’s been unemployed for a while, I just want to find a job quickly to get a paycheck | Mass application but still want to make sure they have the highest chance (customized) |  |  |  |
 |  | As … I have to manually fill in random ad-hoc question for almost every different companies. This is painful because I have to manually recall each experience, type it down every time, polish the writings each time. | Auto fill form LLM |  |  |  |
-| Keep track & manage | As a job searcher, I have to manage my CV and applications on too many platforms: LinkedIn, Glassdoor (international), VietnamWorks, ITViec, TopDev (domestic) …This is: Time-consuming Easy to miss out: I don’t know/ not sure if I apply for a job twice/ FOMO I’m afraid of missing chances to work for company A, which is one of the best in this field Confusing: I’m not sure/ find it hard to keep track of all applications & status of each | Keep track of jobs users applied through OkBuddy Status of each stage & notification |  |  |  |
+| Keep track & manage | As a job searcher, I have to manage my CV and applications on too many platforms: LinkedIn, Glassdoor (international), VietnamWorks, ITViec, TopDev (domestic) …This is: Time-consuming Easy to miss out: I don’t know/ not sure if I apply for a job twice/ FOMO I’m afraid of missing chances to work for company A, which is one of the best in this field Confusing: I’m not sure/ find it hard to keep track of all applications & status of each | Keep track of jobs users applied through CV Builder Status of each stage & notification |  |  |  |
 
 #### Current Standard
 
@@ -145,11 +145,11 @@ We leverage cutting-edge Large Language Models (LLMs) to deliver unparalleled pe
 
 ## User Empowerment First
 
-Every interaction, suggestion, or solution provided by OkBuddy empowers users with clear, actionable insights. We optimize relentlessly for simplicity, clarity, and utility to ensure users feel confident and supported.
+Every interaction, suggestion, or solution provided by CV Builder empowers users with clear, actionable insights. We optimize relentlessly for simplicity, clarity, and utility to ensure users feel confident and supported.
 
 ## Radically Personalized Experiences
 
-Generic advice has no place in OkBuddy. We deeply tailor every recommendation, CV enhancement, job match, and application aid to the individual user, their unique career ambitions, and targeted roles.
+Generic advice has no place in CV Builder. We deeply tailor every recommendation, CV enhancement, job match, and application aid to the individual user, their unique career ambitions, and targeted roles.
 
 ## Data-Driven Trust & Transparency
 
@@ -157,11 +157,11 @@ We actively maintain transparency in how we leverage user data and generate AI i
 
 ## Holistic and Continuous Value
 
-OkBuddy isn’t transactional—it’s relational. Our platform continuously engages users throughout their careers, evolving alongside their professional journeys and always remaining relevant, useful, and up-to-date.
+CV Builder isn’t transactional—it’s relational. Our platform continuously engages users throughout their careers, evolving alongside their professional journeys and always remaining relevant, useful, and up-to-date.
 
 # Vision/ Magic Wand
 
-Imagine OkBuddy as your lifelong career companion—a hyper-personalized AI mentor who intimately understands your career goals, skills, aspirations, and preferences. You simply describe your dream job, and OkBuddy instantly delivers a crystal-clear, actionable roadmap:
+Imagine CV Builder as your lifelong career companion—a hyper-personalized AI mentor who intimately understands your career goals, skills, aspirations, and preferences. You simply describe your dream job, and CV Builder instantly delivers a crystal-clear, actionable roadmap:
 
 ## Instantly Customized CV
 
@@ -179,7 +179,7 @@ Each application, from cover letters to form-filling, is precisely and automatic
 
 Never wonder again about the status of your applications or worry about missing opportunities. Your personal assistant manages every application across every platform, continuously providing clarity, guidance, and proactive follow-up.
 
-*Ultimately, OkBuddy completely redefines the job-seeking experience: no friction, no uncertainty—just effortless progression toward your dream career.*
+*Ultimately, CV Builder completely redefines the job-seeking experience: no friction, no uncertainty—just effortless progression toward your dream career.*
 
 # Hypotheses
 

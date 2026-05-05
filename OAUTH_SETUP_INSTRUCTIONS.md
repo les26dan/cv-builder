@@ -15,7 +15,7 @@ You need to get **real OAuth credentials** from Google and LinkedIn. Here's exac
 
 ### **1.2 Create Project** 
 1. Click **"New Project"**
-2. **Name**: `OkBuddy-OAuth-Production`
+2. **Name**: `CV Builder-OAuth-Production`
 3. Click **"Create"**
 
 ### **1.3 Enable Google+ API**
@@ -26,7 +26,7 @@ You need to get **real OAuth credentials** from Google and LinkedIn. Here's exac
 ### **1.4 Configure OAuth Consent Screen**
 1. Go to **"APIs & Services" > "OAuth consent screen"**
 2. Choose **"External"**
-3. **App name**: `OkBuddy CV Builder`
+3. **App name**: `CV Builder CV Builder`
 4. **User support email**: `admin@example.com`
 5. **Developer contact**: `admin@example.com`
 6. **Authorized domains**: Add `localhost` for testing
@@ -36,7 +36,7 @@ You need to get **real OAuth credentials** from Google and LinkedIn. Here's exac
 1. Go to **"APIs & Services" > "Credentials"**
 2. Click **"+ Create Credentials" > "OAuth 2.0 Client IDs"**
 3. **Application type**: `Web application`
-4. **Name**: `OkBuddy OAuth Client`
+4. **Name**: `CV Builder OAuth Client`
 5. **Authorized redirect URIs**: Add these EXACT URLs:
    ```
    http://localhost:3000/api/auth/google/callback
@@ -56,7 +56,7 @@ You need to get **real OAuth credentials** from Google and LinkedIn. Here's exac
 
 ### **2.2 Create App**
 1. Click **"Create app"**
-2. **App name**: `OkBuddy CV Builder`
+2. **App name**: `CV Builder CV Builder`
 3. **LinkedIn Page**: You need to create a LinkedIn company page first
 4. **Privacy policy URL**: `http://localhost:3000/terms-of-service`
 5. **App logo**: Upload any image (200x200px minimum)

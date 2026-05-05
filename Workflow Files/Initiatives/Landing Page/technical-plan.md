@@ -1,4 +1,4 @@
-# OkBuddy Landing Page – Technical Plan
+# CV Builder Landing Page – Technical Plan
 
 ## 1. 🧱 Tech Stack Overview
 

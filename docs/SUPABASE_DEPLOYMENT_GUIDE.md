@@ -8,7 +8,7 @@
 
 ## 📋 **PREREQUISITES**
 
-- ✅ OkBuddy unified application (current codebase)
+- ✅ CV Builder unified application (current codebase)
 - ✅ Supabase account (free tier available)
 - ✅ Node.js 18+ installed
 - ✅ Terminal/command line access
@@ -26,7 +26,7 @@
 1. Click **"New Project"**
 2. Select your organization
 3. Configure project:
-   - **Name**: `OkBuddy Production`
+   - **Name**: `CV Builder Production`
    - **Database Password**: Generate strong password (save it!)
    - **Region**: `us-east-1` (recommended for performance)
    - **Pricing**: `Free` (for testing) or `Pro` (for production)
@@ -53,7 +53,7 @@ After creation, go to **Settings > API**:
 
 ### **2.1 Create Environment File**
 ```bash
-cd /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy
+cd /Users/tomnguyen/Documents/Cursor/Projects/CV Builder
 cp docs/env-template.txt .env.local
 ```
 
@@ -122,7 +122,7 @@ npm run db:test
 
 **Expected Output**:
 ```
-🧪 OkBuddy Supabase Connection Test
+🧪 CV Builder Supabase Connection Test
 =====================================
 ✅ Environment variables found
 ✅ Basic connection successful
@@ -265,7 +265,7 @@ Mark each item when completed:
 
 ### **Documentation**
 - 📚 [Supabase Docs](https://supabase.com/docs)
-- 📚 [OkBuddy Architecture](./database-readiness-assessment.md)
+- 📚 [CV Builder Architecture](./database-readiness-assessment.md)
 - 📚 [Environment Config](./environment-config.env)
 
 ### **Monitoring Tools**
@@ -284,7 +284,7 @@ Mark each item when completed:
 
 After successful deployment:
 
-**OkBuddy Supabase Integration: 95/100** ⭐⭐⭐⭐⭐
+**CV Builder Supabase Integration: 95/100** ⭐⭐⭐⭐⭐
 
 - ✅ **Security**: Enterprise-grade with RLS
 - ✅ **Performance**: Optimized indexes and queries  
@@ -292,7 +292,7 @@ After successful deployment:
 - ✅ **Reliability**: Built on proven PostgreSQL
 - ✅ **Monitoring**: Comprehensive dashboards
 
-**Your OkBuddy application is production-ready!** 🚀
+**Your CV Builder application is production-ready!** 🚀
 
 ---
 

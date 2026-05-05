@@ -1,4 +1,4 @@
-# OkBuddy Landing Page – Development Task List
+# CV Builder Landing Page – Development Task List
 
 ## Completed ✅
 
@@ -65,7 +65,7 @@
 - [ ] Add an analytics dashboard for variant performance
 - [ ] Implement tracking
 
-- [ ] Update /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Projects/landing-page/config/texts/vi/landingPage.ts
+- [ ] Update /Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Projects/landing-page/config/texts/vi/landingPage.ts
   - Re-wording ATS following https://thetechresume.com/samples/ats-myths-busted#ats-myths-busted
     - Tailoring your resume for the position is solid advice, though. This is the reason why you'd see results following ATS optimization techniques. If you tailor your resume for the job, you should see better results. The ATS itself won't decide whether to move forward with your resume: the recruiter or hiring manager scanning your resume will. They will look to determine how relevant your experience is: and they'll do this in a few seconds. As the number of applications for roles is almost always high, tailoring your resume for the position and grabbing attention with the first scan, do make a difference.
 
@@ -90,8 +90,8 @@
 - Store in Supabase or print to console for MVP validation
 
 ## [x] Implement the Landing Page
-- Vietnamese version (default): '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Materials/Designs/Landing Page/May 23/VI.txt'
-- English version: '/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Materials/Designs/Landing Page/May 23/EN.txt'
+- Vietnamese version (default): '/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Materials/Designs/Landing Page/May 23/VI.txt'
+- English version: '/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Materials/Designs/Landing Page/May 23/EN.txt'
 - These are the sections for both versions:
   -`HeroSection` with headline, subtext, CTA
   -`ProblemATS` section

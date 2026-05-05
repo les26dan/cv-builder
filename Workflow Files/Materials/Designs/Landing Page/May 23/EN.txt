@@ -1,4 +1,4 @@
-/* OkBuddy Website EN */
+/* CV Builder Website EN */
 
 /* Auto layout */
 display: flex;
@@ -4784,7 +4784,7 @@ order: 1;
 flex-grow: 0;
 
 
-/* "OkBuddy helped me land interviews at 3 top tech companies by optimizing my resume for ATS systems. The cover letter generator saved me hours of work!" */
+/* "CV Builder helped me land interviews at 3 top tech companies by optimizing my resume for ATS systems. The cover letter generator saved me hours of work!" */
 
 width: 272px;
 height: 96px;
@@ -4931,7 +4931,7 @@ order: 1;
 flex-grow: 0;
 
 
-/* "I was missing critical keywords in my resume that were causing automatic rejections. OkBuddy identified them and helped me tailor my applications perfectly." */
+/* "I was missing critical keywords in my resume that were causing automatic rejections. CV Builder identified them and helped me tailor my applications perfectly." */
 
 width: 272px;
 height: 96px;
@@ -5078,7 +5078,7 @@ order: 1;
 flex-grow: 0;
 
 
-/* "As a new graduate, I was struggling to get interviews. OkBuddy helped me apply to 30+ positions with customized resumes in just one day. I got 5 callbacks!" */
+/* "As a new graduate, I was struggling to get interviews. CV Builder helped me apply to 30+ positions with customized resumes in just one day. I got 5 callbacks!" */
 
 width: 272px;
 height: 96px;

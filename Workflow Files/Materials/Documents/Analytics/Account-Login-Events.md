@@ -1,7 +1,7 @@
 # Account Login - Event Tracking Specification
 
 ## Overview
-Event tracking for OkBuddy's account login page to measure user authentication success, login funnel performance, and optimize returning user experience.
+Event tracking for CV Builder's account login page to measure user authentication success, login funnel performance, and optimize returning user experience.
 
 ## Page Load Events
 

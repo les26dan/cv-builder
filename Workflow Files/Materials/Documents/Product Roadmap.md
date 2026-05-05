@@ -1,4 +1,4 @@
-# OkBuddy Product Roadmap
+# CV Builder Product Roadmap
 
 ## Solution Ideation & Craft
 
@@ -37,7 +37,7 @@ MVP 1.01
 | I want to effortlessly generate tailored cover letters instantly because crafting unique cover letters repeatedly is exhausting and demotivating. | \[A/B\] Write tailored cover letters in one-click | High: This directly addresses a critical, frequent pain point causing fatigue and frustration for job seekers. |  | P0 |
 | I want to easily join a waitlist or provide my email for updates because I’m actively looking for effective solutions to support my job application process. | Waitlist & Emails collecting | High |  | P0 |
 | I want a clear, objective rating of my CV quality so I don't feel uncertain about whether my resume is competitive enough against other applicants. | \[A/B\] CV Rating | Medium: This reduces anxiety around competitiveness but does not directly guarantee interview outcomes. |  | P1 |
-| I want to see clearly how OkBuddy improves my CV compared to generic AI tools, so I feel confident paying for the service. | \[A/B\] Showcase explicit “Before (Generic AI)”  vs.  “After (OkBuddy)”  examples to clearly illustrate the quality difference. |  Medium: Crucial for building trust, clearly demonstrates value and strongly impacts purchasing decisions. |  | P1 |
+| I want to see clearly how CV Builder improves my CV compared to generic AI tools, so I feel confident paying for the service. | \[A/B\] Showcase explicit “Before (Generic AI)”  vs.  “After (CV Builder)”  examples to clearly illustrate the quality difference. |  Medium: Crucial for building trust, clearly demonstrates value and strongly impacts purchasing decisions. |  | P1 |
 |  | Testimonials | Low |  | P2 |
 
 #### Landing Page

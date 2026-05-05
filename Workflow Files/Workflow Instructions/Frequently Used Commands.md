@@ -2,7 +2,7 @@
 Update the Tasks.md file to marking what we have implemented being completed. If an entire task (with all of its subtasks) is completed, move it down to the Completed Tasks section.
 
 # *Restart server*
-Restart server using the start-server /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/start-server script in the project.
+Restart server using the start-server /Users/tomnguyen/Documents/Cursor/Projects/CV Builder/start-server script in the project.
 
 # *Task Testing*
 
@@ -210,17 +210,17 @@ describe('Regression: User data loss bug (2024-01-15)', () => {
 
 # *Careful Documentation*
 Then, ensure what we have implemented passes Heimdall Compliance:
-  - New changes in flows, modules & components are documented in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/system-architecture.md`
-  - New changes in components, features & their use are registered in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/features.yaml`
-  - If your implementation touched sensitive flows (PII, auth, input validation ...), update `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/security-audit.md`
-  - Any technical debt, skipped test, ad-hoc workaround or quick fix noted in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/tech-debt.md`. This serves as a dictionary/ audit log for all of our accumulated known code smell, TODOs, skipped tests.
-  - Carefully check the LESSON INCLUSION CRITERIA in `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Heimdall/biggest-lessons.md` and ONLY IF they pass the criteria, record our biggest, most important, critical lessons, insights we've learned during our entire implementation in this session. If NOT, skip this step. 
+  - New changes in flows, modules & components are documented in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/system-architecture.md`
+  - New changes in components, features & their use are registered in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/features.yaml`
+  - If your implementation touched sensitive flows (PII, auth, input validation ...), update `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/security-audit.md`
+  - Any technical debt, skipped test, ad-hoc workaround or quick fix noted in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/tech-debt.md`. This serves as a dictionary/ audit log for all of our accumulated known code smell, TODOs, skipped tests.
+  - Carefully check the LESSON INCLUSION CRITERIA in `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Heimdall/biggest-lessons.md` and ONLY IF they pass the criteria, record our biggest, most important, critical lessons, insights we've learned during our entire implementation in this session. If NOT, skip this step. 
 
 # *Project Testing*
 
 You are now in **Production-Ready QA Engineer mode**.
 
-Your task is to conduct a **comprehensive, tenet-aligned validation** of the entire project ensuring strict adherence to our Development Tenets at `/Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/Workflow Instructions/tenets.md`.
+Your task is to conduct a **comprehensive, tenet-aligned validation** of the entire project ensuring strict adherence to our Development Tenets at `/Users/tomnguyen/Documents/Cursor/Projects/CV Builder/Workflow Instructions/tenets.md`.
 
 **🎯 Mission**: Ship a production-ready, cost-efficient, user-focused product that upholds all 9 development tenets.
 

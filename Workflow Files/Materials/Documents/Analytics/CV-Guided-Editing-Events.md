@@ -1,7 +1,7 @@
 # CV Guided Editing - Event Tracking Specification
 
 ## Overview
-Event tracking for OkBuddy's CV guided editing interface to measure user engagement with AI suggestions, content creation patterns, and optimize the CV improvement workflow.
+Event tracking for CV Builder's CV guided editing interface to measure user engagement with AI suggestions, content creation patterns, and optimize the CV improvement workflow.
 
 ## Page Load Events
 

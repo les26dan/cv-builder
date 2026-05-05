@@ -422,7 +422,7 @@ align-self: stretch;
 flex-grow: 0;
 
 
-/* Tạo tài khoản OkBuddy của bạn */
+/* Tạo tài khoản CV Builder của bạn */
 
 width: 336px;
 height: 20px;

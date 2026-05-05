@@ -1,4 +1,4 @@
-# OkBuddy Landing Page - Progress Report
+# CV Builder Landing Page - Progress Report
 
 ## ✅ COMPLETED - Vietnamese Landing Page Implementation
 

@@ -74,7 +74,7 @@ const shouldShowHeader = sectionId === 'experience' ? currentPage === 1 : true;
 **Business Impact:**
 - ✅ **Professional Quality**: CVs now have clean, single headers per section
 - ✅ **User Satisfaction**: Eliminates confusing duplicate headers
-- ✅ **Brand Standards**: Maintains OkBuddy's professional output quality
+- ✅ **Brand Standards**: Maintains CV Builder's professional output quality
 
 **Technical Quality:**
 - ✅ **Low Risk**: Isolated change with no side effects

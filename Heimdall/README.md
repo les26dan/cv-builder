@@ -1,13 +1,13 @@
-# OkBuddy Heimdall - System Gatekeeper
+# CV Builder Heimdall - System Gatekeeper
 
-**Purpose**: Comprehensive system monitoring and documentation for OkBuddy unified application  
+**Purpose**: Comprehensive system monitoring and documentation for CV Builder unified application  
 **Status**: Active - Monitoring production deployment
 
 ---
 
 ## 🛡️ **WHAT IS HEIMDALL?**
 
-Heimdall serves as OkBuddy's **system gatekeeper** - a comprehensive monitoring and documentation framework that maintains a live understanding of our full system structure, security posture, and technical debt. Named after the Norse guardian of the bifrost, Heimdall watches over all aspects of the OkBuddy ecosystem.
+Heimdall serves as CV Builder's **system gatekeeper** - a comprehensive monitoring and documentation framework that maintains a live understanding of our full system structure, security posture, and technical debt. Named after the Norse guardian of the bifrost, Heimdall watches over all aspects of the CV Builder ecosystem.
 
 ## 📁 **HEIMDALL STRUCTURE**
 
@@ -25,7 +25,7 @@ Heimdall serves as OkBuddy's **system gatekeeper** - a comprehensive monitoring 
 ## 📋 **DOCUMENT PURPOSES**
 
 ### **🏗️ system-architecture.md**
-- **Purpose**: Authoritative reference for OkBuddy's unified system architecture
+- **Purpose**: Authoritative reference for CV Builder's unified system architecture
 - **Contains**: File structure, deployment architecture, data flow, technical stack
 - **Updated**: When significant architectural changes are made
 - **Audience**: Developers, DevOps, system architects
@@ -214,4 +214,4 @@ Update `tech-debt.md` when:
 
 ---
 
-*Heimdall serves as the single source of truth for OkBuddy's system state. Keep it updated, accurate, and comprehensive to ensure effective system management and team coordination.* 
+*Heimdall serves as the single source of truth for CV Builder's system state. Keep it updated, accurate, and comprehensive to ensure effective system management and team coordination.* 

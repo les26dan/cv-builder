@@ -1,7 +1,7 @@
 # Landing Page - Event Tracking Specification
 
 ## Overview
-Event tracking for OkBuddy's marketing landing page to measure user engagement, conversion funnel performance, and optimize user acquisition.
+Event tracking for CV Builder's marketing landing page to measure user engagement, conversion funnel performance, and optimize user acquisition.
 
 ## Page Load Events
 

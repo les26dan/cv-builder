@@ -1,4 +1,4 @@
-# OkBuddy Security Audit
+# CV Builder Security Audit
 
 ## Security Status: ✅ ENHANCED - OAUTH SECURITY IMPLEMENTATION COMPLETE
 
@@ -46,7 +46,7 @@
 - **Access Control**: Test user limited to standard user permissions, cannot access admin functions
 
 **Test User Security Features:**
-- **Secure Credentials**: Email `okbuddy.test.user@gmail.com` with strong password `OkBuddy2025!`
+- **Secure Credentials**: Email `okbuddy.test.user@gmail.com` with strong password `CV Builder2025!`
 - **Production Isolation**: Test user in production database with controlled access and audit logging
 - **OAuth Compatibility**: Designed for Google OAuth testing without security vulnerabilities
 - **Privilege Verification**: Confirmed non-admin status preventing unauthorized system access

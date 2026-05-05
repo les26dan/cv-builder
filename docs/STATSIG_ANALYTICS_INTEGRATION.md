@@ -1,8 +1,8 @@
-# Statsig Analytics Integration for OkBuddy
+# Statsig Analytics Integration for CV Builder
 
 ## Overview
 
-This document outlines the implementation of Statsig event tracking for the OkBuddy application, following the comprehensive event tracking specifications previously defined for Mixpanel but optimized for Statsig's architecture.
+This document outlines the implementation of Statsig event tracking for the CV Builder application, following the comprehensive event tracking specifications previously defined for Mixpanel but optimized for Statsig's architecture.
 
 ## 🚀 Key Features
 
@@ -285,4 +285,4 @@ console.log(debugInfo);
 
 ---
 
-*This integration follows OkBuddy's development tenets: maximizing learning through data collection, enabling rapid experimentation, and maintaining modular, replaceable architecture.*
+*This integration follows CV Builder's development tenets: maximizing learning through data collection, enabling rapid experimentation, and maintaining modular, replaceable architecture.*

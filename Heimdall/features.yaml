@@ -1,4 +1,4 @@
-# OkBuddy Unified Application - Features Registry
+# CV Builder Unified Application - Features Registry
 
 # Status: Production Ready - CV Template System + Guest Sessions + Authentication-Free Onboarding + UX Optimization
 # Build: ✅ 30 pages, 19 API routes successfully building
@@ -59,7 +59,7 @@ core_implementation:
   - **System Analysis**: Comprehensive Heimdall analysis and user flow documentation ✅ NEW
 
 features:
-  - **Test Credentials**: Email `okbuddy.test.user@gmail.com` with secure password `OkBuddy2025!` ✅ NEW
+  - **Test Credentials**: Email `okbuddy.test.user@gmail.com` with secure password `CV Builder2025!` ✅ NEW
   - **Database Integration**: Production Supabase user creation with ID `94cf34cf-9788-435c-b411-88b3dc6958f7` ✅ NEW
   - **Authentication Flow**: Login API testing with 308 redirect verification ✅ NEW
   - **Security Testing**: Non-admin access validation and privilege verification ✅ NEW
@@ -534,7 +534,7 @@ core_implementation:
     auto_save_integration: Real-time status display on CV Workspace and CV Guided Editing
     back_navigation: Consistent back button with smart destination routing
     brand_consistency: Maintained #0277BD color scheme across all variants
-  - **Centralized Color Palette**: OkBuddy brand colors with systematic naming ✅ UPDATED (Jan 31, 2025)
+  - **Centralized Color Palette**: CV Builder brand colors with systematic naming ✅ UPDATED (Jan 31, 2025)
     primary: '#0277BD' (brand blue - UPDATED FROM #0288D1)
     primary-50: '#E0F7FA' (light backgrounds)
     primary-100: '#B2EBF2' (accents)
@@ -625,11 +625,11 @@ removed_components:
   - **SEO Ready**: Meta tags and structured content
   - **Analytics Ready**: GA4 integration points prepared
   - **Accessibility Compliant**: ARIA labels, keyboard navigation, focus states ✅ NEW
-  - **Brand Consistency**: OkBuddy blue logo with hover effects ✅ NEW
+  - **Brand Consistency**: CV Builder blue logo with hover effects ✅ NEW
 
 technical_implementation:
   - Next.js 15 App Router with TypeScript
-  - Tailwind CSS with OkBuddy design system
+  - Tailwind CSS with CV Builder design system
   - React functional components with hooks
   - Centralized Vietnamese text configuration
   - Static site generation for performance
@@ -668,7 +668,7 @@ technical_implementation:
   - Dynamic language detection and text loading
   - Professional modal design with Tailwind CSS
   - Error boundary handling for text loading failures
-  - Consistent with OkBuddy design system (primary colors, fonts)
+  - Consistent with CV Builder design system (primary colors, fonts)
 
 text_configuration:
   - **Vietnamese**: Complete feedback form text in /config/texts/vi/feedback.ts
@@ -692,7 +692,7 @@ components:
   - RegisterPageContent (registration flow with verification)
 
 features:
-  - **Professional Authentication UI**: Enhanced header with OkBuddy branding ✅ NEW
+  - **Professional Authentication UI**: Enhanced header with CV Builder branding ✅ NEW
   - **Consistent Color Scheme**: Primary color system applied throughout ✅ NEW  
   - **Responsive Authentication**: Mobile-optimized login/register forms
   - **OAuth Integration**: Google and LinkedIn social authentication
@@ -706,7 +706,7 @@ ui_enhancement_details:
   - **Original Component**: Based on legacy `/Projects/Account Creation & Login/src/components/Header.tsx`
   - **Enhanced Component**: `/components/auth/Header.tsx` (auth-specific)
   - **Color System Integration**: Uses centralized primary color variables ✅ NEW
-  - **Logo Enhancement**: OkBuddy blue branding with hover effects ✅ NEW
+  - **Logo Enhancement**: CV Builder blue branding with hover effects ✅ NEW
   - **Button Styling**: Professional primary/secondary button system ✅ NEW
   - **Background Theme**: Proper light blue background (`bg-background`) ✅ NEW
   - **Mobile Responsiveness**: Better breakpoints and touch targets ✅ NEW
@@ -723,14 +723,14 @@ components:
 
 legacy_ui_restoration_achievements:
   - **Complete Layout Architecture Restoration**: 60-40 split layout matching legacy design ✅ RESTORED
-    - Left Panel: 60% width (w-3/5) with OkBuddy light blue background (#E0F7FA) ✅ EXACT MATCH
+    - Left Panel: 60% width (w-3/5) with CV Builder light blue background (#E0F7FA) ✅ EXACT MATCH
     - Right Panel: 40% width (w-2/5) with clean white background ✅ EXACT MATCH
     - Proper overflow handling: scrollable editor, fixed preview ✅ PROFESSIONAL
     - Full-height layout with fixed header system ✅ LEGACY COMPATIBLE
 
   - **Professional Header Design Restoration**: Legacy HeaderCVEditor styling ✅ COMPLETED
     - Back to workspace navigation with proper icon and hover effects ✅ LEGACY STYLE
-    - OkBuddy logo with professional tooltip system ✅ BRAND CONSISTENT
+    - CV Builder logo with professional tooltip system ✅ BRAND CONSISTENT
     - Auto-save status indicator with green success styling ✅ USER FEEDBACK
     - User avatar with primary color scheme ✅ PROFESSIONAL APPEARANCE
     - Fixed header positioning with proper z-index ✅ LAYOUT STABILITY
@@ -743,7 +743,7 @@ legacy_ui_restoration_achievements:
     - Focus ring accessibility improvements ✅ ACCESSIBLE
     - Professional tooltip styling for enhanced UX ✅ POLISHED
 
-  - **OkBuddy Brand Color Implementation**: Exact legacy color scheme ✅ BRAND ACCURATE
+  - **CV Builder Brand Color Implementation**: Exact legacy color scheme ✅ BRAND ACCURATE
     - Primary blue (#0288D1) for logos and interactive elements ✅ CONSISTENT
     - Light blue background (#E0F7FA) for editor panel ✅ BRAND IDENTITY
     - Success green for auto-save indicators ✅ USER FEEDBACK
@@ -752,7 +752,7 @@ legacy_ui_restoration_achievements:
 cv_editor_header_features:
   - **Specialized Design**: Purpose-built for CV editing workflow ✅ LEGACY RESTORED
   - **Professional Navigation**: Back button with proper routing and auto-save ✅ ENHANCED
-  - **Brand Logo Integration**: OkBuddy logo with hover tooltip and navigation ✅ PROFESSIONAL
+  - **Brand Logo Integration**: CV Builder logo with hover tooltip and navigation ✅ PROFESSIONAL
   - **Auto-save Visual Feedback**: Real-time save status with green success indicator ✅ USER FOCUSED
   - **User Avatar Display**: Professional user identification with primary colors ✅ CONSISTENT
 
@@ -787,7 +787,7 @@ layout_architecture_verification:
 user_experience_achievements:
   - **Professional First Impression**: Marketing-quality UI matching legacy standards ✅ IMPRESSIVE
   - **Seamless Navigation**: Smooth transitions between workspace and editing ✅ INTUITIVE
-  - **Brand Consistency**: Cohesive OkBuddy visual identity throughout ✅ UNIFIED
+  - **Brand Consistency**: Cohesive CV Builder visual identity throughout ✅ UNIFIED
   - **Interactive Feedback**: Real-time auto-save and user action feedback ✅ RESPONSIVE
   - **Error Resilience**: Graceful handling of all edge cases and failures ✅ RELIABLE
 
@@ -824,7 +824,7 @@ location: /app/cv-upload/page.tsx
 status: production_ready_with_legacy_ui_restoration
 
 components:
-  - **Professional Header** (OkBuddy branding with exit and progress tracking - ✅ RESTORED)
+  - **Professional Header** (CV Builder branding with exit and progress tracking - ✅ RESTORED)
   - **Upload Interface** (drag & drop with enhanced UX - ✅ ENHANCED)
   - **Job Description Input** (text and URL options - ✅ FUNCTIONAL)
   - **Trust & Security Section** (privacy assurance messaging - ✅ NEW)
@@ -919,7 +919,7 @@ cv_workspace_features:
   - **Unified Header System**: Replaced HeaderMinimal with SharedHeader for consistency ✅ NEW (Jan 31, 2025)
   - **Dynamic Text Loading**: Workspace text loaded based on user language preference ✅ NEW (Jan 31, 2025)
   - **Mock Data Display**: 3 example CVs (Marketing Manager, Software Engineer, Project Manager) ✅ WORKING
-  - **Professional UI**: Legacy-style professional layout with OkBuddy branding ✅ RESTORED
+  - **Professional UI**: Legacy-style professional layout with CV Builder branding ✅ RESTORED
   - **User Drawer Integration**: Clickable avatar opens user management drawer ✅ NEW
   - **Language Toggle**: EN/VI switching with localStorage persistence ✅ NEW
   - **Secure Sign Out**: Logout functionality with confirmation dialog ✅ NEW
@@ -949,7 +949,7 @@ status: production_ready_with_separation
 
 header_components:
   - **Header.tsx**: Landing page marketing header (✅ RESTORED)
-    - Professional branding with OkBuddy logo
+    - Professional branding with CV Builder logo
     - Login/Register navigation buttons
     - Hover effects and transitions
     - Responsive design patterns
@@ -995,7 +995,7 @@ status: consistent_with_legacy
 
 design_principles:
   - **Professional Appearance**: Marketing-quality visual design
-  - **Brand Consistency**: OkBuddy visual identity maintained
+  - **Brand Consistency**: CV Builder visual identity maintained
   - **Responsive Design**: Mobile-first approach with proper breakpoints
   - **Accessibility**: WCAG 2.1 AA compliance standards
   - **Performance**: Optimized CSS and component structure
@@ -1054,7 +1054,7 @@ completed_ui_restorations:
     - Left-aligned title section with proper hierarchy
     - Right-aligned create button matching legacy positioning
     - List-style CV layout (not grid) matching original design
-    - OkBuddy light blue background (#E0F7FA) - exact legacy color
+    - CV Builder light blue background (#E0F7FA) - exact legacy color
     - Legacy button styling with cyan colors and hover states
     - Inter font consistency applied throughout
     - Professional empty state with centered content
@@ -1067,7 +1067,7 @@ completed_ui_restorations:
 
 completed_ui_restorations:
   - ✅ **CV Upload**: Professional upload interface with legacy UI restoration (January 27, 2025)
-    - Professional header with OkBuddy branding, exit button, and 4-step progress tracking
+    - Professional header with CV Builder branding, exit button, and 4-step progress tracking
     - Legacy design specifications compliance with light blue background (#E0F7FA)
     - Enhanced upload interface with drag & drop functionality
     - Job description input with text area and URL options
@@ -1097,7 +1097,7 @@ user_experience_improvements:
   - **Seamless Navigation**: Smooth transitions between pages
   - **Responsive Design**: Excellent mobile and desktop experience
   - **Accessibility**: Screen reader and keyboard navigation support
-  - **Brand Consistency**: Cohesive OkBuddy visual identity
+  - **Brand Consistency**: Cohesive CV Builder visual identity
 
 business_impact:
   - **First Impression**: Professional landing page for user acquisition
@@ -1128,7 +1128,7 @@ user_management_features:
   - **Performance**: Optimized rendering with proper state management ✅ EFFICIENT
 
 design_system_integration:
-  - **OkBuddy Colors**: Uses centralized primary color scheme (#0288D1) ✅ BRAND_CONSISTENT
+  - **CV Builder Colors**: Uses centralized primary color scheme (#0288D1) ✅ BRAND_CONSISTENT
   - **Typography**: Inter font family with proper weight hierarchy ✅ CONSISTENT
   - **Animations**: slideInRight animation with 0.3s ease-out timing ✅ SMOOTH
   - **Interactive States**: Hover effects, focus rings, disabled states ✅ POLISHED
@@ -1265,7 +1265,7 @@ oauth_production_features:
 current_oauth_status:
   - ✅ **Architecture**: 100% production-ready implementation
   - ✅ **Security**: Enterprise-grade OAuth security layer
-  - ✅ **Integration**: Full integration with OkBuddy authentication system
+  - ✅ **Integration**: Full integration with CV Builder authentication system
   - ❌ **Credentials**: Need real Google + LinkedIn OAuth app credentials
   - ❌ **Testing**: Need production testing with real OAuth providers
 
@@ -1368,7 +1368,7 @@ text_content:
   rule: "Never hardcode Vietnamese text in components"
 
 color_system:
-  tailwind_config: "Centralized OkBuddy brand colors"
+  tailwind_config: "Centralized CV Builder brand colors"
   usage: "bg-[#E0F7FA] text-[#0288D1] from defined palette"
 
 responsive_design:
@@ -1449,7 +1449,7 @@ vercel_blob_features:
     - CDN edge delivery
     - Pay-per-use pricing model
 
-*This features registry serves as the authoritative source for OkBuddy's current capabilities. Updated February 16, 2025 with production Vercel Blob credentials and environment validation.* 
+*This features registry serves as the authoritative source for CV Builder's current capabilities. Updated February 16, 2025 with production Vercel Blob credentials and environment validation.* 
 
 ## 🚀 **PRODUCTION READINESS VALIDATION** ✅ COMPREHENSIVE QA COMPLETE (January 27, 2025)
 validation_date: January 27, 2025
@@ -1856,7 +1856,7 @@ business_impact:
   user_experience:
     - **Professional Output**: CVs no longer have redundant headers ✅ FIXED
     - **Visual Consistency**: Clean pagination across all CV templates ✅ IMPROVED
-    - **Brand Quality**: Maintains OkBuddy's professional standards ✅ ENHANCED
+    - **Brand Quality**: Maintains CV Builder's professional standards ✅ ENHANCED
   
   technical_quality:
     - **Minimal Risk**: Surgical 4-line fix, no logic rewrites ✅ SAFE
