@@ -1,6 +1,6 @@
 /**
  * Vietnamese Job Description Analysis AI Prompts
- * Following OkBuddy development tenets - centralized text management
+ * Following CV Builder development tenets - centralized text management
  * Updated for Feature 4: New Unified JD Analysis & Keywords Suggestions
  * Culturally appropriate for Vietnamese professional market
  */

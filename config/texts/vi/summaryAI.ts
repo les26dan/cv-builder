@@ -1,6 +1,6 @@
 /**
  * Vietnamese Summary Section AI Prompts
- * Following OkBuddy development tenets - centralized text management
+ * Following CV Builder development tenets - centralized text management
  * Culturally appropriate for Vietnamese professional market
  * Updated with Feature 5 specifications from LLM Prompts Spec
  */

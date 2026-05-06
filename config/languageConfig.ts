@@ -1,7 +1,7 @@
 /**
  * Language Configuration System
- * Comprehensive language management for OkBuddy CV Guided Editing
- * Following OkBuddy development tenets: centralized, scalable, configurable
+ * Comprehensive language management for CV Builder CV Guided Editing
+ * Following CV Builder development tenets: centralized, scalable, configurable
  */
 
 export type SupportedLanguage = 'vi' | 'en';

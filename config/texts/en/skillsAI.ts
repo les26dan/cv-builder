@@ -1,6 +1,6 @@
 /**
  * English Skills Section AI Prompts
- * Following OkBuddy development tenets - centralized text management
+ * Following CV Builder development tenets - centralized text management
  * Optimized for international professional markets
  */
 

@@ -1,7 +1,7 @@
 /**
  * Dynamic Text Loading System
  * Loads text based on language configuration with Vietnamese as default
- * Following OkBuddy development tenets: centralized, configurable, scalable
+ * Following CV Builder development tenets: centralized, configurable, scalable
  */
 
 import { detectLanguage, type SupportedLanguage } from '../languageConfig';

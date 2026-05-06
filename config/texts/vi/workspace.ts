@@ -1,6 +1,6 @@
 export const workspace = {
   header: {
-    logo: 'OkBuddy',
+    logo: 'CV Builder',
     autosave: {
       saving: 'Đang lưu...',
       saved: 'Đã lưu tự động',

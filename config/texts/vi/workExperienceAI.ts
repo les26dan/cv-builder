@@ -1,6 +1,6 @@
 /**
  * Vietnamese Work Experience Section AI Prompts
- * Following OkBuddy development tenets - centralized text management
+ * Following CV Builder development tenets - centralized text management
  * Culturally appropriate for Vietnamese professional market
  */
 

@@ -1,6 +1,6 @@
 /**
  * English Summary Section AI Prompts
- * Following OkBuddy development tenets - centralized text management
+ * Following CV Builder development tenets - centralized text management
  * Optimized for international professional markets
  * Updated with Feature 5 specifications from LLM Prompts Spec
  */

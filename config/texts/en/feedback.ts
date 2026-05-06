@@ -1,17 +1,17 @@
 /**
  * English Feedback Text Configuration
- * Following OkBuddy Tenet 9: Centralized text management
+ * Following CV Builder Tenet 9: Centralized text management
  */
 
 export const feedback = {
   title: 'Feedback',
   buttonLabel: 'Feedback',
-  description: 'Share your thoughts, suggestions, or report bugs to help us make OkBuddy better.',
+  description: 'Share your thoughts, suggestions, or report bugs to help us make CV Builder better.',
   
   form: {
     feedbackLabel: 'Feedback content',
     feedbackRequired: '*',
-    feedbackPlaceholder: 'Share your thoughts about OkBuddy...',
+    feedbackPlaceholder: 'Share your thoughts about CV Builder...',
     
     emailLabel: 'Email',
     emailOptional: '(optional)',

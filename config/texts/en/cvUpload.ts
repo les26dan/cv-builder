@@ -1,7 +1,7 @@
 export const cvUpload = {
   header: {
     title: "Create your winning resume in 3 minutes",
-    subtitle: "Boost your chances of landing interviews with OkBuddy AI",
+    subtitle: "Boost your chances of landing interviews with CV Builder AI",
     exitButton: "Exit",
     autoSaveStatus: "Auto-saved",
     userAvatar: "U",
@@ -47,7 +47,7 @@ export const cvUpload = {
     analyzing: "Analyzing resume…",
     comparing: "Comparing with JD…", 
     applying: "Applying suggested changes…",
-    loadingMessage: "Your resume is being analyzed by OkBuddy's most advanced AI",
+    loadingMessage: "Your resume is being analyzed by CV Builder's most advanced AI",
     processingMessage: "We are comparing your resume with the job description and optimizing every detail"
   },
   template: {

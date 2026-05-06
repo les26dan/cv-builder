@@ -1,17 +1,17 @@
 /**
  * Vietnamese Feedback Text Configuration
- * Following OkBuddy Tenet 9: Centralized text management
+ * Following CV Builder Tenet 9: Centralized text management
  */
 
 export const feedback = {
   title: 'Feedback',
   buttonLabel: 'Góp ý',
-  description: 'Hãy chia sẻ với chúng tôi ý kiến, góp ý hoặc báo cáo lỗi để giúp OkBuddy ngày càng tốt hơn.',
+  description: 'Hãy chia sẻ với chúng tôi ý kiến, góp ý hoặc báo cáo lỗi để giúp CV Builder ngày càng tốt hơn.',
   
   form: {
     feedbackLabel: 'Nội dung feedback',
     feedbackRequired: '*',
-    feedbackPlaceholder: 'Chia sẻ ý kiến của bạn về OkBuddy...',
+    feedbackPlaceholder: 'Chia sẻ ý kiến của bạn về CV Builder...',
     
     emailLabel: 'Email',
     emailOptional: '(tùy chọn)',

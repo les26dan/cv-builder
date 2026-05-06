@@ -1,7 +1,7 @@
 export const cvUpload = {
   header: {
     title: 'Tối ưu CV trong 5 phút',
-    subtitle: 'OKBuddy sẽ phân tích và giúp bạn cải thiện CV, tăng cơ hội phỏng vấn',
+    subtitle: 'CV Builder sẽ phân tích và giúp bạn cải thiện CV, tăng cơ hội phỏng vấn',
     autoSaveStatus: 'Đã lưu tự động',
     userAvatar: 'N'
   },
