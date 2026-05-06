@@ -1,6 +1,6 @@
 /**
  * English AI Prompt Templates
- * Centralized prompt management following OkBuddy development tenets
+ * Centralized prompt management following CV Builder development tenets
  * Following tenet 9: Strings, Copy & Multilingual Text Must Be Centralized
  */
 

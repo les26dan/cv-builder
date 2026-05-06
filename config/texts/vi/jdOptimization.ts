@@ -1,6 +1,6 @@
 /**
  * Vietnamese JD Optimization Text Configuration
- * Following OkBuddy development tenets - centralized text management
+ * Following CV Builder development tenets - centralized text management
  * Optimized for Vietnamese professional markets and culture
  */
 

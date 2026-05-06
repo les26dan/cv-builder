@@ -36,7 +36,7 @@ export const cvEditor = {
     },
     jobAnalysis: {
       title: 'Phân tích JD',
-      subtitle: 'OkBuddy giúp bạn phân tích mô tả công việc và đưa ra gợi ý tối ưu CV của bạn',
+      subtitle: 'CV Builder giúp bạn phân tích mô tả công việc và đưa ra gợi ý tối ưu CV của bạn',
       placeholder: 'Dán mô tả công việc vào đây để nhận đề xuất tối ưu hóa...',
       analyzeButton: 'Phân tích',
       analyzing: 'Đang phân tích...',
@@ -97,7 +97,7 @@ export const cvEditor = {
     experience: {
       title: 'Kinh nghiệm làm việc',
       addExperience: 'Thêm kinh nghiệm làm việc',
-      guidance: 'Chỉ cần nhập chức danh và tên công ty - OkBuddy AI giúp bạn tạo mô tả kinh nghiệm làm việc ngay lập tức.',
+      guidance: 'Chỉ cần nhập chức danh và tên công ty - AI giúp bạn tạo mô tả kinh nghiệm làm việc ngay lập tức.',
       aiGuidance: 'Điền chức danh và tên công ty để AI có thể hỗ trợ tạo mô tả công việc hoàn hảo cho bạn.',
       fields: {
         title: 'Chức danh',

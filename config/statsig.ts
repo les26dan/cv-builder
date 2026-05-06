@@ -1,8 +1,8 @@
 /**
- * Statsig Analytics Configuration for OkBuddy
+ * Statsig Analytics Configuration for CV Builder
  * Event tracking and experimentation infrastructure
  * 
- * Following OkBuddy Tenets:
+ * Following CV Builder Tenets:
  * - Tenet 2: Rapid Experimentation & Configurability
  * - Tenet 3: Maximize Learning Through Data Collection
  */

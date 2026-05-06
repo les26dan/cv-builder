@@ -1,5 +1,5 @@
 /**
- * OkBuddy Account Creation & Login - Monitoring Configuration
+ * CV Builder Account Creation & Login - Monitoring Configuration
  * Production monitoring and analytics setup for OAuth integration
  */
 

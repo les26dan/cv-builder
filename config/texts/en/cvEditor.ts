@@ -36,7 +36,7 @@ export const cvEditor = {
     },
     jobAnalysis: {
       title: 'Job Description Analysis',
-      subtitle: 'OkBuddy helps you analyze job descriptions and provides optimization suggestions for your CV',
+      subtitle: 'CV Builder helps you analyze job descriptions and provides optimization suggestions for your CV',
       placeholder: 'Paste the job description here to receive CV optimization suggestions...',
       analyzeButton: 'Analyze',
       analyzing: 'Analyzing...',
@@ -97,7 +97,7 @@ export const cvEditor = {
     experience: {
       title: 'Work Experience',
       addExperience: 'Add Work Experience',
-      guidance: 'Just enter job title and company name - OkBuddy AI will help you create a work experience description instantly.',
+      guidance: 'Just enter job title and company name - AI will help you create a work experience description instantly.',
       aiGuidance: 'Fill in job title and company name so AI can help create the perfect job description for you.',
       fields: {
         title: 'Job Title',
