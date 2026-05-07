@@ -12,7 +12,7 @@ describe('WaitlistSection', () => {
     
     // Check for the updated content from the design
     const headingElement = screen.getByText(/Sẵn sàng thay đổi cách bạn tìm việc\?/i);
-    const descriptionElement = screen.getByText(/Tham gia danh sách ưu tiên để là một trong những người đầu tiên trải nghiệm OkBuddy/i);
+    const descriptionElement = screen.getByText(/Tham gia danh sách ưu tiên để là một trong những người đầu tiên trải nghiệm CV Builder/i);
     const inputElement = screen.getByPlaceholderText(/Nhập email của bạn/i);
     const buttonElement = screen.getByRole('button', { name: /Tham gia ngay/i });
 

@@ -10,7 +10,7 @@ describe('ProblemKeywords', () => {
     // Check for the updated content from the design - use exact text match for label
     const labelElement = screen.getByText('BỔ SUNG TỪ KHÓA QUAN TRỌNG');
     const titleElement = screen.getByText(/60% CV bị loại vì thiếu các từ khóa quan trọng mà công việc yêu cầu/i);
-    const descriptionElement = screen.getByText(/Mỗi công việc yêu cầu những từ khóa cụ thể. OkBuddy phân tích nhanh/i);
+    const descriptionElement = screen.getByText(/Mỗi công việc yêu cầu những từ khóa cụ thể. CV Builder phân tích nhanh/i);
 
     expect(labelElement).toBeInTheDocument();
     expect(titleElement).toBeInTheDocument();

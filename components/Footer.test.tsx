@@ -8,7 +8,7 @@ describe('Footer', () => {
     render(<Footer />);
     
     // Check for logo and description
-    expect(screen.getByText('OkBuddy')).toBeInTheDocument();
+    expect(screen.getByText('CV Builder')).toBeInTheDocument();
     expect(screen.getByText(/Trợ lý AI giúp bạn tối ưu hóa CV và tìm việc hiệu quả hơn/i)).toBeInTheDocument();
     
     // Check for section headers
@@ -17,7 +17,7 @@ describe('Footer', () => {
     expect(screen.getByText('Pháp lý')).toBeInTheDocument();
     
     // Check for updated copyright with 2025
-    expect(screen.getByText(/© 2025 OkBuddy. Tất cả quyền được bảo lưu/i)).toBeInTheDocument();
+    expect(screen.getByText(/© 2025 CV Builder. Tất cả quyền được bảo lưu/i)).toBeInTheDocument();
   });
 
   it('renders all footer links', () => {
