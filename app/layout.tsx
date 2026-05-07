@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "OkBuddy - Resumes That Win Jobs",
+  title: "CV Builder - Resumes That Win Jobs",
   description: "Create ATS-optimized resumes and cover letters with AI. Increase your interview chances by 75%.",
 };
 

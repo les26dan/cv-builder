@@ -7,7 +7,7 @@ describe('TestimonialsSection', () => {
     render(<TestimonialsSection />);
     
     // Check if updated title is rendered
-    expect(screen.getByText('Hơn 1000+ người đã tìm được việc mơ ước nhờ OkBuddy')).toBeInTheDocument();
+    expect(screen.getByText('Hơn 1000+ người đã tìm được việc mơ ước nhờ CV Builder')).toBeInTheDocument();
   });
 
   it('renders all testimonial cards', () => {
@@ -28,7 +28,7 @@ describe('TestimonialsSection', () => {
     render(<TestimonialsSection />);
     
     // Check if testimonial content is rendered
-    const testimonialContent = screen.getByText(/OkBuddy giúp tôi có được phỏng vấn tại 3 công ty/);
+    const testimonialContent = screen.getByText(/CV Builder giúp tôi có được phỏng vấn tại 3 công ty/);
     expect(testimonialContent).toBeInTheDocument();
   });
 

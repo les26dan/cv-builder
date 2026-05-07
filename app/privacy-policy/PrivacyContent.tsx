@@ -59,7 +59,7 @@ export default function PrivacyContent() {
             {privacyTexts.title}
           </h1>
           <p className="text-gray-600 text-lg">
-            {privacyTexts.lastUpdated || (currentLanguage === 'vi' ? 'Cập nhật lần cuối: 3/8/2025' : 'Last Updated: August 3, 2025')}
+            {privacyTexts.lastUpdated || (currentLanguage === 'vi' ? 'Cập nhật lần cuối: 3/8/2026' : 'Last Updated: August 3, 2026')}
           </p>
         </header>
 

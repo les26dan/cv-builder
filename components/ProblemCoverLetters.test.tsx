@@ -10,7 +10,7 @@ describe('ProblemCoverLetters', () => {
     // Check for the updated content from the design - use more specific selectors
     const labelElement = screen.getByText('TẠO THƯ XIN VIỆC NỔI BẬT');
     const titleElement = screen.getByText(/Thư xin việc tốt tăng ngay 55% cơ hội phỏng vấn, nhưng bạn đang mất hàng giờ để viết?/i);
-    const descriptionElement = screen.getByText(/OkBuddy phân tích mô tả công việc, văn hoá công ty và lịch sử làm việc/i);
+    const descriptionElement = screen.getByText(/CV Builder phân tích mô tả công việc, văn hoá công ty và lịch sử làm việc/i);
 
     expect(labelElement).toBeInTheDocument();
     expect(titleElement).toBeInTheDocument();
