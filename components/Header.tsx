@@ -94,8 +94,8 @@ export default function Header() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         className="font-inter font-bold text-2xl leading-[29px] text-[#0277BD] hover:text-primary-600 active:text-[#0277BD] transition-colors duration-200 bg-none border-none cursor-pointer px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-        title="OkBuddy - Trang chủ"
-        aria-label="OkBuddy - Trang chủ"
+        title="CV Builder - Trang chủ"
+        aria-label="CV Builder - Trang chủ"
       >
         {header.logo}
       </button>
@@ -115,15 +115,6 @@ export default function Header() {
 
       {/* Navigation & Auth Section */}
       <div className="flex flex-row justify-center items-center gap-4">
-        {/* Feedback Button */}
-        <button
-          onClick={handleFeedbackClick}
-          className="font-inter font-medium text-base leading-[19px] text-[#374151] hover:text-[#0277BD] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-          aria-label="Gửi feedback"
-        >
-          Feedback
-        </button>
-        
         {/* Auth Buttons / User Avatar */}
         <div className="flex flex-row justify-center items-center gap-4">
         {isLoading ? (

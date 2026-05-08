@@ -82,7 +82,7 @@ describe('Header Component', () => {
   });
 
   describe('Basic Rendering', () => {
-    it('renders the OkBuddy logo/title', () => {
+    it('renders the CV Builder logo/title', () => {
       render(<Header {...defaultProps} />);
       
       expect(screen.getByText(/okbuddy/i)).toBeInTheDocument();
@@ -180,12 +180,12 @@ describe('Header Component', () => {
   });
 
   describe('Logo Navigation', () => {
-    it('renders OkBuddy logo as clickable button', () => {
+    it('renders CV Builder logo as clickable button', () => {
       render(<Header {...defaultProps} />);
       
       const logoButton = screen.getByRole('button', { name: /quay lại cv workspace/i });
       expect(logoButton).toBeInTheDocument();
-      expect(logoButton).toHaveTextContent('OkBuddy');
+      expect(logoButton).toHaveTextContent('CV Builder');
     });
 
     it('navigates to workspace when logo is clicked', () => {
