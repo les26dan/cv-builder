@@ -18,7 +18,7 @@ interface MobileBlockingOverlayProps {
  * - Block devices with viewport width < 1024px
  * - Provide clear messaging about desktop requirement
  * - Offer navigation options (back to workspace)
- * - Maintain OkBuddy branding and styling
+ * - Maintain CV Builder branding and styling
  * - Use Vietnamese text from configuration
  */
 export function MobileBlockingOverlay({ 

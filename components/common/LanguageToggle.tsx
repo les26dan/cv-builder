@@ -1,7 +1,7 @@
 /**
  * Language Toggle Component
  * Ready for future implementation of language switching feature
- * Following OkBuddy development tenets: modular, configurable, scalable
+ * Following CV Builder development tenets: modular, configurable, scalable
  */
 
 import React, { useState, useEffect } from 'react';

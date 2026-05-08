@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => ({
 describe('Header Component', () => {
   it('renders the logo', () => {
     render(<Header />);
-    expect(screen.getByText('OkBuddy')).toBeInTheDocument();
+    expect(screen.getByText('CV Builder')).toBeInTheDocument();
   });
 
   it('renders navigation links', () => {

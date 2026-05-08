@@ -3,11 +3,18 @@ import React from 'react';
 interface HeaderCVEditorProps {
   cvScore: number;
   cvData?: any;
+  cvId?: string;
   onUpdateCvData?: (data: any) => void;
   onJobAnalysisComplete?: (analysisResults: any) => void;
 }
 
-export const HeaderCVEditor = ({ cvScore, cvData, onUpdateCvData, onJobAnalysisComplete }: HeaderCVEditorProps) => {
+export const HeaderCVEditor = ({ cvScore, cvData, cvId, onUpdateCvData, onJobAnalysisComplete }: HeaderCVEditorProps) => {
+  const handleMatchJD = () => {
+    if (cvData && onUpdateCvData) onUpdateCvData(cvData);
+    const target = cvId ? `/cv-match/${cvId}` : '/cv-match/new';
+    window.location.href = target;
+  };
+
   const handleBackToWorkspace = () => {
     // Auto-save current CV data before navigation
     if (cvData && onUpdateCvData) {
@@ -59,14 +66,14 @@ export const HeaderCVEditor = ({ cvScore, cvData, onUpdateCvData, onJobAnalysisC
             </svg>
           </button>
           
-          {/* OkBuddy Logo - Legacy Professional Styling */}
+          {/* Logo - Legacy Professional Styling */}
           <button
             onClick={handleLogoClick}
             className="text-2xl font-bold text-primary hover:text-primary-600 active:text-primary-600 transition-colors duration-200 relative group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1 font-inter"
             title="Quay lại CV Workspace"
             aria-label="Quay lại CV Workspace"
           >
-            OkBuddy
+            CV Builder
             {/* Legacy Hover tooltip */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
               Quay lại CV Workspace
@@ -78,6 +85,15 @@ export const HeaderCVEditor = ({ cvScore, cvData, onUpdateCvData, onJobAnalysisC
         <div className="flex-1"></div>
 
         <div className="flex items-center gap-4">
+          {/* Match against JD — thesis Chương 4 §4.7 */}
+          <button
+            onClick={handleMatchJD}
+            className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-inter"
+            title="So khớp CV với mô tả công việc"
+            aria-label="So khớp CV với mô tả công việc"
+          >
+            ⚡ Match against JD
+          </button>
           {/* Auto-save Status - Legacy Success Color */}
           <div className="px-3 py-1 bg-green-50 text-green-600 text-sm rounded-full border border-green-500/20 font-inter">
             ✓ Đã lưu tự động

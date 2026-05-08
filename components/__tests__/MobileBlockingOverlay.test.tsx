@@ -171,7 +171,7 @@ describe('MobileBlockingOverlay', () => {
   });
 
   describe('Visual Design and Styling', () => {
-    it('should render with proper OkBuddy styling', () => {
+    it('should render with proper CV Builder styling', () => {
       const detection = createMobileDetection();
       
       render(

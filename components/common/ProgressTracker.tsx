@@ -1,7 +1,7 @@
 /**
  * Progress Tracker Component
  * Task 5: Enhanced progress tracking with animations and celebrations
- * Following OkBuddy development tenets - smooth UX with gamification elements
+ * Following CV Builder development tenets - smooth UX with gamification elements
  */
 
 import React, { useState, useEffect } from 'react';

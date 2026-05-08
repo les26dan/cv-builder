@@ -143,7 +143,7 @@ export default function HeaderMinimal({
           title="Trang chủ CV Workspace"
           aria-label="Trang chủ CV Workspace"
         >
-          OkBuddy
+          CV Builder
         </button>
       </div>
 

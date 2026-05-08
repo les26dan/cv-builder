@@ -36,7 +36,7 @@ describe('Header Component - JD Analysis Implementation', () => {
     it('renders logo and branding correctly', () => {
       render(<Header {...defaultProps} />);
       
-      expect(screen.getByText('OkBuddy')).toBeInTheDocument();
+      expect(screen.getByText('CV Builder')).toBeInTheDocument();
     });
 
     it('renders auto-save indicator', () => {
@@ -77,17 +77,17 @@ describe('Header Component - JD Analysis Implementation', () => {
         render(<Header {...propsWithoutCvData} />);
       }).not.toThrow();
       
-      expect(screen.getByText('OkBuddy')).toBeInTheDocument();
+      expect(screen.getByText('CV Builder')).toBeInTheDocument();
     });
 
     it('handles different score values', () => {
       // Test with score 0
       const { rerender } = render(<Header {...defaultProps} cvScore={0} />);
-      expect(screen.getByText('OkBuddy')).toBeInTheDocument();
+      expect(screen.getByText('CV Builder')).toBeInTheDocument();
 
       // Test with score 100 by rerendering same component
       rerender(<Header {...defaultProps} cvScore={100} />);
-      expect(screen.getByText('OkBuddy')).toBeInTheDocument();
+      expect(screen.getByText('CV Builder')).toBeInTheDocument();
     });
   });
 

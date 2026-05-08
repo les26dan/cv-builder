@@ -39,8 +39,8 @@ interface SharedHeaderProps {
 }
 
 export default function SharedHeader({ 
-  logoText = 'OkBuddy',
-  showFeedback = true,
+  logoText = 'CV Builder',
+  showFeedback = false,
   variant = 'landing',
   children,
   showBackButton = false,
@@ -325,8 +325,8 @@ export default function SharedHeader({
         <button 
           onClick={handleLogoClick}
           className={getLogoClasses()}
-          title="OkBuddy - Trang chủ"
-          aria-label="OkBuddy - Trang chủ"
+          title="CV Builder - Trang chủ"
+          aria-label="CV Builder - Trang chủ"
         >
           {logoText}
         </button>

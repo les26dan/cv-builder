@@ -11,8 +11,8 @@ export default function Header() {
         <Link 
           href="/" 
           className="text-xl sm:text-2xl font-bold text-primary hover:text-primary-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-          title="OkBuddy - Trang chủ"
-          aria-label="OkBuddy - Trang chủ"
+          title="CV Builder - Trang chủ"
+          aria-label="CV Builder - Trang chủ"
         >
           {account.logo}
         </Link>
@@ -20,14 +20,6 @@ export default function Header() {
 
       {/* Navigation */}
       <nav className="flex items-center gap-3 sm:gap-6">
-        {/* Feedback link - Hidden on mobile for clean design */}
-        <Link 
-          href="#" 
-          className="hidden sm:block text-sm sm:text-base font-medium text-gray-500 hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded-md px-2 py-1"
-        >
-          {account.nav.feedback}
-        </Link>
-
         {/* Auth buttons with enhanced styling */}
         <div className="flex items-center gap-2 sm:gap-4">
           <Link 
