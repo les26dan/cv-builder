@@ -1,9 +1,12 @@
 /**
  * Embedding matcher — semantic baseline for thesis comparison.
  *
- * Uses Voyage AI `voyage-3-lite` (1024-dim) and cosine similarity.
- * Voyage is Anthropic's recommended embedding provider; free tier covers
- * the entire thesis corpus.
+ * Uses OpenAI `text-embedding-3-small` (1536-dim) and cosine similarity.
+ *
+ * 2026-05-12: Switched from Voyage voyage-3 → OpenAI text-embedding-3-small.
+ * Voyage free tier (3 RPM) was too slow for 676-text corpus; OpenAI has
+ * higher rate limits and the user's API key is already provisioned.
+ * Pricing: $0.02 / 1M tokens — full corpus ~$0.024 (one-time).
  *
  * Two ways to use:
  *
@@ -24,16 +27,15 @@
 import { createHash } from 'node:crypto'
 import { MatchResult } from './types'
 
-const VOYAGE_EMBED_URL = 'https://api.voyageai.com/v1/embeddings'
-const DEFAULT_MODEL = 'voyage-3-lite'
-export const EMBED_DIM = 1024
+const OPENAI_EMBED_URL = 'https://api.openai.com/v1/embeddings'
+const DEFAULT_MODEL = 'text-embedding-3-small'
+export const EMBED_DIM = 1536
 
-// Voyage AI pricing as of 2026-05 — see https://www.voyageai.com/pricing
-// voyage-3-lite: $0.02 / 1M input tokens (same as OpenAI text-embedding-3-small)
-const VOYAGE_PRICING_USD = {
-  'voyage-3-lite': 0.02 / 1_000_000,
-  'voyage-3': 0.06 / 1_000_000,
-  'voyage-3-large': 0.18 / 1_000_000,
+// OpenAI embedding pricing as of 2026-05 — https://openai.com/api/pricing/
+const OPENAI_EMBED_PRICING_USD = {
+  'text-embedding-3-small': 0.02 / 1_000_000,
+  'text-embedding-3-large': 0.13 / 1_000_000,
+  'text-embedding-ada-002': 0.10 / 1_000_000,
 } as const
 
 export interface EmbeddingCache {
@@ -82,8 +84,8 @@ export function cosineSimDense(a: number[], b: number[]): number {
 // =============================================================================
 
 export interface EmbeddingMatcherOptions {
-  apiKey?: string                      // defaults to env VOYAGE_API_KEY
-  model?: string                       // defaults to voyage-3-lite
+  apiKey?: string                      // defaults to env OPENAI_API_KEY
+  model?: string                       // defaults to text-embedding-3-small
   cache?: EmbeddingCache               // optional sha256→vector cache
   timeoutMs?: number                   // default 30s
 }
@@ -95,7 +97,7 @@ export class EmbeddingMatcher {
   private timeoutMs: number
 
   constructor(opts: EmbeddingMatcherOptions = {}) {
-    this.apiKey = opts.apiKey ?? process.env.VOYAGE_API_KEY ?? ''
+    this.apiKey = opts.apiKey ?? process.env.OPENAI_API_KEY ?? ''
     this.model = opts.model ?? DEFAULT_MODEL
     this.cache = opts.cache
     this.timeoutMs = opts.timeoutMs ?? 30_000
@@ -131,26 +133,22 @@ export class EmbeddingMatcher {
     }
 
     if (!this.apiKey) {
-      throw new Error('VOYAGE_API_KEY missing — required for embedding matcher')
+      throw new Error('OPENAI_API_KEY missing — required for embedding matcher')
     }
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs)
     let resp: Response
     try {
-      resp = await fetch(VOYAGE_EMBED_URL, {
+      resp = await fetch(OPENAI_EMBED_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.apiKey}`,
         },
-        // Voyage accepts `input: string | string[]` and an optional `input_type`
-        // ("query" | "document") that lightly tunes the embedding for retrieval.
-        // We use "document" for both CV and JD since both are corpus-like.
         body: JSON.stringify({
           model: this.model,
           input: text,
-          input_type: 'document',
         }),
         signal: controller.signal,
       })
@@ -161,13 +159,13 @@ export class EmbeddingMatcher {
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({} as any))
       throw new Error(
-        `Voyage embedding error ${resp.status}: ${err?.detail || err?.error?.message || resp.statusText}`
+        `OpenAI embedding error ${resp.status}: ${err?.error?.message || resp.statusText}`
       )
     }
 
     const data = await resp.json() as {
       data: { embedding: number[]; index: number }[]
-      usage: { total_tokens: number }
+      usage: { prompt_tokens: number; total_tokens: number }
       model: string
     }
     const vec = data.data?.[0]?.embedding
@@ -178,7 +176,7 @@ export class EmbeddingMatcher {
 
     if (this.cache) this.cache.set(hash, vec)
 
-    const pricePerToken = (VOYAGE_PRICING_USD as Record<string, number>)[this.model] ?? VOYAGE_PRICING_USD['voyage-3-lite']
+    const pricePerToken = (OPENAI_EMBED_PRICING_USD as Record<string, number>)[this.model] ?? OPENAI_EMBED_PRICING_USD['text-embedding-3-small']
     return {
       vec,
       cached: false,
@@ -220,6 +218,8 @@ export class EmbeddingMatcher {
       },
     }
   }
+
+  get modelName(): string { return this.model }
 
   /**
    * Score from already-computed vectors. Used by the evaluation harness

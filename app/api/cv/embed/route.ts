@@ -1,7 +1,7 @@
 /**
  * POST /api/cv/embed
  *
- * Computes a 1024-dim Voyage AI embedding for a CV or JD text and returns it.
+ * Computes a 1536-dim OpenAI text-embedding-3-small embedding for a CV or JD text and returns it.
  * Caches by sha256(text) into the appropriate table:
  *   - kind='cv'  → cv_workflow.cv_embedding (when cvId provided)
  *   - kind='jd'  → jd_targets.jd_embedding (when jdTargetId provided)
@@ -23,7 +23,7 @@
  *     embedding: number[],             // length 1536
  *     hash: string,                    // sha256 hex of the text
  *     cached: boolean,                 // true if served from row hash match
- *     model: 'voyage-3-lite',
+ *     model: 'text-embedding-3-small',
  *     latencyMs: number,
  *     costUsd: number,
  *     tokensUsed: number,
@@ -65,8 +65,8 @@ export async function POST(req: NextRequest) {
     if (kind !== 'cv' && kind !== 'jd') {
       return NextResponse.json({ success: false, error: 'kind must be "cv" or "jd"' }, { status: 400 })
     }
-    if (!process.env.VOYAGE_API_KEY) {
-      return NextResponse.json({ success: false, error: 'VOYAGE_API_KEY not configured' }, { status: 500 })
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ success: false, error: 'OPENAI_API_KEY not configured' }, { status: 500 })
     }
 
     const hash = hashText(text)
@@ -97,13 +97,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const matcher = new EmbeddingMatcher()
+
     if (cachedVec && cachedVec.length === EMBED_DIM) {
       return NextResponse.json({
         success: true,
         embedding: cachedVec,
         hash,
         cached: true,
-        model: 'voyage-3-lite',
+        model: matcher.modelName,
         latencyMs: 0,
         costUsd: 0,
         tokensUsed: 0,
@@ -113,7 +115,6 @@ export async function POST(req: NextRequest) {
     // ---------------------------------------------------------------
     // 2) Cache miss — call OpenAI
     // ---------------------------------------------------------------
-    const matcher = new EmbeddingMatcher()
     const r = await matcher.embed(text)
 
     // ---------------------------------------------------------------
@@ -146,7 +147,7 @@ export async function POST(req: NextRequest) {
       embedding: r.vec,
       hash: r.hash,
       cached: false,
-      model: 'voyage-3-lite',
+      model: matcher.modelName,
       latencyMs: r.latencyMs,
       costUsd: r.costUsd,
       tokensUsed: r.tokensUsed,

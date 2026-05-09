@@ -151,6 +151,26 @@ export class TfidfMatcher {
     return { N: this.idfStats.N, idf: Object.fromEntries(this.idfStats.idf) }
   }
 
+  /** UI/debug helper: return the tokenized form of cv + jd (post-stopword filter). */
+  getTokens(cvText: string, jdText: string): { cv: string[]; jd: string[] } {
+    return { cv: tokenize(cvText), jd: tokenize(jdText) }
+  }
+
+  /**
+   * UI/debug helper: return the top-K JD terms by TF-IDF weight, plus
+   * whether each one is present in CV. Useful for the "what the algorithm
+   * looked at" panel.
+   */
+  getTopJdTerms(jdText: string, cvText: string, k = 15): { term: string; weight: number; inCV: boolean }[] {
+    const jdTokens = tokenize(jdText)
+    const cvTokenSet = new Set(tokenize(cvText))
+    const jdVec = tfidfVector(jdTokens, this.idfStats.idf)
+    return [...jdVec.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, k)
+      .map(([term, weight]) => ({ term, weight: +weight.toFixed(4), inCV: cvTokenSet.has(term) }))
+  }
+
   static fromJSON(j: { N: number; idf: Record<string, number> }): TfidfMatcher {
     return new TfidfMatcher({ N: j.N, idf: new Map(Object.entries(j.idf)) })
   }

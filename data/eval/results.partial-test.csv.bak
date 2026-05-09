@@ -1,0 +1,6 @@
+pairId,label,method,score,predictedRelevant,latencyMs,costUsd,tokensUsed,error,computedAt
+p-0,1,tfidf,4.14,0,1,0,0,,2026-05-12T11:43:30.973Z
+p-1,1,tfidf,3.03,0,2,0,0,,2026-05-12T11:43:30.976Z
+p-2,1,tfidf,6.93,0,0,0,0,,2026-05-12T11:43:30.976Z
+p-3,1,tfidf,5.95,0,0,0,0,,2026-05-12T11:43:30.976Z
+p-4,1,tfidf,3.59,0,0,0,0,,2026-05-12T11:43:30.976Z

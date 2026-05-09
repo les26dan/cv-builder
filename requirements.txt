@@ -1,0 +1,12 @@
+# Python dependencies for thesis evaluation scripts (scripts/analyze-results.py).
+# Reproduce with:
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r requirements.txt
+#
+# Versions pinned to match the thesis defense run (2026-05).
+
+numpy==2.0.2
+pandas==2.3.3
+scipy==1.13.1
+scikit-learn==1.6.1
+matplotlib==3.9.4

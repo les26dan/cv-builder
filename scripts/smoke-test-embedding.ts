@@ -5,12 +5,14 @@
  *
  * Cost: ~$0.00001 (3 short embeddings).
  */
-import 'dotenv/config'
+import * as dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+dotenv.config()
 import { EmbeddingMatcher, InMemoryCache, cosineSimDense } from '../shared/services/matching/embeddingMatcher'
 
 async function main() {
-  if (!process.env.VOYAGE_API_KEY) {
-    console.error('VOYAGE_API_KEY missing in env. Add to .env.local first.')
+  if (!process.env.OPENAI_API_KEY) {
+    console.error('OPENAI_API_KEY missing in env. Add to .env.local first.')
     process.exit(1)
   }
 
