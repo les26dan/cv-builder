@@ -1,0 +1,95 @@
+{
+  "pairs_total": 400,
+  "positives": 200,
+  "methods": {
+    "embedding": {
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "precision_at_10_ci95": [
+        1.0,
+        1.0
+      ],
+      "recall_at_10": 0.05,
+      "ndcg_at_10": 1.0,
+      "ndcg_at_10_ci95": [
+        1.0,
+        1.0
+      ],
+      "mrr": 1.0,
+      "roc_auc": 0.7660624999999999,
+      "f1_at_median": 0.695,
+      "threshold": 38.655,
+      "latency_p50_ms": 0.0,
+      "latency_p95_ms": 1.0,
+      "cost_per_1000_pairs_usd": 0.0,
+      "n_pairs": 400
+    },
+    "llm": {
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "precision_at_10_ci95": [
+        0.9,
+        1.0
+      ],
+      "recall_at_10": 0.05,
+      "ndcg_at_10": 1.0,
+      "ndcg_at_10_ci95": [
+        0.9305687780632229,
+        1.0
+      ],
+      "mrr": 1.0,
+      "roc_auc": 0.7551125,
+      "f1_at_median": 0.7169811320754716,
+      "threshold": 20.0,
+      "latency_p50_ms": 2526.5,
+      "latency_p95_ms": 5213.9,
+      "cost_per_1000_pairs_usd": 0.28016737499996974,
+      "n_pairs": 400
+    },
+    "tfidf": {
+      "precision_at_5": 1.0,
+      "precision_at_10": 1.0,
+      "precision_at_10_ci95": [
+        0.8,
+        1.0
+      ],
+      "recall_at_10": 0.05,
+      "ndcg_at_10": 1.0,
+      "ndcg_at_10_ci95": [
+        0.8572048559638626,
+        1.0
+      ],
+      "mrr": 1.0,
+      "roc_auc": 0.75475,
+      "f1_at_median": 0.695,
+      "threshold": 5.8149999999999995,
+      "latency_p50_ms": 1.0,
+      "latency_p95_ms": 3.0,
+      "cost_per_1000_pairs_usd": 0.0,
+      "n_pairs": 400
+    }
+  },
+  "pairwise_wilcoxon": {
+    "embedding_vs_llm": {
+      "statistic": 33402.0,
+      "p_value": 0.0037928930190674237,
+      "mean_err_m1": 0.230084847425,
+      "mean_err_m2": 0.23428125000000002,
+      "lower_error_method": "embedding"
+    },
+    "embedding_vs_tfidf": {
+      "statistic": 20551.0,
+      "p_value": 2.9349424251731785e-17,
+      "mean_err_m1": 0.230084847425,
+      "mean_err_m2": 0.40326377350000003,
+      "lower_error_method": "embedding"
+    },
+    "llm_vs_tfidf": {
+      "statistic": 24135.0,
+      "p_value": 5.1961531415455974e-12,
+      "mean_err_m1": 0.23428125000000002,
+      "mean_err_m2": 0.40326377350000003,
+      "lower_error_method": "llm"
+    }
+  }
+}

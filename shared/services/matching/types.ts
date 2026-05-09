@@ -4,7 +4,7 @@
  * Three matching methods compared in this thesis:
  *  - 'tfidf':     lexical baseline (corpus-IDF + cosine on TF vectors)
  *  - 'embedding': dense semantic (OpenAI text-embedding-3-small + cosine)
- *  - 'llm':       reasoning (gpt-4o-mini structured output)
+ *  - 'llm':       reasoning (OpenAI gpt-4o-mini structured output)
  *
  * All methods produce a normalized score in [0, 100] so they're directly
  * comparable in the thesis evaluation.
@@ -135,17 +135,20 @@ export interface MatchRequest {
 }
 
 /**
- * Pricing constants for OpenAI models used in this thesis.
- * Source: https://openai.com/api/pricing/ (accessed 2026-05).
+ * Pricing constants for models used in this thesis.
  *
- * Treat these as best-effort — actual cost is read from OpenAI usage logs
- * when running the evaluation harness. These constants are for live
- * UI cost-badge display and rough budgeting.
+ * LLM: OpenAI gpt-4o-mini ($0.15 / 1M input, $0.60 / 1M output) — chosen
+ * for cost-effectiveness vs alternatives. ~$0.13 to run full 400-pair eval.
+ *
+ * Embeddings: OpenAI text-embedding-3-small (see embeddingMatcher.ts for pricing).
  */
-export const OPENAI_PRICING_USD = {
-  // text-embedding-3-small: $0.02 / 1M input tokens
+export const LLM_PRICING_USD = {
+  // OpenAI text-embedding-3-small: $0.02 / 1M input tokens
   embeddingPerToken: 0.02 / 1_000_000,
-  // gpt-4o-mini: $0.15 / 1M input, $0.60 / 1M output
+  // OpenAI gpt-4o-mini: $0.15 / 1M input, $0.60 / 1M output
   llmInputPerToken: 0.15 / 1_000_000,
   llmOutputPerToken: 0.60 / 1_000_000,
 } as const
+
+/** @deprecated use LLM_PRICING_USD; kept as alias for back-compat */
+export const OPENAI_PRICING_USD = LLM_PRICING_USD
