@@ -9,7 +9,7 @@
 
 ### **1.2 Create/Select Project**
 1. **Create New Project** or select existing
-2. **Project Name**: `OkBuddy Production`
+2. **Project Name**: `CV Builder Production`
 3. **Project ID**: Note this for later
 
 ### **1.3 Enable APIs**
@@ -22,9 +22,9 @@
 1. Go to **APIs & Services > OAuth consent screen**
 2. **User Type**: External
 3. **App Information**:
-   - **App name**: `OkBuddy CV Builder`
+   - **App name**: `CV Builder CV Builder`
    - **User support email**: `admin@example.com`
-   - **App logo**: Upload OkBuddy logo (optional)
+   - **App logo**: Upload CV Builder logo (optional)
    - **App domain**: `http://localhost:3000` (for dev) or your production domain
    - **Developer contact**: `admin@example.com`
 
@@ -32,7 +32,7 @@
 1. Go to **APIs & Services > Credentials**
 2. **Create Credentials > OAuth 2.0 Client IDs**
 3. **Application type**: Web application
-4. **Name**: `OkBuddy OAuth Client`
+4. **Name**: `CV Builder OAuth Client`
 5. **Authorized redirect URIs**:
    ```
    http://localhost:3000/api/auth/google/callback
@@ -52,9 +52,9 @@
 
 ### **2.2 Create New App**
 1. **Click "Create app"**
-2. **App name**: `OkBuddy CV Builder`
+2. **App name**: `CV Builder CV Builder`
 3. **LinkedIn Page**: Create or select a company page
-4. **App logo**: Upload OkBuddy logo
+4. **App logo**: Upload CV Builder logo
 5. **Legal agreement**: Accept terms
 
 ### **2.3 Configure OAuth Settings**

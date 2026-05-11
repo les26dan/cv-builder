@@ -1,6 +1,6 @@
 /**
  * Unified AI Configuration - Cross-Project Settings
- * Following OkBuddy tenets: modular, swappable, no vendor lock-in
+ * Following CV Builder tenets: modular, swappable, no vendor lock-in
  * Centralized configuration management for all AI services
  */
 

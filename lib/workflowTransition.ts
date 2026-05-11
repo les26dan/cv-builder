@@ -1,6 +1,6 @@
 /**
  * Workflow Transition Utilities
- * Handles transitioning between different phases of the OkBuddy workflow
+ * Handles transitioning between different phases of the CV Builder workflow
  */
 
 // Define types locally since the imports are not available

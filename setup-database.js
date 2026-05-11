@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Database Setup Script for OkBuddy
+ * Database Setup Script for CV Builder
  * Sets up the database with admin user
  */
 
@@ -10,7 +10,7 @@ const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 
 async function setupDatabase() {
-  console.log('🔧 Setting up OkBuddy database...');
+  console.log('🔧 Setting up CV Builder database...');
   
   // Initialize Supabase client
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

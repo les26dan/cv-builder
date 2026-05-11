@@ -1,6 +1,6 @@
 /**
  * AI Service - Real ChatGPT API Integration
- * Following OkBuddy tenets: modular, swappable, no vendor lock-in
+ * Following CV Builder tenets: modular, swappable, no vendor lock-in
  * Centralized AI functionality for CV editing with bilingual support
  */
 

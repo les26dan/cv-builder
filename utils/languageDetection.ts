@@ -1,7 +1,7 @@
 /**
  * Language Detection Utility
  * Smart language detection for AI prompt selection
- * Following OkBuddy development tenets: modular, replaceable, adaptable
+ * Following CV Builder development tenets: modular, replaceable, adaptable
  */
 
 export type SupportedLanguage = 'vi' | 'en';

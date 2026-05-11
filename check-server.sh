@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Always run from the OkBuddy project directory
+# Always run from the CV Builder project directory
 cd "$(dirname "$0")" || exit 1
 
-echo "🔍 Checking OkBuddy Server Status..."
+echo "🔍 Checking CV Builder Server Status..."
 echo "📁 Working from: $(pwd)"
 echo ""
 

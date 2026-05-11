@@ -1,6 +1,6 @@
 /**
  * AI Usage Tracker - Cross-Project Monitoring System
- * Following OkBuddy tenets: modular, swappable, data-driven optimization
+ * Following CV Builder tenets: modular, swappable, data-driven optimization
  * Centralized monitoring for AI usage, costs, and performance
  */
 

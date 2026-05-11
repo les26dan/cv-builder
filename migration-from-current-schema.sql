@@ -1,6 +1,6 @@
 -- ===============================================
 -- MIGRATION SCRIPT: Current Schema → Enhanced User Credentials Schema
--- Safely migrates existing OkBuddy database to new multi-auth structure
+-- Safely migrates existing CV Builder database to new multi-auth structure
 -- ===============================================
 
 -- ⚠️ IMPORTANT: Run this migration during maintenance window

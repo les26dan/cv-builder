@@ -1,7 +1,7 @@
 /**
  * AI Analysis Service - CV JD Upload Project
  * Real ChatGPT API integration for CV analysis and job description processing
- * Following OkBuddy tenets: modular, swappable, bilingual support
+ * Following CV Builder tenets: modular, swappable, bilingual support
  */
 
 import { NextApiRequest } from 'next'

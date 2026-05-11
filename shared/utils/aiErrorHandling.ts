@@ -1,6 +1,6 @@
 /**
  * Unified AI Error Handling - Cross-Project Error Management
- * Following OkBuddy tenets: modular, swappable, consistent error handling
+ * Following CV Builder tenets: modular, swappable, consistent error handling
  * Centralized error handling for all AI-related functionality
  */
 

@@ -1,6 +1,6 @@
 /**
  * CV Validation Tests
- * Following OkBuddy development tenets - comprehensive testing for core functionality
+ * Following CV Builder development tenets - comprehensive testing for core functionality
  */
 
 import { describe, it, expect } from 'vitest';

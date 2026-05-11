@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * OkBuddy Supabase Connection Test
+ * CV Builder Supabase Connection Test
  * Tests database connectivity and basic operations
  */
 
@@ -9,7 +9,7 @@ require('dotenv').config({ path: '.env.local' });
 const { createClient } = require('@supabase/supabase-js');
 
 async function testSupabaseConnection() {
-    console.log('🧪 OkBuddy Supabase Connection Test');
+    console.log('🧪 CV Builder Supabase Connection Test');
     console.log('=====================================');
 
     // Check environment variables
@@ -104,7 +104,7 @@ async function testSupabaseConnection() {
 
         console.log('\n🎉 Connection test completed!');
         console.log('=====================================');
-        console.log('Your Supabase database is ready for OkBuddy!');
+        console.log('Your Supabase database is ready for CV Builder!');
 
     } catch (error) {
         console.log('❌ Unexpected error:', error.message);

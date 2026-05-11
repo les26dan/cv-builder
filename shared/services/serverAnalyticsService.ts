@@ -1,5 +1,5 @@
 /**
- * OkBuddy Server-side Analytics Service - Statsig Integration
+ * CV Builder Server-side Analytics Service - Statsig Integration
  * Server-side event tracking service for backend operations
  * 
  * Features:

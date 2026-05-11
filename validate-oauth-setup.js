@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// OAuth Setup Validation Script for OkBuddy
+// OAuth Setup Validation Script for CV Builder
 console.log('🔍 Validating OAuth Setup...\n');
 
 const requiredVars = [

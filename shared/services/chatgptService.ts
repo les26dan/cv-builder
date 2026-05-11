@@ -1,7 +1,7 @@
 /**
  * Unified ChatGPT Service - Cross-Project AI Integration
- * Following OkBuddy tenets: modular, swappable, no vendor lock-in
- * Centralized AI functionality for all OkBuddy projects with bilingual support
+ * Following CV Builder tenets: modular, swappable, no vendor lock-in
+ * Centralized AI functionality for all CV Builder projects with bilingual support
  */
 
 import { AIResponse, ChatMessage, OpenAIRequest, OpenAIResponse } from '../types/aiInterfaces';
@@ -62,7 +62,7 @@ export interface ContentImprovementRequest {
 }
 
 /**
- * Unified ChatGPT Service for all OkBuddy projects
+ * Unified ChatGPT Service for all CV Builder projects
  */
 export class UnifiedChatGPTService {
   private cache = new Map<string, CacheEntry<any>>();

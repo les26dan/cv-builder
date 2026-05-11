@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# OkBuddy Persistent Background Server
+# CV Builder Persistent Background Server
 # Enhanced with permanent webpack error prevention
 # Updated January 2025 - PERMANENT FIX VERSION
 
@@ -27,7 +27,7 @@ if [ "$1" = "--clean" ] || [ "$1" = "-c" ]; then
     FORCE_CLEAN=true
     echo -e "${YELLOW}🧹 Aggressive cache cleaning requested${NC}"
 elif [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo -e "${BLUE}OkBuddy Server - Usage:${NC}"
+    echo -e "${BLUE}CV Builder Server - Usage:${NC}"
     echo -e "${CYAN}  ./start-server          ${NC}Start server with smart cache management"
     echo -e "${CYAN}  ./start-server --clean  ${NC}Force aggressive cache clearing before start"
     echo -e "${CYAN}  ./start-server -c       ${NC}Same as --clean (short form)"
@@ -50,7 +50,7 @@ fi
 
 echo -e "${BLUE}"
 echo "╔════════════════════════════════════════╗"
-echo "║        OkBuddy PERSISTENT Server       ║"
+echo "║        CV Builder PERSISTENT Server       ║"
 echo "║            Background Mode             ║"
 echo "║         PERMANENT FIX VERSION          ║"
 echo "╚════════════════════════════════════════╝"

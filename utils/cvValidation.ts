@@ -1,6 +1,6 @@
 /**
  * CV Completion Validation Utility
- * Following OkBuddy development tenets - modular, testable logic
+ * Following CV Builder development tenets - modular, testable logic
  * Validates CV prerequisites for JD optimization feature
  */
 
