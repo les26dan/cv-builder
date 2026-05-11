@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔐 Testing OkBuddy Authentication & Protected Pages"
+echo "🔐 Testing CV Builder Authentication & Protected Pages"
 echo ""
 
 # Function to test page with session cookie

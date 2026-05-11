@@ -444,7 +444,11 @@ const escapeLatex = (text: string): string => {
 
 
 // Main download function
-export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' | 'latex', templateSetting?: string) => {
+// `pageCount` (optional) is the number of A4 pages the visible preview decided on
+// based on measured content height. We forward it to the print renderer so the
+// template's internal pagination logic produces the same page split — without it
+// the printed PDF can spill into extra pages even when the preview shows one.
+export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' | 'latex', templateSetting?: string, pageCount?: number) => {
   const filename = generateFilename(cvData, format);
 
   switch (format) {
@@ -455,27 +459,27 @@ export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' 
     }
 
     case 'pdf': {
-      const htmlContent = await generateHTMLForPrintFromReact(cvData, templateSetting);
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-        printWindow.focus();
-
-        // Wait for content to load, then trigger print dialog
-        setTimeout(() => {
-          printWindow.print();
-          printWindow.close();
-        }, 400);
-      }
+      // Rasterized pipeline (html2canvas + jsPDF) — see utils/pdfGenerator.ts
+      // for why we don't use window.print().
+      const { generatePdfFromTemplate } = await import('./pdfGenerator');
+      await generatePdfFromTemplate(cvData as any, templateSetting, pageCount ?? 1, filename);
       break;
     }
       
     case 'docx': {
-      // For DOCX, we'd typically use a library like docx or mammoth
-      // For now, we'll download as RTF which can be opened by Word
-      const rtfContent = generateRTFContent(cvData);
-      downloadFile(rtfContent, filename.replace('.docx', '.rtf'), 'application/rtf');
+      // Real OOXML .docx via the `docx` library — Vietnamese diacritics
+      // are preserved natively. (The old RTF fallback shipped a `.rtf` file
+      // with a `.docx` extension, which Word complained about.)
+      const { generateDocxBlob } = await import('./docxGenerator');
+      const blob = await generateDocxBlob(cvData);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       break;
     }
 
@@ -490,70 +494,8 @@ export const downloadCV = async (cvData: CVData, format: 'pdf' | 'docx' | 'txt' 
   }
 };
 
-// Render the actual React template to static HTML for printing.
-// Single source of truth — preview and print share the same component tree.
-const generateHTMLForPrintFromReact = async (cvData: CVData, templateSetting?: string): Promise<string> => {
-  const React = (await import('react')).default;
-  const { renderToStaticMarkup } = await import('react-dom/server');
-  const { parseTemplateSetting, templateRegistry, DEFAULT_TEMPLATE_ID } = await import('../components/templates/templateRegistry');
-  const { injectThemeVars } = await import('../components/templates/colorThemes');
-
-  const { templateId, themeId } = parseTemplateSetting(templateSetting);
-  const def = templateRegistry[templateId] ?? templateRegistry[DEFAULT_TEMPLATE_ID];
-  const ActiveTemplate = def.component;
-  const theme = def.themes.find((t: any) => t.id === themeId) ?? def.themes[0];
-
-  // We render every page sequentially. Templates already accept currentPage/totalPages.
-  // Heuristic: render up to 4 pages; templates that paginate themselves stop emitting content.
-  const MAX_PAGES = 4;
-  const pageMarkup: string[] = [];
-  for (let p = 1; p <= MAX_PAGES; p++) {
-    const html = renderToStaticMarkup(
-      React.createElement(ActiveTemplate, {
-        cvData,
-        activeSection: null,
-        onSectionClick: () => {},
-        currentPage: p,
-        totalPages: MAX_PAGES,
-        isPreview: false,
-        language: undefined,
-        colorTheme: theme,
-      })
-    );
-    pageMarkup.push(html);
-    // Quick exit: if rendered output is essentially empty, stop.
-    if (p > 1 && html.replace(/<[^>]+>/g, '').trim().length < 5) {
-      pageMarkup.pop();
-      break;
-    }
-  }
-
-  const themeStyle = injectThemeVars(theme);
-  const cssVars = Object.entries(themeStyle as Record<string, string>)
-    .map(([k, v]) => `${k}:${v}`).join(';');
-
-  const pages = pageMarkup.map(m => `<div class="cv-page" style="${cssVars}">${m}</div>`).join('');
-
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>CV</title>
-<style>
-  @page { size: A4; margin: 0; }
-  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  html, body { margin: 0; padding: 0; background: #fff; font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif; }
-  .cv-page { width: 210mm; min-height: 297mm; background: #fff; page-break-after: always; overflow: hidden; }
-  .cv-page:last-child { page-break-after: auto; }
-  .cv-experience-item, .cv-education-item, .cv-project-item { page-break-inside: avoid; }
-  @media print { .no-print { display: none !important; } }
-</style>
-</head>
-<body>
-${pages}
-</body>
-</html>`;
-};
+// (Print-to-HTML pipeline removed — PDF now goes through utils/pdfGenerator.ts
+//  using html2canvas + jsPDF for pixel-perfect WYSIWYG with the preview.)
 
 // Resolve theme colors from templateSetting string ("templateId:themeId")
 const resolveThemeColors = (templateSetting?: string): { primary: string; accent: string; text: string; muted: string; templateId: string } => {
@@ -1217,101 +1159,4 @@ const generateHTMLForPrint = (cvData: CVData, colors?: { primary: string; accent
   return html;
 };
 
-// Generate RTF content for DOCX alternative
-const generateRTFContent = (cvData: CVData): string => {
-  let rtf = '{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}';
-  
-  const sectionOrder = cvData.sectionOrder || ['contact', 'summary', 'experience', 'skills', 'education'];
-  
-  for (const sectionId of sectionOrder) {
-    const sectionData = cvData[sectionId];
-    
-    if (!hasContent(sectionId, sectionData)) continue;
-    
-    switch (sectionId) {
-      case 'contact': {
-        if (sectionData.fullName) {
-          rtf += `\\f0\\fs28\\b ${sectionData.fullName}\\b0\\fs20\\par\\par`;
-        }
-        
-        const contactInfo = [];
-        if (sectionData.email) contactInfo.push(sectionData.email);
-        if (sectionData.phone) contactInfo.push(sectionData.phone);
-        if (sectionData.location) contactInfo.push(sectionData.location);
-        if (sectionData.linkedin) contactInfo.push(sectionData.linkedin);
-        
-        if (contactInfo.length > 0) {
-          rtf += `${contactInfo.join(' | ')}\\par\\par`;
-        }
-        break;
-      }
-        
-      case 'summary':
-        if (sectionData.content) {
-          rtf += `${sectionData.content}\\par\\par`;
-        }
-        break;
-        
-      case 'experience': {
-        rtf += `\\b ${getSectionTitle(sectionId, cvData.sectionTitles)}\\b0\\par`;
-        
-        sectionData.items.forEach((exp: any) => {
-          if (exp.title || exp.company) {
-            const jobLine = [];
-            if (exp.title) jobLine.push(`\\b ${exp.title}\\b0`);
-            if (exp.company) jobLine.push(exp.company);
-            if (exp.location) jobLine.push(exp.location);
-            
-            rtf += `${jobLine.join(', ')}\\par`;
-            
-            const dateRange = `${exp.startDate} - ${exp.current ? 'Hiện tại' : exp.endDate || ''}`;
-            rtf += `\\i ${dateRange}\\i0\\par`;
-            
-            if (exp.bullets && exp.bullets.length > 0) {
-              exp.bullets.forEach((bullet: string) => {
-                if (bullet && bullet.trim()) {
-                  rtf += `• ${bullet}\\par`;
-                }
-              });
-            }
-            rtf += '\\par';
-          }
-        });
-        break;
-      }
-        
-      case 'skills':
-        rtf += `\\b ${getSectionTitle(sectionId, cvData.sectionTitles)}\\b0\\par`;
-        rtf += `${sectionData.items.map(skillName).join(' | ')}\\par\\par`;
-        break;
-        
-      case 'education': {
-        rtf += `\\b ${getSectionTitle(sectionId, cvData.sectionTitles)}\\b0\\par`;
-        
-        sectionData.items.forEach((edu: any) => {
-          if (edu.degree || edu.institution) {
-            const eduLine = [];
-            if (edu.degree) eduLine.push(`\\b ${edu.degree}\\b0`);
-            if (edu.institution) eduLine.push(edu.institution);
-            if (edu.location) eduLine.push(edu.location);
-            
-            rtf += `${eduLine.join(', ')}\\par`;
-            
-            if (edu.graduationDate) {
-              rtf += `\\i ${edu.graduationDate}\\i0\\par`;
-            }
-            
-            if (edu.description) {
-              rtf += `${edu.description}\\par`;
-            }
-            rtf += '\\par';
-          }
-        });
-        break;
-      }
-    }
-  }
-  
-  rtf += '}';
-  return rtf;
-}; 
+// (RTF fallback removed — DOCX now uses the `docx` library via utils/docxGenerator.ts.)

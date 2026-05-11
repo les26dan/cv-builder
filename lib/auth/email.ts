@@ -19,7 +19,7 @@ const createEmailTemplate = (data: EmailData): string => {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Chào mừng đến với OkBuddy!</title>
+  <title>Chào mừng đến với CV Builder!</title>
   <style>
     body { font-family: 'Inter', Arial, sans-serif; line-height: 1.6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -33,11 +33,11 @@ const createEmailTemplate = (data: EmailData): string => {
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎉 Chào mừng đến với OkBuddy!</h1>
+      <h1>🎉 Chào mừng đến với CV Builder!</h1>
     </div>
     <div class="content">
       <h2>Xin chào ${data.fullName},</h2>
-      <p>Cảm ơn bạn đã đăng ký tài khoản OkBuddy! Chúng tôi rất vui mừng được đồng hành cùng bạn trong hành trình tìm kiếm việc làm.</p>
+      <p>Cảm ơn bạn đã đăng ký tài khoản CV Builder! Chúng tôi rất vui mừng được đồng hành cùng bạn trong hành trình tìm kiếm việc làm.</p>
       
       <div class="credentials">
         <h3>📧 Thông tin tài khoản của bạn:</h3>
@@ -46,7 +46,7 @@ const createEmailTemplate = (data: EmailData): string => {
         <p><em>Vui lòng lưu giữ thông tin này an toàn và thay đổi mật khẩu sau khi đăng nhập lần đầu.</em></p>
       </div>
 
-      <p>Với OkBuddy, bạn có thể:</p>
+      <p>Với CV Builder, bạn có thể:</p>
       <ul>
         <li>🎯 Tối ưu hóa CV để vượt qua hệ thống ATS</li>
         <li>🔍 Tìm kiếm việc làm phù hợp với kỹ năng</li>
@@ -55,16 +55,16 @@ const createEmailTemplate = (data: EmailData): string => {
       </ul>
 
       <div style="text-align: center;">
-        <a href="#" class="button">Bắt đầu sử dụng OkBuddy</a>
+        <a href="#" class="button">Bắt đầu sử dụng CV Builder</a>
       </div>
 
       <p>Nếu bạn có bất kỳ câu hỏi nào, đừng ngần ngại liên hệ với chúng tôi qua email này.</p>
       
       <p>Chúc bạn thành công!</p>
-      <p><strong>Đội ngũ OkBuddy</strong></p>
+      <p><strong>Đội ngũ CV Builder</strong></p>
     </div>
     <div class="footer">
-      <p>© 2024 OkBuddy. Tất cả quyền được bảo lưu.</p>
+      <p>© 2024 CV Builder. Tất cả quyền được bảo lưu.</p>
       <p>Email này được gửi tự động, vui lòng không trả lời.</p>
     </div>
   </div>
@@ -106,7 +106,7 @@ export async function sendConfirmationEmail(data: EmailData): Promise<EmailResul
       console.log('\n🔔 EMAIL WOULD BE SENT (Development Mode)');
       console.log('=====================================');
       console.log(`To: ${data.email}`);
-      console.log(`Subject: Chào mừng đến với OkBuddy - Tài khoản của bạn đã được tạo!`);
+      console.log(`Subject: Chào mừng đến với CV Builder - Tài khoản của bạn đã được tạo!`);
       console.log('\nEmail Content:');
       console.log('📧 Account Details:');
       console.log(`   Full Name: ${data.fullName}`);
@@ -126,16 +126,16 @@ export async function sendConfirmationEmail(data: EmailData): Promise<EmailResul
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: process.env.SMTP_FROM || '"OkBuddy" <noreply@okbuddy.io>',
+      from: process.env.SMTP_FROM || '"CV Builder" <noreply@okbuddy.io>',
       to: data.email,
-      subject: 'Chào mừng đến với OkBuddy - Tài khoản của bạn đã được tạo!',
+      subject: 'Chào mừng đến với CV Builder - Tài khoản của bạn đã được tạo!',
       html: createEmailTemplate(data),
       text: `
-Chào mừng đến với OkBuddy!
+Chào mừng đến với CV Builder!
 
 Xin chào ${data.fullName},
 
-Cảm ơn bạn đã đăng ký tài khoản OkBuddy!
+Cảm ơn bạn đã đăng ký tài khoản CV Builder!
 
 Thông tin tài khoản:
 Email: ${data.email}
@@ -144,7 +144,7 @@ Mật khẩu: ${data.password}
 Vui lòng lưu giữ thông tin này an toàn.
 
 Trân trọng,
-Đội ngũ OkBuddy
+Đội ngũ CV Builder
       `.trim()
     };
 

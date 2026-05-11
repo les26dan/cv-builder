@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🧪 Testing Admin Login Methods for OkBuddy"
+echo "🧪 Testing Admin Login Methods for CV Builder"
 echo "=========================================="
 echo ""
 
@@ -59,4 +59,4 @@ echo "   ✅ Log in successfully with email (manual typing)"
 echo "   ⚠️  Log in successfully with Gmail OAuth button (ready for setup)"
 echo ""
 echo "🚀 Admin Dashboard: http://localhost:3000/admin/"
-echo "📖 Documentation: /Users/tomnguyen/Documents/Cursor/Projects/OkBuddy/ADMIN_ACCESS.md" 
+echo "📖 Documentation: /Users/tomnguyen/Documents/Cursor/Projects/CV Builder/ADMIN_ACCESS.md" 

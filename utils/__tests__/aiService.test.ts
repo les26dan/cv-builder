@@ -1,7 +1,7 @@
 /**
  * AI Service Tests
  * Comprehensive test suite for ChatGPT API integration
- * Following OkBuddy development tenet 5: Relentless, Rigorous Testing & Code Health
+ * Following CV Builder development tenet 5: Relentless, Rigorous Testing & Code Health
  */
 
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';

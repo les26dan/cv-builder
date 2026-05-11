@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * OkBuddy Direct Schema Deployment
+ * CV Builder Direct Schema Deployment
  * Uses service role key to deploy database schema directly
  */
 
@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 async function deploySchema() {
-    console.log('🚀 OkBuddy Database Schema Deployment');
+    console.log('🚀 CV Builder Database Schema Deployment');
     console.log('====================================');
 
     // Check environment variables

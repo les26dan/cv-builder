@@ -78,7 +78,7 @@ async function runSQL(sqlText, label) {
   return false;
 }
 
-console.log('\n🚀 OkBuddy — Setup Database & Admin Account');
+console.log('\n🚀 CV Builder — Setup Database & Admin Account');
 console.log('===========================================');
 console.log(`📡 Supabase: ${SUPABASE_URL}`);
 console.log(`👤 Admin:    ${ADMIN_EMAIL}\n`);

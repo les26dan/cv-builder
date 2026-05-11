@@ -30,6 +30,7 @@
     "permanent-fix": "./scripts/permanent-fix.sh"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -67,6 +68,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.52.1",
+    "react-markdown": "^10.1.0",
     "statsig-node": "^6.4.4"
   },
   "devDependencies": {

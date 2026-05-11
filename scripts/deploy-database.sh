@@ -6,7 +6,7 @@
 
 set -e  # Exit on any error
 
-echo "🚀 OkBuddy Supabase Database Deployment"
+echo "🚀 CV Builder Supabase Database Deployment"
 echo "======================================"
 
 # Check if environment variables are set

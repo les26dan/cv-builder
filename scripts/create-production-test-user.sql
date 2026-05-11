@@ -16,8 +16,8 @@ BEGIN
         RAISE NOTICE 'Test user already exists with email: okbuddy.test.user@gmail.com';
     ELSE
         -- Create the test user
-        -- Note: You'll need to hash the password 'OkBuddy2025!' using bcrypt
-        -- You can use: bcrypt.hash('OkBuddy2025!', 12)
+        -- Note: You'll need to hash the password 'CV Builder2025!' using bcrypt
+        -- You can use: bcrypt.hash('CV Builder2025!', 12)
         INSERT INTO users (
             id,
             email,
@@ -31,8 +31,8 @@ BEGIN
         ) VALUES (
             gen_random_uuid(),
             'okbuddy.test.user@gmail.com',
-            'OkBuddy Test User',
-            '$2b$12$IHIuUMCC5xMw5MdzD6vIR.5csLp9T.e/GhCMv7QoyTpxPp5hGT.UW',  -- bcrypt hash for 'OkBuddy2025!'
+            'CV Builder Test User',
+            '$2b$12$IHIuUMCC5xMw5MdzD6vIR.5csLp9T.e/GhCMv7QoyTpxPp5hGT.UW',  -- bcrypt hash for 'CV Builder2025!'
             true,
             'email',
             'active',

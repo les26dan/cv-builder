@@ -27,8 +27,8 @@ const TEST_ACCOUNTS: Omit<TestAccount, 'id' | 'created' | 'error' | 'loginUrl'>[
   },
   {
     email: 'okbuddy.test.user@gmail.com',
-    password: 'OkBuddy2025!',
-    fullName: 'OkBuddy Test User'
+    password: 'CV Builder2025!',
+    fullName: 'CV Builder Test User'
   },
   {
     email: 'user1@okbuddy.com',

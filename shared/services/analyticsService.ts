@@ -1,6 +1,6 @@
 /**
- * OkBuddy Analytics Service - Statsig Integration
- * Centralized event tracking service following OkBuddy development tenets
+ * CV Builder Analytics Service - Statsig Integration
+ * Centralized event tracking service following CV Builder development tenets
  * 
  * Features:
  * - Statsig integration for event tracking and experimentation

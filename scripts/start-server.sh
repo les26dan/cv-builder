@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Starting OkBuddy Unified Development Server${NC}"
+echo -e "${BLUE}🚀 Starting CV Builder Unified Development Server${NC}"
 echo ""
 
 # Function to ensure we're in the correct directory
@@ -19,7 +19,7 @@ ensure_correct_directory() {
   
   if [ ! -f "$project_dir/package.json" ]; then
     echo -e "${RED}❌ Error: package.json not found in $project_dir${NC}"
-    echo "Please run this script from the OkBuddy project root directory."
+    echo "Please run this script from the CV Builder project root directory."
     exit 1
   fi
   
@@ -112,7 +112,7 @@ wait_for_server() {
 # Function to display server info
 show_server_info() {
   echo ""
-  echo -e "${GREEN}🎉 OkBuddy Server Started Successfully!${NC}"
+  echo -e "${GREEN}🎉 CV Builder Server Started Successfully!${NC}"
   echo ""
   echo -e "${BLUE}📍 Server Information:${NC}"
   echo -e "   🌐 Local:     http://localhost:3000"

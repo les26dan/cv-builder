@@ -1,6 +1,6 @@
 /**
  * Unified Prompt Templates - Cross-Project Prompt Management
- * Following OkBuddy tenets: modular, swappable, consistent prompts
+ * Following CV Builder tenets: modular, swappable, consistent prompts
  * Centralized prompt template system for all AI-related functionality
  */
 

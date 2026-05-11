@@ -1,6 +1,6 @@
 /**
  * Date formatting utilities for CV sections
- * Following OkBuddy development tenets - centralized utility functions
+ * Following CV Builder development tenets - centralized utility functions
  */
 
 /**

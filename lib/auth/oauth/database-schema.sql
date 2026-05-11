@@ -1,4 +1,4 @@
--- Enhanced OAuth Database Schema for OkBuddy Account Creation & Login
+-- Enhanced OAuth Database Schema for CV Builder Account Creation & Login
 -- This file documents the required database structure for the OAuth system
 
 -- Users table (main user accounts)

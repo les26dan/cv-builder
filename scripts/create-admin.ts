@@ -3,9 +3,13 @@
 /**
  * Admin Account Creation Script
  * Creates an admin user with full access permissions
- * 
+ *
  * Usage: npx tsx scripts/create-admin.ts
  */
+
+import * as dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+dotenv.config()
 
 import { hashPassword } from '../lib/password'
 import { DatabaseService } from '../lib/database'

@@ -1,8 +1,8 @@
 #!/bin/bash
-# OkBuddy Page Rendering Validation Script
+# CV Builder Page Rendering Validation Script
 # Prevents pages from showing raw text instead of styled UI
 
-echo "🚨 OkBuddy Page Rendering Validation"
+echo "🚨 CV Builder Page Rendering Validation"
 echo "====================================="
 
 # Colors for output
@@ -84,7 +84,7 @@ echo "==================="
 
 if [[ $ERRORS -eq 0 ]]; then
     echo -e "${GREEN}✅ ALL CHECKS PASSED${NC}"
-    echo "🎉 All OkBuddy pages follow correct rendering patterns!"
+    echo "🎉 All CV Builder pages follow correct rendering patterns!"
 else
     echo -e "${RED}❌ $ERRORS ISSUES FOUND${NC}"
     echo ""

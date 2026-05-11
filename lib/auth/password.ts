@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 
 /**
  * Password utility functions for secure hashing and verification
- * Following OkBuddy security-first development tenet
+ * Following CV Builder security-first development tenet
  */
 
 const SALT_ROUNDS = 12; // Higher than default for enhanced security

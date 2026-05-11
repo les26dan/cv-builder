@@ -42,7 +42,7 @@ describe('Email Service', () => {
     expect(mockConsoleLog).toHaveBeenCalledWith('\n🔔 EMAIL WOULD BE SENT (Development Mode)');
     expect(mockConsoleLog).toHaveBeenCalledWith('=====================================');
     expect(mockConsoleLog).toHaveBeenCalledWith(`To: ${testData.email}`);
-    expect(mockConsoleLog).toHaveBeenCalledWith(`Subject: Chào mừng đến với OkBuddy - Tài khoản của bạn đã được tạo!`);
+    expect(mockConsoleLog).toHaveBeenCalledWith(`Subject: Chào mừng đến với CV Builder - Tài khoản của bạn đã được tạo!`);
     expect(mockConsoleLog).toHaveBeenCalledWith('\nEmail Content:');
     expect(mockConsoleLog).toHaveBeenCalledWith('📧 Account Details:');
     expect(mockConsoleLog).toHaveBeenCalledWith(`   Full Name: ${testData.fullName}`);

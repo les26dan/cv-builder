@@ -1,5 +1,5 @@
 // Email service for sending confirmation emails
-// Following OkBuddy tenets: modular, swappable, no vendor lock-in
+// Following CV Builder tenets: modular, swappable, no vendor lock-in
 
 export interface EmailData {
   fullName: string;
@@ -40,11 +40,11 @@ export async function sendConfirmationEmail(data: EmailData): Promise<EmailResul
     // For MVP: Log email content (in production, integrate with email service)
     const emailContent = {
       to: data.email,
-      subject: 'Chào mừng đến với OkBuddy - Xác nhận tài khoản',
+      subject: 'Chào mừng đến với CV Builder - Xác nhận tài khoản',
       body: `
         Xin chào ${data.fullName},
 
-        Cảm ơn bạn đã đăng ký tài khoản OkBuddy!
+        Cảm ơn bạn đã đăng ký tài khoản CV Builder!
 
         Thông tin đăng nhập của bạn:
         Email: ${data.email}
@@ -53,7 +53,7 @@ export async function sendConfirmationEmail(data: EmailData): Promise<EmailResul
         Vui lòng đăng nhập vào hệ thống để bắt đầu sử dụng dịch vụ.
 
         Trân trọng,
-        Đội ngũ OkBuddy
+        Đội ngũ CV Builder
       `
     };
 
@@ -109,18 +109,18 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
     // For MVP: Log reset email content
     const emailContent = {
       to: email,
-      subject: 'OkBuddy - Đặt lại mật khẩu',
+      subject: 'CV Builder - Đặt lại mật khẩu',
       body: `
         Xin chào,
 
-        Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản OkBuddy.
+        Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản CV Builder.
 
         Mã đặt lại mật khẩu: ${resetToken}
 
         Vui lòng sử dụng mã này để đặt lại mật khẩu.
 
         Trân trọng,
-        Đội ngũ OkBuddy
+        Đội ngũ CV Builder
       `
     };
 

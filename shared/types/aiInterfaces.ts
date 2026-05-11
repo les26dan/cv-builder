@@ -1,6 +1,6 @@
 /**
  * Unified AI Interfaces - Cross-Project Type Definitions
- * Following OkBuddy tenets: modular, swappable, consistent types
+ * Following CV Builder tenets: modular, swappable, consistent types
  * Centralized interfaces for all AI-related functionality
  */
 

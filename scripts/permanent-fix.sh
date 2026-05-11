@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# OkBuddy Permanent Webpack Error Fix
+# CV Builder Permanent Webpack Error Fix
 # Run this script whenever webpack module errors occur
 # Updated January 2025 - DEFINITIVE SOLUTION
 
@@ -16,7 +16,7 @@ NC='\033[0m'
 
 echo -e "${BLUE}"
 echo "╔══════════════════════════════════════════════╗"
-echo "║      OkBuddy PERMANENT WEBPACK FIX           ║"
+echo "║      CV Builder PERMANENT WEBPACK FIX           ║"
 echo "║      Eliminates Module Errors Forever        ║"
 echo "╚══════════════════════════════════════════════╝"
 echo -e "${NC}"
@@ -196,7 +196,7 @@ main() {
     echo -e "${CYAN}  • Test: http://localhost:3000${NC}"
     echo -e "${CYAN}  • Monitor: tail -f server-persistent.log${NC}"
     echo ""
-    echo -e "${GREEN}✅ OkBuddy is ready for development!${NC}"
+    echo -e "${GREEN}✅ CV Builder is ready for development!${NC}"
 }
 
 # Run main function

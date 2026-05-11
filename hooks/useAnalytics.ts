@@ -1,5 +1,5 @@
 /**
- * Analytics React Hook for OkBuddy
+ * Analytics React Hook for CV Builder
  * Provides convenient React hooks for event tracking throughout the application
  */
 
