@@ -1,6 +1,6 @@
 /**
  * CV Editor Component
- * Following OkBuddy development tenets - modular, replaceable, accessible
+ * Following CV Builder development tenets - modular, replaceable, accessible
  * Updated for enhanced CV parsing integration and JD optimization workflow
  */
 
@@ -399,17 +399,15 @@ export const CVEditor: React.FC<CVEditorProps> = ({
     setCvData(prev => ({ ...prev, [sectionId]: data } as CVData));
   }, []);
 
-  // Handle section order changes
+  // Handle section order changes.
+  // Use a functional setState so we don't clobber other section updates that
+  // happen in the same tick (e.g. handleAddSection calls onUpdateSection then
+  // onSectionOrderChange back-to-back — without functional update the second
+  // call's closure would spread a stale cvData and wipe the new section data).
   const handleSectionOrderChange = useCallback((newOrder: string[]) => {
     console.log('🔧 CVEditor: Updating section order', newOrder);
-    
-    const updatedData = {
-      ...cvData,
-      sectionOrder: newOrder
-    };
-    
-    handleDataUpdate(updatedData);
-  }, [cvData, handleDataUpdate]);
+    setCvData(prev => ({ ...prev, sectionOrder: newOrder } as CVData));
+  }, []);
 
   // JD optimization handlers removed - using new LLM-based CV parser instead
 

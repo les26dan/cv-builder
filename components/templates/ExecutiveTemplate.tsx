@@ -7,6 +7,7 @@ import { detectLanguage } from '../../config/languageConfig'
 import { injectThemeVars } from './colorThemes'
 import { cvType, cvSpace, cvBullet, cvClass } from './designTokens'
 import type { CVTemplateProps } from './templateRegistry'
+import { MarkdownNotes } from '../common/MarkdownNotes'
 
 export const ExecutiveTemplate = memo<CVTemplateProps>(({
   cvData,
@@ -259,6 +260,9 @@ export const ExecutiveTemplate = memo<CVTemplateProps>(({
                 {item.title && <span style={{ fontWeight: 600 }}>{item.title}</span>}
                 {item.description && <span style={{ color: mutedHex }}> — {item.description}</span>}
                 {item.name && <span>{item.name}</span>}
+                {item.issuer && <span style={{ color: mutedHex }}> — {item.issuer}</span>}
+                {item.date && <span style={{ color: mutedHex }}> ({item.date})</span>}
+                <MarkdownNotes source={item.notes} color={textHex} />
               </div>
             ))}
           </div>

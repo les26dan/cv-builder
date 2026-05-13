@@ -878,7 +878,7 @@ export const WorkExperienceSection = ({
                 Xây Dựng Kinh Nghiệm Làm Việc Ấn Tượng Trong 5 Giây!
               </h4>
               <p className="text-sm text-primary-500 mb-2">
-                Chỉ cần nhập chức danh và tên công ty - OkBuddy AI giúp bạn tạo mô tả kinh nghiệm làm việc ngay lập tức.
+                Chỉ cần nhập chức danh và tên công ty - AI giúp bạn tạo mô tả kinh nghiệm làm việc ngay lập tức.
               </p>
             </div>
           </div>
