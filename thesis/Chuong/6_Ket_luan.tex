@@ -1,30 +1,51 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-\section{Kết luận}
+Khóa luận đã giải quyết hai bài toán đặt ra ở Chương 1: (i) xây dựng một hệ thống web hoàn chỉnh hỗ trợ tạo, phân tích và tối ưu CV bằng mô hình ngôn ngữ lớn; và (ii) thực hiện thí nghiệm so sánh ba phương pháp đo độ phù hợp giữa CV và mô tả công việc trên dữ liệu công khai, với kiểm định thống kê đầy đủ. Chương này tóm tắt kết quả, nêu các hạn chế còn tồn tại, và đề xuất một số hướng phát triển trong tương lai.
 
-Đồ án đã hoàn thành việc xây dựng hệ thống OkBuddy -- một ứng dụng web toàn diện hỗ trợ người dùng tạo, phân tích và tối ưu hồ sơ việc làm bằng cách ứng dụng Mô hình Ngôn ngữ lớn. Các kết quả chính đạt được bao gồm:
+\section{Tóm tắt kết quả đạt được}
 
-Thứ nhất, đồ án đã đề xuất và hiện thực thành công phương pháp phân tích CV hybrid, kết hợp giữa kỹ thuật xử lý văn bản truyền thống bằng biểu thức chính quy và Mô hình Ngôn ngữ lớn (ChatGPT API). Phương pháp này giúp giảm 56\% lượng token API sử dụng và giảm hơn một nửa thời gian xử lý so với phương pháp sử dụng hoàn toàn LLM, trong khi chỉ hy sinh 2--3\% độ chính xác. Kết quả này chứng minh tính khả thi của cách tiếp cận hybrid trong các bài toán trích xuất thông tin, nơi một phần dữ liệu có cấu trúc tương đối cố định và có thể xử lý hiệu quả bằng phương pháp truyền thống.
+\textbf{Về phần sản phẩm:}
 
-Thứ hai, đồ án đã xây dựng trình soạn thảo CV tương tác với khả năng chỉnh sửa theo từng phần, hỗ trợ kéo thả sắp xếp thứ tự, tự động lưu, và xem trước định dạng A4 trong thời gian thực. Hệ thống hỗ trợ xuất CV ra bốn định dạng (PDF, DOCX, LaTeX, TXT), trong đó xuất LaTeX là tính năng hiếm có ở các công cụ CV builder hiện nay, đặc biệt hữu ích cho người dùng trong môi trường học thuật.
+\begin{enumerate}
+\item Sinh viên đã đề xuất và hiện thực phương pháp \textit{phân tích CV lai} (hybrid parser) kết hợp giữa biểu thức chính quy cho các trường có cấu trúc rõ và mô hình ngôn ngữ lớn cho phần kinh nghiệm tự do. Kết quả đánh giá trên 20 CV mẫu cho thấy phương pháp lai giảm khoảng 56\% lượng dữ liệu phải gửi cho LLM trong khi độ chính xác chỉ giảm 2--3\% -- mức giảm chấp nhận được so với phần chi phí tiết kiệm được.
 
-Thứ ba, đồ án đã phát triển nền tảng web hoàn chỉnh với hệ thống xác thực đa phương thức (email, Google OAuth, LinkedIn OAuth), quản lý CV trực tuyến, phiên khách không cần đăng ký, và hỗ trợ song ngữ Việt--Anh. Hệ thống được xây dựng trên nền tảng công nghệ hiện đại (Next.js 15, React 19, TypeScript, Supabase) với nhiều lớp bảo mật (RLS, bcrypt, CSRF, rate limiting).
+\item Sinh viên đã xây dựng trình soạn thảo CV tương tác với layout hai cột (editor và preview), hỗ trợ chỉnh sửa theo từng phần, kéo thả sắp xếp thứ tự các mục, lưu tự động sau 2 giây, và xem trước định dạng A4 ngay khi đang sửa. Trình soạn thảo hỗ trợ xuất CV ra hai định dạng phổ biến: PDF và DOCX.
 
-Tổng cộng 31 trường hợp kiểm thử chức năng đã được thực hiện và đều đạt yêu cầu. So sánh với các giải pháp hiện có trên thị trường (Canva, Zety, Sovren, LinkedIn), OkBuddy có lợi thế ở khả năng kết hợp upload-phân tích-soạn thảo trong một hệ thống duy nhất, hỗ trợ tiếng Việt đầy đủ, xuất LaTeX, và phiên khách.
+\item Sinh viên đã phát triển hệ thống web hoàn chỉnh với ba phương thức đăng nhập (email/mật khẩu, Google OAuth, LinkedIn OAuth), quản lý nhiều CV trực tuyến cho từng người dùng, và giao diện song ngữ Việt--Anh. Hệ thống đã được kiểm thử qua 28 trường hợp kiểm thử chức năng và đều đạt yêu cầu.
+\end{enumerate}
+
+\textbf{Về phần nghiên cứu:}
+
+\begin{enumerate}\setcounter{enumi}{3}
+\item Sinh viên đã thiết kế và thực hiện một thí nghiệm so sánh định lượng ba phương pháp đo độ phù hợp CV--JD (đếm trùng từ TF-IDF, so sánh nghĩa Embedding, và LLM chấm điểm) trên 400 cặp dữ liệu công khai từ Kaggle. Kết quả chính:
+\begin{itemize}
+\item Trả lời \textbf{RQ1} (chất lượng): Embedding cho ROC-AUC cao nhất (0,766), vượt cả TF-IDF (0,755) và LLM (0,755). Kiểm định paired Wilcoxon xác nhận khác biệt sai số giữa Embedding và LLM ($p = 0{,}0038$), giữa Embedding và TF-IDF ($p < 10^{-16}$) đều có ý nghĩa thống kê.
+\item Trả lời \textbf{RQ2} (chi phí): Embedding là phương pháp hiệu quả chi phí nhất -- chất lượng cao nhất với chi phí gần như 0 sau khi cache, trong khi LLM tốn 0,28 USD/1\,000 cặp và chậm hơn 5\,000 lần.
+\end{itemize}
+Toàn bộ pipeline đánh giá (script, dữ liệu trung gian, kết quả) được công bố mã nguồn mở để người khác có thể tái lập và tham chiếu khi lựa chọn phương pháp cho hệ thống tuyển dụng thực tế.
+\end{enumerate}
+
+\section{Hạn chế}
+
+\textbf{Hạn chế về ground truth.} Strategy A dán nhãn theo nhóm nghề là silver-standard: hai CV và JD cùng nhóm nghề không nhất thiết phù hợp 100\%, và khác nhóm cũng có thể vẫn liên quan. Việc dùng ground truth do người chấm điểm tay sẽ cho kết quả tin cậy hơn nhưng tốn nhiều công sức.
+
+\textbf{Hạn chế về phạm vi dữ liệu.} Thí nghiệm chỉ dùng 400 cặp tiếng Anh. Kết quả có thể khác trên dữ liệu tiếng Việt do mô hình embedding chủ yếu được huấn luyện trên tiếng Anh.
+
+\textbf{Hạn chế về tính năng hệ thống.} Hệ thống hiện chỉ xuất CV ra PDF và DOCX; chưa hỗ trợ các định dạng khác như LaTeX hay TXT. Module phân tích CV chưa hỗ trợ tệp scan PDF (cần OCR).
+
+\textbf{Hạn chế về quy mô đánh giá.} Số cặp ($n = 400$) đủ để có kiểm định thống kê có ý nghĩa nhưng vẫn nhỏ so với các benchmark IR chuẩn.
 
 \section{Hướng phát triển trong tương lai}
 
-Dựa trên các hạn chế đã nhận diện ở Chương 5, đồ án đề xuất các hướng phát triển sau:
+\textbf{Mở rộng dữ liệu sang tiếng Việt.} Thu thập một bộ dữ liệu CV--JD tiếng Việt với ít nhất vài trăm cặp được người chuyên gia tuyển dụng gắn nhãn. Lặp lại thí nghiệm để kiểm tra xem kết luận có còn đúng trên ngôn ngữ Việt hay không, đặc biệt khi các mô hình embedding hiện tại chưa được tối ưu cho tiếng Việt.
 
-\textbf{Thuật toán chấm điểm CV:} Xây dựng thuật toán đánh giá chất lượng CV dựa trên nhiều tiêu chí bao gồm: mức độ đầy đủ thông tin, cấu trúc CV phù hợp ATS, chất lượng nội dung (sử dụng LLM để đánh giá), và mức độ phù hợp với mô tả công việc. Điểm số từ 0 đến 100 sẽ đi kèm gợi ý cải thiện cụ thể cho từng tiêu chí.
+\textbf{Tích hợp OCR cho CV scan.} Tích hợp một mô hình OCR (như Tesseract hoặc PaddleOCR) để xử lý các CV đã được scan thành ảnh -- một dạng phổ biến trong thực tế tuyển dụng.
 
-\textbf{Hệ thống đa template:} Phát triển thư viện template CV đa dạng phục vụ các ngành nghề khác nhau (kỹ sư phần mềm, marketing, thiết kế, quản lý dự án), cho phép người dùng chuyển đổi template trong khi vẫn giữ nguyên nội dung.
+\textbf{Cải thiện gợi ý chỉnh sửa CV.} Phát triển một module riêng dùng LLM để gợi ý cách viết lại các mục trong CV cho phù hợp với một mô tả công việc cụ thể, kết hợp kết quả của Embedding (chấm điểm tổng thể) và LLM (gợi ý sửa chi tiết).
 
-\textbf{So khớp CV với mô tả công việc nâng cao:} Tích hợp sâu hơn khả năng phân tích job description bằng LLM, so khớp từ khóa và kỹ năng, đưa ra gợi ý cụ thể để tối ưu CV cho từng vị trí ứng tuyển, bao gồm điểm phù hợp (match score) và danh sách từ khóa còn thiếu.
+\textbf{Mở rộng nghiên cứu.} Thử các phương pháp khác như Cross-Encoder (so sánh ngữ nghĩa với mô hình re-ranker), hoặc kết hợp Embedding + LLM cho top-k tái xếp hạng -- để kiểm tra xem có cải thiện được ROC-AUC vượt 0,766 hay không.
 
-\textbf{Hỗ trợ thiết bị di động:} Thiết kế lại giao diện soạn thảo CV theo phương pháp responsive, có thể sử dụng layout một cột với khả năng chuyển đổi giữa chế độ edit và preview trên màn hình nhỏ.
-
-\textbf{Tích hợp nền tảng tuyển dụng:} Kết nối với các nền tảng tuyển dụng phổ biến tại Việt Nam (TopCV, VietnamWorks, LinkedIn) để cho phép người dùng nộp CV trực tiếp từ hệ thống.
+\textbf{Phát triển sản phẩm thương mại.} Hệ thống hiện tại đã đủ tính năng cốt lõi để mang ra phục vụ người dùng thật. Hướng tiếp theo gồm: thêm gói trả phí (xuất nhiều CV/tháng, tính năng AI nâng cao), tích hợp thanh toán, và triển khai trên hạ tầng đám mây có khả năng mở rộng tự động.
 
 \end{document}
