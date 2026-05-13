@@ -722,8 +722,11 @@ export const EditorPanel = ({
           />
         );
       default: {
-        const sectionData = cvData[sectionId];
-        if (!sectionData) return null;
+        // Defensive: if section is in sectionOrder but data hasn't been
+        // initialised yet (e.g. a state-sync race after handleAddSection),
+        // fall back to an empty shape so the form still renders. Otherwise
+        // the user sees a header with no inputs and no way to recover.
+        const sectionData = cvData[sectionId] || {};
 
         const baseType = sectionId.replace(/-\d+$/, '');
 
@@ -747,9 +750,26 @@ export const EditorPanel = ({
                     <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày kết thúc" value={item.endDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, endDate: e.target.value } : it))} />
                   </div>
                   <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Link dự án (tùy chọn)" value={item.url || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, url: e.target.value } : it))} />
+                  <textarea
+                    className="w-full p-2 border border-gray-300 rounded text-sm min-h-[80px] font-mono"
+                    placeholder={'Ghi chú thêm (hỗ trợ Markdown)\n\nVí dụ:\n- **Vai trò**: Lead developer\n- *Tech*: React, Node.js\n- Link: [demo](https://...)'}
+                    value={item.notes || ''}
+                    onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, notes: e.target.value } : it))}
+                  />
+                  <p className="text-xs text-gray-400">Hỗ trợ Markdown: **đậm**, *nghiêng*, `code`, - danh sách, [link](url)</p>
                 </div>
               ))}
-              <button onClick={() => updateItems([...items, { id: `project-${Date.now()}`, title: '', description: '', technologies: [], startDate: '', endDate: '', url: '' }])} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600">
+              {items.length === 0 && (
+                <div className="text-center py-6 text-sm text-gray-500">
+                  Chưa có dự án nào. Nhấn nút bên dưới để bắt đầu.
+                </div>
+              )}
+              <button
+                onClick={() => updateItems([...items, { id: `project-${Date.now()}`, title: '', description: '', technologies: [], startDate: '', endDate: '', url: '', notes: '' }])}
+                className={items.length === 0
+                  ? 'w-full py-3 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 flex items-center justify-center gap-2'
+                  : 'w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600'}
+              >
                 + Thêm dự án
               </button>
             </div>
@@ -775,9 +795,26 @@ export const EditorPanel = ({
                     <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày bắt đầu" value={item.startDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, startDate: e.target.value } : it))} />
                     <input className="flex-1 p-2 border border-gray-300 rounded text-sm" placeholder="Ngày kết thúc" value={item.endDate || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, endDate: e.target.value } : it))} />
                   </div>
+                  <textarea
+                    className="w-full p-2 border border-gray-300 rounded text-sm min-h-[80px] font-mono"
+                    placeholder={'Ghi chú thêm (hỗ trợ Markdown)\n\nVí dụ:\n- **Thành tích**: Tổ chức 3 sự kiện\n- *Quy mô*: 200+ người tham gia'}
+                    value={item.notes || ''}
+                    onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, notes: e.target.value } : it))}
+                  />
+                  <p className="text-xs text-gray-400">Hỗ trợ Markdown: **đậm**, *nghiêng*, `code`, - danh sách, [link](url)</p>
                 </div>
               ))}
-              <button onClick={() => updateItems([...items, { id: `volunteer-${Date.now()}`, organization: '', role: '', description: '', startDate: '', endDate: '' }])} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600">
+              {items.length === 0 && (
+                <div className="text-center py-6 text-sm text-gray-500">
+                  Chưa có hoạt động nào. Nhấn nút bên dưới để bắt đầu.
+                </div>
+              )}
+              <button
+                onClick={() => updateItems([...items, { id: `volunteer-${Date.now()}`, organization: '', role: '', description: '', startDate: '', endDate: '', notes: '' }])}
+                className={items.length === 0
+                  ? 'w-full py-3 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 flex items-center justify-center gap-2'
+                  : 'w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600'}
+              >
                 + Thêm hoạt động
               </button>
             </div>
@@ -800,9 +837,26 @@ export const EditorPanel = ({
                   <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Tổ chức cấp" value={item.issuer || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, issuer: e.target.value } : it))} />
                   <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Ngày cấp" value={item.date || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, date: e.target.value } : it))} />
                   <input className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Link xác minh (tùy chọn)" value={item.url || ''} onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, url: e.target.value } : it))} />
+                  <textarea
+                    className="w-full p-2 border border-gray-300 rounded text-sm min-h-[80px] font-mono"
+                    placeholder={'Ghi chú thêm (hỗ trợ Markdown)\n\nVí dụ:\n- **Điểm số**: 950/990\n- *Chứng nhận*: Coursera'}
+                    value={item.notes || ''}
+                    onChange={e => updateItems(items.map((it, i) => i === idx ? { ...it, notes: e.target.value } : it))}
+                  />
+                  <p className="text-xs text-gray-400">Hỗ trợ Markdown: **đậm**, *nghiêng*, `code`, - danh sách, [link](url)</p>
                 </div>
               ))}
-              <button onClick={() => updateItems([...items, { id: `cert-${Date.now()}`, name: '', issuer: '', date: '', url: '' }])} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600">
+              {items.length === 0 && (
+                <div className="text-center py-6 text-sm text-gray-500">
+                  Chưa có chứng chỉ nào. Nhấn nút bên dưới để bắt đầu.
+                </div>
+              )}
+              <button
+                onClick={() => updateItems([...items, { id: `cert-${Date.now()}`, name: '', issuer: '', date: '', url: '', notes: '' }])}
+                className={items.length === 0
+                  ? 'w-full py-3 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 flex items-center justify-center gap-2'
+                  : 'w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600'}
+              >
                 + Thêm chứng chỉ
               </button>
             </div>
@@ -871,22 +925,36 @@ export const EditorPanel = ({
                    {editorTexts?.editorPanel?.jobAnalysis?.title || 'Job Description Analysis'}
                  </h3>
                  <p className="text-sm font-normal leading-5 text-slate-500">
-                   {editorTexts?.editorPanel?.jobAnalysis?.subtitle || 'OkBuddy helps you analyze job descriptions and provides optimization suggestions for your CV'}
+                   {editorTexts?.editorPanel?.jobAnalysis?.subtitle || 'CV Builder helps you analyze job descriptions and provides optimization suggestions for your CV'}
                  </p>
                </div>
-              <button 
-                onClick={handleAnalyzeJob}
-                className="px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                disabled={isAnalyzing || !jdInput.trim()}
-              >
-                {isAnalyzing && (
-                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                )}
-                {isAnalyzing ? (editorTexts?.editorPanel?.jobAnalysis?.analyzing || 'Analyzing...') : (editorTexts?.editorPanel?.jobAnalysis?.analyzeButton || 'Analyze')}
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Compare 3 methods — thesis Chương 4 §4.7 entry point */}
+                <button
+                  onClick={() => {
+                    const m = typeof window !== 'undefined' ? window.location.pathname.match(/cv-guided-editing\/([^/?]+)/) : null
+                    const cvId = m?.[1] || 'new'
+                    window.location.href = `/cv-match/${cvId}`
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"
+                  title="So sánh 3 phương pháp matching (TF-IDF / Embedding / LLM)"
+                >
+                  ⚡ Compare 3 methods
+                </button>
+                <button
+                  onClick={handleAnalyzeJob}
+                  className="px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  disabled={isAnalyzing || !jdInput.trim()}
+                >
+                  {isAnalyzing && (
+                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 818-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  )}
+                  {isAnalyzing ? (editorTexts?.editorPanel?.jobAnalysis?.analyzing || 'Analyzing...') : (editorTexts?.editorPanel?.jobAnalysis?.analyzeButton || 'Analyze')}
+                </button>
+              </div>
             </div>
             
             {/* JD Input Section */}

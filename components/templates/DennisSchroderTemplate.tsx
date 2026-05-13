@@ -7,6 +7,7 @@ import { detectLanguage } from '../../config/languageConfig';
 import type { CVTemplateProps } from './templateRegistry';
 import { injectThemeVars } from './colorThemes';
 import { cvType, cvSpace, cvBullet, cvClass } from './designTokens';
+import { MarkdownNotes } from '../common/MarkdownNotes';
 
 interface DennisSchroderTemplateProps extends CVTemplateProps {}
 
@@ -230,6 +231,10 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
                 ) : null)}
               </ul>
             )}
+            {/* For project/volunteer items rendered through this path, item.description
+                is shown as a single-line; markdown notes give the user free-form space. */}
+            {exp.description && <div style={{ ...cvType.body, color: muted, marginTop: 4 }}>{exp.description}</div>}
+            <MarkdownNotes source={exp.notes} color={textColor} />
           </div>
         ))}
       </div>
@@ -299,6 +304,9 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
             {item.title && <span style={{ fontWeight: 600 }}>{item.title}</span>}
             {item.description && <span style={{ color: muted }}> — {item.description}</span>}
             {item.name && <span>{item.name}</span>}
+            {item.issuer && <span style={{ color: muted }}> — {item.issuer}</span>}
+            {item.date && <span style={{ color: muted }}> ({item.date})</span>}
+            <MarkdownNotes source={item.notes} color={textColor} />
           </div>
         ))}
       </div>
@@ -314,7 +322,10 @@ export const DennisSchroderTemplate = memo<DennisSchroderTemplateProps>(({
       case 'education':  return renderEducation(sectionId);
       default:
         if (sectionId.includes('experience') || sectionId.startsWith('projects-') || sectionId.startsWith('volunteer-')) return renderExperience(sectionId);
-        if (sectionId.includes('skills') || sectionId.startsWith('certifications-') || sectionId.startsWith('languages-')) return renderSkills(sectionId);
+        if (sectionId.includes('skills') || sectionId.startsWith('languages-')) return renderSkills(sectionId);
+        // certifications use the custom-item rendering so multi-line content
+        // (name + issuer + date + markdown notes) lays out properly instead of
+        // being squashed into a chip.
         return renderCustomSection(sectionId);
     }
   };

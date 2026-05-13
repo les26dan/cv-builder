@@ -163,7 +163,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
   const handleDownload = useCallback(async (format: 'pdf' | 'docx') => {
     try {
       setDownloadLoading(format);
-      await downloadCV(cvData, format, buildTemplateSetting(templateId, themeId));
+      await downloadCV(cvData, format, buildTemplateSetting(templateId, themeId), totalPages);
     } catch (error) {
       console.error('❌ Download error:', error);
     } finally {
