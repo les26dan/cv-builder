@@ -1,13 +1,13 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Chương 2 đã trình bày cơ sở lý thuyết về LLM, NLP và các công nghệ nền tảng. Chương này trình bày quá trình phân tích yêu cầu và thiết kế hệ thống OkBuddy, bao gồm đặc tả yêu cầu, kiến trúc tổng thể, thiết kế cơ sở dữ liệu, API, giao diện, và pipeline phân tích CV.
+Chương 2 đã trình bày các kiến thức nền tảng. Chương này mô tả quá trình \textit{phân tích yêu cầu} và \textit{thiết kế hệ thống}: xác định các chức năng cần có, vẽ kiến trúc tổng thể, thiết kế cơ sở dữ liệu, các API, và quy trình phân tích CV bằng phương pháp lai.
 
 \section{Phân tích yêu cầu}
 
 \subsection{Yêu cầu chức năng}
 
-Dựa trên phân tích bài toán ở Chương 1, hệ thống OkBuddy cần đáp ứng các yêu cầu chức năng sau:
+Dựa trên bài toán đã định nghĩa ở Chương 1, hệ thống cần đáp ứng các yêu cầu chức năng liệt kê trong Bảng \ref{tab:func_req}.
 
 \begin{table}[H]
 \centering
@@ -20,28 +20,28 @@ Dựa trên phân tích bài toán ở Chương 1, hệ thống OkBuddy cần đ
 FR01 & Đăng ký tài khoản & Người dùng đăng ký bằng email và mật khẩu \\ \hline
 FR02 & Đăng nhập đa phương thức & Đăng nhập bằng email/mật khẩu, Google OAuth, hoặc LinkedIn OAuth \\ \hline
 FR03 & Quản lý phiên đăng nhập & Duy trì phiên đăng nhập bằng JWT, hỗ trợ đăng xuất \\ \hline
-FR04 & Hỗ trợ phiên khách & Cho phép sử dụng CV editor mà không cần đăng nhập \\ \hline
-FR05 & Tải lên CV & Upload file PDF hoặc DOCX (tối đa 10MB) \\ \hline
-FR06 & Trích xuất văn bản & Tự động trích xuất text từ file PDF và DOCX \\ \hline
+FR04 & Hỗ trợ phiên khách & Cho phép sử dụng trình soạn thảo CV mà không cần đăng nhập \\ \hline
+FR05 & Tải lên CV & Upload file PDF hoặc DOCX (tối đa 10 MB) \\ \hline
+FR06 & Trích xuất văn bản & Tự động trích xuất văn bản từ tệp PDF và DOCX \\ \hline
 FR07 & Phân tích CV bằng AI & Phân tích nội dung CV, trích xuất thông tin có cấu trúc \\ \hline
-FR08 & Chấm điểm tin cậy & Tính toán điểm tin cậy (possibility\_score) cho kết quả phân tích \\ \hline
-FR09 & Nhận diện ngôn ngữ & Tự động phát hiện ngôn ngữ CV (Việt/Anh) \\ \hline
-FR10 & Chỉnh sửa CV theo phần & Editor cho phép sửa từng section (liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng) \\ \hline
-FR11 & Kéo thả sắp xếp & Cho phép sắp xếp thứ tự các mục bằng kéo thả \\ \hline
+FR08 & Chấm điểm tin cậy & Tính điểm tin cậy cho kết quả phân tích \\ \hline
+FR09 & Nhận diện ngôn ngữ & Tự động phát hiện CV viết bằng tiếng Việt hay tiếng Anh \\ \hline
+FR10 & Chỉnh sửa theo phần & Editor cho phép sửa từng section: liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng \\ \hline
+FR11 & Kéo thả sắp xếp & Cho phép sắp xếp thứ tự các mục bằng thao tác kéo thả \\ \hline
 FR12 & Tự động lưu & Auto-save dữ liệu CV định kỳ \\ \hline
 FR13 & Xem trước real-time & Preview CV định dạng A4 cập nhật theo thời gian thực \\ \hline
-FR14 & Xuất PDF & Xuất CV sang định dạng PDF \\ \hline
-FR15 & Xuất DOCX & Xuất CV sang định dạng Microsoft Word \\ \hline
-FR16 & Xuất LaTeX & Xuất CV sang định dạng LaTeX (moderncv) \\ \hline
-FR17 & Xuất TXT & Xuất CV sang định dạng văn bản thuần \\ \hline
-FR18 & Quản lý workspace & Dashboard hiển thị, tạo mới, sửa, xóa CV \\ \hline
-FR19 & Hỗ trợ song ngữ & Giao diện hỗ trợ cả tiếng Việt và tiếng Anh \\ \hline
-FR20 & Trang quản trị & Dashboard quản trị cho admin với thống kê hệ thống \\ \hline
+FR14 & Xuất PDF & Xuất CV ra định dạng PDF \\ \hline
+FR15 & Xuất DOCX & Xuất CV ra định dạng Microsoft Word \\ \hline
+FR16 & Quản lý workspace & Dashboard hiển thị, tạo mới, sửa, xoá CV \\ \hline
+FR17 & Hỗ trợ song ngữ & Giao diện hỗ trợ cả tiếng Việt và tiếng Anh \\ \hline
+FR18 & So khớp CV-JD & So sánh CV với mô tả công việc bằng ba phương pháp matching \\ \hline
 \end{tabular}%
 }
 \end{table}
 
 \subsection{Yêu cầu phi chức năng}
+
+Bảng \ref{tab:nonfunc_req} liệt kê các yêu cầu phi chức năng quan trọng.
 
 \begin{table}[H]
 \centering
@@ -51,93 +51,281 @@ FR20 & Trang quản trị & Dashboard quản trị cho admin với thống kê h
 \hline
 \textbf{Mã} & \textbf{Tên yêu cầu} & \textbf{Mô tả} \\ \hline
 NFR01 & Hiệu năng & Thời gian phân tích CV dưới 15 giây \\ \hline
-NFR02 & Bảo mật dữ liệu & Mã hóa mật khẩu, RLS, CSRF protection \\ \hline
-NFR03 & Khả năng mở rộng & Kiến trúc module hỗ trợ thêm tính năng \\ \hline
-NFR04 & Tương thích trình duyệt & Hoạt động trên Chrome, Firefox, Safari, Edge \\ \hline
-NFR05 & Tối ưu bundle & Bundle size dưới 200KB cho trang CV editor \\ \hline
-NFR06 & Rate limiting & Giới hạn số lượng request để chống tấn công \\ \hline
+NFR02 & Khả năng mở rộng & Kiến trúc module hỗ trợ thêm tính năng mới \\ \hline
+NFR03 & Tương thích trình duyệt & Hoạt động trên Chrome, Firefox, Safari, Edge \\ \hline
 \end{tabular}
 \end{table}
 
 \subsection{Biểu đồ Use Case}
 
-Hệ thống có ba tác nhân chính: Khách (Guest), Người dùng đã đăng nhập (User), và Quản trị viên (Admin). Hình \ref{fig:usecase} mô tả biểu đồ use case tổng thể của hệ thống.
+Hệ thống có ba tác nhân chính: Khách (chưa đăng nhập), Người dùng (đã đăng nhập), và Quản trị viên. Hình \ref{fig:usecase} mô tả tổng thể các trường hợp sử dụng.
 
-% Placeholder cho biểu đồ Use Case
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.8\textwidth}{\centering\vspace{3cm}
-\textit{[Sinh viên bổ sung biểu đồ Use Case tại đây]}\\
-\textit{Vẽ bằng draw.io hoặc PlantUML}
-\vspace{3cm}}}
-\caption{Biểu đồ Use Case tổng thể hệ thống OkBuddy}
+\begin{tikzpicture}[
+  every node/.style={font=\small},
+  uc/.style={ellipse, draw, thick, minimum width=3.8cm, minimum height=1.0cm, align=center, font=\footnotesize, fill=blue!8},
+  actor/.style={font=\footnotesize\bfseries, align=center},
+  sysbox/.style={rectangle, draw, very thick, dashed, inner sep=0.6cm},
+  conn/.style={thick, gray!70}
+]
+\foreach \name/\y/\label in {guest/4.0/Khách, user/-1.1/Người dùng, admin/-5.9/Quản trị viên} {
+  \node[circle, draw, minimum size=0.45cm, inner sep=0pt] (\name h) at (-5, \y+0.4) {};
+  \draw[thick] (-5, \y+0.18) -- (-5, \y-0.6);
+  \draw[thick] (-5.4, \y-0.2) -- (-4.6, \y-0.2);
+  \draw[thick] (-5, \y-0.6) -- (-5.35, \y-1.05);
+  \draw[thick] (-5, \y-0.6) -- (-4.65, \y-1.05);
+  \node[actor, anchor=north] at (-5, \y-1.1) {\label};
+  \coordinate (\name) at (-4.5, \y-0.2);
+}
+
+\node[uc] (uc1) at (2, 5.4)  {Xem trang chủ};
+\node[uc] (uc2) at (2, 4.0)  {Soạn thảo CV};
+\node[uc] (uc3) at (2, 2.6)  {Xuất CV\\(PDF/DOCX)};
+\node[uc] (uc4) at (2, 1.0)  {Đăng nhập / Đăng ký};
+\node[uc] (uc5) at (2, -0.4) {Tải lên CV};
+\node[uc] (uc6) at (2, -1.8) {Phân tích CV\\bằng LLM};
+\node[uc] (uc7) at (2, -3.2) {Quản lý CV\\(workspace)};
+\node[uc] (uc8) at (2, -5.2) {Xem thống kê};
+\node[uc] (uc9) at (2, -6.6) {Quản lý người dùng};
+
+\begin{scope}[on background layer]
+  \node[sysbox, fit=(uc1)(uc2)(uc3)(uc4)(uc5)(uc6)(uc7)(uc8)(uc9), label={[font=\bfseries\footnotesize]above:Hệ thống}] {};
+\end{scope}
+
+\draw[conn] (guest) -- (uc1.west);
+\draw[conn] (guest) -- (uc2.west);
+\draw[conn] (guest) -- (uc3.west);
+\draw[conn] (user) -- (uc4.west);
+\draw[conn] (user) -- (uc5.west);
+\draw[conn] (user) -- (uc6.west);
+\draw[conn] (user) -- (uc7.west);
+\draw[conn] (admin) -- (uc8.west);
+\draw[conn] (admin) -- (uc9.west);
+\end{tikzpicture}
+\caption{Biểu đồ Use Case tổng thể của hệ thống}
 \label{fig:usecase}
 \end{figure}
 
-Khách có thể truy cập trang chủ, tạo CV từ template, và sử dụng trình soạn thảo CV mà không cần đăng nhập. Người dùng đã đăng nhập có thêm quyền quản lý workspace, lưu CV vào cơ sở dữ liệu, và tải lên CV để phân tích. Quản trị viên có quyền truy cập dashboard quản trị, xem thống kê hệ thống và quản lý người dùng.
+Khách có thể truy cập trang chủ, soạn thảo CV từ template, và xuất CV mà không cần đăng nhập. Người dùng đã đăng nhập có thêm các chức năng quản lý workspace, lưu CV vào cơ sở dữ liệu, tải lên CV để phân tích. Quản trị viên có quyền truy cập dashboard quản trị và xem thống kê hệ thống.
 
 \section{Kiến trúc tổng thể hệ thống}
 
-Hệ thống OkBuddy được thiết kế theo kiến trúc ba lớp (three-tier architecture) bao gồm lớp trình bày (Presentation Layer), lớp logic nghiệp vụ (Business Logic Layer), và lớp dữ liệu (Data Layer). Toàn bộ hệ thống được xây dựng trên nền tảng Next.js, cho phép tích hợp cả frontend và backend API trong cùng một dự án.
+Hệ thống được thiết kế theo kiến trúc \textit{ba lớp} (three-tier) gồm: lớp trình bày, lớp logic nghiệp vụ, và lớp dữ liệu. Toàn bộ hệ thống chạy trên nền tảng Next.js cho phép tích hợp cả frontend và backend API trong cùng một dự án. Hình \ref{fig:architecture} mô tả tổ chức ba lớp.
 
-% Placeholder cho sơ đồ kiến trúc
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}
-\textit{[Sinh viên bổ sung sơ đồ kiến trúc hệ thống tại đây]}
-\vspace{2cm}}}
-\caption{Kiến trúc tổng thể hệ thống OkBuddy}
+\begin{tikzpicture}[
+  every node/.style={font=\small},
+  layer/.style={rectangle, rounded corners, draw, very thick, minimum width=13cm, minimum height=2.4cm, align=center},
+  comp/.style={rectangle, rounded corners=2pt, draw, minimum width=2.5cm, minimum height=1.0cm, align=center, font=\footnotesize, fill=white},
+  arr/.style={{Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}, thick}
+]
+\node[layer, fill=blue!10] (pres) {};
+\node[anchor=north, font=\bfseries, yshift=-0.15cm] at (pres.north) {Lớp trình bày};
+\node[comp] at ([xshift=-4.5cm, yshift=-0.45cm]pres.center) {Landing\\Page};
+\node[comp] at ([xshift=-1.5cm, yshift=-0.45cm]pres.center) {CV Upload\\\& Editor};
+\node[comp] at ([xshift=1.5cm, yshift=-0.45cm]pres.center) {Workspace};
+\node[comp] at ([xshift=4.5cm, yshift=-0.45cm]pres.center) {Admin\\Dashboard};
+
+\node[layer, fill=orange!12, below=0.5cm of pres] (logic) {};
+\node[anchor=north, font=\bfseries, yshift=-0.15cm] at (logic.north) {Lớp logic nghiệp vụ};
+\node[comp] at ([xshift=-4.5cm, yshift=-0.45cm]logic.center) {API\\Routes};
+\node[comp] at ([xshift=-1.5cm, yshift=-0.45cm]logic.center) {Xác thực\\(JWT, OAuth)};
+\node[comp] at ([xshift=1.5cm, yshift=-0.45cm]logic.center) {Hybrid CV\\Parser};
+\node[comp] at ([xshift=4.5cm, yshift=-0.45cm]logic.center) {Matching\\Engine};
+
+\node[layer, fill=green!12, below=0.5cm of logic] (data) {};
+\node[anchor=north, font=\bfseries, yshift=-0.15cm] at (data.north) {Lớp dữ liệu};
+\node[comp] at ([xshift=-4.5cm, yshift=-0.45cm]data.center) {Supabase\\PostgreSQL};
+\node[comp] at ([xshift=-1.5cm, yshift=-0.45cm]data.center) {pgvector\\(1536-dim)};
+\node[comp] at ([xshift=1.5cm, yshift=-0.45cm]data.center) {Vercel Blob\\(File storage)};
+\node[comp] at ([xshift=4.5cm, yshift=-0.45cm]data.center) {OpenAI API};
+
+\draw[arr] (pres) -- (logic);
+\draw[arr] (logic) -- (data);
+\end{tikzpicture}
+\caption{Kiến trúc tổng thể hệ thống ba lớp}
 \label{fig:architecture}
 \end{figure}
 
-\textbf{Lớp trình bày} bao gồm các trang React được kết xuất phía máy chủ (SSR) thông qua Next.js App Router. Lớp này chịu trách nhiệm hiển thị giao diện người dùng, xử lý tương tác, và giao tiếp với lớp logic nghiệp vụ thông qua API call. Các thành phần chính gồm: trang Landing, trang Login/Register, CV Upload, CV Guided Editor, CV Workspace, và Admin Dashboard.
+\textbf{Lớp trình bày} là các trang giao diện viết bằng React/Next.js: trang chủ, trang đăng nhập, trang tải lên CV, trình soạn thảo, workspace quản lý CV, và admin dashboard.
 
-\textbf{Lớp logic nghiệp vụ} được hiện thực dưới dạng các API Routes của Next.js. Lớp này xử lý toàn bộ logic ứng dụng bao gồm: xác thực và phân quyền người dùng, xử lý tệp tải lên, gọi OpenAI API để phân tích CV, quản lý phiên đăng nhập, và các thao tác CRUD trên dữ liệu CV. Middleware của Next.js đóng vai trò kiểm soát truy cập, phân biệt giữa các tuyến đường yêu cầu xác thực và cho phép khách truy cập.
+\textbf{Lớp logic nghiệp vụ} gồm các API endpoint Next.js xử lý: xác thực (JWT, OAuth), hybrid CV parser (regex + LLM), matching engine (TF-IDF, Embedding, LLM).
 
-\textbf{Lớp dữ liệu} sử dụng Supabase (PostgreSQL) làm cơ sở dữ liệu chính và Vercel Blob làm dịch vụ lưu trữ tệp. Supabase cung cấp cơ chế Row Level Security đảm bảo tách biệt dữ liệu giữa các người dùng ở tầng cơ sở dữ liệu.
+\textbf{Lớp dữ liệu} dùng Supabase PostgreSQL kèm tiện ích mở rộng pgvector để lưu vector 1536 chiều. Tệp CV được lưu trên Vercel Blob. Các lời gọi tới OpenAI API (cho LLM và embedding) cũng được tính trong lớp này.
 
-\section{Thiết kế cơ sở dữ liệu}
+\section{Thiết kế Mô hình thực thể và Cơ sở dữ liệu}
 
-\subsection{Sơ đồ quan hệ thực thể}
+\subsection{Mô hình thực thể (Domain Model)}
 
-Cơ sở dữ liệu của hệ thống bao gồm sáu bảng chính, được thiết kế trên PostgreSQL thông qua Supabase. Hình \ref{fig:erd} mô tả sơ đồ quan hệ thực thể (ERD) của hệ thống.
+Ở mức ứng dụng, hệ thống mô hình hoá các thực thể nghiệp vụ dưới dạng các lớp có quan hệ rõ ràng. Hình \ref{fig:domain_model} trình bày biểu đồ lớp của các thực thể chính.
 
-% Placeholder cho ERD
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{3cm}
-\textit{[Sinh viên bổ sung sơ đồ ERD tại đây]}\\
-\textit{Vẽ bằng dbdiagram.io hoặc draw.io}
-\vspace{3cm}}}
+\begin{tikzpicture}[
+  cls/.style={rectangle, draw, very thick, fill=white, inner sep=0pt},
+  rel/.style={thick, -{Stealth[length=2mm]}},
+  rellabel/.style={font=\scriptsize, fill=white, inner sep=1pt}
+]
+\node[cls] (User) at (0, 0) {%
+\begin{tabular}{|p{3.6cm}|}
+\hline
+\rowcolor{blue!15}\centering\bfseries User \tabularnewline\hline
+\scriptsize\,-- id: UUID \tabularnewline
+\scriptsize\,-- email: string \tabularnewline
+\scriptsize\,-- passwordHash: string? \tabularnewline
+\scriptsize\,-- oauthProvider: string? \tabularnewline
+\scriptsize\,-- emailVerified: bool \tabularnewline
+\scriptsize\,-- createdAt: datetime \tabularnewline\hline
+\end{tabular}};
+
+\node[cls] (CV) at (8, 0) {%
+\begin{tabular}{|p{3.6cm}|}
+\hline
+\rowcolor{blue!15}\centering\bfseries CV \tabularnewline\hline
+\scriptsize\,-- id: UUID \tabularnewline
+\scriptsize\,-- userId: UUID? \tabularnewline
+\scriptsize\,-- title: string \tabularnewline
+\scriptsize\,-- cvData: JSONB \tabularnewline
+\scriptsize\,-- jobDescription: string? \tabularnewline
+\scriptsize\,-- possibilityScore: int \tabularnewline
+\scriptsize\,-- createdAt: datetime \tabularnewline\hline
+\end{tabular}};
+
+\node[cls] (Exp) at (0, -5.3) {%
+\begin{tabular}{|p{3.6cm}|}
+\hline
+\rowcolor{blue!15}\centering\bfseries Experience \tabularnewline\hline
+\scriptsize\,-- title: string \tabularnewline
+\scriptsize\,-- company: string \tabularnewline
+\scriptsize\,-- startDate: string \tabularnewline
+\scriptsize\,-- endDate: string? \tabularnewline
+\scriptsize\,-- isCurrent: bool \tabularnewline
+\scriptsize\,-- bullets: string[] \tabularnewline\hline
+\end{tabular}};
+
+\node[cls] (Section) at (8, -5.3) {%
+\begin{tabular}{|p{3.6cm}|}
+\hline
+\rowcolor{blue!15}\centering\bfseries Section \tabularnewline\hline
+\scriptsize\,-- id: string \tabularnewline
+\scriptsize\,-- type: enum (contact, \tabularnewline
+\scriptsize\quad summary, experience, \tabularnewline
+\scriptsize\quad education, skills, custom) \tabularnewline
+\scriptsize\,-- order: int \tabularnewline
+\scriptsize\,-- content: JSONB \tabularnewline\hline
+\end{tabular}};
+
+\node[cls] (Guest) at (0, -10) {%
+\begin{tabular}{|p{3.6cm}|}
+\hline
+\rowcolor{blue!15}\centering\bfseries GuestSession \tabularnewline\hline
+\scriptsize\,-- sessionId: UUID \tabularnewline
+\scriptsize\,-- cvDataDraft: JSONB \tabularnewline
+\scriptsize\,-- expiresAt: datetime \tabularnewline\hline
+\end{tabular}};
+
+\draw[rel] (User.east) -- node[rellabel, above, pos=0.08]{1} node[rellabel, above, pos=0.92]{*} (CV.west);
+\draw[rel] (CV.south) -- node[rellabel, right, pos=0.1]{1} node[rellabel, right, pos=0.9]{*} (Section.north);
+\draw[rel] (Section.west) -- node[rellabel, above, pos=0.08]{1} node[rellabel, above, pos=0.92]{*} (Exp.east);
+\draw[rel, dashed] (Guest.west) -- ++(-1.2,0) |- node[rellabel, pos=0.25, left]{nâng cấp} (User.west);
+\end{tikzpicture}
+\caption{Mô hình thực thể (Domain Model) các đối tượng nghiệp vụ chính}
+\label{fig:domain_model}
+\end{figure}
+
+Mỗi \texttt{User} có thể sở hữu nhiều \texttt{CV}. Mỗi \texttt{CV} gồm nhiều \texttt{Section} có thứ tự (kiểu enum: liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng, tuỳ chỉnh); trong đó section kinh nghiệm chứa danh sách \texttt{Experience}. Thực thể \texttt{GuestSession} cho phép khách dùng trình soạn thảo mà không cần đăng nhập; dữ liệu nháp có thể được nâng cấp thành \texttt{CV} thuộc \texttt{User} mới khi khách đăng ký.
+
+\subsection{Sơ đồ quan hệ thực thể (ERD)}
+
+Ở mức cơ sở dữ liệu, hệ thống dùng sáu bảng chính. Hình \ref{fig:erd} mô tả quan hệ giữa chúng.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\scriptsize},
+  header/.style={rectangle, draw, very thick, fill=blue!15, minimum width=4cm, minimum height=0.5cm, font=\footnotesize\bfseries, align=center, anchor=north west},
+  fields/.style={rectangle, draw, very thick, fill=white, minimum width=4cm, anchor=north west, align=left, text width=3.8cm, inner sep=3pt, font=\scriptsize},
+  arr/.style={-{Stealth[length=2mm]}, thick, blue!70!black},
+  one/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt},
+  many/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt}
+]
+\node[header] (uh) at (0, 4) {users};
+\node[fields, below=0pt of uh.south west] (uf) {
+- id (PK) UUID\\
+- email\\
+- password\_hash\\
+- oauth\_provider\\
+- created\_at};
+
+\node[header] (wh) at (6, 4) {cv\_workflow};
+\node[fields, below=0pt of wh.south west] (wf) {
+- id (PK) TEXT\\
+- user\_id (FK $\to$ users)\\
+- title\\
+- cv\_data JSONB\\
+- status\\
+- cv\_embedding vector(1536)};
+
+\node[header] (dh) at (12, 4) {cv\_drafts};
+\node[fields, below=0pt of dh.south west] (df) {
+- id (PK) UUID\\
+- user\_id (FK $\to$ users)\\
+- file\_id\\
+- jd\_text\\
+- analysis\_id};
+
+\node[header] (ch) at (0, -2.0) {jd\_targets};
+\node[fields, below=0pt of ch.south west] (cf) {
+- id (PK) UUID\\
+- cv\_id (FK $\to$ cv\_workflow)\\
+- label\\
+- jd\_text\\
+- jd\_embedding vector(1536)};
+
+\node[header] (sh) at (6, -2.0) {match\_runs};
+\node[fields, below=0pt of sh.south west] (sf) {
+- id (PK) UUID\\
+- cv\_id\\
+- jd\_target\_id\\
+- method (tfidf/embed/llm)\\
+- score, latency, cost};
+
+\node[header] (ah) at (12, -2.0) {audit\_logs};
+\node[fields, below=0pt of ah.south west] (af) {
+- id (PK) UUID\\
+- user\_id (FK $\to$ users)\\
+- action\\
+- timestamp};
+
+\draw[arr] (uf.east |- uh.south) -- node[one, pos=0.1]{1} node[many, pos=0.9]{*} (wf.west |- wh.south);
+\draw[arr] (wf.east |- wh.south) -- node[one, pos=0.1]{1} node[many, pos=0.9]{*} (df.west |- dh.south);
+\draw[arr] ($(uf.south)+(0,0)$) -- ++(0,-0.5) -| node[many, pos=0.95]{*} (cf.north);
+\draw[arr] (cf.east |- ch.south) -- node[one, pos=0.1]{1} node[many, pos=0.9]{*} (sf.west |- sh.south);
+\draw[arr] ($(uf.south)+(1.0,0)$) -- ++(0,-0.7) -| node[many, pos=0.95]{*} (af.north);
+\end{tikzpicture}
 \caption{Sơ đồ quan hệ thực thể (ERD) của hệ thống}
 \label{fig:erd}
 \end{figure}
 
 \subsection{Mô tả các bảng dữ liệu}
 
-\textbf{Bảng users} lưu trữ thông tin tài khoản người dùng bao gồm họ tên, email, mật khẩu đã băm (hash), trạng thái xác minh email, và thông tin OAuth. Khóa chính là \texttt{id} kiểu UUID. Bảng có ràng buộc đảm bảo: nếu người dùng đăng nhập bằng OAuth thì không cần mật khẩu, ngược lại phải có mật khẩu đã băm.
+\textbf{Bảng \texttt{users}} lưu thông tin tài khoản: họ tên, email, mật khẩu đã băm (bcrypt), trạng thái xác minh, và thông tin OAuth. Ràng buộc: nếu đăng nhập bằng OAuth thì không cần mật khẩu, ngược lại phải có mật khẩu đã băm.
 
-\textbf{Bảng cv\_workflow} là bảng trung tâm lưu trữ dữ liệu CV đầy đủ theo quy trình làm việc. Bảng chứa dữ liệu CV ở dạng JSONB (cấu trúc linh hoạt), thông tin tệp tải lên, mô tả công việc (job description) để so khớp, kết quả phân tích AI, trạng thái quy trình, và các cài đặt người dùng. Trường \texttt{cv\_data} kiểu JSONB lưu toàn bộ dữ liệu CV có cấu trúc.
+\textbf{Bảng \texttt{cv\_workflow}} là bảng trung tâm lưu trữ CV đầy đủ. Trường \texttt{cv\_data} kiểu JSONB lưu toàn bộ cấu trúc CV (các section và nội dung). Trường \texttt{cv\_embedding} kiểu \texttt{vector(1536)} lưu vector embedding để phục vụ tìm kiếm ngữ nghĩa và matching.
 
-\textbf{Bảng cv\_drafts} lưu trữ các bản nháp CV từ quá trình tải lên, bao gồm thông tin tệp, văn bản trích xuất, và kết quả phân tích.
+\textbf{Bảng \texttt{cv\_drafts}} lưu bản nháp CV từ quá trình tải lên, gồm tệp gốc, văn bản đã trích xuất, và kết quả phân tích.
 
-\textbf{Bảng user\_sessions} quản lý phiên đăng nhập với token phiên duy nhất và thời gian hết hạn.
+\textbf{Bảng \texttt{jd\_targets}} lưu các mô tả công việc mà người dùng muốn so khớp với CV. Mỗi JD cũng có \texttt{jd\_embedding} riêng để tránh tính lại.
 
-\textbf{Bảng audit\_logs} ghi nhận các hành động của người dùng phục vụ mục đích kiểm toán và phân tích bảo mật.
+\textbf{Bảng \texttt{match\_runs}} lưu lịch sử các lần so khớp -- mỗi dòng tương ứng với một (CV, JD, phương pháp), gồm điểm số, độ trễ, chi phí. Vừa làm cache vừa làm audit log cho thí nghiệm Chương 5.
 
-\subsection{Chính sách bảo mật cấp hàng}
-
-Row Level Security (RLS) được kích hoạt trên tất cả các bảng. Mỗi bảng có chính sách đảm bảo người dùng chỉ truy cập được dữ liệu của chính mình. Ví dụ, chính sách trên bảng \texttt{cv\_workflow}:
-
-\begin{lstlisting}[language=SQL, caption={Chính sách RLS trên bảng cv\_workflow}]
-CREATE POLICY cv_workflow_own_data ON cv_workflow
-    FOR ALL
-    USING (auth.uid()::text = user_id::text);
-\end{lstlisting}
+\textbf{Bảng \texttt{audit\_logs}} ghi nhận các hành động của người dùng để theo dõi và phân tích.
 
 \section{Thiết kế API}
 
-Hệ thống cung cấp 19 API endpoint được tổ chức theo nhóm chức năng. Bảng \ref{tab:api} liệt kê các API chính.
+Hệ thống cung cấp 19 API endpoint được tổ chức theo nhóm chức năng (Bảng \ref{tab:api}). Mọi API trả về JSON; các API yêu cầu xác thực kiểm tra JWT được lưu trong cookie httpOnly.
 
 \begin{table}[H]
 \centering
@@ -149,87 +337,122 @@ Hệ thống cung cấp 19 API endpoint được tổ chức theo nhóm chức n
 \textbf{Endpoint} & \textbf{Phương thức} & \textbf{Mô tả} \\ \hline
 \multicolumn{3}{|c|}{\textbf{Xác thực}} \\ \hline
 /api/register & POST & Đăng ký tài khoản mới \\ \hline
-/api/login & POST & Đăng nhập bằng email hoặc username \\ \hline
+/api/login & POST & Đăng nhập email/mật khẩu \\ \hline
+/api/auth/logout & POST & Đăng xuất \\ \hline
 /api/auth/me & GET & Lấy thông tin người dùng hiện tại \\ \hline
-/api/auth/logout & POST & Đăng xuất, xóa phiên \\ \hline
-/api/auth/google/signin & GET & Khởi tạo luồng Google OAuth \\ \hline
-/api/auth/google/callback & GET & Xử lý callback Google OAuth \\ \hline
-/api/auth/linkedin/signin & GET & Khởi tạo luồng LinkedIn OAuth \\ \hline
-/api/auth/linkedin/callback & GET & Xử lý callback LinkedIn OAuth \\ \hline
-\multicolumn{3}{|c|}{\textbf{Quản lý CV}} \\ \hline
-/api/upload/cv & POST & Tải lên và phân tích CV \\ \hline
-/api/upload/cv-blob & POST & Tải CV lên Vercel Blob \\ \hline
-/api/cv/[cvId] & GET/PUT/DELETE & CRUD cho CV cụ thể \\ \hline
-/api/download/cv-blob & GET & Tải xuống CV từ Blob \\ \hline
+/api/auth/google/\{signin,callback\} & GET & OAuth Google \\ \hline
+/api/auth/linkedin/\{signin,callback\} & GET & OAuth LinkedIn \\ \hline
+\multicolumn{3}{|c|}{\textbf{Tải lên \& Phân tích CV}} \\ \hline
+/api/upload/cv & POST & Upload tệp PDF/DOCX và phân tích \\ \hline
+/api/upload/cv-blob & POST & Upload tệp lên Vercel Blob \\ \hline
+/api/cv/\{cvId\} & GET, POST & Lấy/cập nhật dữ liệu CV \\ \hline
+/api/cv-parser-stats & GET & Thống kê hiệu năng parser \\ \hline
+\multicolumn{3}{|c|}{\textbf{Matching CV--JD}} \\ \hline
+/api/cv/match & POST & Chạy 3 phương pháp matching song song \\ \hline
+/api/cv/embed & POST & Tính embedding cho CV hoặc JD \\ \hline
+/api/cv/jd-analyze & POST & Phân tích chi tiết CV vs JD bằng LLM \\ \hline
+/api/cv/rewrite-bullet & POST & Viết lại một mục bằng LLM \\ \hline
+/api/cv/summary & POST & Sinh tóm tắt nghề nghiệp bằng LLM \\ \hline
 \multicolumn{3}{|c|}{\textbf{Quản trị}} \\ \hline
 /api/admin/create & POST & Tạo tài khoản admin \\ \hline
-/api/cv-parser-stats & GET & Thống kê phân tích CV \\ \hline
 \end{tabular}%
 }
 \end{table}
 
-Tất cả API đều trả về dữ liệu dạng JSON. Các API yêu cầu xác thực sử dụng JWT token được lưu trong httpOnly cookie. Middleware kiểm tra token ở mỗi request và từ chối truy cập nếu token không hợp lệ hoặc đã hết hạn.
+\section{Thiết kế pipeline phân tích CV hybrid}
 
-\section{Thiết kế giao diện người dùng}
+Pipeline phân tích CV là thành phần cốt lõi của hệ thống, sử dụng phương pháp lai kết hợp xử lý bằng biểu thức chính quy và LLM. Hình \ref{fig:pipeline} mô tả luồng xử lý tổng thể.
 
-Giao diện hệ thống được thiết kế theo phong cách tối giản, sử dụng Tailwind CSS làm framework CSS. Hệ thống gồm các màn hình chính sau:
-
-\textbf{Trang chủ (Landing Page)} bao gồm Hero section với nút kêu gọi hành động (CTA), ba phần trình bày vấn đề (ATS Optimization, Keyword Matching, Mass CV Management), phần đánh giá từ người dùng (Testimonials), và footer với liên kết pháp lý.
-
-\textbf{Trang đăng nhập/đăng ký} cung cấp form nhập email và mật khẩu, các nút đăng nhập bằng Google và LinkedIn, và liên kết chuyển đổi giữa đăng nhập và đăng ký.
-
-\textbf{Trang tải lên CV} cho phép người dùng kéo thả hoặc chọn tệp PDF/DOCX, hiển thị tiến trình tải lên và phân tích, và cung cấp tùy chọn bắt đầu từ template.
-
-\textbf{Trang soạn thảo CV} là màn hình chính của hệ thống, sử dụng bố cục hai cột: cột trái là editor với các section có thể mở rộng/thu gọn và hỗ trợ kéo thả, cột phải là bản xem trước (preview) định dạng A4 cập nhật trong thời gian thực.
-
-\textbf{Trang workspace} hiển thị danh sách CV của người dùng dưới dạng thẻ (card), mỗi thẻ chứa tên CV, ngày tạo, trạng thái, và các nút hành động (sửa, xóa).
-
-% Placeholder cho wireframe
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{3cm}
-\textit{[Sinh viên bổ sung ảnh chụp giao diện trang soạn thảo CV tại đây]}
-\vspace{3cm}}}
-\caption{Giao diện trang soạn thảo CV với bố cục hai cột}
-\label{fig:editor_ui}
-\end{figure}
+\begin{tikzpicture}[
+  node distance=0.7cm and 0.9cm,
+  every node/.style={font=\small},
+  pstep/.style={rectangle, rounded corners, draw, thick, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=blue!8},
+  parser/.style={rectangle, rounded corners, draw, thick, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=orange!15},
+  data/.style={cylinder, draw, thick, aspect=0.25, shape border rotate=90, minimum height=1cm, minimum width=2.2cm, align=center, fill=gray!10},
+  arr/.style={-{Stealth[length=2.5mm]}, thick}
+]
+\node[pstep] (upload) {Tải lên CV\\(PDF / DOCX)};
+\node[pstep, right=of upload] (extract) {Trích xuất văn bản};
+\node[pstep, right=of extract] (lang) {Nhận diện\\ngôn ngữ};
 
-\section{Thiết kế pipeline phân tích CV}
+\node[parser, below=1.3cm of extract, xshift=-2.0cm] (regex) {Phân tích bằng\\biểu thức chính quy\\(liên hệ, kỹ năng)};
+\node[parser, below=1.3cm of extract, xshift=2.0cm] (llm) {Phân tích bằng LLM\\(kinh nghiệm\\làm việc)};
 
-Pipeline phân tích CV là thành phần cốt lõi của hệ thống, sử dụng phương pháp hybrid kết hợp xử lý trực tiếp bằng regex và LLM. Hình \ref{fig:pipeline} mô tả luồng xử lý tổng thể.
+\node[pstep, below=1.3cm of regex, xshift=2.0cm, fill=green!12] (merge) {Hợp nhất kết quả\\+ tính điểm tin cậy};
+\node[data, below=0.7cm of merge] (db) {Cơ sở dữ liệu\\(cv\_workflow)};
+\node[pstep, right=1.5cm of db] (editor) {Trình soạn thảo\\CV};
 
-% Placeholder cho sơ đồ pipeline
-\begin{figure}[H]
-\centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{3cm}
-\textit{[Sinh viên bổ sung sơ đồ pipeline phân tích CV tại đây]}\\
-\textit{Các bước: Upload $\rightarrow$ Extract Text $\rightarrow$ Language Detection $\rightarrow$}\\
-\textit{Hybrid Parser (Regex + LLM) $\rightarrow$ Structured JSON $\rightarrow$ Editor}
-\vspace{3cm}}}
-\caption{Pipeline phân tích CV hybrid}
+\draw[arr] (upload) -- (extract);
+\draw[arr] (extract) -- (lang);
+\draw[arr] (lang.south) -| (llm.north);
+\draw[arr] (lang.south) -| (regex.north);
+\draw[arr] (regex.south) -- (merge.north -| regex.south);
+\draw[arr] (llm.south) -- (merge.north -| llm.south);
+\draw[arr] (merge) -- (db);
+\draw[arr] (db) -- (editor);
+\end{tikzpicture}
+\caption{Pipeline phân tích CV hybrid (kết hợp regex và LLM)}
 \label{fig:pipeline}
 \end{figure}
 
 Pipeline hoạt động theo các bước sau:
 
-\textbf{Bước 1 -- Tải lên và trích xuất văn bản:} Người dùng tải lên tệp CV dạng PDF hoặc DOCX. Hệ thống sử dụng thư viện \texttt{pdf-parse} và \texttt{pdfjs-dist} để trích xuất văn bản từ PDF, hoặc \texttt{mammoth} cho DOCX. Tệp gốc được lưu vào Vercel Blob Storage.
+\textbf{Bước 1 -- Tải lên và trích xuất văn bản:} Người dùng tải tệp PDF hoặc DOCX. Hệ thống dùng \texttt{pdf-parse} cho PDF hoặc \texttt{mammoth} cho DOCX. Tệp gốc lưu vào Vercel Blob.
 
-\textbf{Bước 2 -- Nhận diện ngôn ngữ:} Module nhận diện ngôn ngữ phân tích văn bản trích xuất để xác định CV được viết bằng tiếng Việt hay tiếng Anh, dựa trên phát hiện các ký tự Unicode đặc trưng của tiếng Việt và tần suất từ vựng.
+\textbf{Bước 2 -- Nhận diện ngôn ngữ:} Module nhận diện ngôn ngữ phân tích văn bản để xác định CV viết bằng tiếng Việt hay tiếng Anh dựa trên ký tự Unicode đặc trưng và tần suất từ vựng.
 
-\textbf{Bước 3 -- Phân tích bằng regex:} Các trường thông tin có cấu trúc rõ ràng được trích xuất trực tiếp bằng biểu thức chính quy:
-\begin{enumerate}[label=(\roman*)]
-\item Email: mẫu \texttt{[a-zA-Z0-9.\_\%+-]+@[a-zA-Z0-9.-]+}
-\item Số điện thoại: mẫu phù hợp với định dạng Việt Nam và quốc tế
-\item URL LinkedIn: mẫu nhận dạng đường dẫn linkedin.com/in/
-\item Kỹ năng: nhận dạng dựa trên danh sách từ khóa kỹ năng phổ biến
-\end{enumerate}
+\textbf{Bước 3 -- Phân tích bằng regex:} Các trường có cấu trúc rõ được trích trực tiếp bằng biểu thức chính quy: email, số điện thoại, URL LinkedIn, danh sách kỹ năng dựa trên từ khoá phổ biến.
 
-\textbf{Bước 4 -- Phân tích bằng LLM:} Phần kinh nghiệm làm việc, do có cấu trúc phức tạp và đa dạng, được gửi tới ChatGPT API với prompt được thiết kế chuyên biệt. Prompt yêu cầu mô hình trả về kết quả dạng JSON với các trường: vị trí, công ty, thời gian, mô tả công việc.
+\textbf{Bước 4 -- Phân tích bằng LLM:} Phần kinh nghiệm làm việc (có cấu trúc phức tạp, viết tự do) được gửi tới ChatGPT API với prompt chuyên biệt. Prompt yêu cầu mô hình trả về JSON với các trường: vị trí, công ty, thời gian, mô tả công việc.
 
-\textbf{Bước 5 -- Hợp nhất và tính điểm:} Kết quả từ regex và LLM được hợp nhất thành cấu trúc JSON thống nhất. Hệ thống tính \texttt{possibility\_score} (0--100) dựa trên mức độ đầy đủ của thông tin trích xuất, phản ánh độ tin cậy rằng tệp tải lên thực sự là một CV hợp lệ.
+\textbf{Bước 5 -- Hợp nhất và tính điểm tin cậy:} Kết quả từ regex và LLM được gộp thành cấu trúc JSON thống nhất. Hệ thống tính \texttt{possibility\_score} (0--100) dựa trên mức độ đầy đủ của thông tin trích xuất.
 
-\textbf{Bước 6 -- Lưu trữ và hiển thị:} Dữ liệu CV có cấu trúc được lưu vào bảng \texttt{cv\_workflow} dạng JSONB và chuyển đến trình soạn thảo CV để người dùng xem và chỉnh sửa.
+\textbf{Bước 6 -- Lưu trữ và hiển thị:} Dữ liệu CV có cấu trúc được lưu vào bảng \texttt{cv\_workflow} kiểu JSONB và chuyển đến trình soạn thảo để người dùng xem và chỉnh sửa.
 
-Chương này đã trình bày quá trình phân tích yêu cầu và thiết kế hệ thống OkBuddy, từ đặc tả yêu cầu chức năng và phi chức năng, kiến trúc ba lớp, thiết kế cơ sở dữ liệu với sáu bảng và RLS, thiết kế API và giao diện, đến pipeline phân tích CV hybrid. Các thiết kế này tạo nền tảng cho quá trình hiện thực hệ thống được trình bày chi tiết trong Chương 4.
+Các bước 3 (regex) và 4 (LLM) độc lập với nhau và đều phụ thuộc vào kết quả bước 2, vì vậy trong hiện thực được thực thi \textit{song song} qua \texttt{Promise.all} nhằm giảm độ trễ tổng thể.
+
+\section{Thiết kế quy trình so sánh CV--JD}
+
+Để trả lời hai câu hỏi nghiên cứu RQ1 và RQ2, hệ thống cài đặt ba phương pháp so khớp CV--JD và chạy song song trên cùng một cặp đầu vào. Hình \ref{fig:matching_pipeline} mô tả luồng xử lý.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=0.8cm and 1.2cm,
+  every node/.style={font=\small},
+  inp/.style={rectangle, rounded corners, draw, thick, minimum width=3.0cm, minimum height=0.8cm, align=center, fill=gray!15},
+  proc/.style={rectangle, rounded corners, draw, thick, minimum width=3.5cm, minimum height=1.1cm, align=center},
+  outbox/.style={rectangle, rounded corners, draw, thick, minimum width=3.5cm, minimum height=0.8cm, align=center, fill=green!10},
+  arr/.style={-{Stealth[length=2.5mm]}, thick}
+]
+\node[inp] (cv) at (0,0) {Văn bản CV};
+\node[inp, right=1.2cm of cv] (jd) {Văn bản JD};
+
+\node[proc, fill=blue!10, below=1.5cm of cv, xshift=1.5cm] (tfidf) {TF-IDF Matcher\\(corpus IDF, cosine)};
+\node[proc, fill=orange!12, below=1.5cm of tfidf] (embed) {Embedding Matcher\\(text-embedding-3-small)};
+\node[proc, fill=purple!10, below=1.5cm of embed] (llm) {LLM Matcher\\(gpt-4o-mini, temp=0)};
+
+\node[outbox, right=2cm of tfidf] (s1) {Điểm + matched\_keywords};
+\node[outbox, right=2cm of embed] (s2) {Điểm + cosine sim};
+\node[outbox, right=2cm of llm]   (s3) {Điểm + reasoning};
+
+\draw[arr] (cv.south) -| ($(tfidf.north)+(-0.5,0)$);
+\draw[arr] (jd.south) -| ($(tfidf.north)+(0.5,0)$);
+\draw[arr] (cv.south) -| ($(embed.north)+(-0.5,0)$);
+\draw[arr] (jd.south) -| ($(embed.north)+(0.5,0)$);
+\draw[arr] (cv.south) -| ($(llm.north)+(-0.5,0)$);
+\draw[arr] (jd.south) -| ($(llm.north)+(0.5,0)$);
+
+\draw[arr] (tfidf.east) -- (s1.west);
+\draw[arr] (embed.east) -- (s2.west);
+\draw[arr] (llm.east) -- (s3.west);
+\end{tikzpicture}
+\caption{Pipeline so sánh CV--JD bằng ba phương pháp chạy song song}
+\label{fig:matching_pipeline}
+\end{figure}
+
+Mỗi phương pháp trả về một bản ghi gồm: điểm chuẩn hoá 0--100, danh sách từ khoá khớp/thiếu (đối với TF-IDF và LLM), độ trễ (ms), chi phí (USD), số token đã dùng. Kết quả của cả ba phương pháp được lưu vào bảng \texttt{match\_runs} để dùng cho hiển thị và cho thí nghiệm so sánh ở Chương 5. Nhờ chạy song song qua \texttt{Promise.allSettled}, một phương pháp lỗi không ảnh hưởng đến hai phương pháp còn lại.
 
 \end{document}
