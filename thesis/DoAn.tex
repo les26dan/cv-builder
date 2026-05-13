@@ -1,23 +1,26 @@
-\documentclass[a4paper,13pt,3p,twoside]{report}
+\documentclass[a4paper,13pt,3p,oneside]{report}
 \usepackage{scrextend}
 \changefontsizes{13pt}
 \usepackage[utf8]{vietnam}
-\usepackage[top=2cm, bottom=2cm, left=3.5cm, right=2.5cm]{geometry}
+\usepackage[top=4cm, bottom=3cm, left=3cm, right=2cm]{geometry}
 \usepackage{xurl}
 \usepackage{appendix}
 \usepackage{babel}
-\usepackage{xcolor}
+\usepackage[table]{xcolor}
 \usepackage{outlines}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,shapes.geometric,shapes.symbols,arrows.meta,fit,backgrounds}
 \usepackage{fancybox}
-\usepackage{indentfirst}
+% \usepackage{indentfirst}  % disabled — đoạn đầu sau heading không thụt
 \usepackage{amsthm}
 \usepackage{latexsym}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsbsy}
-\usepackage{times}
+% \usepackage{times}  % disabled — VNTeX CMR gives nicer Vietnamese diacritics
 \usepackage{array}
+\usepackage{longtable}
 \usepackage{enumitem}
 \usepackage{subfiles}
 \usepackage{titlesec}
@@ -51,7 +54,8 @@
 
 \renewcommand{\bibname}{Danh_sach_tai_lieu_tham_khao}
 \usepackage[backend=bibtex,style=ieee]{biblatex}
-\usepackage{csquotes}
+\usepackage[autostyle=false,style=english]{csquotes}
+\MakeOuterQuote{"}
 
 \addbibresource{Danh_sach_tai_lieu_tham_khao.bib}
 
