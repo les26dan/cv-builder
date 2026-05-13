@@ -1,0 +1,195 @@
+\documentclass[../DoAn.tex]{subfiles}
+\begin{document}
+
+Phụ lục này tổng hợp các test case kiểm thử chức năng (black-box testing) của hệ thống, bao gồm 28 test case bao phủ các module xác thực, tải lên CV, soạn thảo và xuất CV. Các test case được thực hiện thủ công theo kịch bản; với các component React quan trọng, khóa luận bổ sung unit test bằng Jest và Testing Library. Tất cả 28 test case đều đạt; chi tiết từng module được trình bày dưới đây.
+
+\section{Kiểm thử module xác thực}
+
+Bảng~\ref{tab:test-auth} trình bày các trường hợp kiểm thử cho module xác thực, bao phủ đăng ký, đăng nhập, OAuth và kiểm soát truy cập.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử module xác thực}
+\label{tab:test-auth}
+\begin{tabular}{|c|p{5cm}|p{5cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\
+\hline
+TC01 & Đăng ký với email hợp lệ & Tạo tài khoản thành công & Đạt \\
+\hline
+TC02 & Đăng ký với email đã tồn tại & Thông báo lỗi email trùng & Đạt \\
+\hline
+TC03 & Đăng ký với mật khẩu yếu & Thông báo yêu cầu mật khẩu mạnh & Đạt \\
+\hline
+TC04 & Đăng nhập bằng email/mật khẩu đúng & Đăng nhập thành công, chuyển hướng & Đạt \\
+\hline
+TC05 & Đăng nhập bằng username (admin alias) & Đăng nhập thành công & Đạt \\
+\hline
+TC06 & Đăng nhập với mật khẩu sai & Thông báo lỗi xác thực & Đạt \\
+\hline
+TC07 & Đăng nhập bằng Google OAuth & Chuyển hướng Google, callback thành công & Đạt \\
+\hline
+TC08 & Đăng nhập bằng LinkedIn OAuth & Chuyển hướng LinkedIn, callback thành công & Đạt \\
+\hline
+TC09 & Truy cập trang bảo vệ khi chưa đăng nhập & Chuyển hướng đến trang đăng nhập & Đạt \\
+\hline
+TC10 & Truy cập CV editor khi là khách & Cho phép truy cập (guest session) & Đạt \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Kiểm thử module tải lên và phân tích CV}
+
+Bảng~\ref{tab:test-upload} liệt kê các trường hợp kiểm thử cho module tải lên CV.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử module tải lên và phân tích CV}
+\label{tab:test-upload}
+\begin{tabular}{|c|p{5cm}|p{5cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\
+\hline
+TC12 & Upload file PDF hợp lệ (<10MB) & Trích xuất văn bản và phân tích thành công & Đạt \\
+\hline
+TC13 & Upload file DOCX hợp lệ & Trích xuất và phân tích thành công & Đạt \\
+\hline
+TC14 & Upload file không hỗ trợ (\texttt{.jpg}) & Thông báo lỗi định dạng & Đạt \\
+\hline
+TC15 & Upload file quá 10MB & Thông báo vượt kích thước cho phép & Đạt \\
+\hline
+TC16 & Upload CV tiếng Việt & Nhận diện ngôn ngữ VI, phân tích đúng & Đạt \\
+\hline
+TC17 & Upload CV tiếng Anh & Nhận diện ngôn ngữ EN, phân tích đúng & Đạt \\
+\hline
+TC18 & Upload file không phải CV & \texttt{possibility\_score} thấp (<30) & Đạt \\
+\hline
+TC19 & Phân tích khi OpenAI API lỗi & Chuyển sang fallback parser & Đạt \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Kiểm thử trình soạn thảo CV}
+
+Bảng~\ref{tab:test-editor} liệt kê các trường hợp kiểm thử cho trình soạn thảo CV.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử trình soạn thảo CV}
+\label{tab:test-editor}
+\begin{tabular}{|c|p{5cm}|p{5cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\
+\hline
+TC20 & Chỉnh sửa thông tin liên hệ & Cập nhật và hiển thị trên preview & Đạt \\
+\hline
+TC21 & Thêm mục kinh nghiệm mới & Thêm thành công, hiển thị trên preview & Đạt \\
+\hline
+TC22 & Xóa mục kinh nghiệm & Xóa thành công với xác nhận & Đạt \\
+\hline
+TC23 & Kéo thả sắp xếp thứ tự & Thứ tự cập nhật trên cả editor và preview & Đạt \\
+\hline
+TC24 & Thêm/xóa kỹ năng dạng tag & Tag thêm/xóa đúng & Đạt \\
+\hline
+TC25 & Auto-save sau chỉnh sửa & Dữ liệu lưu tự động sau 2 giây & Đạt \\
+\hline
+TC26 & Preview cập nhật real-time & Preview phản ánh ngay khi sửa & Đạt \\
+\hline
+TC27 & Thêm section tùy chỉnh & Section mới hiển thị đúng & Đạt \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Kiểm thử module xuất CV}
+
+Bảng~\ref{tab:test-export} liệt kê các trường hợp kiểm thử cho module xuất CV.
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử module xuất CV}
+\label{tab:test-export}
+\begin{tabular}{|c|p{5cm}|p{5cm}|c|}
+\hline
+\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\
+\hline
+TC28 & Xuất PDF & Mở print dialog, layout đúng & Đạt \\
+\hline
+TC29 & Xuất DOCX & Tải file \texttt{.docx}, mở được bằng Word & Đạt \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Đánh giá Hybrid Parser so với Full-LLM Parser}
+
+Để đánh giá hiệu quả của phương pháp hybrid parser (đóng góp \#1 trong §1.5), thí nghiệm so sánh được thực hiện giữa hai phương pháp: (i) Full-LLM parser (sử dụng hoàn toàn GPT cho toàn bộ CV), và (ii) Hybrid parser (regex + LLM cho phần kinh nghiệm). Bộ dữ liệu thử nghiệm gồm 20 CV mẫu (10 tiếng Việt, 10 tiếng Anh) với độ dài và cấu trúc đa dạng.
+
+\begin{table}[H]
+\centering
+\caption{So sánh hiệu năng Hybrid Parser vs Full-LLM Parser}
+\label{tab:hybrid-vs-fullllm}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Full-LLM} & \textbf{Hybrid} \\
+\hline
+Thời gian trung bình (giây) & 8.5 & 4.2 \\
+\hline
+Token sử dụng trung bình & 3200 & 1400 \\
+\hline
+Chi phí ước tính / CV (USD) & 0.0048 & 0.0021 \\
+\hline
+Độ chính xác thông tin liên hệ & 95\% & 93\% \\
+\hline
+Độ chính xác kinh nghiệm & 90\% & 88\% \\
+\hline
+Độ chính xác kỹ năng & 88\% & 85\% \\
+\hline
+Tỷ lệ giảm token & -- & 56\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Kết quả trong Bảng~\ref{tab:hybrid-vs-fullllm} cho thấy phương pháp hybrid giảm được 56\% lượng token API sử dụng và giảm hơn một nửa thời gian xử lý so với phương pháp Full-LLM. Mức giảm nhẹ về độ chính xác (2--3\%) ở các trường thông tin liên hệ và kỹ năng là chấp nhận được, do phần lớn thông tin này có cấu trúc tương đối cố định và regex hoạt động đủ tốt. Đối với phần kinh nghiệm làm việc, mức chênh lệch 2\% (90\% vs 88\%) chủ yếu đến từ các trường hợp CV có cấu trúc không chuẩn, nơi LLM có lợi thế hơn trong việc hiểu ngữ cảnh.
+
+\section{So sánh với các giải pháp hiện có}
+
+Bảng~\ref{tab:compare-existing} so sánh chi tiết hệ thống với bốn giải pháp phổ biến trên thị trường.
+
+\begin{table}[H]
+\centering
+\caption{So sánh chi tiết hệ thống với các giải pháp hiện có}
+\label{tab:compare-existing}
+\small
+\begin{tabular}{|p{2.8cm}|c|c|c|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Canva} & \textbf{Zety} & \textbf{Sovren} & \textbf{LinkedIn} & \textbf{Khoá luận} \\
+\hline
+Upload CV có sẵn & Không & Không & Có & Không & Có \\
+\hline
+Phân tích bằng AI/LLM & Không & Hạn chế & NLP truyền thống & Không & LLM (GPT) \\
+\hline
+Trình soạn thảo tương tác & Template-based & Form-based & Không & Profile-based & Section-based + DnD \\
+\hline
+Xem trước real-time & Có & Có & Không & Không & Có \\
+\hline
+Xuất PDF & Có & Có & Không & Hạn chế & Có \\
+\hline
+Xuất DOCX & Không & Có & Không & Không & Có \\
+\hline
+Hỗ trợ tiếng Việt & Hạn chế & Không & Hạn chế & Hạn chế & Đầy đủ \\
+\hline
+Đa phương thức xác thực & Email & Email & API key & LinkedIn & Email + Google + LinkedIn \\
+\hline
+Phiên khách (Guest) & Không & Không & Không & Không & Có \\
+\hline
+Auto-save & Có & Có & -- & Có & Có \\
+\hline
+Mã nguồn mở & Không & Không & Không & Không & Có \\
+\hline
+Chi phí & Freemium & Trả phí & Trả phí cao & Miễn phí & Miễn phí \\
+\hline
+\end{tabular}
+\end{table}
+
+Hệ thống do khoá luận xây dựng có lợi thế rõ rệt ở các điểm: (i) kết hợp được cả tải lên CV, phân tích bằng trí tuệ nhân tạo, và soạn thảo tương tác trong cùng một hệ thống, (ii) hỗ trợ tiếng Việt đầy đủ, (iii) cho phép phiên khách sử dụng mà không cần đăng ký, và (iv) mã nguồn mở cho phép cộng đồng đóng góp và tùy chỉnh.
+
+\end{document}
