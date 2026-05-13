@@ -1,68 +1,79 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Chương này trình bày bối cảnh và động lực thực hiện đồ án, phân tích các giải pháp hiện có cùng những hạn chế của chúng, từ đó đề xuất mục tiêu, hướng tiếp cận và các đóng góp chính của đồ án.
+Chương này trình bày lý do lựa chọn đề tài, định nghĩa bài toán, các đóng góp chính và bố cục của khóa luận.
 
-\section{Đặt vấn đề}
+\section{Lý do lựa chọn đề tài}
 \label{sec:dvd}
 
-Trong bối cảnh thị trường lao động Việt Nam và quốc tế ngày càng cạnh tranh, hồ sơ việc làm (Curriculum Vitae -- CV) là công cụ đầu tiên và quan trọng nhất để ứng viên tạo ấn tượng với nhà tuyển dụng. Theo báo cáo của Jobscan \cite{jobscan2023}, hơn 98\% các công ty trong danh sách Fortune 500 sử dụng hệ thống theo dõi ứng viên (Applicant Tracking System -- ATS) để tự động sàng lọc hồ sơ trước khi đến tay nhà tuyển dụng. Các hệ thống ATS phân tích cấu trúc và nội dung CV, so khớp từ khóa với yêu cầu tuyển dụng, và loại bỏ những hồ sơ không đáp ứng tiêu chí -- thường là trước khi bất kỳ con người nào đọc chúng.
+Mỗi năm, hàng triệu người Việt Nam đi xin việc. Tài liệu đầu tiên họ gửi cho nhà tuyển dụng là \textit{hồ sơ việc làm}, hay còn gọi là CV. Một bản CV viết tốt giúp người xin việc có nhiều cơ hội được mời phỏng vấn hơn. Ngược lại, một bản CV không phù hợp với vị trí ứng tuyển có thể bị loại ngay từ vòng đầu.
 
-Tuy nhiên, phần lớn người tìm việc, đặc biệt là sinh viên mới tốt nghiệp tại Việt Nam, chưa nhận thức đầy đủ về vai trò của ATS và cách tối ưu CV để vượt qua vòng sàng lọc tự động. Một khảo sát của TopCV \cite{topcv2023} cho thấy hơn 75\% CV của ứng viên Việt Nam bị loại ngay ở vòng ATS do lỗi định dạng, thiếu từ khóa phù hợp, hoặc cấu trúc không chuẩn. Bên cạnh đó, việc viết CV bằng tiếng Việt còn gặp thêm thách thức về xử lý ngôn ngữ do đặc thù về dấu thanh và cấu trúc câu.
+Hiện nay, phần lớn các công ty lớn không đọc CV bằng tay nữa. Thay vào đó, họ dùng \textit{phần mềm sàng lọc tự động} để chọn ra những bản CV phù hợp nhất với vị trí cần tuyển. Phần mềm này đọc văn bản trong CV, đối chiếu với mô tả công việc, rồi xếp hạng các ứng viên. Những bản CV không phù hợp thường bị loại trước khi nhà tuyển dụng đọc tới. Theo một báo cáo của Jobscan \cite{jobscan2023}, hơn 98\% các công ty lớn nhất tại Mỹ dùng loại phần mềm này. Một khảo sát của TopCV \cite{topcv2023} cho thấy hơn 75\% CV của ứng viên Việt Nam bị loại ngay ở vòng sàng lọc -- thường là do lỗi định dạng, thiếu từ khóa, hoặc trình bày không rõ ràng.
 
-Sự phát triển vượt bậc của các Mô hình Ngôn ngữ lớn (Large Language Model -- LLM) như GPT-4 \cite{openai2023gpt4} đã mở ra cơ hội mới trong việc phân tích, hiểu và cấu trúc hóa nội dung văn bản phi cấu trúc. Khả năng hiểu ngữ cảnh sâu và sinh văn bản tự nhiên của LLM đặc biệt phù hợp với bài toán trích xuất thông tin từ CV, vốn đòi hỏi sự linh hoạt trong việc nhận dạng các mục như kinh nghiệm làm việc, học vấn, kỹ năng từ nhiều định dạng trình bày khác nhau.
+Với người đi xin việc tại Việt Nam, việc viết một bản CV tốt còn khó hơn vì:
 
-Xuất phát từ những phân tích trên, đồ án đặt ra bài toán: \textit{Xây dựng một ứng dụng web toàn diện hỗ trợ người dùng tạo, phân tích và tối ưu hồ sơ việc làm bằng cách ứng dụng Mô hình Ngôn ngữ lớn, phục vụ đặc biệt cho thị trường Việt Nam với khả năng hỗ trợ song ngữ Việt--Anh.}
+\begin{itemize}
+    \item Các công cụ tạo CV phổ biến (Canva, Zety\dots) chỉ cho mẫu thiết kế đẹp, không kiểm tra xem nội dung CV có thực sự phù hợp với vị trí ứng tuyển hay không.
+    \item Các dịch vụ phân tích CV chuyên nghiệp (Sovren, Textkernel\dots) có giá cao và chỉ phục vụ doanh nghiệp tuyển dụng, không phải ứng viên.
+    \item Phần lớn công cụ trên thị trường được thiết kế cho tiếng Anh; hỗ trợ tiếng Việt còn rất hạn chế.
+\end{itemize}
 
-\section{Các giải pháp hiện tại và hạn chế}
-\label{sec:giaiphap}
+Trong vài năm gần đây, các \textit{mô hình ngôn ngữ lớn} -- nổi tiếng nhất là ChatGPT \cite{openai2023gpt4} -- đã chứng minh khả năng đọc hiểu văn bản gần như con người. Khả năng này có thể dùng vào hai việc: (i) tự động đọc một bản CV và tách ra các thông tin cần thiết như tên, kinh nghiệm, kỹ năng; và (ii) so sánh CV với mô tả công việc để gợi ý cách viết lại cho phù hợp hơn. Tận dụng cơ hội đó, sinh viên chọn đề tài xây dựng một ứng dụng web giúp người dùng tạo và tối ưu CV, đồng thời thực hiện một thí nghiệm để so sánh ba cách \textit{đo độ phù hợp} giữa CV và mô tả công việc.
 
-Hiện nay, trên thị trường đã tồn tại nhiều công cụ và dịch vụ hỗ trợ người dùng xây dựng CV. Các giải pháp này có thể được phân thành ba nhóm chính.
+\section{Định nghĩa bài toán}
+\label{sec:def_problem}
 
-Nhóm thứ nhất là các công cụ xây dựng CV trực tuyến như Canva, Zety, NovoResume và FlowCV. Các nền tảng này cung cấp thư viện mẫu CV đa dạng với giao diện kéo thả trực quan. Ưu điểm của chúng nằm ở tính dễ sử dụng và khả năng tạo CV có thiết kế đẹp mắt. Tuy nhiên, các công cụ này chủ yếu tập trung vào khía cạnh trình bày mà thiếu khả năng phân tích nội dung thông minh. Chúng không thể đánh giá mức độ phù hợp của CV với yêu cầu tuyển dụng cụ thể, không hỗ trợ trích xuất dữ liệu từ CV có sẵn, và hầu hết không hỗ trợ tốt cho tiếng Việt.
+Khóa luận giải quyết hai bài toán liên quan đến nhau:
 
-Nhóm thứ hai là các dịch vụ phân tích CV thương mại như Sovren, Textkernel và DaXtra. Đây là các bộ phân tích CV (CV parser) chuyên nghiệp sử dụng công nghệ xử lý ngôn ngữ tự nhiên (NLP) để trích xuất thông tin có cấu trúc từ CV dạng tự do. Nhược điểm chính của nhóm này là chi phí cao (thường tính theo số lượng CV xử lý), giao diện hướng đến doanh nghiệp chứ không phải người dùng cuối, và khả năng hỗ trợ tiếng Việt còn hạn chế.
+\textbf{Bài toán 1 -- Hỗ trợ tạo và phân tích CV.} Xây dựng một ứng dụng web cho phép người dùng:
 
-Nhóm thứ ba là các nền tảng mạng nghề nghiệp như LinkedIn. Mặc dù LinkedIn cho phép người dùng xây dựng hồ sơ nghề nghiệp trực tuyến đầy đủ, khả năng xuất CV sang các định dạng truyền thống (PDF, DOCX) còn hạn chế và người dùng ít có khả năng tùy chỉnh nội dung và bố cục theo nhu cầu cá nhân.
+\begin{itemize}
+    \item Tải lên bản CV có sẵn (định dạng PDF hoặc DOCX), ứng dụng tự động tách thông tin trong CV thành các phần rõ ràng: thông tin liên hệ, tóm tắt nghề nghiệp, kinh nghiệm làm việc, học vấn, kỹ năng.
+    \item Chỉnh sửa CV theo từng phần, vừa sửa vừa xem trước kết quả ngay lập tức.
+    \item Tải CV về máy ở hai định dạng phổ biến (PDF, DOCX) tuỳ theo nơi nộp.
+    \item Sử dụng được bằng cả tiếng Việt và tiếng Anh.
+\end{itemize}
 
-Tổng hợp lại, các giải pháp hiện có tồn tại ba hạn chế chính: (i) thiếu khả năng phân tích nội dung CV bằng AI để đưa ra gợi ý cải thiện, (ii) không hỗ trợ quy trình tải lên CV có sẵn rồi cấu trúc hóa và chỉnh sửa, và (iii) thiếu hỗ trợ song ngữ Việt--Anh phù hợp cho thị trường Việt Nam.
+Một yêu cầu thêm là: việc dùng mô hình ngôn ngữ lớn để phân tích CV tốn phí (mỗi lần gọi đều mất một khoản tiền cho nhà cung cấp dịch vụ). Vì vậy cần tìm cách giảm chi phí mà vẫn giữ được độ chính xác.
 
-\section{Mục tiêu và định hướng giải pháp}
+\textbf{Bài toán 2 -- So sánh ba cách đo độ phù hợp giữa CV và mô tả công việc.} Cho trước một bản CV và một mô tả công việc, cần \textit{tự động cho ra một con số trong khoảng 0--100} thể hiện độ phù hợp giữa CV và công việc đó. Khi có nhiều CV ứng tuyển vào cùng một vị trí (hoặc một ứng viên muốn xét nhiều vị trí cùng lúc), con số này dùng để sắp xếp thứ tự từ phù hợp nhất đến ít phù hợp nhất.
 
-Từ phân tích các hạn chế nêu trên, đồ án đề ra các mục tiêu cụ thể sau:
-
-\begin{enumerate}
-\item Xây dựng hệ thống web cho phép người dùng tải lên CV dạng PDF hoặc DOCX, tự động trích xuất văn bản và phân tích nội dung bằng phương pháp kết hợp giữa kỹ thuật xử lý văn bản truyền thống và Mô hình Ngôn ngữ lớn.
-\item Phát triển trình soạn thảo CV có hướng dẫn (guided editor) cho phép chỉnh sửa trực quan theo từng phần với khả năng xem trước trong thời gian thực.
-\item Hỗ trợ xuất CV ra nhiều định dạng (PDF, DOCX, LaTeX, TXT) đáp ứng nhu cầu đa dạng của người dùng.
-\item Xây dựng hệ thống xác thực đa phương thức (email, Google OAuth, LinkedIn OAuth) và quản lý CV trực tuyến.
-\item Đảm bảo hỗ trợ song ngữ Việt--Anh xuyên suốt toàn bộ hệ thống.
-\end{enumerate}
-
-Định hướng giải pháp là xây dựng ứng dụng web toàn diện mang tên OkBuddy, sử dụng kiến trúc hiện đại dựa trên Next.js với React, tích hợp OpenAI ChatGPT API cho khả năng phân tích CV thông minh. Điểm khác biệt chính so với các giải pháp hiện có là cách tiếp cận \textit{hybrid} trong phân tích CV: kết hợp phương pháp phân tích trực tiếp bằng biểu thức chính quy (regex) cho các phần dễ trích xuất (thông tin liên hệ, kỹ năng) với LLM cho các phần phức tạp hơn (kinh nghiệm làm việc), giúp tiết kiệm chi phí API mà vẫn đảm bảo độ chính xác.
-
-\section{Đóng góp của đồ án}
-
-Đồ án này có ba đóng góp chính như sau:
+Có ba cách làm phổ biến để tính ra con số đó:
 
 \begin{enumerate}
-\item Đồ án đề xuất và hiện thực phương pháp phân tích CV lai (hybrid CV parser) kết hợp giữa xử lý văn bản truyền thống bằng regex và Mô hình Ngôn ngữ lớn. Phương pháp này giúp tiết kiệm đáng kể lượng token API sử dụng (ước tính giảm 40--60\% so với phương pháp sử dụng hoàn toàn LLM) mà vẫn duy trì độ chính xác cao trong việc trích xuất thông tin có cấu trúc từ CV.
-\item Đồ án xây dựng hệ thống soạn thảo CV tương tác với khả năng chỉnh sửa theo từng phần (section-based editing), hỗ trợ kéo thả để sắp xếp thứ tự các mục, tự động lưu theo thời gian thực, và xem trước định dạng chuẩn A4. Hệ thống hỗ trợ xuất CV ra bốn định dạng khác nhau (PDF, DOCX, LaTeX, TXT).
-\item Đồ án phát triển nền tảng web hoàn chỉnh với hệ thống xác thực đa phương thức, quản lý CV trực tuyến, và hỗ trợ song ngữ Việt--Anh, phục vụ cho cả sinh viên và người đi làm tại Việt Nam.
+    \item \textit{Cách 1 -- Đếm trùng từ:} đếm xem CV và mô tả công việc có chung những từ nào, rồi tính một con số đại diện cho mức độ trùng lặp. Cách này đơn giản, nhanh, miễn phí, dùng làm điểm so sánh nền.
+    \item \textit{Cách 2 -- So sánh nghĩa:} dùng một mô hình đã huấn luyện trước để biến CV và mô tả công việc thành dạng số học, sau đó so sánh xem hai văn bản có gần nhau về mặt ngữ nghĩa hay không. Cách này nhận ra được cả những trường hợp viết khác từ nhưng cùng nghĩa (ví dụ ``frontend developer'' và ``UI engineer'').
+    \item \textit{Cách 3 -- Nhờ mô hình ngôn ngữ lớn chấm điểm:} đưa cả CV và mô tả công việc cho mô hình đọc, rồi yêu cầu cho điểm trực tiếp. Cách này thường thông minh nhất nhưng cũng tốn chi phí và chậm nhất.
 \end{enumerate}
 
-\section{Bố cục đồ án}
+Câu hỏi đặt ra là: cách nào cho kết quả xếp hạng tốt nhất? Cách nào đáng đồng tiền nhất khi đưa vào sử dụng thực tế? Khóa luận trả lời hai câu hỏi này qua một thí nghiệm có kiểm định thống kê đầy đủ, được trình bày chi tiết trong Chương 5.
 
-Phần còn lại của báo cáo đồ án tốt nghiệp này được tổ chức như sau.
+\section{Đóng góp của khóa luận}
+\label{sec:contributions}
 
-Chương 2 trình bày cơ sở lý thuyết liên quan đến đồ án, bao gồm tổng quan về Mô hình Ngôn ngữ lớn và kiến trúc Transformer, các kỹ thuật xử lý ngôn ngữ tự nhiên trong phân tích CV, kiến trúc ứng dụng web hiện đại với Next.js và React, cơ chế hoạt động của hệ thống ATS, cùng các công nghệ nền tảng được sử dụng trong hệ thống.
+Trong khóa luận này, sinh viên đã phát triển một hệ thống web hoàn chỉnh và thực hiện một thí nghiệm so sánh ba cách đo độ phù hợp giữa CV và mô tả công việc. Kết quả được đánh giá qua kiểm thử chức năng và bộ độ đo chuẩn dùng cho xếp hạng. Khóa luận có bốn đóng góp chính:
 
-Chương 3 trình bày quá trình phân tích yêu cầu và thiết kế hệ thống OkBuddy, bao gồm đặc tả yêu cầu chức năng và phi chức năng, kiến trúc tổng thể ba lớp, thiết kế cơ sở dữ liệu với sáu bảng chính, thiết kế các API endpoint, thiết kế giao diện người dùng, và đặc biệt là thiết kế pipeline phân tích CV hybrid.
+\begin{enumerate}
+\item Sinh viên đã đề xuất và hiện thực phương pháp \textit{phân tích CV lai} -- kết hợp giữa cách xử lý văn bản truyền thống bằng biểu thức chính quy (cho các trường có cấu trúc rõ như email, số điện thoại) và mô hình ngôn ngữ lớn (cho phần kinh nghiệm làm việc viết tự do). Kết quả đánh giá trên 20 CV mẫu cho thấy cách lai giảm khoảng 56\% lượng dữ liệu phải gửi cho mô hình ngôn ngữ lớn, trong khi độ chính xác chỉ giảm 2--3\% -- một mức giảm chấp nhận được so với phần chi phí tiết kiệm được.
+\item Sinh viên đã xây dựng trình soạn thảo CV tương tác cho phép chỉnh sửa theo từng phần, kéo thả sắp xếp thứ tự các mục, lưu tự động, và xem trước định dạng A4 ngay khi đang sửa. Trình soạn thảo hỗ trợ xuất CV ra hai định dạng phổ biến: PDF và DOCX.
+\item Sinh viên đã phát triển hệ thống web hoàn chỉnh với nhiều cách đăng nhập (email, Google, LinkedIn), quản lý nhiều CV trực tuyến cho từng người dùng, và giao diện song ngữ Việt -- Anh. Hệ thống đã được kiểm thử qua 28 trường hợp kiểm thử chức năng (chi tiết ở Chương 5).
+\item \textbf{Đóng góp nghiên cứu chính:} sinh viên đã thiết kế và thực hiện một thí nghiệm so sánh định lượng ba cách đo độ phù hợp CV -- mô tả công việc (đếm trùng từ, so sánh nghĩa, và nhờ mô hình ngôn ngữ lớn) trên 400 cặp dữ liệu công khai từ Kaggle. Kết quả được đánh giá bằng các chỉ số chuẩn cho bài toán xếp hạng, có kiểm định thống kê và khoảng tin cậy đầy đủ. Toàn bộ pipeline đánh giá -- gồm script, dữ liệu trung gian, kết quả -- được công bố mã nguồn mở để người khác có thể tái lập và tham chiếu khi lựa chọn phương pháp cho hệ thống tuyển dụng thực tế. Đây là đóng góp được trình bày chi tiết trong Chương 5.
+\end{enumerate}
 
-Chương 4 mô tả chi tiết quá trình hiện thực các module chính của hệ thống, từ module xác thực đa phương thức, module tải lên và phân tích CV bằng phương pháp hybrid, trình soạn thảo CV tương tác, module xuất CV đa định dạng, đến hệ thống quản lý CV workspace và các cơ chế bảo mật.
+Toàn bộ mã nguồn của hệ thống và pipeline đánh giá được công bố tại kho lưu trữ: \url{https://github.com/les26dan/cv-builder}.
 
-Chương 5 trình bày kết quả kiểm thử và đánh giá hệ thống, bao gồm kiểm thử chức năng các module chính, đánh giá hiệu năng của phương pháp phân tích CV hybrid, đánh giá trải nghiệm người dùng, so sánh với các giải pháp hiện có, và thảo luận về các hạn chế còn tồn tại.
+\section{Bố cục khóa luận}
 
-Chương 6 tổng kết các kết quả đã đạt được của đồ án và đề xuất các hướng phát triển trong tương lai.
+Phần còn lại của báo cáo khóa luận được tổ chức như sau:
+
+Chương 2 trình bày cơ sở lý thuyết liên quan, gồm tổng quan về mô hình ngôn ngữ lớn và kiến trúc Transformer, các kỹ thuật xử lý ngôn ngữ tự nhiên cho phân tích CV, kiến trúc ứng dụng web hiện đại, cơ chế hoạt động của phần mềm sàng lọc CV, các công nghệ nền tảng được sử dụng, và đặc biệt là cơ sở lý thuyết cho thí nghiệm so sánh ở Chương 5 (truy hồi thông tin, biểu diễn ngữ nghĩa, dùng mô hình ngôn ngữ lớn để chấm điểm, kiểm định thống kê).
+
+Chương 3 trình bày quá trình phân tích yêu cầu và thiết kế hệ thống: đặc tả yêu cầu chức năng và phi chức năng, kiến trúc tổng thể ba lớp, thiết kế cơ sở dữ liệu với sáu bảng, thiết kế giao tiếp giữa các thành phần, thiết kế giao diện, và thiết kế quy trình phân tích CV.
+
+Chương 4 mô tả quá trình hiện thực các thành phần chính của hệ thống: đăng nhập, tải lên và phân tích CV bằng phương pháp lai, trình soạn thảo CV tương tác, xuất CV và quản lý nhiều CV.
+
+Chương 5 trình bày đóng góp nghiên cứu chính: thiết kế thí nghiệm và đánh giá định lượng ba cách đo độ phù hợp CV -- mô tả công việc trên dữ liệu công khai, trả lời hai câu hỏi nghiên cứu đặt ra. Chương gồm thiết kế thí nghiệm, xây dựng dữ liệu nhãn, các chỉ số đánh giá, kết quả định lượng kèm kiểm định thống kê, phân tích lỗi, và thảo luận các yếu tố ảnh hưởng đến tính tin cậy của kết quả.
+
+Chương 6 tổng kết các kết quả đạt được, nêu các hạn chế của khóa luận và đề xuất hướng phát triển trong tương lai.
 
 \end{document}
