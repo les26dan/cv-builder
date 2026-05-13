@@ -1,11 +1,11 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Chương 3 đã trình bày quá trình phân tích yêu cầu và thiết kế hệ thống. Chương này mô tả chi tiết quá trình hiện thực các module chính của hệ thống OkBuddy, bao gồm môi trường phát triển, module xác thực, module tải lên và phân tích CV, trình soạn thảo CV, module xuất CV, quản lý workspace, và các cơ chế bảo mật.
+Chương 3 đã trình bày quá trình phân tích yêu cầu và thiết kế hệ thống. Chương này mô tả cách sinh viên đã hiện thực các module chính: môi trường phát triển, xác thực, tải lên và phân tích CV, trình soạn thảo CV, xuất CV, và ba phương pháp matching CV--JD.
 
 \section{Môi trường phát triển}
 
-Hệ thống được phát triển với bộ công nghệ như trình bày trong Bảng \ref{tab:tech_stack}.
+Hệ thống được phát triển với bộ công nghệ được liệt kê trong Bảng \ref{tab:tech_stack}.
 
 \begin{table}[H]
 \centering
@@ -14,252 +14,150 @@ Hệ thống được phát triển với bộ công nghệ như trình bày tro
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Thành phần} & \textbf{Công nghệ} & \textbf{Phiên bản} \\ \hline
-Framework & Next.js & 15.x \\ \hline
+Framework & Next.js (App Router) & 15.x \\ \hline
 Thư viện UI & React & 19.x \\ \hline
 Ngôn ngữ & TypeScript & 5.x \\ \hline
 CSS Framework & Tailwind CSS & 3.x \\ \hline
-Cơ sở dữ liệu & Supabase (PostgreSQL) & -- \\ \hline
+Cơ sở dữ liệu & Supabase (PostgreSQL + pgvector) & -- \\ \hline
 Lưu trữ tệp & Vercel Blob & -- \\ \hline
-AI/LLM & OpenAI API (GPT-4o-mini) & -- \\ \hline
+AI/LLM & OpenAI (gpt-4o-mini, text-embedding-3-small) & -- \\ \hline
 Xử lý PDF & pdf-parse, pdfjs-dist & -- \\ \hline
 Xử lý DOCX & mammoth & -- \\ \hline
-Kéo thả & @dnd-kit & -- \\ \hline
 Xác thực & bcryptjs, jsonwebtoken & -- \\ \hline
-Analytics & Statsig & -- \\ \hline
+Kéo thả & @dnd-kit (core, sortable) & -- \\ \hline
 Kiểm thử & Jest, Testing Library & -- \\ \hline
 \end{tabular}
 \end{table}
 
-Cấu trúc thư mục dự án tuân theo quy ước của Next.js App Router:
-
-\begin{lstlisting}[language=bash, caption={Cấu trúc thư mục dự án}]
-pmf/
-  app/              # Pages + API routes (App Router)
-  components/       # React UI components
-  config/           # Configuration files
-  shared/
-    contexts/       # React contexts
-    services/       # Business logic services
-    types/          # TypeScript type definitions
-  lib/              # Utilities (supabase, auth, etc.)
-  utils/            # Helper functions
-  hooks/            # Custom React hooks
-  middleware.ts     # Request middleware
-\end{lstlisting}
+Mã nguồn được tổ chức theo quy ước của Next.js App Router: thư mục \texttt{app/} chứa các trang và API; \texttt{components/} chứa các component React tái sử dụng; \texttt{shared/services/} chứa các service nghiệp vụ (hybrid parser, matching); \texttt{lib/} chứa tiện ích cấp thấp (Supabase client, xác thực).
 
 \section{Hiện thực module xác thực}
 
-Module xác thực hỗ trợ ba phương thức đăng nhập: email/mật khẩu, Google OAuth 2.0, và LinkedIn OAuth. Ngoài ra, hệ thống hỗ trợ phiên khách (guest session) cho phép người dùng sử dụng trình soạn thảo CV mà không cần đăng nhập.
+Module xác thực hỗ trợ ba phương thức đăng nhập: email/mật khẩu, Google OAuth 2.0, và LinkedIn OAuth. Ngoài ra hệ thống hỗ trợ phiên khách cho phép dùng trình soạn thảo CV mà không cần đăng nhập.
 
 \subsection{Xác thực bằng email và mật khẩu}
 
-Quá trình đăng ký bao gồm: xác thực đầu vào (định dạng email, độ mạnh mật khẩu), băm mật khẩu bằng thuật toán bcrypt với salt factor 12, lưu thông tin người dùng vào bảng \texttt{users}, và tạo phiên đăng nhập. Đoạn mã sau minh họa quá trình xử lý đăng nhập:
+Quá trình đăng ký gồm bốn bước: (i) kiểm tra định dạng email và độ mạnh mật khẩu, (ii) băm mật khẩu bằng \texttt{bcryptjs} (salt rounds = 10) trước khi lưu vào cơ sở dữ liệu, (iii) lưu thông tin người dùng vào bảng \texttt{users}, (iv) tạo phiên đăng nhập.
 
-\begin{lstlisting}[language=TypeScript, caption={Xử lý đăng nhập trong route handler}]
-export async function POST(request: Request) {
-  const { email, password } = await request.json();
-  
-  // Rate limiting check
-  const rateLimitResult = checkRateLimit(clientIP);
-  if (!rateLimitResult.allowed) {
-    return Response.json(
-      { error: 'Too many attempts' }, 
-      { status: 429 }
-    );
-  }
-  
-  // Find user and verify password
-  const user = await findUserByEmail(email);
-  const isValid = await verifyPassword(
-    password, user.password_hash
-  );
-  
-  // Generate JWT and set session cookie
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-  
-  const response = Response.json({ success: true });
-  response.headers.set('Set-Cookie', 
-    `user_session=${token}; HttpOnly; Secure; Path=/`
-  );
-  return response;
-}
-\end{lstlisting}
+Quá trình đăng nhập tuần tự: tìm bản ghi người dùng theo email, so khớp mật khẩu với hash đã lưu, sinh JSON Web Token (JWT) có thời gian sống 7 ngày, đặt cookie phiên với các cờ \texttt{HttpOnly} và \texttt{Secure}.
 
 \subsection{Xác thực bằng OAuth}
 
-Luồng OAuth 2.0 được hiện thực cho cả Google và LinkedIn. Quá trình bao gồm bốn bước: (i) chuyển hướng người dùng đến trang xác thực của nhà cung cấp với \texttt{client\_id}, \texttt{redirect\_uri} và \texttt{state} token chống CSRF; (ii) nhận authorization code từ callback; (iii) đổi code lấy access token; (iv) sử dụng access token để lấy thông tin người dùng và tạo hoặc liên kết tài khoản trong hệ thống.
+Luồng OAuth 2.0 được hiện thực cho cả Google và LinkedIn theo bốn bước: (i) chuyển hướng người dùng đến trang xác thực của nhà cung cấp, (ii) nhận \textit{authorization code} từ callback, (iii) đổi code lấy \textit{access token}, (iv) dùng access token để lấy thông tin người dùng và tạo hoặc liên kết tài khoản trong hệ thống.
 
 Dịch vụ liên kết tài khoản (\texttt{AccountLinkingService}) xử lý trường hợp người dùng đã có tài khoản email nhưng đăng nhập bằng OAuth: hệ thống tự động liên kết hai tài khoản thay vì tạo tài khoản trùng lặp.
 
 \subsection{Phiên khách và middleware}
 
-Middleware của Next.js kiểm tra mỗi request đến và phân biệt ba loại truy cập: (i) tuyến đường công khai (trang chủ, đăng nhập, đăng ký) -- cho phép tất cả; (ii) tuyến đường yêu cầu xác thực (\texttt{/cv-workspace}, \texttt{/admin}) -- yêu cầu JWT hợp lệ; (iii) tuyến đường cho phép khách (\texttt{/cv-upload}, \texttt{/cv-guided-editing}) -- cho phép cả người dùng đã đăng nhập và khách.
+Middleware của Next.js kiểm tra mỗi request đến và phân biệt ba loại truy cập như trong Bảng \ref{tab:route_perms}.
 
-\begin{lstlisting}[language=TypeScript, caption={Middleware phân quyền truy cập}]
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('user_session');
-  const path = request.nextUrl.pathname;
-  
-  // Guest-allowed routes
-  if (path.startsWith('/cv-upload') || 
-      path.startsWith('/cv-guided-editing')) {
-    return NextResponse.next();
-  }
-  
-  // Auth-required routes
-  if (path.startsWith('/cv-workspace') || 
-      path.startsWith('/admin')) {
-    if (!token) {
-      return NextResponse.redirect('/login');
-    }
-  }
-  
-  return NextResponse.next();
-}
-\end{lstlisting}
+\begin{table}[H]
+\centering
+\caption{Phân loại tuyến đường và quy tắc truy cập}
+\label{tab:route_perms}
+\begin{tabular}{|l|p{5cm}|p{5cm}|}
+\hline
+\textbf{Loại tuyến đường} & \textbf{Ví dụ} & \textbf{Quy tắc} \\ \hline
+Công khai & Trang chủ, đăng nhập, đăng ký & Cho phép tất cả. \\ \hline
+Yêu cầu xác thực & \texttt{/cv-workspace}, \texttt{/admin} & Yêu cầu JWT hợp lệ; nếu thiếu, chuyển hướng về trang đăng nhập. \\ \hline
+Cho phép khách & \texttt{/cv-upload}, \texttt{/cv-guided-editing} & Cho phép cả người dùng đã đăng nhập lẫn phiên khách. \\ \hline
+\end{tabular}
+\end{table}
+
+Middleware đọc cookie phiên (\texttt{user\_session}) từ request, đối chiếu đường dẫn với bảng phân loại trên, và áp dụng quy tắc tương ứng. Dữ liệu CV của khách được lưu vào \texttt{localStorage} của trình duyệt với khoá \texttt{cv\_workflow\_\{cvId\}}; khi khách đăng ký tài khoản, dữ liệu nháp có thể được nâng cấp thành CV thuộc người dùng mới.
 
 \section{Hiện thực module tải lên và phân tích CV}
 
 \subsection{Trích xuất văn bản}
 
-Module trích xuất văn bản xử lý hai định dạng tệp: PDF và DOCX. Đối với PDF, hệ thống sử dụng thư viện \texttt{pdf-parse} kết hợp với \texttt{pdfjs-dist} để trích xuất toàn bộ nội dung văn bản. Đối với DOCX, thư viện \texttt{mammoth} được sử dụng để chuyển đổi nội dung thành văn bản thuần, loại bỏ định dạng nhưng giữ nguyên cấu trúc đoạn văn.
-
-Tệp gốc sau khi trích xuất văn bản được tải lên Vercel Blob Storage thông qua API endpoint \texttt{/api/upload/cv-blob}, lưu trữ đường dẫn (URL) để người dùng có thể tải xuống sau này.
+Module trích xuất văn bản xử lý hai định dạng tệp. Với PDF, hệ thống dùng \texttt{pdf-parse} kết hợp \texttt{pdfjs-dist} để trích xuất toàn bộ nội dung. Với DOCX, thư viện \texttt{mammoth} chuyển đổi nội dung thành văn bản thuần, loại bỏ định dạng nhưng giữ cấu trúc đoạn văn. Tệp gốc sau đó được tải lên Vercel Blob qua endpoint \texttt{/api/upload/cv-blob} để lưu trữ lâu dài.
 
 \subsection{Hybrid CV Parser}
 
-Đây là thành phần cốt lõi của hệ thống, được hiện thực trong file \texttt{shared/services/hybridCVParserService.ts}. Parser hoạt động theo hai pha:
+Đây là thành phần cốt lõi của hệ thống, hiện thực trong file \texttt{shared/services/hybridCV\allowbreak{}ParserService.ts}. Parser hoạt động theo hai pha song song.
 
-\textbf{Pha 1 -- Phân tích trực tiếp (Direct Parsing):} Lớp \texttt{SectionParsers} sử dụng regex và các heuristic để trích xuất thông tin liên hệ, tóm tắt nghề nghiệp, học vấn, và kỹ năng. Module \texttt{EnhancedTextProcessor} tiền xử lý văn bản, chia thành các section dựa trên từ khóa tiêu đề phổ biến (``Experience'', ``Education'', ``Skills'', ``Kinh nghiệm'', ``Học vấn'', ``Kỹ năng''...).
+\textbf{Pha 1 -- Trích xuất bằng biểu thức chính quy.} Các trường có cấu trúc cố định được trích bằng regex theo các mẫu liệt kê trong Bảng \ref{tab:contact_regex}.
 
-\begin{lstlisting}[language=TypeScript, caption={Trích xuất thông tin liên hệ bằng regex}]
-static parseContact(cvText: string) {
-  const contactText = EnhancedTextProcessor
-    .extractSection(cvText, 'contact');
-  
-  const emailMatch = cvText.match(
-    /[\w.+-]+@[\w-]+\.[\w.]+/
-  );
-  const phoneMatch = cvText.match(
-    /(\+?\d{1,3}[-.\s]?)?\(?\d{2,4}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/
-  );
-  const linkedinMatch = cvText.match(
-    /linkedin\.com\/in\/[\w-]+/i
-  );
-  
-  return {
-    full_name: extractName(contactText),
-    email: emailMatch?.[0] || '',
-    phone: phoneMatch?.[0] || '',
-    linkedin: linkedinMatch?.[0] || '',
-    address: extractAddress(contactText)
-  };
-}
-\end{lstlisting}
+\begin{table}[H]
+\centering
+\caption{Các mẫu trích xuất thông tin liên hệ và kỹ năng}
+\label{tab:contact_regex}
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Trường} & \textbf{Mẫu regex (rút gọn)} \\ \hline
+Email & \texttt{[A-Za-z0-9.\_\%+-]+@[A-Za-z0-9.-]+\textbackslash.[A-Z|a-z]\{2,\}} \\ \hline
+Số điện thoại & \texttt{(+84|0)?[\textbackslash s\textbackslash-.]?[0-9]\{2,3\}[\textbackslash s\textbackslash-.]?[0-9]\{3,4\}[\textbackslash s\textbackslash-.]?[0-9]\{3,4\}} \\ \hline
+URL LinkedIn & \texttt{linkedin\textbackslash.com/in/[a-zA-Z0-9-]+} \\ \hline
+Kỹ năng & Khớp với danh sách 10 nhóm từ khoá (ngôn ngữ, framework, công cụ, kỹ năng mềm\dots) \\ \hline
+\end{tabular}
+\end{table}
 
-\textbf{Pha 2 -- Phân tích bằng LLM (ChatGPT Parsing):} Phần kinh nghiệm làm việc được gửi đến OpenAI ChatGPT API với system prompt và structured output request. Mô hình \texttt{gpt-4o-mini} được chọn để cân bằng giữa chi phí và chất lượng.
+\textbf{Pha 2 -- Trích xuất kinh nghiệm bằng LLM.} Phần kinh nghiệm làm việc -- có cấu trúc đa dạng, viết tự do, khó tách bằng regex -- được gửi tới OpenAI \texttt{gpt-4o-mini} với prompt chuyên biệt yêu cầu trả về JSON. Tham số của lời gọi LLM được liệt kê trong Bảng \ref{tab:llm_parser_params}.
 
-\begin{lstlisting}[language=TypeScript, caption={Gọi ChatGPT API phân tích kinh nghiệm}]
-const messages: ChatMessage[] = [
-  {
-    role: 'system',
-    content: `You are a professional CV parser. 
-    Extract work experience as structured JSON.
-    Return: position, company, location, 
-    start_date, end_date, bullets[]`
-  },
-  {
-    role: 'user', 
-    content: `Parse work experience:\n${cvText}`
-  }
-];
+\begin{table}[H]
+\centering
+\caption{Tham số gọi LLM cho pha phân tích kinh nghiệm làm việc}
+\label{tab:llm_parser_params}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Tham số} & \textbf{Giá trị} \\ \hline
+Mô hình & \texttt{gpt-4o-mini} \\ \hline
+\texttt{temperature} & 0.1 \\ \hline
+\texttt{max\_tokens} & 2000 \\ \hline
+\texttt{response\_format} & \texttt{\{type: "json\_object"\}} \\ \hline
+Cache TTL & 5 phút (khoá: hash của văn bản đầu vào) \\ \hline
+\end{tabular}
+\end{table}
 
-const response = await fetch(
-  'https://api.openai.com/v1/chat/completions', {
-  method: 'POST',
-  headers: { 
-    'Authorization': `Bearer ${apiKey}` 
-  },
-  body: JSON.stringify({
-    model: 'gpt-4o-mini',
-    messages,
-    max_tokens: 2000,
-    temperature: 0.1
-  })
-});
-\end{lstlisting}
-
-Kết quả từ hai pha được hợp nhất thành đối tượng \texttt{CVParsingResponse} với các trường: \texttt{contact}, \texttt{summary}, \texttt{work\_experience}, \texttt{education}, \texttt{skills}, và \texttt{possibility\_score}.
-
-\subsection{Cơ chế dự phòng}
-
-Nếu hybrid parser gặp lỗi (ví dụ: API OpenAI không khả dụng), hệ thống tự động chuyển sang \texttt{cvParserService.ts} -- service sử dụng hoàn toàn ChatGPT API cho toàn bộ quá trình phân tích. Cơ chế dự phòng này đảm bảo hệ thống luôn hoạt động ngay cả khi một thành phần gặp sự cố.
+Hai pha chạy độc lập bằng \texttt{Promise.all} trên cùng văn bản trích xuất, sau đó kết quả được hợp nhất thành cấu trúc JSON thống nhất. Hệ thống tính thêm \texttt{possibility\_score} (0--100) dựa trên mức độ đầy đủ của thông tin -- nếu thiếu nhiều trường thì điểm thấp, báo hiệu tệp đầu vào có thể không phải CV hợp lệ.
 
 \section{Hiện thực trình soạn thảo CV}
 
-Trình soạn thảo CV (CV Guided Editor) là thành phần giao diện phức tạp nhất của hệ thống, nằm tại đường dẫn \texttt{/cv-guided-editing/[cvId]}. Component chính \texttt{CVEditor} được tải động (dynamic import) để tối ưu bundle size.
+\subsection{Bố cục hai cột}
 
-\subsection{Section-based editing}
-
-Mỗi phần của CV được hiện thực dưới dạng một component React riêng biệt: \texttt{ContactSection}, \texttt{SummarySection}, \texttt{WorkExperienceSection}, \texttt{EducationSection}, và \texttt{SkillsSection}. Người dùng cũng có thể thêm các section tùy chỉnh như Projects, Certifications, Languages, và Hobbies.
-
-Dữ liệu CV được quản lý tập trung thông qua \texttt{CVWorkflowContext} sử dụng React Context API kết hợp với useReducer pattern. Mọi thay đổi từ các section component đều dispatch action đến reducer, đảm bảo trạng thái nhất quán và hỗ trợ undo/redo.
+Trang soạn thảo CV dùng bố cục hai cột: bên trái là \textit{editor} với các section có thể mở/thu gọn, bên phải là bản \textit{preview} định dạng A4 cập nhật theo thời gian thực. Mỗi section (liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng) được hiện thực thành một component React riêng và quản lý trạng thái cục bộ.
 
 \subsection{Kéo thả với @dnd-kit}
 
-Thư viện \texttt{@dnd-kit} được sử dụng để hiện thực chức năng kéo thả sắp xếp thứ tự các mục trong phần kinh nghiệm làm việc và các section tùy chỉnh. Khi người dùng kéo thả một mục, hệ thống cập nhật thứ tự trong state và phản ánh ngay lập tức trên bản xem trước.
+Để cho phép sắp xếp lại thứ tự các section và các mục con (ví dụ thứ tự công ty trong kinh nghiệm), hệ thống dùng thư viện \texttt{@dnd-kit/core} kết hợp \texttt{@dnd-kit/sortable}. Mỗi mục có thể kéo được bọc trong component \texttt{DraggableSection} -- khi kéo thả, thư viện gọi callback \texttt{onDragEnd} để cập nhật thứ tự trong state. Thư tự mới được lưu vào trường \texttt{order} của Section và cập nhật vào cơ sở dữ liệu.
 
-\subsection{Tự động lưu}
+\subsection{Auto-save và preview real-time}
 
-Cơ chế auto-save sử dụng \texttt{useEffect} hook kết hợp debounce (2 giây) để lưu dữ liệu CV lên Supabase mỗi khi có thay đổi. Đối với phiên khách, dữ liệu được lưu vào \texttt{localStorage} của trình duyệt.
+Mỗi thay đổi của người dùng kích hoạt một hàm \texttt{onUpdateSection} cập nhật state trung tâm. Khi state thay đổi, hai việc xảy ra song song: (i) preview ở cột phải re-render ngay lập tức (React tự xử lý), (ii) hệ thống ghi state vào \texttt{localStorage} sau debounce 2 giây để tránh ghi quá nhiều. Với người dùng đã đăng nhập, state cũng được gửi đến API \texttt{/api/cv/\{cvId\}} (POST) để đồng bộ về cơ sở dữ liệu Supabase. Phương án này đảm bảo dữ liệu không bị mất ngay cả khi trình duyệt bị đóng đột ngột.
 
-\subsection{Xem trước real-time}
+\section{Hiện thực ba phương pháp matching}
 
-Panel preview bên phải hiển thị CV trong định dạng A4 chuẩn in ấn, sử dụng template Dennis Schroeder với layout chuyên nghiệp. Preview cập nhật tức thì khi người dùng chỉnh sửa bất kỳ nội dung nào ở panel editor bên trái. Section đang được chỉnh sửa được highlight trên preview để người dùng dễ theo dõi.
+Module matching được hiện thực trong thư mục \texttt{shared/services/matching/}, gồm ba lớp matcher độc lập tuân thủ cùng giao diện trả về \texttt{MatchResult}.
 
-\section{Hiện thực module xuất CV}
+\subsection{TF-IDF Matcher}
 
-Hệ thống hỗ trợ xuất CV ra bốn định dạng khác nhau, mỗi định dạng phục vụ một nhu cầu cụ thể:
+File: \texttt{tfidfMatcher.ts}. Cài đặt theo công thức TF-IDF được làm trơn theo kiểu \textit{scikit-learn}: $\mathrm{idf}(t) = \ln((N+1)/(\mathrm{df}(t)+1)) + 1$, trong đó $N$ là số tài liệu trong corpus và $\mathrm{df}(t)$ là số tài liệu chứa từ $t$. Cosine similarity được tính giữa hai vector TF-IDF trên không gian từ vựng hợp nhất rồi nhân 100 để chuẩn hoá ra điểm 0--100.
 
-\textbf{Xuất PDF:} Sử dụng cơ chế print dialog của trình duyệt thông qua \texttt{window.print()} với CSS media query \texttt{@media print} được thiết kế riêng để đảm bảo bản in giống với preview trên màn hình.
+Hệ thống dùng danh sách stopword cho cả tiếng Việt (\textit{và}, \textit{hoặc}, \textit{của}\dots) và tiếng Anh (\textit{the}, \textit{and}, \textit{for}\dots) để giảm nhiễu. Khi chạy thí nghiệm, IDF được tính trên toàn corpus 676 JD; khi chạy đơn lẻ trong demo, matcher trả về điểm dựa trên 1-document IDF.
 
-\textbf{Xuất DOCX:} Tạo file DOCX bằng thư viện \texttt{docx}, chuyển đổi dữ liệu CV có cấu trúc thành các đoạn văn (Paragraph), bảng (Table), và các phần (Section) theo định dạng Microsoft Word. File được tạo phía client và tải xuống thông qua \texttt{file-saver}.
+\subsection{Embedding Matcher}
 
-\textbf{Xuất LaTeX:} Sinh mã LaTeX sử dụng lớp \texttt{moderncv}, phù hợp cho môi trường học thuật. Mã LaTeX được tạo từ dữ liệu CV có cấu trúc, với các lệnh \texttt{\\cventry}, \texttt{\\cvitem} cho từng mục.
+File: \texttt{embeddingMatcher.ts}. Hệ thống gọi OpenAI API tới mô hình \texttt{text-embedding-3-small} để biến mỗi văn bản (CV hoặc JD) thành vector 1536 chiều, sau đó tính cosine similarity giữa hai vector.
 
-\textbf{Xuất TXT:} Xuất văn bản thuần có cấu trúc rõ ràng, phù hợp cho việc dán vào các form ứng tuyển trực tuyến.
+Để tránh gọi API lặp lại, mỗi vector được cache theo \texttt{sha256} của văn bản đầu vào. Cache có thể là in-memory (cho lần chạy hiện tại) hoặc lưu xuống JSON trên đĩa (cho thí nghiệm). Trong cơ sở dữ liệu, trường \texttt{cv\_embedding} và \texttt{jd\_embedding} kiểu \texttt{vector(1536)} cùng với \texttt{cv\_embedding\_hash} cho phép cache cấp ứng dụng -- nếu hash trùng thì dùng lại vector cũ.
 
-\section{Hiện thực quản lý CV workspace}
+\subsection{LLM Matcher}
 
-Trang workspace (\texttt{/cv-workspace}) hiển thị danh sách tất cả CV của người dùng, lấy từ bảng \texttt{cv\_workflow} thông qua Supabase client. Các thao tác CRUD được hiện thực:
+File: \texttt{llmMatcher.ts}. Hệ thống gọi \texttt{gpt-4o-mini} với prompt yêu cầu chấm điểm 0--100 và liệt kê từ khoá khớp/thiếu. Để đảm bảo kết quả ổn định giữa các lần chạy (quan trọng cho thí nghiệm), các tham số sau được đặt:
 
-\begin{enumerate}[label=(\roman*)]
-\item \textit{Tạo mới:} Người dùng có thể tạo CV mới từ template hoặc tải lên CV có sẵn. Hệ thống tạo bản ghi mới trong \texttt{cv\_workflow} với trạng thái ``draft''.
-\item \textit{Đọc:} Danh sách CV được sắp xếp theo thời gian cập nhật gần nhất, hiển thị tên, trạng thái, và ngày tạo.
-\item \textit{Cập nhật:} Khi mở CV trong editor, mọi thay đổi được auto-save. Người dùng cũng có thể đổi tên CV trực tiếp từ workspace.
-\item \textit{Xóa:} Xóa CV với hộp thoại xác nhận, thực hiện xóa bản ghi từ \texttt{cv\_workflow} và file từ Vercel Blob (nếu có).
-\end{enumerate}
+\begin{itemize}
+\item \texttt{temperature = 0}: mô hình chọn câu trả lời chắc chắn nhất, không lấy mẫu ngẫu nhiên.
+\item \texttt{seed = 42}: cố định nguồn ngẫu nhiên ở phía OpenAI (best-effort).
+\item \texttt{response\_format = \{type: "json\_object"\}}: ép mô hình trả về JSON đúng cấu trúc.
+\item \texttt{max\_tokens = 400}: đủ cho điểm và từ khoá, không cần phần giải thích dài.
+\end{itemize}
 
-\section{Bảo mật hệ thống}
+Chi phí được tính từ số token đầu vào và đầu ra theo bảng giá: \$0,15 / 1 triệu token đầu vào và \$0,60 / 1 triệu token đầu ra.
 
-Hệ thống áp dụng nhiều lớp bảo mật:
+\section{Xuất CV ra PDF và DOCX}
 
-\textbf{Mã hóa mật khẩu:} Mật khẩu được băm bằng bcrypt với salt factor 12 trước khi lưu vào cơ sở dữ liệu. Quá trình xác thực so sánh mật khẩu đầu vào với hash đã lưu mà không bao giờ giải mã ngược.
+Hệ thống hỗ trợ hai định dạng xuất phổ biến. Để xuất \textbf{PDF}, hệ thống dùng API in của trình duyệt: gọi \texttt{window.print()} sau khi đã áp dụng CSS chuyên biệt cho định dạng A4. Cách này tận dụng renderer HTML--CSS có sẵn của trình duyệt, đảm bảo CV in ra giống hệt preview.
 
-\textbf{Row Level Security:} Tất cả sáu bảng trong cơ sở dữ liệu đều kích hoạt RLS. Chính sách RLS đảm bảo mỗi người dùng chỉ đọc và ghi được dữ liệu thuộc về mình, ngay cả khi có lỗi logic ở tầng ứng dụng.
-
-\textbf{CSRF Protection:} Luồng OAuth sử dụng state token ngẫu nhiên được lưu trong session cookie. Khi nhận callback từ nhà cung cấp OAuth, hệ thống so sánh state token để đảm bảo request không bị giả mạo.
-
-\textbf{Rate limiting:} API đăng nhập và đăng ký áp dụng giới hạn số lượng request từ cùng một IP trong khoảng thời gian nhất định, ngăn chặn tấn công brute-force.
-
-\textbf{Xác thực đầu vào:} Tất cả dữ liệu từ người dùng được kiểm tra định dạng (email hợp lệ, độ mạnh mật khẩu, kích thước tệp tải lên) trước khi xử lý.
-
-\textbf{Session management:} JWT token được lưu trong httpOnly cookie, ngăn chặn truy cập từ JavaScript phía client. Token có thời gian hết hạn (7 ngày) và được kiểm tra ở mỗi request thông qua middleware.
-
-Chương này đã trình bày chi tiết quá trình hiện thực các module chính của hệ thống OkBuddy, từ xác thực đa phương thức, tải lên và phân tích CV hybrid, trình soạn thảo tương tác, xuất đa định dạng, quản lý workspace, đến các cơ chế bảo mật. Chương 5 tiếp theo sẽ trình bày kết quả kiểm thử và đánh giá hệ thống.
+Để xuất \textbf{DOCX}, hệ thống dùng thư viện \texttt{docx} (JavaScript) để xây dựng cấu trúc tài liệu Word từ dữ liệu CV JSON: tạo các \texttt{Paragraph}, \texttt{TextRun}, \texttt{Table} với style tương ứng từng section, rồi đóng gói thành tệp \texttt{.docx} và gửi về trình duyệt qua \texttt{Blob}.
 
 \end{document}
