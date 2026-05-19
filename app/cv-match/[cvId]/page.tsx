@@ -80,7 +80,7 @@ export default function CVMatchPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="max-w-7xl mx-auto p-6 space-y-6" suppressHydrationWarning>
       <header>
         <h1 className="text-2xl font-semibold text-gray-900">
           So khớp CV với Mô tả công việc — So sánh 3 phương pháp

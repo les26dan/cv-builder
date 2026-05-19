@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ContactSection } from './sections/ContactSection';
@@ -248,8 +248,9 @@ export const EditorPanel = ({
     setJdInput(value);
     setAnalysisError(null);
     
-    // Auto-save to localStorage
-    localStorage.setItem('okbuddy_jd_draft', value);
+    // Auto-save to localStorage (keyed by CV id)
+    const draftKey = cvData?.id ? `okbuddy_jd_draft_${cvData.id}` : null;
+    if (draftKey) localStorage.setItem(draftKey, value);
   };
 
   const handleAnalyzeJob = async () => {
@@ -405,20 +406,26 @@ export const EditorPanel = ({
   // Load saved JD and analysis results on component mount
   useEffect(() => {
     const loadInitialData = async () => {
-      // Load JD input from localStorage
-      const savedJd = localStorage.getItem('okbuddy_jd_draft');
+      // Load JD draft from localStorage (keyed by CV id)
+      const draftKey = cvData?.id ? `okbuddy_jd_draft_${cvData.id}` : null;
+      const savedJd = draftKey ? localStorage.getItem(draftKey) : null;
       if (savedJd) {
         setJdInput(savedJd);
       }
       
       // Try to load analysis from database first, then fallback to localStorage
+      // Only restore analysis if there's also a saved JD text (avoid showing stale results)
       if (cvData?.id) {
         try {
+          console.log('🔍 EditorPanel loadJDAnalysis for cvId:', cvData.id);
           const dbResult = await dataService.loadJDAnalysis(cvData.id);
-          if (dbResult.success && dbResult.data) {
+          console.log('🔍 EditorPanel dbResult:', { success: dbResult.success, hasData: !!dbResult.data, jdText: (dbResult as any).jobDescriptionText?.slice?.(0,30) });
+          const jdText = (dbResult as any).jobDescriptionText || '';
+          if (dbResult.success && dbResult.data && jdText.trim()) {
+            if (!savedJd) setJdInput(jdText);
             setAnalysisResults(dbResult.data);
             setLastAnalysisId(dbResult.data.analysisId);
-            
+
             if (dbResult.data.jobMatch?.missingKeywords) {
               setMissingKeywords(dbResult.data.jobMatch.missingKeywords);
             }
@@ -432,30 +439,7 @@ export const EditorPanel = ({
         }
       }
       
-      // Fallback to localStorage
-      const savedAnalysis = localStorage.getItem('okbuddy_jd_analysis');
-      const savedAnalysisId = localStorage.getItem('okbuddy_jd_analysis_id');
-      
-      if (savedAnalysis && savedAnalysisId) {
-        try {
-          const parsedAnalysis = JSON.parse(savedAnalysis);
-          setAnalysisResults(parsedAnalysis);
-          setLastAnalysisId(savedAnalysisId);
-          
-                      // Load keywords if available
-            if (parsedAnalysis.jobMatch?.missingKeywords) {
-              setMissingKeywords(parsedAnalysis.jobMatch.missingKeywords);
-            }
-            if (parsedAnalysis.jobMatch?.matchedKeywords) {
-              setMatchedKeywords(parsedAnalysis.jobMatch.matchedKeywords);
-            }
-        } catch (error) {
-          console.error('Error loading saved analysis:', error);
-          // Clear corrupted data
-          localStorage.removeItem('okbuddy_jd_analysis');
-          localStorage.removeItem('okbuddy_jd_analysis_id');
-        }
-      }
+      // No JD draft and no DB analysis with JD text — nothing to restore
     };
     
     loadInitialData();
@@ -481,13 +465,13 @@ export const EditorPanel = ({
     autoTriggerAnalysis();
   }, [cvData, jdInput, analysisResults]);
   
-  // Auto-save analysis results to localStorage
+  // Auto-save analysis results to localStorage (keyed by CV id)
   useEffect(() => {
-    if (analysisResults && lastAnalysisId) {
-      localStorage.setItem('okbuddy_jd_analysis', JSON.stringify(analysisResults));
-      localStorage.setItem('okbuddy_jd_analysis_id', lastAnalysisId);
+    if (analysisResults && lastAnalysisId && cvData?.id) {
+      localStorage.setItem(`okbuddy_jd_analysis_${cvData.id}`, JSON.stringify(analysisResults));
+      localStorage.setItem(`okbuddy_jd_analysis_id_${cvData.id}`, lastAnalysisId);
     }
-  }, [analysisResults, lastAnalysisId]);
+  }, [analysisResults, lastAnalysisId, cvData?.id]);
 
 
 
