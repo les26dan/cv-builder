@@ -572,32 +572,14 @@ export class CVWorkflowDataService {
   public async loadJDAnalysis(cvId: string): Promise<DatabaseResult<any>> {
     try {
       if (!CVWorkflowDataService.isValidUuid(cvId)) {
-        const storageKey = `okbuddy_jd_analysis_${cvId}`
-        try {
-          const stored = localStorage.getItem(storageKey)
-          if (stored) {
-            const { analysisResults } = JSON.parse(stored)
-            return { success: true, data: analysisResults }
-          }
-        } catch {
-          // ignore parse errors
-        }
         return { success: false, error: 'No JD analysis found' }
       }
 
       const client = await databaseService.getClient()
       if (!client) {
-        // Use localStorage fallback when DB not available
-        const storageKey = `okbuddy_jd_analysis_${cvId}`
-        const savedData = localStorage.getItem(storageKey)
-        if (savedData) {
-          const parsed = JSON.parse(savedData)
-          return { success: true, data: parsed.analysisResults }
-        }
         return { success: false, error: 'No analysis found' }
       }
 
-      // Use maybeSingle() so missing row returns data: null without an error (avoids PGRST116 / empty DB noise)
       const { data, error } = await client
         .from('cv_workflow')
         .select('analysis_results, job_description_text, job_description_keywords')
@@ -605,38 +587,19 @@ export class CVWorkflowDataService {
         .maybeSingle()
 
       if (error) {
-        // Only log real errors (not "no rows" which maybeSingle avoids; guard against empty error object)
         const isEmptyObject = error && typeof error === 'object' && Object.keys(error).length === 0
         const code = error?.code
-        const msg = error?.message
-
-        // Skip logging if: empty object, or PGRST116 (no rows found)
         const shouldLog = !isEmptyObject && code && code !== 'PGRST116'
-
         if (shouldLog) {
           console.error('Load JD analysis error:', error)
-        }
-        // Fallback to localStorage
-        const storageKey = `okbuddy_jd_analysis_${cvId}`
-        const savedData = localStorage.getItem(storageKey)
-        if (savedData) {
-          const parsed = JSON.parse(savedData)
-          return { success: true, data: parsed.analysisResults }
         }
         return { success: false, error: 'No analysis found' }
       }
 
-      if (data?.analysis_results) {
-        return { success: true, data: data.analysis_results }
+      if (data?.analysis_results && data?.job_description_text) {
+        return { success: true, data: data.analysis_results, jobDescriptionText: data.job_description_text }
       }
 
-      // No row or row has no analysis_results (e.g. empty DB) — try localStorage, then "no analysis"
-      const storageKey = `okbuddy_jd_analysis_${cvId}`
-      const savedData = localStorage.getItem(storageKey)
-      if (savedData) {
-        const parsed = JSON.parse(savedData)
-        return { success: true, data: parsed.analysisResults }
-      }
       return { success: false, error: 'No analysis found' }
 
     } catch (error) {

@@ -46,10 +46,8 @@ export default function Header() {
     if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
       setCurrentLanguage(savedLanguage);
     } else {
-      // Use language detection system
-      const detectedLanguage = detectLanguage();
-      setCurrentLanguage(detectedLanguage.language);
-      localStorage.setItem('okbuddy_language', detectedLanguage.language);
+      setCurrentLanguage('vi');
+      localStorage.setItem('okbuddy_language', 'vi');
     }
   }, []);
 

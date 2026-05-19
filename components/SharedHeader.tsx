@@ -81,18 +81,9 @@ export default function SharedHeader({
 
     // Initialize language configuration using the detection system
     const initLanguage = async () => {
-      const savedLanguage = localStorage.getItem('okbuddy_language') as SupportedLanguage;
-      let language: SupportedLanguage;
-      
-      if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
-        language = savedLanguage;
-      } else {
-        // Use language detection system
-        const detectedLanguage = detectLanguage();
-        language = detectedLanguage.language;
-        localStorage.setItem('okbuddy_language', language);
-      }
-      
+      const language: SupportedLanguage = 'vi';
+      localStorage.setItem('okbuddy_language', 'vi');
+
       setCurrentLanguage(language);
       
       // Load workspace texts for the detected language
@@ -382,7 +373,7 @@ export default function SharedHeader({
                   className="flex flex-row justify-center items-center w-[100px] h-10 bg-white border border-[#0277BD] rounded-lg hover:bg-[#E1F5FE] transition-colors"
                 >
                   <span className="font-inter font-medium text-sm leading-[17px] text-[#0277BD]">
-                    {accountTexts?.nav?.login || 'Log In'}
+                    {accountTexts?.nav?.login || 'Đăng nhập'}
                   </span>
                 </button>
 
@@ -392,7 +383,7 @@ export default function SharedHeader({
                   className="flex flex-row justify-center items-center w-[120px] h-10 bg-[#0277BD] rounded-lg hover:bg-primary-600 transition-colors"
                 >
                   <span className="font-inter font-medium text-sm leading-[17px] text-white">
-                    {accountTexts?.nav?.signup || 'Sign Up'}
+                    {accountTexts?.nav?.signup || 'Đăng ký'}
                   </span>
                 </button>
               </>

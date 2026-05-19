@@ -488,6 +488,7 @@ export const CVEditor: React.FC<CVEditorProps> = ({
         <div className="w-3/5 overflow-y-auto bg-blue-50">
           <div className="p-6">
             <EditorPanel
+              key={cvId}
               cvData={cvData}
               onUpdateSection={handleUpdateSection}
               onSectionOrderChange={handleSectionOrderChange}
