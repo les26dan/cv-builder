@@ -21,18 +21,7 @@ Truy cập tại `/cv-workspace` — không gian làm việc tích hợp:
 - **Phân tích JD tự động** bằng AI: trích xuất kỹ năng yêu cầu, highlight điểm khớp/thiếu với CV.
 - Mỗi CV có JD draft và kết quả phân tích riêng biệt.
 
-### 3. So khớp CV ↔ JD (3 phương pháp)
-Truy cập tại `/cv-match/[cvId]` — tự động lấy CV bạn vừa soạn từ trình soạn thảo.
-
-| Phương pháp | Cách hoạt động | Tốc độ | Chi phí | Khi nào dùng |
-|---|---|---|---|---|
-| **TF-IDF** | Đếm tần suất từ khoá (lexical) | ~1ms | $0 | JD và CV dùng đúng từ khoá giống nhau |
-| **Embedding** | Vector hoá ngữ nghĩa (Voyage AI) | ~200ms | rất thấp | Hai bên dùng từ khác nhau nhưng cùng ý |
-| **LLM** | Suy luận bằng Claude/GPT | ~2-3s | cao hơn | Cần giải thích chi tiết khớp/không khớp |
-
-Mỗi phương pháp hiển thị **panel riêng** với điểm số, từ khoá khớp, và biểu đồ so sánh trade-off chi phí ↔ chất lượng.
-
-### 4. Gợi ý việc làm
+### 3. Gợi ý việc làm
 Truy cập tại `/jobs/[cvId]` — tìm việc làm phù hợp dựa trên CV:
 - Tìm kiếm job postings từ database qua `/api/jobs/search`.
 - Hiển thị điểm khớp và lý do phù hợp cho từng vị trí.
@@ -48,7 +37,6 @@ Bộ script tính các chỉ số chuẩn xếp hạng: **nDCG@10, MAP, MRR, P@K
 ```bash
 npm run eval:build-truth        # dán nhãn ground truth từ tập CV-JD
 npm run eval:embed              # cache embedding cho corpus
-npm run eval:run                # chạy đánh giá 3 phương pháp
 python scripts/evaluate-rag.py  # đánh giá RAG pipeline
 python scripts/analyze-results.py   # vẽ biểu đồ + báo cáo
 ```
@@ -103,23 +91,15 @@ app/
   page.tsx                  # Trang chủ
   cv-builder/[cvId]/        # Trình soạn thảo CV
   cv-workspace/             # Workspace tích hợp soạn CV + phân tích JD
-  cv-match/[cvId]/          # Trang so khớp 3 phương pháp
   jobs/[cvId]/              # Gợi ý việc làm theo CV
   api/
-    cv/match/               # API gọi 3 matcher song song
-    cv/embed/               # API tạo embedding
     jobs/search/            # API tìm kiếm job postings
 components/
   CVEditor.tsx              # State chính của editor
   EditorPanel.tsx           # UI từng phần CV
   JobCard.tsx               # Card hiển thị job posting
-  match/                    # Các panel TF-IDF / Embedding / LLM
 lib/
   ragPipeline.ts            # RAG pipeline (retrieval + rerank)
-shared/services/matching/
-  tfidfMatcher.ts           # Cài đặt TF-IDF
-  embeddingMatcher.ts       # Voyage embedding + cosine
-  llmMatcher.ts             # Prompt + parse Claude/GPT
 scripts/                    # Script đánh giá thực nghiệm
   evaluate-rag.py           # Đánh giá RAG pipeline
   evaluate-rag-full.py      # Đánh giá đầy đủ toàn bộ corpus
