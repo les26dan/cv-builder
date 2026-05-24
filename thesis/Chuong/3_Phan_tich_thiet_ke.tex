@@ -18,23 +18,24 @@ Dựa trên bài toán đã định nghĩa ở Chương 1, hệ thống cần đ
 \hline
 \textbf{Mã} & \textbf{Tên yêu cầu} & \textbf{Mô tả} \\ \hline
 FR01 & Đăng ký tài khoản & Người dùng đăng ký bằng email và mật khẩu \\ \hline
-FR02 & Đăng nhập đa phương thức & Đăng nhập bằng email/mật khẩu, Google OAuth, hoặc LinkedIn OAuth \\ \hline
-FR03 & Quản lý phiên đăng nhập & Duy trì phiên đăng nhập bằng JWT, hỗ trợ đăng xuất \\ \hline
-FR04 & Hỗ trợ phiên khách & Cho phép sử dụng trình soạn thảo CV mà không cần đăng nhập \\ \hline
-FR05 & Tải lên CV & Upload file PDF hoặc DOCX (tối đa 10 MB) \\ \hline
-FR06 & Trích xuất văn bản & Tự động trích xuất văn bản từ tệp PDF và DOCX \\ \hline
-FR07 & Phân tích CV bằng AI & Phân tích nội dung CV, trích xuất thông tin có cấu trúc \\ \hline
-FR08 & Chấm điểm tin cậy & Tính điểm tin cậy cho kết quả phân tích \\ \hline
-FR09 & Nhận diện ngôn ngữ & Tự động phát hiện CV viết bằng tiếng Việt hay tiếng Anh \\ \hline
-FR10 & Chỉnh sửa theo phần & Editor cho phép sửa từng section: liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng \\ \hline
-FR11 & Kéo thả sắp xếp & Cho phép sắp xếp thứ tự các mục bằng thao tác kéo thả \\ \hline
-FR12 & Tự động lưu & Auto-save dữ liệu CV định kỳ \\ \hline
-FR13 & Xem trước real-time & Preview CV định dạng A4 cập nhật theo thời gian thực \\ \hline
-FR14 & Xuất PDF & Xuất CV ra định dạng PDF \\ \hline
-FR15 & Xuất DOCX & Xuất CV ra định dạng Microsoft Word \\ \hline
-FR16 & Quản lý workspace & Dashboard hiển thị, tạo mới, sửa, xoá CV \\ \hline
-FR17 & Hỗ trợ song ngữ & Giao diện hỗ trợ cả tiếng Việt và tiếng Anh \\ \hline
-FR18 & So khớp CV-JD & So sánh CV với mô tả công việc bằng ba phương pháp matching \\ \hline
+FR02 & Đăng nhập & Đăng nhập bằng email/mật khẩu \\ \hline
+FR03 & Hỗ trợ phiên khách & Cho phép sử dụng trình soạn thảo CV mà không cần đăng nhập \\ \hline
+FR04 & Tải lên CV & Upload file PDF hoặc DOCX (tối đa 10 MB) \\ \hline
+FR05 & Trích xuất văn bản & Tự động trích xuất văn bản từ tệp PDF và DOCX \\ \hline
+FR06 & Phân tích CV bằng AI & Phân tích nội dung CV, trích xuất thông tin có cấu trúc \\ \hline
+FR07 & Chấm điểm tin cậy & Tính điểm tin cậy cho kết quả phân tích \\ \hline
+FR08 & Nhận diện ngôn ngữ & Tự động phát hiện CV viết bằng tiếng Việt hay tiếng Anh \\ \hline
+FR09 & Chỉnh sửa theo phần & Editor cho phép sửa từng section: liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng \\ \hline
+FR10 & Kéo thả sắp xếp & Cho phép sắp xếp thứ tự các mục bằng thao tác kéo thả \\ \hline
+FR11 & Tự động lưu & Auto-save dữ liệu CV định kỳ \\ \hline
+FR12 & Xem trước real-time & Preview CV định dạng A4 cập nhật theo thời gian thực \\ \hline
+FR13 & Xuất PDF & Xuất CV ra định dạng PDF \\ \hline
+FR14 & Xuất DOCX & Xuất CV ra định dạng Microsoft Word \\ \hline
+FR15 & Quản lý workspace & Dashboard hiển thị, tạo mới, sửa, xoá CV \\ \hline
+FR16 & Hỗ trợ song ngữ & Giao diện hỗ trợ cả tiếng Việt và tiếng Anh \\ \hline
+FR17 & Tìm JD phù hợp & Ứng viên dùng CV của mình để tìm các tin tuyển dụng phù hợp từ kho JD \\ \hline
+FR18 & Xem chi tiết JD & Xem mô tả công việc đầy đủ, điểm phù hợp và lý do giải thích \\ \hline
+FR19 & Ứng tuyển (Apply) & Ứng viên nộp đơn ứng tuyển vào tin tuyển dụng phù hợp \\ \hline
 \end{tabular}%
 }
 \end{table}
@@ -56,276 +57,259 @@ NFR03 & Tương thích trình duyệt & Hoạt động trên Chrome, Firefox, Sa
 \end{tabular}
 \end{table}
 
-\subsection{Biểu đồ Use Case}
+\subsection{Tác nhân}
 
-Hệ thống có ba tác nhân chính: Khách (chưa đăng nhập), Người dùng (đã đăng nhập), và Quản trị viên. Hình \ref{fig:usecase} mô tả tổng thể các trường hợp sử dụng.
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-  every node/.style={font=\small},
-  uc/.style={ellipse, draw, thick, minimum width=3.8cm, minimum height=1.0cm, align=center, font=\footnotesize, fill=blue!8},
-  actor/.style={font=\footnotesize\bfseries, align=center},
-  sysbox/.style={rectangle, draw, very thick, dashed, inner sep=0.6cm},
-  conn/.style={thick, gray!70}
-]
-\foreach \name/\y/\label in {guest/4.0/Khách, user/-1.1/Người dùng, admin/-5.9/Quản trị viên} {
-  \node[circle, draw, minimum size=0.45cm, inner sep=0pt] (\name h) at (-5, \y+0.4) {};
-  \draw[thick] (-5, \y+0.18) -- (-5, \y-0.6);
-  \draw[thick] (-5.4, \y-0.2) -- (-4.6, \y-0.2);
-  \draw[thick] (-5, \y-0.6) -- (-5.35, \y-1.05);
-  \draw[thick] (-5, \y-0.6) -- (-4.65, \y-1.05);
-  \node[actor, anchor=north] at (-5, \y-1.1) {\label};
-  \coordinate (\name) at (-4.5, \y-0.2);
-}
-
-\node[uc] (uc1) at (2, 5.4)  {Xem trang chủ};
-\node[uc] (uc2) at (2, 4.0)  {Soạn thảo CV};
-\node[uc] (uc3) at (2, 2.6)  {Xuất CV\\(PDF/DOCX)};
-\node[uc] (uc4) at (2, 1.0)  {Đăng nhập / Đăng ký};
-\node[uc] (uc5) at (2, -0.4) {Tải lên CV};
-\node[uc] (uc6) at (2, -1.8) {Phân tích CV\\bằng LLM};
-\node[uc] (uc7) at (2, -3.2) {Quản lý CV\\(workspace)};
-\node[uc] (uc8) at (2, -5.2) {Xem thống kê};
-\node[uc] (uc9) at (2, -6.6) {Quản lý người dùng};
-
-\begin{scope}[on background layer]
-  \node[sysbox, fit=(uc1)(uc2)(uc3)(uc4)(uc5)(uc6)(uc7)(uc8)(uc9), label={[font=\bfseries\footnotesize]above:Hệ thống}] {};
-\end{scope}
-
-\draw[conn] (guest) -- (uc1.west);
-\draw[conn] (guest) -- (uc2.west);
-\draw[conn] (guest) -- (uc3.west);
-\draw[conn] (user) -- (uc4.west);
-\draw[conn] (user) -- (uc5.west);
-\draw[conn] (user) -- (uc6.west);
-\draw[conn] (user) -- (uc7.west);
-\draw[conn] (admin) -- (uc8.west);
-\draw[conn] (admin) -- (uc9.west);
-\end{tikzpicture}
-\caption{Biểu đồ Use Case tổng thể của hệ thống}
-\label{fig:usecase}
-\end{figure}
-
-Khách có thể truy cập trang chủ, soạn thảo CV từ template, và xuất CV mà không cần đăng nhập. Người dùng đã đăng nhập có thêm các chức năng quản lý workspace, lưu CV vào cơ sở dữ liệu, tải lên CV để phân tích. Quản trị viên có quyền truy cập dashboard quản trị và xem thống kê hệ thống.
+Hệ thống có hai tác nhân: \textbf{Khách} (chưa đăng nhập) -- truy cập trang chủ, soạn thảo CV từ template, xuất CV mà không cần tài khoản; \textbf{Người dùng} (đã đăng nhập) -- thừa hưởng mọi chức năng của khách, thêm khả năng tải lên CV để phân tích, quản lý nhiều CV trong workspace, và \textit{tìm JD phù hợp} qua luồng xử lý RAG. Kho JD được hệ thống crawl tự động từ các nền tảng tuyển dụng.
 
 \section{Kiến trúc tổng thể hệ thống}
 
-Hệ thống được thiết kế theo kiến trúc \textit{ba lớp} (three-tier) gồm: lớp trình bày, lớp logic nghiệp vụ, và lớp dữ liệu. Toàn bộ hệ thống chạy trên nền tảng Next.js cho phép tích hợp cả frontend và backend API trong cùng một dự án. Hình \ref{fig:architecture} mô tả tổ chức ba lớp.
+Hệ thống được xây dựng trên nền tảng \textbf{Next.js} -- framework cho phép viết cả trang giao diện React lẫn API backend trong cùng một dự án, triển khai lên Vercel mà không cần cấu hình server riêng. Về mặt kiến trúc, hệ thống tổ chức theo mô hình \textit{ba lớp} (three-tier): lớp trình bày chứa giao diện người dùng, lớp logic nghiệp vụ chứa các pipeline xử lý AI, và lớp dữ liệu chứa cơ sở dữ liệu và các dịch vụ lưu trữ ngoài.
+
+Hình~\ref{fig:e2e_overview} nhìn hệ thống theo chiều ngang -- bám theo hai luồng nghiệp vụ chính của ứng viên từ đầu đến cuối. Hình~\ref{fig:architecture} chiếu cùng hệ thống theo chiều dọc ba lớp để thấy rõ trách nhiệm từng tầng.
 
 \begin{figure}[H]
 \centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  every node/.style={font=\footnotesize},
+  actor/.style={rectangle, rounded corners=2pt, draw, thick, minimum width=2.6cm, minimum height=0.9cm, align=center, fill=yellow!25},
+  fe/.style={rectangle, rounded corners=2pt, draw, thick, minimum width=3.4cm, minimum height=0.9cm, align=center, fill=blue!12},
+  be/.style={rectangle, rounded corners=2pt, draw, thick, minimum width=3.8cm, minimum height=1.1cm, align=center, fill=orange!18},
+  store/.style={cylinder, draw, thick, aspect=0.25, shape border rotate=90, minimum height=1.2cm, minimum width=2.6cm, align=center, fill=green!18},
+  ext/.style={rectangle, rounded corners=2pt, draw, thick, minimum width=3.0cm, minimum height=1.1cm, align=center, fill=violet!18},
+  outbox/.style={rectangle, rounded corners=2pt, draw, thick, dashed, minimum width=3.4cm, minimum height=0.9cm, align=center, fill=gray!12},
+  arr/.style={-{Stealth[length=2.5mm]}, thick},
+  arr2/.style={{Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}, thick, dashed, gray!70!black},
+  lab/.style={font=\scriptsize\itshape, fill=white, inner sep=1pt}
+]
+% Hàng 1: stick figure actor (ứng viên, giữa)
+\draw[thick] (0, 7.2) circle (0.18);
+\draw[thick] (0, 7.02) -- (0, 6.55);
+\draw[thick] (-0.3, 6.85) -- (0.3, 6.85);
+\draw[thick] (0, 6.55) -- (-0.25, 6.1);
+\draw[thick] (0, 6.55) -- (0.25, 6.1);
+\node[actor] (cand) at (0, 5.4) {Ứng viên};
+
+% Hàng 2: Frontend -- hai luồng
+\node[fe] (feA) at (-4.8, 3.8) {Trang Upload CV\\\& Editor};
+\node[fe] (feB) at ( 4.8, 3.8) {Trang Tìm JD\\(Job Search)};
+
+% Hàng 3: Backend pipelines
+\node[be] (parser) at (-4.8, 1.8) {\textbf{Hybrid CV Parser}\\Regex $\parallel$ LLM};
+\node[be] (rag)    at ( 4.8, 1.8) {\textbf{Pipeline RAG 2 bước}\\CV $\to$ top-K JD};
+
+% Hàng 4: Storage + External API (dãn cách đủ không chồng nhau)
+\node[store] (db)   at (-3.5, -1.8) {Supabase\\+ pgvector};
+\node[store, fill=green!10] (blob) at (0, -1.8) {Vercel Blob\\\scriptsize PDF/DOCX gốc};
+\node[ext]   (api)  at ( 3.5, -1.8) {OpenAI API\\\scriptsize embedding-3-small\\\scriptsize gpt-4o-mini};
+
+% Hàng 5: Outputs (đẩy ra hai mép, mũi tên đi vòng ngoài né storage)
+\node[outbox] (outA) at (-6.5, -4.0) {CV có cấu trúc\\\scriptsize(JSON + gợi ý AI)};
+\node[outbox] (outB) at ( 6.5, -4.0) {Top-K JD phù hợp\\\scriptsize(ranked list + lý do)};
+
+% ===== Mũi tên luồng chính (solid) =====
+% Luồng A: ứng viên -> tạo CV -> kết quả CV có cấu trúc
+\draw[arr] (cand.west) to[out=180, in=90] node[lab,left] {PDF/DOCX} (feA.north);
+\draw[arr] (feA)  -- node[lab,right] {Text thô} (parser);
+% Đi vòng ngoài storage row: từ parser.west -> xuống -> outA
+\draw[arr] (parser.west) to[out=180, in=90] node[lab,left,pos=0.55] {JSON CV} (outA.north);
+
+% Luồng B: ứng viên -> tìm JD -> top-K JD
+\draw[arr] (cand.east) to[out=0, in=90] node[lab,right] {CV đã parse} (feB.north);
+\draw[arr] (feB)  -- node[lab,left] {CV embedding} (rag);
+% Đi vòng ngoài storage row: từ rag.east -> xuống -> outB
+\draw[arr] (rag.east) to[out=0, in=90] node[lab,right,pos=0.55] {top-K JD} (outB.north);
+
+% ===== Mũi tên Storage / External (tách điểm xuất phát để không chồng nhãn) =====
+% Parser -> DB (lưu CV) và Parser -> Blob (file gốc) — tách 2 anchor riêng
+\draw[arr2] (parser.south west) to[out=270, in=90] node[lab,left,pos=0.6] {lưu CV} (db.north);
+\draw[arr2] (parser.south east) to[out=270, in=150] node[lab,above,pos=0.5] {file gốc} (blob.north west);
+% RAG -> API (embed+LLM) và RAG -> DB (truy vấn JD) — tách 2 anchor riêng
+\draw[arr2] (rag.south east) to[out=270, in=90] node[lab,right,pos=0.6] {embed + LLM} (api.north);
+\draw[arr2] (rag.south west) to[out=270, in=30] node[lab,above,pos=0.5] {truy vấn JD} (blob.north east);
+
+% Background bands phân lớp
+\begin{scope}[on background layer]
+  \node[fit=(cand), inner xsep=7.5cm, inner ysep=0.9cm, fill=yellow!8, draw=yellow!50, rounded corners] {};
+  \node[fit=(feA)(feB),   inner xsep=2.0cm, inner ysep=0.35cm, fill=blue!4, draw=blue!30, rounded corners] {};
+  \node[fit=(parser)(rag), inner xsep=2.0cm, inner ysep=0.5cm, fill=orange!5, draw=orange!40, rounded corners] {};
+  \node[fit=(db)(blob)(api), inner xsep=2.5cm, inner ysep=0.4cm, fill=green!4, draw=green!40, rounded corners] {};
+  \node[fit=(outA)(outB), inner xsep=0.3cm, inner ysep=0.3cm, fill=gray!6, draw=gray!50, rounded corners] {};
+\end{scope}
+
+% Label layer bên phải
+\node[font=\scriptsize\bfseries, anchor=west] at (8.5,  6.5) {Actor};
+\node[font=\scriptsize\bfseries, anchor=west] at (8.5,  3.8) {Frontend};
+\node[font=\scriptsize\bfseries, anchor=west] at (8.5,  1.8) {Backend};
+\node[font=\scriptsize\bfseries, anchor=west] at (8.5, -1.8) {Storage + API};
+\node[font=\scriptsize\bfseries, anchor=west] at (8.5, -4.0) {Output};
+
+\end{tikzpicture}
+}
+\caption{Kiến trúc tổng quan hệ thống dạng end-to-end flow: ứng viên có hai luồng -- tạo CV qua Hybrid CV Parser (trái) và tìm JD phù hợp qua Pipeline RAG hai bước (phải), cùng dùng chung cơ sở dữ liệu pgvector và OpenAI API}
+\label{fig:e2e_overview}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\resizebox{0.96\textwidth}{!}{%
 \begin{tikzpicture}[
   every node/.style={font=\small},
-  layer/.style={rectangle, rounded corners, draw, very thick, minimum width=13cm, minimum height=2.4cm, align=center},
-  comp/.style={rectangle, rounded corners=2pt, draw, minimum width=2.5cm, minimum height=1.0cm, align=center, font=\footnotesize, fill=white},
+  layer/.style={rectangle, rounded corners=4pt, draw, very thick,
+                minimum width=16cm, minimum height=3.0cm, align=center},
+  comp/.style={rectangle, rounded corners=2pt, draw, thick,
+               minimum width=2.8cm, minimum height=1.1cm,
+               align=center, font=\footnotesize, fill=white},
   arr/.style={{Stealth[length=2.5mm]}-{Stealth[length=2.5mm]}, thick}
 ]
+
+% ---- Lớp trình bày (4 thành phần) ----
 \node[layer, fill=blue!10] (pres) {};
-\node[anchor=north, font=\bfseries, yshift=-0.15cm] at (pres.north) {Lớp trình bày};
-\node[comp] at ([xshift=-4.5cm, yshift=-0.45cm]pres.center) {Landing\\Page};
-\node[comp] at ([xshift=-1.5cm, yshift=-0.45cm]pres.center) {CV Upload\\\& Editor};
-\node[comp] at ([xshift=1.5cm, yshift=-0.45cm]pres.center) {Workspace};
-\node[comp] at ([xshift=4.5cm, yshift=-0.45cm]pres.center) {Admin\\Dashboard};
+\node[anchor=north, font=\bfseries\small, yshift=-0.22cm] at (pres.north)
+  {Lớp trình bày};
+\foreach \lbl/\x in {
+    {Landing\\Page}/-4.5,
+    {CV Upload\\\& Editor}/-1.5,
+    {Workspace}/1.5,
+    {Job Search\\Page}/4.5}
+  \node[comp] at ([xshift=\x cm, yshift=-0.65cm]pres.center) {\lbl};
 
-\node[layer, fill=orange!12, below=0.5cm of pres] (logic) {};
-\node[anchor=north, font=\bfseries, yshift=-0.15cm] at (logic.north) {Lớp logic nghiệp vụ};
-\node[comp] at ([xshift=-4.5cm, yshift=-0.45cm]logic.center) {API\\Routes};
-\node[comp] at ([xshift=-1.5cm, yshift=-0.45cm]logic.center) {Xác thực\\(JWT, OAuth)};
-\node[comp] at ([xshift=1.5cm, yshift=-0.45cm]logic.center) {Hybrid CV\\Parser};
-\node[comp] at ([xshift=4.5cm, yshift=-0.45cm]logic.center) {Matching\\Engine};
+% ---- Lớp logic nghiệp vụ (3 thành phần) ----
+\node[layer, fill=orange!12, below=0.7cm of pres] (logic) {};
+\node[anchor=north, font=\bfseries\small, yshift=-0.22cm] at (logic.north)
+  {Lớp logic nghiệp vụ};
+\foreach \lbl/\x in {
+    {API\\Routes}/-4.0,
+    {Hybrid CV\\Parser}/0.0,
+    {RAG Pipeline\\(Job Search)}/4.0}
+  \node[comp] at ([xshift=\x cm, yshift=-0.65cm]logic.center) {\lbl};
 
-\node[layer, fill=green!12, below=0.5cm of logic] (data) {};
-\node[anchor=north, font=\bfseries, yshift=-0.15cm] at (data.north) {Lớp dữ liệu};
-\node[comp] at ([xshift=-4.5cm, yshift=-0.45cm]data.center) {Supabase\\PostgreSQL};
-\node[comp] at ([xshift=-1.5cm, yshift=-0.45cm]data.center) {pgvector\\(1536-dim)};
-\node[comp] at ([xshift=1.5cm, yshift=-0.45cm]data.center) {Vercel Blob\\(File storage)};
-\node[comp] at ([xshift=4.5cm, yshift=-0.45cm]data.center) {OpenAI API};
+% ---- Lớp dữ liệu (4 thành phần) ----
+\node[layer, fill=green!12, below=0.7cm of logic] (data) {};
+\node[anchor=north, font=\bfseries\small, yshift=-0.22cm] at (data.north)
+  {Lớp dữ liệu};
+\foreach \lbl/\x in {
+    {Supabase\\PostgreSQL}/-4.5,
+    {pgvector\\(1536-dim)}/-1.5,
+    {Vercel Blob\\(File storage)}/1.5,
+    {OpenAI API}/4.5}
+  \node[comp] at ([xshift=\x cm, yshift=-0.65cm]data.center) {\lbl};
 
 \draw[arr] (pres) -- (logic);
 \draw[arr] (logic) -- (data);
 \end{tikzpicture}
+}
 \caption{Kiến trúc tổng thể hệ thống ba lớp}
 \label{fig:architecture}
 \end{figure}
 
-\textbf{Lớp trình bày} là các trang giao diện viết bằng React/Next.js: trang chủ, trang đăng nhập, trang tải lên CV, trình soạn thảo, workspace quản lý CV, và admin dashboard.
+\textbf{Lớp trình bày} gồm bốn trang giao diện viết bằng React/Next.js. Trang Landing Page và Workspace phục vụ điều hướng chung. Trang CV Upload \& Editor là nơi ứng viên tải lên CV cũ hoặc soạn thảo CV mới -- giao diện hai cột với editor bên trái và preview A4 bên phải cập nhật theo thời gian thực. Trang Job Search Page là nơi ứng viên chọn CV đã có và nhận về danh sách JD tương thích do quy trình RAG xếp hạng.
 
-\textbf{Lớp logic nghiệp vụ} gồm các API endpoint Next.js xử lý: xác thực (JWT, OAuth), hybrid CV parser (regex + LLM), matching engine (TF-IDF, Embedding, LLM).
+\textbf{Lớp logic nghiệp vụ} chứa hai pipeline AI cốt lõi. \textit{Hybrid CV Parser} nhận văn bản thô từ PDF/DOCX, chạy song song regex (để trích email, số điện thoại, kỹ năng) và LLM (để hiểu phần kinh nghiệm viết tự do), rồi hợp nhất thành JSON có cấu trúc. \textit{Pipeline RAG hai bước} nhận CV embedding đã lưu sẵn, truy vấn kho JD bằng Hybrid Retrieval để lọc top-20, sau đó dùng Structural Scoring và LLM Batch Ranking để xếp hạng top-5 JD tốt nhất. Ngoài hai pipeline này, lớp logic còn bao gồm các API Route xử lý xác thực, quản lý CV, và xuất file.
 
-\textbf{Lớp dữ liệu} dùng Supabase PostgreSQL kèm tiện ích mở rộng pgvector để lưu vector 1536 chiều. Tệp CV được lưu trên Vercel Blob. Các lời gọi tới OpenAI API (cho LLM và embedding) cũng được tính trong lớp này.
+\textbf{Lớp dữ liệu} gồm ba thành phần phục vụ các nhu cầu khác nhau. Supabase PostgreSQL (kèm pgvector) lưu toàn bộ dữ liệu có cấu trúc: thông tin người dùng, CV đã phân tích dưới dạng JSON, vector ngữ nghĩa của CV và JD -- các vector này cho phép tính độ tương đồng nhanh ngay trong SQL mà không cần dịch vụ riêng. Vercel Blob lưu file PDF/DOCX gốc sau khi tải lên, tách biệt với database để tránh phình dung lượng bảng. OpenAI API là dịch vụ ngoài duy nhất hệ thống gọi ra: dùng \texttt{text-embedding-3-small} để tính vector ngữ nghĩa và \texttt{gpt-4o-mini} để phân tích kinh nghiệm CV và xếp hạng JD theo nhóm.
 
-\section{Thiết kế Mô hình thực thể và Cơ sở dữ liệu}
+Hai luồng nghiệp vụ chính của ứng viên (Hình~\ref{fig:e2e_overview}) chạy qua cả ba lớp này: \textit{Luồng tạo CV} -- ứng viên tải file lên frontend, lớp logic chạy Hybrid Parser, kết quả JSON lưu vào Supabase và file gốc lưu vào Vercel Blob; \textit{Luồng tìm JD} -- ứng viên chọn CV trên frontend, lớp logic lấy CV embedding từ Supabase, truy vấn bảng JD, gọi OpenAI để xếp hạng batch, trả về top-5 JD.
 
-\subsection{Mô hình thực thể (Domain Model)}
+\section{Thiết kế cơ sở dữ liệu}
 
-Ở mức ứng dụng, hệ thống mô hình hoá các thực thể nghiệp vụ dưới dạng các lớp có quan hệ rõ ràng. Hình \ref{fig:domain_model} trình bày biểu đồ lớp của các thực thể chính.
+Hệ thống mô hình hoá các thực thể nghiệp vụ chính như sau: mỗi \texttt{User} sở hữu nhiều \texttt{CV}; mỗi \texttt{CV} gồm nhiều \texttt{Section} có thứ tự (liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng, tuỳ chỉnh); section kinh nghiệm chứa danh sách \texttt{Experience}. \texttt{GuestSession} cho phép khách dùng trình soạn thảo không cần đăng nhập, dữ liệu nháp được nâng cấp thành \texttt{CV} thuộc \texttt{User} mới khi khách đăng ký. Phần JD và kết quả tìm kiếm được lưu trong bảng \texttt{job\_postings} và \texttt{cv\_job\_searches}.
 
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-  cls/.style={rectangle, draw, very thick, fill=white, inner sep=0pt},
-  rel/.style={thick, -{Stealth[length=2mm]}},
-  rellabel/.style={font=\scriptsize, fill=white, inner sep=1pt}
-]
-\node[cls] (User) at (0, 0) {%
-\begin{tabular}{|p{3.6cm}|}
-\hline
-\rowcolor{blue!15}\centering\bfseries User \tabularnewline\hline
-\scriptsize\,-- id: UUID \tabularnewline
-\scriptsize\,-- email: string \tabularnewline
-\scriptsize\,-- passwordHash: string? \tabularnewline
-\scriptsize\,-- oauthProvider: string? \tabularnewline
-\scriptsize\,-- emailVerified: bool \tabularnewline
-\scriptsize\,-- createdAt: datetime \tabularnewline\hline
-\end{tabular}};
+Ở mức cơ sở dữ liệu, hệ thống dùng bảy bảng chính. Hình~\ref{fig:erd} mô tả quan hệ giữa chúng.
 
-\node[cls] (CV) at (8, 0) {%
-\begin{tabular}{|p{3.6cm}|}
-\hline
-\rowcolor{blue!15}\centering\bfseries CV \tabularnewline\hline
-\scriptsize\,-- id: UUID \tabularnewline
-\scriptsize\,-- userId: UUID? \tabularnewline
-\scriptsize\,-- title: string \tabularnewline
-\scriptsize\,-- cvData: JSONB \tabularnewline
-\scriptsize\,-- jobDescription: string? \tabularnewline
-\scriptsize\,-- possibilityScore: int \tabularnewline
-\scriptsize\,-- createdAt: datetime \tabularnewline\hline
-\end{tabular}};
-
-\node[cls] (Exp) at (0, -5.3) {%
-\begin{tabular}{|p{3.6cm}|}
-\hline
-\rowcolor{blue!15}\centering\bfseries Experience \tabularnewline\hline
-\scriptsize\,-- title: string \tabularnewline
-\scriptsize\,-- company: string \tabularnewline
-\scriptsize\,-- startDate: string \tabularnewline
-\scriptsize\,-- endDate: string? \tabularnewline
-\scriptsize\,-- isCurrent: bool \tabularnewline
-\scriptsize\,-- bullets: string[] \tabularnewline\hline
-\end{tabular}};
-
-\node[cls] (Section) at (8, -5.3) {%
-\begin{tabular}{|p{3.6cm}|}
-\hline
-\rowcolor{blue!15}\centering\bfseries Section \tabularnewline\hline
-\scriptsize\,-- id: string \tabularnewline
-\scriptsize\,-- type: enum (contact, \tabularnewline
-\scriptsize\quad summary, experience, \tabularnewline
-\scriptsize\quad education, skills, custom) \tabularnewline
-\scriptsize\,-- order: int \tabularnewline
-\scriptsize\,-- content: JSONB \tabularnewline\hline
-\end{tabular}};
-
-\node[cls] (Guest) at (0, -10) {%
-\begin{tabular}{|p{3.6cm}|}
-\hline
-\rowcolor{blue!15}\centering\bfseries GuestSession \tabularnewline\hline
-\scriptsize\,-- sessionId: UUID \tabularnewline
-\scriptsize\,-- cvDataDraft: JSONB \tabularnewline
-\scriptsize\,-- expiresAt: datetime \tabularnewline\hline
-\end{tabular}};
-
-\draw[rel] (User.east) -- node[rellabel, above, pos=0.08]{1} node[rellabel, above, pos=0.92]{*} (CV.west);
-\draw[rel] (CV.south) -- node[rellabel, right, pos=0.1]{1} node[rellabel, right, pos=0.9]{*} (Section.north);
-\draw[rel] (Section.west) -- node[rellabel, above, pos=0.08]{1} node[rellabel, above, pos=0.92]{*} (Exp.east);
-\draw[rel, dashed] (Guest.west) -- ++(-1.2,0) |- node[rellabel, pos=0.25, left]{nâng cấp} (User.west);
-\end{tikzpicture}
-\caption{Mô hình thực thể (Domain Model) các đối tượng nghiệp vụ chính}
-\label{fig:domain_model}
-\end{figure}
-
-Mỗi \texttt{User} có thể sở hữu nhiều \texttt{CV}. Mỗi \texttt{CV} gồm nhiều \texttt{Section} có thứ tự (kiểu enum: liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng, tuỳ chỉnh); trong đó section kinh nghiệm chứa danh sách \texttt{Experience}. Thực thể \texttt{GuestSession} cho phép khách dùng trình soạn thảo mà không cần đăng nhập; dữ liệu nháp có thể được nâng cấp thành \texttt{CV} thuộc \texttt{User} mới khi khách đăng ký.
-
-\subsection{Sơ đồ quan hệ thực thể (ERD)}
-
-Ở mức cơ sở dữ liệu, hệ thống dùng sáu bảng chính. Hình \ref{fig:erd} mô tả quan hệ giữa chúng.
+\newcommand{\erdtable}[2]{%
+  \begin{tabular}{|>{\columncolor{blue!15}}l|}
+    \hline
+    \textbf{\normalsize #1} \\ \hline
+    \footnotesize #2 \\ \hline
+  \end{tabular}%
+}
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-  every node/.style={font=\scriptsize},
-  header/.style={rectangle, draw, very thick, fill=blue!15, minimum width=4cm, minimum height=0.5cm, font=\footnotesize\bfseries, align=center, anchor=north west},
-  fields/.style={rectangle, draw, very thick, fill=white, minimum width=4cm, anchor=north west, align=left, text width=3.8cm, inner sep=3pt, font=\scriptsize},
-  arr/.style={-{Stealth[length=2mm]}, thick, blue!70!black},
-  one/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt},
-  many/.style={font=\scriptsize\bfseries, fill=white, inner sep=1pt}
-]
-\node[header] (uh) at (0, 4) {users};
-\node[fields, below=0pt of uh.south west] (uf) {
-- id (PK) UUID\\
-- email\\
-- password\_hash\\
-- oauth\_provider\\
-- created\_at};
-
-\node[header] (wh) at (6, 4) {cv\_workflow};
-\node[fields, below=0pt of wh.south west] (wf) {
-- id (PK) TEXT\\
-- user\_id (FK $\to$ users)\\
-- title\\
-- cv\_data JSONB\\
-- status\\
-- cv\_embedding vector(1536)};
-
-\node[header] (dh) at (12, 4) {cv\_drafts};
-\node[fields, below=0pt of dh.south west] (df) {
-- id (PK) UUID\\
-- user\_id (FK $\to$ users)\\
-- file\_id\\
-- jd\_text\\
-- analysis\_id};
-
-\node[header] (ch) at (0, -2.0) {jd\_targets};
-\node[fields, below=0pt of ch.south west] (cf) {
-- id (PK) UUID\\
-- cv\_id (FK $\to$ cv\_workflow)\\
-- label\\
-- jd\_text\\
-- jd\_embedding vector(1536)};
-
-\node[header] (sh) at (6, -2.0) {match\_runs};
-\node[fields, below=0pt of sh.south west] (sf) {
-- id (PK) UUID\\
-- cv\_id\\
-- jd\_target\_id\\
-- method (tfidf/embed/llm)\\
-- score, latency, cost};
-
-\node[header] (ah) at (12, -2.0) {audit\_logs};
-\node[fields, below=0pt of ah.south west] (af) {
-- id (PK) UUID\\
-- user\_id (FK $\to$ users)\\
-- action\\
-- timestamp};
-
-\draw[arr] (uf.east |- uh.south) -- node[one, pos=0.1]{1} node[many, pos=0.9]{*} (wf.west |- wh.south);
-\draw[arr] (wf.east |- wh.south) -- node[one, pos=0.1]{1} node[many, pos=0.9]{*} (df.west |- dh.south);
-\draw[arr] ($(uf.south)+(0,0)$) -- ++(0,-0.5) -| node[many, pos=0.95]{*} (cf.north);
-\draw[arr] (cf.east |- ch.south) -- node[one, pos=0.1]{1} node[many, pos=0.9]{*} (sf.west |- sh.south);
-\draw[arr] ($(uf.south)+(1.0,0)$) -- ++(0,-0.7) -| node[many, pos=0.95]{*} (af.north);
-\end{tikzpicture}
+\resizebox{\textwidth}{!}{%
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{c@{\quad$\xrightarrow{1:*}$\quad}c@{\quad$\xrightarrow{1:*}$\quad}c}
+%--- Row 1 ---
+\erdtable{users}{
+  id (PK) UUID \\
+  email \\
+  password\_hash \\
+  created\_at \\
+  ~ \\
+  ~
+}
+&
+\erdtable{cv\_workflow}{
+  id (PK) TEXT \\
+  user\_id (FK$\to$users) \\
+  title \\
+  cv\_data JSONB \\
+  status \\
+  cv\_embedding vec(1536)
+}
+&
+\erdtable{cv\_drafts}{
+  id (PK) UUID \\
+  user\_id (FK$\to$users) \\
+  file\_id \\
+  raw\_text \\
+  analysis\_id \\
+  ~
+}
+\\[6pt]
+$\downarrow_{1:*}$ & $\downarrow_{1:*}$ & $\downarrow_{1:*}$ \\[4pt]
+%--- Row 2 ---
+\erdtable{job\_postings}{
+  id (PK) UUID \\
+  title \\
+  company \\
+  jd\_text \\
+  jd\_embedding vec(1536) \\
+  source\_url
+}
+&
+\erdtable{job\_applications}{
+  id (PK) UUID \\
+  user\_id (FK$\to$users) \\
+  job\_id (FK$\to$job\_postings) \\
+  cv\_id (FK$\to$cv\_workflow) \\
+  applied\_at \\
+  ~
+}
+&
+\erdtable{cv\_job\_searches}{
+  id (PK) UUID \\
+  user\_id (FK$\to$users) \\
+  cv\_id (FK$\to$cv\_workflow) \\
+  top\_k\_results JSONB \\
+  created\_at \\
+  ~
+}
+\\
+\multicolumn{1}{c}{} & & \\
+\end{tabular}}
 \caption{Sơ đồ quan hệ thực thể (ERD) của hệ thống}
 \label{fig:erd}
 \end{figure}
 
 \subsection{Mô tả các bảng dữ liệu}
 
-\textbf{Bảng \texttt{users}} lưu thông tin tài khoản: họ tên, email, mật khẩu đã băm (bcrypt), trạng thái xác minh, và thông tin OAuth. Ràng buộc: nếu đăng nhập bằng OAuth thì không cần mật khẩu, ngược lại phải có mật khẩu đã băm.
+\textbf{Bảng \texttt{users}} lưu thông tin tài khoản: email và mật khẩu đã băm (bcrypt). Trường \texttt{password\_hash} bắt buộc -- hệ thống yêu cầu tất cả tài khoản đăng nhập bằng email/mật khẩu.
 
-\textbf{Bảng \texttt{cv\_workflow}} là bảng trung tâm lưu trữ CV đầy đủ. Trường \texttt{cv\_data} kiểu JSONB lưu toàn bộ cấu trúc CV (các section và nội dung). Trường \texttt{cv\_embedding} kiểu \texttt{vector(1536)} lưu vector embedding để phục vụ tìm kiếm ngữ nghĩa và matching.
+\textbf{Bảng \texttt{cv\_workflow}} là bảng trung tâm lưu trữ CV của ứng viên. Trường \texttt{cv\_data} lưu toàn bộ cấu trúc CV (các phần và nội dung) ở định dạng JSON. Trường \texttt{cv\_embedding} kiểu \texttt{vector(1536)} lưu vector ngữ nghĩa của CV để phục vụ tìm kiếm.
 
-\textbf{Bảng \texttt{cv\_drafts}} lưu bản nháp CV từ quá trình tải lên, gồm tệp gốc, văn bản đã trích xuất, và kết quả phân tích.
+\textbf{Bảng \texttt{cv\_drafts}} lưu bản nháp CV từ quá trình tải lên, gồm tệp gốc, văn bản đã trích xuất, và kết quả phân tích AI.
 
-\textbf{Bảng \texttt{jd\_targets}} lưu các mô tả công việc mà người dùng muốn so khớp với CV. Mỗi JD cũng có \texttt{jd\_embedding} riêng để tránh tính lại.
+\textbf{Bảng \texttt{job\_postings}} lưu kho tin tuyển dụng được crawl tự động từ các nền tảng việc làm. Trường \texttt{jd\_embedding vector(1536)} phục vụ bước Hybrid Retrieval trong luồng RAG -- được tính một lần khi crawl và lưu sẵn để tránh tính lại mỗi lần tìm kiếm.
 
-\textbf{Bảng \texttt{match\_runs}} lưu lịch sử các lần so khớp -- mỗi dòng tương ứng với một (CV, JD, phương pháp), gồm điểm số, độ trễ, chi phí. Vừa làm cache vừa làm audit log cho thí nghiệm Chương 5.
+\textbf{Bảng \texttt{job\_applications}} lưu lịch sử ứng tuyển của người dùng, liên kết ba chiều giữa \texttt{users}, \texttt{job\_postings}, và \texttt{cv\_workflow} (CV nào được dùng để apply vào JD nào).
 
-\textbf{Bảng \texttt{audit\_logs}} ghi nhận các hành động của người dùng để theo dõi và phân tích.
+\textbf{Bảng \texttt{cv\_job\_searches}} lưu cache kết quả mỗi lần ứng viên chạy tìm JD, giúp tránh tính toán lại khi truy cập cùng một CV. Trường \texttt{top\_k\_results} lưu ở định dạng JSON, chứa danh sách JD đã xếp hạng, điểm phù hợp, và lý do LLM giải thích.
 
 \section{Thiết kế API}
 
-Hệ thống cung cấp 19 API endpoint được tổ chức theo nhóm chức năng (Bảng \ref{tab:api}). Mọi API trả về JSON; các API yêu cầu xác thực kiểm tra JWT được lưu trong cookie httpOnly.
+Hệ thống cung cấp các API endpoint được tổ chức theo nhóm chức năng (Bảng \ref{tab:api}). Mọi API trả về JSON; các API yêu cầu xác thực kiểm tra cookie bảo mật (httpOnly) đã thiết lập sau khi đăng nhập bằng email/mật khẩu.
 
 \begin{table}[H]
 \centering
@@ -340,119 +324,266 @@ Hệ thống cung cấp 19 API endpoint được tổ chức theo nhóm chức n
 /api/login & POST & Đăng nhập email/mật khẩu \\ \hline
 /api/auth/logout & POST & Đăng xuất \\ \hline
 /api/auth/me & GET & Lấy thông tin người dùng hiện tại \\ \hline
-/api/auth/google/\{signin,callback\} & GET & OAuth Google \\ \hline
-/api/auth/linkedin/\{signin,callback\} & GET & OAuth LinkedIn \\ \hline
 \multicolumn{3}{|c|}{\textbf{Tải lên \& Phân tích CV}} \\ \hline
 /api/upload/cv & POST & Upload tệp PDF/DOCX và phân tích \\ \hline
 /api/upload/cv-blob & POST & Upload tệp lên Vercel Blob \\ \hline
 /api/cv/\{cvId\} & GET, POST & Lấy/cập nhật dữ liệu CV \\ \hline
 /api/cv-parser-stats & GET & Thống kê hiệu năng parser \\ \hline
-\multicolumn{3}{|c|}{\textbf{Matching CV--JD}} \\ \hline
-/api/cv/match & POST & Chạy 3 phương pháp matching song song \\ \hline
-/api/cv/embed & POST & Tính embedding cho CV hoặc JD \\ \hline
-/api/cv/jd-analyze & POST & Phân tích chi tiết CV vs JD bằng LLM \\ \hline
+\multicolumn{3}{|c|}{\textbf{Phân tích \& Tối ưu CV}} \\ \hline
+/api/cv/embed & POST & Tính embedding cho CV \\ \hline
 /api/cv/rewrite-bullet & POST & Viết lại một mục bằng LLM \\ \hline
 /api/cv/summary & POST & Sinh tóm tắt nghề nghiệp bằng LLM \\ \hline
-\multicolumn{3}{|c|}{\textbf{Quản trị}} \\ \hline
-/api/admin/create & POST & Tạo tài khoản admin \\ \hline
+\multicolumn{3}{|c|}{\textbf{Tìm JD \& Ứng tuyển}} \\ \hline
+/api/jobs/search & POST & Nhận CV embedding, chạy pipeline RAG 2 bước, trả danh sách JD xếp hạng \\ \hline
+/api/jobs/\{jobId\} & GET & Lấy chi tiết tin tuyển dụng và điểm phù hợp với CV \\ \hline
+/api/jobs/apply & POST & Nộp đơn ứng tuyển vào tin tuyển dụng \\ \hline
 \end{tabular}%
 }
 \end{table}
 
 \section{Thiết kế pipeline phân tích CV hybrid}
 
-Pipeline phân tích CV là thành phần cốt lõi của hệ thống, sử dụng phương pháp lai kết hợp xử lý bằng biểu thức chính quy và LLM. Hình \ref{fig:pipeline} mô tả luồng xử lý tổng thể.
+Quy trình phân tích CV là thành phần cốt lõi của hệ thống, sử dụng phương pháp lai kết hợp xử lý bằng biểu thức chính quy và LLM. Hình \ref{fig:pipeline} mô tả luồng xử lý tổng thể.
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  node distance=0.7cm and 0.9cm,
+  node distance=0.6cm and 0.7cm,
   every node/.style={font=\small},
-  pstep/.style={rectangle, rounded corners, draw, thick, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=blue!8},
-  parser/.style={rectangle, rounded corners, draw, thick, minimum width=3.2cm, minimum height=0.9cm, align=center, fill=orange!15},
-  data/.style={cylinder, draw, thick, aspect=0.25, shape border rotate=90, minimum height=1cm, minimum width=2.2cm, align=center, fill=gray!10},
+  pstep/.style={rectangle, rounded corners=3pt, draw, thick,
+                minimum width=3.0cm, minimum height=0.95cm,
+                align=center, fill=blue!8},
+  prepstep/.style={rectangle, rounded corners=3pt, draw, thick,
+                minimum width=3.0cm, minimum height=0.95cm,
+                align=center, fill=yellow!20},
+  parserstep/.style={rectangle, rounded corners=3pt, draw, thick,
+                minimum width=3.2cm, minimum height=0.95cm,
+                align=center, fill=orange!18},
+  datastep/.style={cylinder, draw, thick, aspect=0.25,
+                shape border rotate=90, minimum height=1.1cm,
+                minimum width=2.4cm, align=center, fill=gray!12},
+  groupbox/.style={rectangle, rounded corners=4pt, draw, dashed,
+                   thick, inner sep=6pt},
+  notelbl/.style={font=\scriptsize\itshape, text=gray!80},
   arr/.style={-{Stealth[length=2.5mm]}, thick}
 ]
-\node[pstep] (upload) {Tải lên CV\\(PDF / DOCX)};
-\node[pstep, right=of upload] (extract) {Trích xuất văn bản};
-\node[pstep, right=of extract] (lang) {Nhận diện\\ngôn ngữ};
 
-\node[parser, below=1.3cm of extract, xshift=-2.0cm] (regex) {Phân tích bằng\\biểu thức chính quy\\(liên hệ, kỹ năng)};
-\node[parser, below=1.3cm of extract, xshift=2.0cm] (llm) {Phân tích bằng LLM\\(kinh nghiệm\\làm việc)};
+%% ── Hàng 1: Nhận file ──────────────────────────────────────────────
+\node[pstep] (upload)  {Tải lên CV\\(PDF / DOCX)};
+\node[pstep, right=of upload]  (extract) {Trích xuất\\văn bản thô};
 
-\node[pstep, below=1.3cm of regex, xshift=2.0cm, fill=green!12] (merge) {Hợp nhất kết quả\\+ tính điểm tin cậy};
-\node[data, below=0.7cm of merge] (db) {Cơ sở dữ liệu\\(cv\_workflow)};
-\node[pstep, right=1.5cm of db] (editor) {Trình soạn thảo\\CV};
+%% ── Hàng 2: EnhancedTextProcessor (5 bước nhỏ theo chiều ngang) ──
+\node[prepstep, below=1.1cm of upload, xshift=2.8cm] (norm)   {1. Chuẩn hoá\\ký tự};
+\node[prepstep, right=of norm]  (fixpdf)  {2. Sửa lỗi PDF\\(chữ rời)};
+\node[prepstep, right=of fixpdf] (hdnorm) {3. Chuẩn hoá\\tiêu đề mục};
+\node[prepstep, right=of hdnorm] (bound)  {4. Phát hiện\\ranh giới mục};
+\node[prepstep, right=of bound]  (qual)   {5. Đánh giá\\chất lượng};
 
+%% ── Hàng 3: Hai nhánh song song ─────────────────────────────────
+\node[parserstep, below=1.1cm of fixpdf, xshift=0.0cm] (regex)
+      {Pha 1 -- Regex\\\footnotesize email, SĐT, LinkedIn, kỹ năng};
+\node[parserstep, right=2.2cm of regex] (llm)
+      {Pha 2 -- LLM (gpt-4o-mini)\\\footnotesize kinh nghiệm làm việc → JSON};
+
+%% ── Hàng 4: Merge + DB + Editor ─────────────────────────────────
+\node[pstep, below=1.1cm of regex, xshift=2.6cm, fill=green!12] (merge)
+      {Hợp nhất + tính\\điểm tin cậy (0--100)};
+\node[datastep, below=0.75cm of merge] (db)     {cv\_workflow\\(Supabase)};
+\node[pstep, right=1.6cm of db, fill=blue!14]   (editor) {Trình soạn thảo CV};
+
+%% ── Groupbox EnhancedTextProcessor ───────────────────────────────
+\begin{scope}[on background layer]
+  \node[groupbox, fill=yellow!6,
+        fit=(norm)(fixpdf)(hdnorm)(bound)(qual),
+        label={[font=\scriptsize\bfseries, yshift=1pt]above:EnhancedTextProcessor}] {};
+  \node[groupbox, fill=orange!6,
+        fit=(regex)(llm),
+        label={[font=\scriptsize\bfseries, yshift=1pt]above:Hybrid CV Parser \normalfont\scriptsize(Promise.all)}] {};
+\end{scope}
+
+%% ── Mũi tên ───────────────────────────────────────────────────────
 \draw[arr] (upload) -- (extract);
-\draw[arr] (extract) -- (lang);
-\draw[arr] (lang.south) -| (llm.north);
-\draw[arr] (lang.south) -| (regex.north);
+\draw[arr] (extract.south) -- ++(0,-0.35) -| (norm.north);
+
+% EnhancedTextProcessor nội bộ
+\draw[arr] (norm)   -- (fixpdf);
+\draw[arr] (fixpdf) -- (hdnorm);
+\draw[arr] (hdnorm) -- (bound);
+\draw[arr] (bound)  -- (qual);
+
+% Sang hai nhánh song song
+\draw[arr] (qual.south) -- ++(0,-0.35) -| (regex.north);
+\draw[arr] (qual.south) -- ++(0,-0.35) -| (llm.north);
+
+% Hợp nhất
 \draw[arr] (regex.south) -- (merge.north -| regex.south);
-\draw[arr] (llm.south) -- (merge.north -| llm.south);
+\draw[arr] (llm.south)   -- (merge.north -| llm.south);
 \draw[arr] (merge) -- (db);
-\draw[arr] (db) -- (editor);
-\end{tikzpicture}
-\caption{Pipeline phân tích CV hybrid (kết hợp regex và LLM)}
+\draw[arr] (db)    -- (editor);
+
+\end{tikzpicture}}
+\caption{Pipeline phân tích CV hybrid: văn bản thô qua EnhancedTextProcessor (5 bước tiền xử lý) rồi vào hai pha song song -- Regex trích thông tin có cấu trúc và LLM phân tích kinh nghiệm tự do}
 \label{fig:pipeline}
 \end{figure}
 
-Pipeline hoạt động theo các bước sau:
+Quy trình gồm ba giai đoạn nối tiếp:
 
-\textbf{Bước 1 -- Tải lên và trích xuất văn bản:} Người dùng tải tệp PDF hoặc DOCX. Hệ thống dùng \texttt{pdf-parse} cho PDF hoặc \texttt{mammoth} cho DOCX. Tệp gốc lưu vào Vercel Blob.
+\textbf{Giai đoạn 1 -- Trích xuất và tiền xử lý.} Người dùng tải tệp PDF hoặc DOCX; hệ thống dùng \texttt{pdf-parse} (PDF) hoặc \texttt{mammoth} (DOCX) để lấy văn bản thô, đồng thời lưu tệp gốc vào Vercel Blob. Văn bản thô sau đó đi qua \texttt{EnhancedTextProcessor} -- pipeline tiền xử lý năm bước gồm: chuẩn hoá ký tự, sửa lỗi PDF (ghép chữ rời, phục hồi email/URL bị ngắt dòng), chuẩn hoá tiêu đề mục, phát hiện ranh giới mục, và đánh giá chất lượng văn bản. Bước nhận diện ngôn ngữ (Việt/Anh) dựa trên ký tự Unicode đặc trưng và tần suất từ vựng cũng được thực hiện trong giai đoạn này để chọn prompt phù hợp ở giai đoạn sau.
 
-\textbf{Bước 2 -- Nhận diện ngôn ngữ:} Module nhận diện ngôn ngữ phân tích văn bản để xác định CV viết bằng tiếng Việt hay tiếng Anh dựa trên ký tự Unicode đặc trưng và tần suất từ vựng.
+\textbf{Giai đoạn 2 -- Hybrid Parser song song.} Văn bản đã làm sạch được đưa vào hai pha chạy cùng lúc (song song). \textit{Pha 1} (Regex) trích các trường có khuôn mẫu cố định: email, số điện thoại, URL LinkedIn, danh sách kỹ năng dựa trên từ khoá phổ biến. \textit{Pha 2} (LLM) gửi phần kinh nghiệm làm việc -- vốn viết tự do, khó tách bằng regex -- tới OpenAI API (\texttt{gpt-4o-mini}) với prompt yêu cầu trả về dữ liệu JSON gồm các trường: vị trí, công ty, thời gian, mô tả công việc. Hai pha độc lập về dữ liệu, nên chạy song song giúp giảm tổng thời gian chờ.
 
-\textbf{Bước 3 -- Phân tích bằng regex:} Các trường có cấu trúc rõ được trích trực tiếp bằng biểu thức chính quy: email, số điện thoại, URL LinkedIn, danh sách kỹ năng dựa trên từ khoá phổ biến.
+\textbf{Giai đoạn 3 -- Hợp nhất và lưu trữ.} Kết quả từ regex và LLM được gộp thành một cấu trúc JSON thống nhất; hệ thống tính thêm \texttt{possibility\_score} (0--100) dựa trên mức độ đầy đủ của thông tin trích xuất để phát hiện tệp không phải CV. Cấu trúc JSON cuối cùng được lưu vào bảng \texttt{cv\_workflow} (kiểu JSONB) và chuyển đến trình soạn thảo cho người dùng xem và chỉnh sửa.
 
-\textbf{Bước 4 -- Phân tích bằng LLM:} Phần kinh nghiệm làm việc (có cấu trúc phức tạp, viết tự do) được gửi tới ChatGPT API với prompt chuyên biệt. Prompt yêu cầu mô hình trả về JSON với các trường: vị trí, công ty, thời gian, mô tả công việc.
+\section{Thiết kế pipeline RAG tìm kiếm JD phù hợp}
+\label{sec:rag_design}
 
-\textbf{Bước 5 -- Hợp nhất và tính điểm tin cậy:} Kết quả từ regex và LLM được gộp thành cấu trúc JSON thống nhất. Hệ thống tính \texttt{possibility\_score} (0--100) dựa trên mức độ đầy đủ của thông tin trích xuất.
+Sau khi ứng viên có CV đã phân tích, bước tiếp theo là tìm những tin tuyển dụng khớp yêu cầu từ kho JD của hệ thống. Bài toán có hai ràng buộc mâu thuẫn nhau.
 
-\textbf{Bước 6 -- Lưu trữ và hiển thị:} Dữ liệu CV có cấu trúc được lưu vào bảng \texttt{cv\_workflow} kiểu JSONB và chuyển đến trình soạn thảo để người dùng xem và chỉnh sửa.
+Một mặt, ứng viên không muốn bỏ sót JD tốt -- tức là recall phải cao. Mặt khác, kho JD có thể lên đến hàng nghìn tin; nếu gọi LLM để so sánh từng cặp (CV, JD) thì chi phí API tăng tuyến tính theo kích thước kho, không khả thi trong thực tế.
 
-Các bước 3 (regex) và 4 (LLM) độc lập với nhau và đều phụ thuộc vào kết quả bước 2, vì vậy trong hiện thực được thực thi \textit{song song} qua \texttt{Promise.all} nhằm giảm độ trễ tổng thể.
-
-\section{Thiết kế quy trình so sánh CV--JD}
-
-Để trả lời hai câu hỏi nghiên cứu RQ1 và RQ2, hệ thống cài đặt ba phương pháp so khớp CV--JD và chạy song song trên cùng một cặp đầu vào. Hình \ref{fig:matching_pipeline} mô tả luồng xử lý.
+Hệ thống giải quyết bằng kiến trúc \textbf{RAG hai bước} -- chia bài toán thành hai giai đoạn với mục tiêu khác nhau (Hình~\ref{fig:rag_pipeline}). Bước đầu lọc rộng với recall ưu tiên: chấp nhận lấy dư để không bỏ sót. Bước sau xếp hạng chặt với precision ưu tiên: từ tập nhỏ đã lọc, chọn ra những JD thực sự tốt nhất. Triết lý này -- \textit{``chọn nhầm còn hơn bỏ sót''} ở bước 1, \textit{``chọn đúng hơn chọn nhiều''} ở bước 2 -- cho phép hệ thống vừa không bỏ sót, vừa tiết kiệm chi phí LLM.
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  node distance=0.8cm and 1.2cm,
   every node/.style={font=\small},
-  inp/.style={rectangle, rounded corners, draw, thick, minimum width=3.0cm, minimum height=0.8cm, align=center, fill=gray!15},
-  proc/.style={rectangle, rounded corners, draw, thick, minimum width=3.5cm, minimum height=1.1cm, align=center},
-  outbox/.style={rectangle, rounded corners, draw, thick, minimum width=3.5cm, minimum height=0.8cm, align=center, fill=green!10},
-  arr/.style={-{Stealth[length=2.5mm]}, thick}
+  topbox/.style={rectangle, rounded corners=3pt, draw, thick,
+                 minimum width=3.6cm, minimum height=1.1cm,
+                 align=center, fill=blue!8},
+  zoombox/.style={rectangle, rounded corners=3pt, draw, thick,
+                  minimum width=3.6cm, minimum height=1.0cm,
+                  align=center, font=\footnotesize},
+  scorebox/.style={rectangle, rounded corners=3pt, draw, thick,
+                   minimum width=3.2cm, minimum height=0.9cm,
+                   align=center, font=\scriptsize},
+  groupbox/.style={rectangle, rounded corners=5pt, draw, very thick,
+                   dashed, inner sep=10pt},
+  notelbl/.style={font=\scriptsize\bfseries},
+  subnote/.style={font=\scriptsize\itshape, text=gray!80},
+  arr/.style={-{Stealth[length=2.5mm]}, thick},
+  arrdash/.style={-{Stealth[length=2mm]}, thick, dashed, gray!60}
 ]
-\node[inp] (cv) at (0,0) {Văn bản CV};
-\node[inp, right=1.2cm of cv] (jd) {Văn bản JD};
 
-\node[proc, fill=blue!10, below=1.5cm of cv, xshift=1.5cm] (tfidf) {TF-IDF Matcher\\(corpus IDF, cosine)};
-\node[proc, fill=orange!12, below=1.5cm of tfidf] (embed) {Embedding Matcher\\(text-embedding-3-small)};
-\node[proc, fill=purple!10, below=1.5cm of embed] (llm) {LLM Matcher\\(gpt-4o-mini, temp=0)};
+%% ═══════════════════════════════════════════════════════════
+%% TẦNG TRÊN: Flow tổng quan — 5 node cách đều, x=0,4,8,13,17
+%% ═══════════════════════════════════════════════════════════
+\node[topbox] (cv)    at (0,  0) {CV ứng viên\\(đã parse)};
+\node[topbox] (embed) at (4,  0) {CV Embedding\\{\scriptsize text-embedding-3-small}};
+\node[topbox, fill=blue!20]  (step1) at (8,  0) {\textbf{Bước 1}\\Hybrid Retrieval};
+\node[topbox, fill=green!20] (step2) at (13, 0) {\textbf{Bước 2}\\Structural + LLM};
+\node[topbox, fill=green!30] (out)   at (17, 0) {Top-5 JD\\+ lý do};
 
-\node[outbox, right=2cm of tfidf] (s1) {Điểm + matched\_keywords};
-\node[outbox, right=2cm of embed] (s2) {Điểm + cosine sim};
-\node[outbox, right=2cm of llm]   (s3) {Điểm + reasoning};
+\draw[arr] (cv) -- (embed);
+\draw[arr] (embed) -- (step1);
+\draw[arr] (step1) -- node[above, font=\scriptsize]{top-20} (step2);
+\draw[arr] (step2) -- (out);
 
-\draw[arr] (cv.south) -| ($(tfidf.north)+(-0.5,0)$);
-\draw[arr] (jd.south) -| ($(tfidf.north)+(0.5,0)$);
-\draw[arr] (cv.south) -| ($(embed.north)+(-0.5,0)$);
-\draw[arr] (jd.south) -| ($(embed.north)+(0.5,0)$);
-\draw[arr] (cv.south) -| ($(llm.north)+(-0.5,0)$);
-\draw[arr] (jd.south) -| ($(llm.north)+(0.5,0)$);
+\node[subnote] at (8,  0.85) {Recall ưu tiên};
+\node[subnote] at (13, 0.85) {Precision ưu tiên};
 
-\draw[arr] (tfidf.east) -- (s1.west);
-\draw[arr] (embed.east) -- (s2.west);
-\draw[arr] (llm.east) -- (s3.west);
-\end{tikzpicture}
-\caption{Pipeline so sánh CV--JD bằng ba phương pháp chạy song song}
-\label{fig:matching_pipeline}
+%% ═══════════════════════════════════════════════════════════
+%% TẦNG DƯỚI TRÁI: Zoom Bước 1 — x trong [0, 8.5]
+%% ═══════════════════════════════════════════════════════════
+\node[zoombox, fill=blue!6]  (tfidf) at (1.8, -3.2)
+      {TF-IDF\\{\scriptsize từ khoá kỹ thuật}\\$s_{\text{tfidf}}$};
+\node[zoombox, fill=blue!6]  (emb)   at (6.2, -3.2)
+      {Embedding\\{\scriptsize cosine sim. 1536-dim}\\$s_{\text{embed}}$};
+\node[zoombox, fill=blue!20] (hyb)   at (4.0, -5.8)
+      {$\alpha{\cdot}s_{\text{tfidf}} + (1{-}\alpha){\cdot}s_{\text{embed}}$\\$\alpha=0{,}4$\\$\Rightarrow$ \textbf{top-20 JD}};
+
+\draw[arr] (tfidf.south) -- (hyb.north -| tfidf.south);
+\draw[arr] (emb.south)   -- (hyb.north -| emb.south);
+
+\begin{scope}[on background layer]
+  \node[groupbox, fill=blue!3,
+        fit=(tfidf)(emb)(hyb),
+        label={[notelbl, yshift=3pt]above:Bước 1 -- bên trong}] (box1) {};
+\end{scope}
+
+%% ═══════════════════════════════════════════════════════════
+%% TẦNG DƯỚI PHẢI: Zoom Bước 2 — x trong [9.5, 18]
+%% ═══════════════════════════════════════════════════════════
+\node[scorebox, fill=orange!14] (exp)   at (10.5, -2.8)
+      {Kinh nghiệm\\$e \in \{0,1\}$\quad$w_1{=}0{,}35$};
+\node[scorebox, fill=orange!14] (edu)   at (13.8, -2.8)
+      {Bằng cấp\\$d \in \{0,1\}$\quad$w_2{=}0{,}25$};
+\node[scorebox, fill=orange!14] (skill) at (17.1, -2.8)
+      {Kỹ năng\\$r \in [0,1]$\quad$w_3{=}0{,}40$};
+
+\node[zoombox, fill=orange!20]  (sstruct)  at (13.8, -5.0)
+      {$s_{\text{struct}} = w_1 e + w_2 d + w_3 r$};
+\node[zoombox, fill=violet!12]  (llmbatch) at (13.8, -7.0)
+      {LLM Batch Ranking\\{\scriptsize 1 prompt · 20 JD rút gọn}\\$s_{\text{llm}}$};
+\node[zoombox, fill=green!22]   (final)    at (13.8, -9.0)
+      {$0{,}3{\cdot}s_{\text{struct}} + 0{,}7{\cdot}s_{\text{llm}}$\\$\Rightarrow$ \textbf{top-5 JD}};
+
+\draw[arr] (exp.south)   -- (sstruct.north -| exp.south);
+\draw[arr] (edu.south)   -- (sstruct);
+\draw[arr] (skill.south) -- (sstruct.north -| skill.south);
+\draw[arr] (sstruct)  -- (llmbatch);
+\draw[arr] (llmbatch) -- (final);
+
+\begin{scope}[on background layer]
+  \node[groupbox, fill=green!3,
+        fit=(exp)(edu)(skill)(sstruct)(llmbatch)(final),
+        label={[notelbl, yshift=3pt]above:Bước 2 -- bên trong}] (box2) {};
+\end{scope}
+
+%% ── Mũi tên nối tầng trên → tầng dưới (dashed, thẳng đứng) ──
+\draw[arrdash] (step1.south) -- ++(0,-0.5) -- (4.0,-2.0) -- (hyb.north);
+\draw[arrdash] (step2.south) -- ++(0,-0.5) -- (13.8,-1.8) -- (sstruct.north);
+
+\end{tikzpicture}}
+\caption{Pipeline RAG hai bước: tầng trên là flow tổng quan; tầng dưới zoom vào bên trong Bước~1 (công thức hybrid $\alpha{=}0{,}4$, đầu ra top-20) và Bước~2 (Structural Score 3 tiêu chí + LLM batch, đầu ra top-5)}
+\label{fig:rag_pipeline}
 \end{figure}
 
-Mỗi phương pháp trả về một bản ghi gồm: điểm chuẩn hoá 0--100, danh sách từ khoá khớp/thiếu (đối với TF-IDF và LLM), độ trễ (ms), chi phí (USD), số token đã dùng. Kết quả của cả ba phương pháp được lưu vào bảng \texttt{match\_runs} để dùng cho hiển thị và cho thí nghiệm so sánh ở Chương 5. Nhờ chạy song song qua \texttt{Promise.allSettled}, một phương pháp lỗi không ảnh hưởng đến hai phương pháp còn lại.
+\subsection{Bước 1 -- Hybrid Retrieval (Recall ưu tiên)}
+
+Mục tiêu của bước này là lọc nhanh từ kho N JD xuống còn \textbf{top-20 tin tuyển dụng tiềm năng}. Triết lý thiết kế: \textit{chọn nhầm còn hơn bỏ sót} -- chấp nhận chọn dư ở bước này để đảm bảo không bỏ qua JD phù hợp.
+
+Phương pháp \textbf{Hybrid Retrieval} kết hợp hai tín hiệu bổ trợ nhau. TF-IDF bắt từ khóa kỹ thuật chính xác -- tên ngôn ngữ lập trình, framework, chứng chỉ -- xuất hiện trong cả CV lẫn JD, chạy nhanh và không tốn chi phí API. Embedding bổ sung cho TF-IDF bằng cách tính độ tương đồng giữa vector ngữ nghĩa của CV và từng JD (vector JD được tính sẵn khi crawl), qua đó bắt được những cặp CV-JD dùng cách diễn đạt khác nhau nhưng cùng nghĩa -- ví dụ CV ghi \textit{``lập trình Python''} trong khi JD yêu cầu \textit{``phát triển phần mềm''}.
+
+Điểm hybrid được tính theo công thức:
+\begin{equation}
+\text{Hybrid\_score}(cv, jd) = \alpha \cdot s_{\text{tfidf}} + (1-\alpha) \cdot s_{\text{embed}}
+\label{eq:hybrid}
+\end{equation}
+trong đó $\alpha = 0{,}4$ là trọng số TF-IDF và $(1-\alpha) = 0{,}6$ là trọng số Embedding -- Embedding được ưu tiên hơn vì bắt được ngữ nghĩa kể cả khi CV và JD dùng từ ngữ khác nhau. Hệ thống trả về 20 JD có $\text{Hybrid\_score}$ cao nhất.
+
+\subsection{Bước 2 -- Structural + LLM Ranking (Precision ưu tiên)}
+
+Từ 20 JD đã lọc, bước 2 xếp hạng để trả về \textbf{top-5 tin tuyển dụng khớp yêu cầu nhất}, kết hợp hai thành phần:
+
+\textbf{(a) Structural Score} -- so sánh trực tiếp giữa CV đã parse và yêu cầu trong JD, không tốn token LLM. Điểm gồm ba tiêu chí, mỗi tiêu chí có trọng số riêng:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|p{5.5cm}|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{Cách tính} & \textbf{Trọng số} \\ \hline
+Kinh nghiệm & 1 nếu số năm kinh nghiệm CV $\geq$ yêu cầu JD, ngược lại 0 & $w_1 = 0{,}35$ \\ \hline
+Bằng cấp & 1 nếu bậc học vấn CV $\geq$ yêu cầu JD, ngược lại 0 & $w_2 = 0{,}25$ \\ \hline
+Kỹ năng & $\dfrac{|\text{kỹ năng CV} \cap \text{kỹ năng JD}|}{|\text{kỹ năng JD}|}$ & $w_3 = 0{,}40$ \\ \hline
+\end{tabular}
+\end{table}
+\vspace{-0.3cm}
+\begin{equation}
+s_{\text{struct}} = w_1 \cdot e + w_2 \cdot d + w_3 \cdot r
+\label{eq:struct}
+\end{equation}
+trong đó $e, d \in \{0,1\}$ là điểm nhị phân của kinh nghiệm và bằng cấp; $r \in [0,1]$ là tỉ lệ kỹ năng khớp.
+
+\textbf{(b) LLM Batch Ranking} -- thay vì gọi LLM riêng lẻ cho 20 cặp (CV, JD), hệ thống \textit{gom tất cả vào một prompt duy nhất}. Mỗi JD được rút gọn xuống khoảng 200 đơn vị văn bản (giữ lại tiêu đề, yêu cầu kỹ năng, mức kinh nghiệm). Prompt yêu cầu mô hình xếp hạng toàn bộ 20 JD theo CV của ứng viên trong một lần gọi, tiết kiệm đáng kể chi phí so với gọi riêng lẻ 20 lần.
+
+\textbf{Điểm xếp hạng cuối cùng}:
+\begin{equation}
+\text{Final\_score}(cv, jd) = 0{,}3 \cdot s_{\text{struct}} + 0{,}7 \cdot s_{\text{llm}}
+\label{eq:final}
+\end{equation}
+
+LLM được trọng số cao hơn vì có khả năng hiểu ngữ cảnh sâu hơn (ví dụ: CV có kinh nghiệm startup phù hợp JD yêu cầu ``fast-paced environment'', dù không có từ khóa trùng khớp trực tiếp). Structural Score đóng vai trò neo (anchor) tránh LLM xếp hạng cao các JD quá xa tầm với của ứng viên.
 
 \end{document}

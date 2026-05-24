@@ -1,191 +1,56 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Chương 1 đã trình bày bối cảnh, mục tiêu và hai câu hỏi nghiên cứu của khóa luận. Chương này giới thiệu các kiến thức nền tảng cần thiết để hiểu hệ thống được xây dựng và thí nghiệm so sánh ở Chương 5. Nội dung gồm hai phần: phần đầu nói về \textit{mô hình ngôn ngữ lớn} và cách phân tích CV; phần sau nói về \textit{cách đo độ phù hợp giữa hai văn bản} và \textit{cách đánh giá kết quả xếp hạng}.
+Chương 1 đã trình bày bối cảnh và bài toán. Chương này tóm tắt ba khối kiến thức nền tảng cần để hiểu phần thiết kế sau: (1)~mô hình ngôn ngữ lớn dùng cho phân tích văn bản, (2)~các cách tiếp cận bài toán phân tích CV, và (3)~kỹ thuật so khớp CV--JD bằng embedding và RAG. Cuối chương là khảo sát các giải pháp hiện có và khoảng trống mà khóa luận hướng tới.
 
-\section{Mô hình ngôn ngữ lớn}
+\section{Mô hình ngôn ngữ lớn và prompt}
 \label{sec:llm}
 
-\subsection{Khái niệm}
+Mô hình ngôn ngữ lớn (Large Language Model -- LLM) là loại mô hình được huấn luyện trên lượng văn bản rất lớn, có khả năng \textit{đọc một đoạn văn bản rồi tách ra các thông tin có cấu trúc} -- chính là điều khóa luận sử dụng để phân tích CV. Các mô hình tiêu biểu gồm ChatGPT (OpenAI) \cite{openai2023gpt4}, Gemini (Google), Claude (Anthropic); bên trong đều dựa trên kiến trúc \textit{Transformer} \cite{vaswani2017attention}. GPT-3 \cite{brown2020gpt3} là cột mốc chứng minh LLM có thể xử lý nhiều tác vụ khác nhau chỉ bằng vài ví dụ trong prompt (few-shot learning). Kiến trúc encoder BERT \cite{devlin2019bert} đặt nền tảng cho các mô hình embedding ngữ nghĩa, trong đó Sentence-BERT \cite{reimers2019sbert} mở rộng ra bài toán tính độ tương đồng câu -- tiền đề cho embedding JD/CV mà khóa luận sử dụng.
 
-Mô hình ngôn ngữ lớn (Large Language Model -- LLM) là loại mô hình được huấn luyện trên lượng văn bản rất lớn để học cách \textit{hiểu} và \textit{sinh} văn bản giống con người. Các mô hình nổi tiếng hiện nay như ChatGPT (OpenAI) \cite{openai2023gpt4}, Gemini (Google) và Claude (Anthropic) đều thuộc nhóm này. Khả năng của LLM gồm: trả lời câu hỏi, tóm tắt văn bản, dịch, viết mã lập trình, và đặc biệt là \textit{đọc một đoạn văn bản rồi tách ra các thông tin có cấu trúc} -- chính là điều khóa luận này sử dụng để phân tích CV.
-
-Bên trong, LLM dùng một kiến trúc mạng nơ-ron gọi là \textit{Transformer} \cite{vaswani2017attention}, cho phép mô hình xử lý nhiều từ cùng lúc và nắm bắt được mối liên hệ giữa các từ ở xa nhau trong câu. Chi tiết kỹ thuật của Transformer nằm ngoài phạm vi khóa luận; người đọc chỉ cần hiểu rằng LLM giúp máy tính ``đọc hiểu'' văn bản tốt hơn nhiều so với các phương pháp truyền thống.
-
-\subsection{Cách điều khiển LLM bằng prompt}
-
-Để LLM thực hiện một tác vụ cụ thể, người dùng cần viết một câu hướng dẫn gọi là \textit{prompt}. Trong khóa luận này, prompt được thiết kế theo ba nguyên tắc \cite{white2023prompt}:
-
-\begin{enumerate}[label=(\roman*)]
-\item Đặt vai trò cho mô hình: ví dụ ``Bạn là chuyên gia phân tích CV''.
-\item Yêu cầu trả về kết quả ở dạng JSON có cấu trúc cố định, để chương trình dễ xử lý.
-\item Đưa một vài ví dụ mẫu để mô hình bắt chước.
-\end{enumerate}
-
-Khóa luận sử dụng API của OpenAI để gọi mô hình \texttt{gpt-4o-mini} -- một phiên bản nhỏ và rẻ của ChatGPT, đủ tốt cho việc phân tích CV.
+Để LLM thực hiện một tác vụ cụ thể, người dùng cần viết một câu hướng dẫn gọi là \textit{prompt}. Khóa luận thiết kế prompt theo hướng dẫn của \cite{white2023prompt}: gán vai trò cho mô hình, yêu cầu trả về dữ liệu JSON có cấu trúc cố định, và đưa ví dụ mẫu. Mô hình được dùng là \texttt{gpt-4o-mini} -- một phiên bản nhỏ và rẻ, đủ tốt cho phân tích CV.
 
 \section{Phân tích CV bằng máy tính}
 
-\subsection{Bài toán}
+Phân tích CV là việc đọc một tệp CV (PDF, DOCX) và tách ra các trường có cấu trúc (họ tên, email, kinh nghiệm, học vấn, kỹ năng). Bài toán này khó vì: mỗi người viết CV theo một kiểu khác nhau, ranh giới giữa các phần đôi khi không rõ, tiếng Việt và tiếng Anh có quy ước khác nhau, và trích văn bản từ PDF/DOCX thường bị nhiễu (chữ rời, ngắt dòng bất thường).
 
-Phân tích CV là việc đọc một tệp CV (PDF, DOCX) và tách ra các trường thông tin có cấu trúc: họ tên, email, số điện thoại, kinh nghiệm làm việc, học vấn, kỹ năng. Đầu vào là văn bản tự do, đầu ra là dữ liệu có dạng bảng hoặc JSON.
+Có ba cách tiếp cận phổ biến:
 
-Bài toán này khó vì: (i) mỗi người viết CV theo một kiểu khác nhau, (ii) ranh giới giữa các phần đôi khi không rõ ràng, (iii) tiếng Việt và tiếng Anh có cách viết CV khác nhau, và (iv) trích văn bản từ PDF/DOCX thường bị nhiễu.
+\textbf{Cách 1 -- Quy tắc (rule-based):} Dùng biểu thức chính quy (regex) để tìm các trường có định dạng cố định như email, số điện thoại, URL LinkedIn. Nhanh, miễn phí, ổn định, nhưng chỉ làm được với khuôn mẫu rõ.
 
-\subsection{Ba cách tiếp cận}
+\textbf{Cách 2 -- Học máy:} Huấn luyện mô hình nhận dạng tên riêng (công ty, chức vụ) trong văn bản \cite{chen2016resume,jiechieu2021skills}. Cần dữ liệu gán nhãn lớn, khó mở rộng sang ngôn ngữ mới.
 
-\textbf{Cách 1 -- Dùng quy tắc (rule-based):} Dùng biểu thức chính quy (regex) để tìm các trường có định dạng cố định như email, số điện thoại, URL LinkedIn. Ưu điểm: nhanh, miễn phí, kết quả ổn định. Nhược điểm: chỉ làm được với các trường có khuôn mẫu rõ.
+\textbf{Cách 3 -- LLM:} Đưa cả CV cho LLM kèm prompt yêu cầu trích thông tin. Linh hoạt, hỗ trợ đa ngôn ngữ, nhưng tốn chi phí gọi API và chậm hơn.
 
-\textbf{Cách 2 -- Dùng học máy:} Huấn luyện một mô hình nhận dạng tên riêng (như tên công ty, chức vụ) trong văn bản \cite{chen2016resume,jiechieu2021skills}. Nhược điểm: cần dữ liệu gán nhãn lớn, khó mở rộng sang ngôn ngữ mới.
+Khóa luận chọn cách \textit{kết hợp} (hybrid): dùng regex cho các trường đơn giản (liên hệ, kỹ năng) và dùng LLM cho phần phức tạp (kinh nghiệm làm việc) -- tận dụng ưu điểm của cả hai và giảm chi phí API. Đánh giá định lượng của lựa chọn này được trình bày ở Chương~5.
 
-\textbf{Cách 3 -- Dùng LLM:} Đưa cả CV cho LLM kèm prompt yêu cầu trích thông tin. Ưu điểm: linh hoạt, không cần huấn luyện riêng, hỗ trợ đa ngôn ngữ. Nhược điểm: tốn chi phí gọi API và chậm hơn.
+\section{So khớp CV--JD: TF-IDF, Embedding và RAG}
 
-Khóa luận chọn cách \textit{kết hợp} (hybrid): dùng regex cho các trường đơn giản (liên hệ, kỹ năng) và dùng LLM cho phần phức tạp (kinh nghiệm làm việc). Cách này tận dụng được ưu điểm của cả hai.
+Bài toán thứ hai của khóa luận -- tìm tin tuyển dụng (JD) phù hợp với CV của ứng viên từ một kho lớn -- thuộc nhóm \textit{Information Retrieval} \cite{manning2008ir}. Có hai họ phương pháp đo độ tương đồng giữa văn bản:
 
-\section{Kiến trúc ứng dụng web hiện đại}
+\textbf{TF-IDF (từ khoá):} Mỗi văn bản được biểu diễn bằng tần suất từ có chiết khấu nghịch đảo tần suất tài liệu \cite{sparck1972statistical}; độ tương đồng tính bằng cosine giữa hai vector. Nhanh, không tốn chi phí, nhưng không nắm được ngữ nghĩa -- ví dụ ``backend developer'' và ``software engineer'' bị coi là khác nhau dù gần nhau về ý. Biến thể BM25 \cite{robertson2009bm25} cải thiện công thức trọng số nhưng vẫn giữ bản chất dựa trên từ khoá.
 
-Hệ thống được xây trên \textbf{Next.js} \cite{nextjs2024} -- một framework web cho phép viết cả phần giao diện (frontend) và phần xử lý phía máy chủ (backend) trong cùng một dự án. Giao diện được viết bằng \textbf{React} \cite{react2024} với mô hình component, kết hợp \textbf{TypeScript} \cite{typescript2024} để kiểm tra kiểu dữ liệu tự động giúp giảm lỗi.
+\textbf{Embedding (ngữ nghĩa):} Mỗi văn bản được mã hoá thành một vector ngữ nghĩa dày đặc \cite{karpukhin2020dense} -- \texttt{text-embedding-3-small} của OpenAI \cite{openai2024embedding} tạo ra vector 1.536 chiều. Hai văn bản gần nghĩa nhau sẽ có vector gần nhau (cosine similarity cao \cite{turney2010frequency}) ngay cả khi từ khoá khác nhau. Đổi lại, cần gọi API để tính embedding và tốn không gian lưu trữ vector. Các hệ thống so khớp CV--JD \cite{qin2018enhancing,shen2018joint,he2021towards} xác nhận embedding vượt TF-IDF cho bài toán này khi từ ngữ giữa CV và JD không khớp trực tiếp.
 
-Dữ liệu được lưu trên \textbf{Supabase} \cite{supabase2024} -- một dịch vụ cung cấp cơ sở dữ liệu PostgreSQL kèm theo các chức năng đi kèm như xác thực và phân quyền. Đáng chú ý nhất là cơ chế \textit{phân quyền cấp hàng} (Row Level Security): mỗi người dùng chỉ truy cập được dữ liệu của chính mình, được kiểm soát ngay tại tầng cơ sở dữ liệu chứ không phụ thuộc vào logic của ứng dụng. Các tệp CV mà người dùng tải lên được lưu trên \textbf{Vercel Blob} \cite{vercel2024} -- một dịch vụ lưu trữ tệp đơn giản.
+\textbf{RAG (Retrieval-Augmented Generation):} Quy trình hai bước do Lewis et al. \cite{lewis2020rag} đề xuất -- bước \textit{retrieval} dùng phương pháp rẻ (TF-IDF/Embedding) lọc nhanh từ kho dữ liệu xuống vài chục kết quả, rồi mới dùng LLM (đắt nhưng tinh) để xếp hạng lại. Cách này tránh chi phí gọi LLM cho từng cặp (CV, JD) trong kho. Khóa luận áp dụng RAG hai bước cho bài toán tìm JD khớp yêu cầu; thiết kế chi tiết ở Chương~3.
 
-Để cho phép đăng nhập bằng tài khoản Google hoặc LinkedIn, hệ thống dùng giao thức \textbf{OAuth 2.0} \cite{hardt2012oauth}. Người dùng được chuyển sang trang đăng nhập của Google/LinkedIn, sau khi đồng ý thì Google/LinkedIn trả về cho hệ thống một mã định danh để xác nhận tài khoản.
+\section{Các giải pháp hiện có và khoảng trống nghiên cứu}
 
-\section{Hệ thống sàng lọc CV tự động}
-
-Phần lớn doanh nghiệp lớn hiện nay dùng \textit{phần mềm sàng lọc CV tự động} -- thường được gọi là Applicant Tracking System (ATS) \cite{sanchez2020ats}. Phần mềm này đọc văn bản trong CV, đối chiếu với mô tả công việc, rồi xếp hạng các ứng viên. Để một bản CV vượt qua ATS, cần lưu ý:
-
-\begin{itemize}
-\item \textbf{Định dạng đơn giản}: tránh bảng phức tạp, hình ảnh và font chữ lạ.
-\item \textbf{Từ khóa phù hợp}: CV cần chứa các từ khóa giống với mô tả công việc.
-\item \textbf{Cấu trúc rõ ràng}: các phần như kinh nghiệm, học vấn, kỹ năng cần được đặt tên chuẩn.
-\item \textbf{Thông tin liên hệ dễ tìm}: đặt ở đầu CV.
-\end{itemize}
-
-Hiểu cách ATS hoạt động giúp thiết kế hệ thống tạo ra CV phù hợp với tiêu chuẩn tuyển dụng thực tế.
-
-\section{Đo độ phù hợp giữa hai văn bản}
-\label{sec:ir}
-
-Bài toán so khớp CV với mô tả công việc bản chất là: cho hai văn bản, máy tính phải đưa ra một con số thể hiện chúng phù hợp với nhau đến mức nào. Mục này trình bày ba cách phổ biến: \textit{đếm trùng từ} (TF-IDF), \textit{so sánh nghĩa} (embedding), và \textit{nhờ LLM chấm điểm}. Hình \ref{fig:three_methods} tóm tắt ba cách này -- chính là ba phương pháp sẽ được so sánh thí nghiệm ở Chương 5.
-
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}[
-  every node/.style={font=\footnotesize},
-  inp/.style={rectangle, rounded corners, draw, thick, fill=gray!12, minimum width=2.8cm, minimum height=0.7cm, align=center},
-  proc/.style={rectangle, draw, very thick, minimum width=4.2cm, minimum height=2.4cm, align=center},
-  outbox/.style={rectangle, rounded corners, draw, thick, fill=green!12, minimum width=2.8cm, minimum height=0.7cm, align=center},
-  cost/.style={font=\scriptsize, align=center},
-  arr/.style={-{Stealth[length=2.2mm]}, thick}
-]
-\node[inp] (cv) at (0,0) {CV};
-\node[inp, right=0.6cm of cv] (jd) {Mô tả công việc (JD)};
-
-\node[proc, fill=blue!8]    (m1) at (-5,-3.5) {};
-\node[proc, fill=orange!12] (m2) at (0,-3.5)  {};
-\node[proc, fill=purple!10] (m3) at (5,-3.5)  {};
-
-\node[font=\footnotesize\bfseries, anchor=north, yshift=-0.1cm] at (m1.north) {Cách 1: TF-IDF};
-\node[font=\footnotesize\bfseries, anchor=north, yshift=-0.1cm] at (m2.north) {Cách 2: Embedding};
-\node[font=\footnotesize\bfseries, anchor=north, yshift=-0.1cm] at (m3.north) {Cách 3: LLM chấm điểm};
-
-\node[font=\scriptsize, align=center] at ([yshift=0.1cm]m1.center) {Đếm trùng từ\\(trọng số TF $\times$ IDF)\\\textit{vector từ vựng}};
-\node[font=\scriptsize, align=center] at ([yshift=0.1cm]m2.center) {Mã hoá thành vector\\\texttt{text-embedding-3-small}\\\textit{1536 chiều}};
-\node[font=\scriptsize, align=center] at ([yshift=0.1cm]m3.center) {Gửi cả 2 văn bản tới\\\texttt{gpt-4o-mini} kèm prompt\\\textit{trả về điểm 0--100}};
-
-\node[outbox, below=0.6cm of m1] (o1) {Điểm cosine (0--1)};
-\node[outbox, below=0.6cm of m2] (o2) {Điểm cosine (0--1)};
-\node[outbox, below=0.6cm of m3] (o3) {Điểm 0--100};
-
-\node[cost, below=0.1cm of o1] {miễn phí, $\sim$1ms};
-\node[cost, below=0.1cm of o2] {\$0,02/1M tok, $<$1s};
-\node[cost, below=0.1cm of o3] {\$0,15/1M tok in, $\sim$3s};
-
-\draw[arr] ($(cv.south)!.5!(jd.south)$) -- (m1.north);
-\draw[arr] ($(cv.south)!.5!(jd.south)$) -- (m2.north);
-\draw[arr] ($(cv.south)!.5!(jd.south)$) -- (m3.north);
-
-\draw[arr] (m1.south) -- (o1.north);
-\draw[arr] (m2.south) -- (o2.north);
-\draw[arr] (m3.south) -- (o3.north);
-\end{tikzpicture}
-\caption{Ba cách đo độ phù hợp giữa CV và mô tả công việc -- đầu vào, cách tính, đầu ra, và chi phí ước lượng}
-\label{fig:three_methods}
-\end{figure}
-
-\subsection{Cách 1 -- Đếm trùng từ (TF-IDF)}
-
-Cách đơn giản nhất là đếm xem hai văn bản có chung những từ nào. Tuy nhiên, không phải từ nào cũng có giá trị bằng nhau: từ ``React'' xuất hiện trong CV nói lên nhiều điều hơn từ ``và'' hay ``là''. Vì vậy mỗi từ được gán một \textit{trọng số}:
-
-\begin{itemize}
-\item Từ xuất hiện nhiều trong văn bản $\rightarrow$ trọng số cao (tần số từ -- TF).
-\item Từ xuất hiện ở khắp mọi văn bản trong kho dữ liệu $\rightarrow$ trọng số thấp (nghịch đảo tần số tài liệu -- IDF).
-\end{itemize}
-
-Trọng số cuối cùng là \textbf{TF-IDF} -- tích của hai giá trị trên \cite{manning2008ir}. Sau khi gán trọng số xong, mỗi văn bản trở thành một vector các con số. Độ phù hợp giữa hai văn bản được tính bằng \textit{cosine similarity} -- giá trị cosine của góc giữa hai vector:
-\begin{equation}\label{eq:cosine}
-\text{sim}(d, q) = \frac{\vec{d} \cdot \vec{q}}{\lVert \vec{d} \rVert \cdot \lVert \vec{q} \rVert}
-\end{equation}
-
-\textbf{Ưu điểm}: nhanh, miễn phí, kết quả luôn giống nhau giữa các lần chạy. \textbf{Nhược điểm}: không nhận ra hai từ khác nhau nhưng cùng nghĩa. Ví dụ ``frontend developer'' và ``UI engineer'' bị coi là không liên quan vì không trùng từ nào -- đây gọi là vấn đề \textit{lệch từ vựng}.
-
-\subsection{Cách 2 -- So sánh nghĩa (embedding)}
-\label{sec:dense}
-
-Để khắc phục vấn đề lệch từ vựng, người ta dùng một mô hình đã được huấn luyện trước để biến mỗi văn bản thành một vector số học, sao cho hai văn bản có nghĩa giống nhau thì vector của chúng nằm gần nhau. Vector này gọi là \textit{embedding} \cite{reimers2019sbert,karpukhin2020dpr}.
-
-Khóa luận sử dụng mô hình \texttt{text-embedding-3-small} của OpenAI \cite{openai2024embeddings} -- mô hình embedding thương mại có chi phí rẻ (0,02 USD cho 1 triệu token, đủ rẻ để chạy thí nghiệm với vài trăm cặp). Mô hình biến mỗi văn bản thành vector 1536 chiều. Độ phù hợp vẫn được tính bằng công thức cosine \eqref{eq:cosine}, chỉ khác là phép so sánh giờ thực hiện trong không gian \textit{nghĩa} chứ không phải không gian từ vựng. Nhờ vậy, mô hình nhận ra được ``frontend developer'' và ``UI engineer'' là gần nghĩa.
-
-\subsection{Cách 3 -- Nhờ LLM chấm điểm}
-\label{sec:llm_judge}
-
-Cách thứ ba là đưa cả CV và mô tả công việc cho một LLM, kèm prompt yêu cầu chấm điểm 0--100 \cite{zheng2023judging}. Ưu điểm: LLM có thể đọc và hiểu ngữ cảnh phức tạp, ví dụ phân biệt được giữa CV có nhiều ``từ khóa'' nhưng kinh nghiệm sai ngành với CV thực sự phù hợp. Nhược điểm: chậm và đắt hơn cả hai cách trên.
-
-Để giảm sự không ổn định giữa các lần chạy, khóa luận đặt tham số \texttt{temperature = 0} (cho mô hình chọn câu trả lời chắc chắn nhất thay vì ngẫu nhiên) và \texttt{seed = 42} (cố định nguồn ngẫu nhiên).
-
-\section{Cách đánh giá kết quả xếp hạng}
-\label{sec:metrics}
-
-Sau khi tính được điểm phù hợp cho từng cặp CV--JD, ta cần đo lường xem cách nào cho \textit{thứ tự xếp hạng} đúng nhất. Khóa luận dùng các chỉ số chuẩn trong lĩnh vực truy hồi thông tin \cite{manning2008ir,jarvelin2002dcg}:
-
-\textbf{Precision@$k$} -- tỷ lệ kết quả phù hợp trong số $k$ kết quả đứng đầu. Ví dụ Precision@10 = 0,8 nghĩa là 8/10 CV xếp hạng cao nhất thật sự phù hợp với vị trí.
-
-\textbf{nDCG@$k$ (Normalized Discounted Cumulative Gain)} -- vừa quan tâm đến \textit{số lượng} kết quả đúng, vừa quan tâm đến \textit{vị trí} của chúng. Một kết quả đúng xuất hiện ở vị trí 1 có giá trị hơn một kết quả đúng xuất hiện ở vị trí 10. Giá trị nDCG nằm trong khoảng 0--1; càng gần 1 càng tốt.
-
-\textbf{MRR (Mean Reciprocal Rank)} -- trung bình của nghịch đảo thứ hạng kết quả phù hợp đầu tiên. Nếu kết quả phù hợp đầu tiên thường ở vị trí 1, MRR sẽ gần 1.
-
-\textbf{ROC-AUC} -- chỉ số đo khả năng phân biệt giữa hai lớp ``phù hợp'' và ``không phù hợp''. Giá trị 0,5 nghĩa là phân biệt như tung đồng xu; giá trị 1,0 là phân biệt hoàn hảo.
-
-Cả bốn chỉ số này đều dùng để trả lời Câu hỏi nghiên cứu 1 (RQ1): cách nào cho xếp hạng tốt nhất.
-
-\section{Kiểm định thống kê}
-\label{sec:stats}
-
-Khi so sánh hai phương pháp, chỉ nhìn vào số trung bình là chưa đủ -- có thể chênh lệch nhỏ chỉ là do \textit{may rủi} chứ không phải do phương pháp thật sự tốt hơn. Để kết luận chắc chắn, khóa luận dùng hai công cụ thống kê:
-
-\textbf{Paired Wilcoxon signed-rank test} \cite{wilcoxon1945}: kiểm định xem hiệu số sai sót giữa hai phương pháp trên cùng một bộ dữ liệu có khác biệt đáng kể không. So với $t$-test, Wilcoxon không giả định dữ liệu có phân phối chuẩn -- phù hợp với dữ liệu xếp hạng. Quy ước: nếu \textit{p-value} dưới 0,05 thì khác biệt được coi là đáng kể.
-
-\textbf{Bootstrap khoảng tin cậy 95\%} \cite{efron1993bootstrap}: lấy mẫu lại nhiều lần (10\,000 lần) từ dữ liệu thí nghiệm, tính chỉ số mỗi lần, rồi lấy khoảng phân vị 2,5\%--97,5\% làm khoảng tin cậy. Khoảng này cho biết \textit{độ chắc chắn} của con số ước lượng. Bootstrap dùng \texttt{seed = 42} để cho phép tái lập kết quả.
-
-\section{Các công trình liên quan}
-
-Trên thị trường hiện nay có nhiều công cụ và dịch vụ liên quan đến CV. Bảng \ref{tab:comparison} so sánh ngắn gọn các nhóm chính với những điểm thiếu sót.
+Trên thị trường có nhiều công cụ liên quan đến CV nhưng đều thiếu một số yếu tố quan trọng. Bảng~\ref{tab:comparison} tóm tắt theo nhóm.
 
 \begin{table}[H]
 \centering
 \caption{So sánh các giải pháp xây dựng CV hiện có}
 \label{tab:comparison}
-\begin{tabular}{|l|p{4.5cm}|p{5.5cm}|}
+\begin{tabular}{|p{4.0cm}|p{4.0cm}|p{5.5cm}|}
 \hline
 \textbf{Nhóm} & \textbf{Đại diện} & \textbf{Hạn chế} \\ \hline
-Công cụ tạo CV trực tuyến & Canva, Zety, NovoResume & Chỉ cung cấp mẫu thiết kế; không phân tích nội dung; ít hỗ trợ tiếng Việt \\ \hline
+Nền tảng tuyển dụng Việt Nam & TopCV, VietnamWorks, JobsGO & Mạnh về CV Builder tiếng Việt; bước đầu tích hợp AI (TopCV CV Scoring 08/2025) nhưng không công bố phương pháp matching; ràng buộc apply trong hệ sinh thái của nền tảng \\ \hline
+Công cụ tạo CV quốc tế & Canva, Zety, NovoResume, Enhancv & Chỉ cung cấp mẫu thiết kế hoặc gợi ý từ khoá; không phân tích sâu nội dung; ít hỗ trợ tiếng Việt \\ \hline
 Dịch vụ phân tích CV thương mại & Sovren, Textkernel, DaXtra & Chi phí cao; phục vụ doanh nghiệp tuyển dụng; ít hỗ trợ tiếng Việt \\ \hline
-Nền tảng mạng nghề nghiệp & LinkedIn & Khó tuỳ chỉnh bố cục; xuất PDF/DOCX hạn chế \\ \hline
 \end{tabular}
 \end{table}
 
-Các nhóm trên đều thiếu một trong ba yếu tố: (i) phân tích nội dung CV bằng trí tuệ nhân tạo để gợi ý cải thiện, (ii) hỗ trợ quy trình tải lên CV có sẵn rồi cấu trúc hoá, và (iii) hỗ trợ song ngữ Việt--Anh.
-
-Về phương pháp so khớp CV--JD, các nghiên cứu trước đây chủ yếu sử dụng riêng lẻ TF-IDF \cite{manning2008ir}, embedding ngữ nghĩa \cite{reimers2019sbert,karpukhin2020dpr}, hoặc dùng LLM trực tiếp \cite{zheng2023judging}. Tuy nhiên, ít có nghiên cứu \textit{so sánh định lượng} ba cách tiếp cận này trên cùng một bộ dữ liệu CV--JD với kiểm định thống kê đầy đủ -- đây chính là khoảng trống mà khóa luận hướng tới.
+\textbf{Khoảng trống nghiên cứu mà khóa luận hướng tới}: chưa có hệ thống mã nguồn mở phục vụ ứng viên Việt Nam mà công khai \textit{phương pháp} phân tích CV và so khớp CV--JD: các công cụ thương mại không công bố thuật toán matching và ràng buộc ứng viên ứng tuyển trong hệ sinh thái của nền tảng. Khóa luận trình bày cụ thể (i) thiết kế Hybrid Parser kết hợp regex và LLM, và (ii) quy trình RAG hai bước (Hybrid Retrieval + Structural/LLM Ranking) -- hai thiết kế có thể tái sử dụng cho các bài toán phân tích CV song ngữ Việt--Anh khác.
 
 \end{document}

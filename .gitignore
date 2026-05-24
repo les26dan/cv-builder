@@ -66,3 +66,14 @@ Workflow Files/Materials/Documents/GitHub Token.md
 Workflow Files/Materials/Documents/ChatGPT Token.md
 Workflow Files/Materials/Documents/Claude API.md
 Heimdall/credentials.md
+Heimdall/
+
+# Internal workflow docs & planning (keep local only)
+Workflow Files/
+backups/
+Projects/
+thesis_backup_*/
+ADMIN_ACCESS.md
+
+# Debug/temp scripts
+server.pid

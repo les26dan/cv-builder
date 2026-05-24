@@ -1,50 +1,49 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Khóa luận đã giải quyết hai bài toán đặt ra ở Chương 1: (i) xây dựng một hệ thống web hoàn chỉnh hỗ trợ tạo, phân tích và tối ưu CV bằng mô hình ngôn ngữ lớn; và (ii) thực hiện thí nghiệm so sánh ba phương pháp đo độ phù hợp giữa CV và mô tả công việc trên dữ liệu công khai, với kiểm định thống kê đầy đủ. Chương này tóm tắt kết quả, nêu các hạn chế còn tồn tại, và đề xuất một số hướng phát triển trong tương lai.
+Khóa luận đã giải quyết hai bài toán đặt ra ở Chương 1: (i) xây dựng một hệ thống web hoàn chỉnh hỗ trợ tạo, phân tích và tối ưu CV bằng mô hình ngôn ngữ lớn; (ii) thiết kế, hiện thực và đánh giá quy trình RAG hai bước phục vụ ứng viên tìm kiếm JD khớp yêu cầu. Chương này tóm tắt kết quả, nêu các hạn chế còn tồn tại, và đề xuất một số hướng phát triển trong tương lai.
 
 \section{Tóm tắt kết quả đạt được}
 
 \textbf{Về phần sản phẩm:}
 
 \begin{enumerate}
-\item Sinh viên đã đề xuất và hiện thực phương pháp \textit{phân tích CV lai} (hybrid parser) kết hợp giữa biểu thức chính quy cho các trường có cấu trúc rõ và mô hình ngôn ngữ lớn cho phần kinh nghiệm tự do. Kết quả đánh giá trên 20 CV mẫu cho thấy phương pháp lai giảm khoảng 56\% lượng dữ liệu phải gửi cho LLM trong khi độ chính xác chỉ giảm 2--3\% -- mức giảm chấp nhận được so với phần chi phí tiết kiệm được.
-
 \item Sinh viên đã xây dựng trình soạn thảo CV tương tác với layout hai cột (editor và preview), hỗ trợ chỉnh sửa theo từng phần, kéo thả sắp xếp thứ tự các mục, lưu tự động sau 2 giây, và xem trước định dạng A4 ngay khi đang sửa. Trình soạn thảo hỗ trợ xuất CV ra hai định dạng phổ biến: PDF và DOCX.
 
-\item Sinh viên đã phát triển hệ thống web hoàn chỉnh với ba phương thức đăng nhập (email/mật khẩu, Google OAuth, LinkedIn OAuth), quản lý nhiều CV trực tuyến cho từng người dùng, và giao diện song ngữ Việt--Anh. Hệ thống đã được kiểm thử qua 28 trường hợp kiểm thử chức năng và đều đạt yêu cầu.
+\item Sinh viên đã phát triển hệ thống web hoàn chỉnh với đăng nhập bằng email/mật khẩu, hỗ trợ phiên khách (không cần đăng nhập), quản lý nhiều CV trực tuyến cho từng người dùng, và giao diện song ngữ Việt--Anh. Hệ thống đã được kiểm thử qua 24 trường hợp kiểm thử chức năng và đều đạt yêu cầu.
 \end{enumerate}
 
-\textbf{Về phần nghiên cứu:}
+\textbf{Về phần thiết kế pipeline AI:}
 
-\begin{enumerate}\setcounter{enumi}{3}
-\item Sinh viên đã thiết kế và thực hiện một thí nghiệm so sánh định lượng ba phương pháp đo độ phù hợp CV--JD (đếm trùng từ TF-IDF, so sánh nghĩa Embedding, và LLM chấm điểm) trên 400 cặp dữ liệu công khai từ Kaggle. Kết quả chính:
-\begin{itemize}
-\item Trả lời \textbf{RQ1} (chất lượng): Embedding cho ROC-AUC cao nhất (0,766), vượt cả TF-IDF (0,755) và LLM (0,755). Kiểm định paired Wilcoxon xác nhận khác biệt sai số giữa Embedding và LLM ($p = 0{,}0038$), giữa Embedding và TF-IDF ($p < 10^{-16}$) đều có ý nghĩa thống kê.
-\item Trả lời \textbf{RQ2} (chi phí): Embedding là phương pháp hiệu quả chi phí nhất -- chất lượng cao nhất với chi phí gần như 0 sau khi cache, trong khi LLM tốn 0,28 USD/1\,000 cặp và chậm hơn 5\,000 lần.
-\end{itemize}
-Toàn bộ pipeline đánh giá (script, dữ liệu trung gian, kết quả) được công bố mã nguồn mở để người khác có thể tái lập và tham chiếu khi lựa chọn phương pháp cho hệ thống tuyển dụng thực tế.
+\begin{enumerate}\setcounter{enumi}{2}
+\item Sinh viên đã thiết kế và hiện thực luồng xử lý RAG hai bước phục vụ ứng viên tìm kiếm JD phù hợp. Pipeline gồm bước Hybrid Retrieval (TF-IDF + Embedding, lọc top-20 JD) và bước Structural + LLM Batch Ranking (xếp hạng top-5). Thiết kế hai bước cho phép mở rộng tới kho JD lớn mà không tăng chi phí gọi LLM tuyến tính theo kích thước kho. Phân tích lý do lựa chọn từng thành phần được trình bày trong Chương~5.
+
+\item Sinh viên đã phân tích quyết định thiết kế then chốt \textbf{Hybrid Parser so với Parser thuần LLM} -- chỉ ra rằng cách dùng regex cho các trường có khuôn mẫu (liên hệ, kỹ năng) và LLM cho phần cần hiểu ngữ nghĩa (kinh nghiệm) là lựa chọn hợp lý về cả chất lượng đầu ra lẫn chi phí token, đồng thời giảm phụ thuộc vào LLM cho các trường đơn giản.
 \end{enumerate}
 
 \section{Hạn chế}
 
-\textbf{Hạn chế về ground truth.} Strategy A dán nhãn theo nhóm nghề là silver-standard: hai CV và JD cùng nhóm nghề không nhất thiết phù hợp 100\%, và khác nhóm cũng có thể vẫn liên quan. Việc dùng ground truth do người chấm điểm tay sẽ cho kết quả tin cậy hơn nhưng tốn nhiều công sức.
+\textbf{Hạn chế về quy mô đánh giá.} Đánh giá quy trình RAG trong Chương~5 được thực hiện trên bộ dữ liệu Kaggle Resume Dataset với ground truth định nghĩa theo ngành nghề -- một proxy hợp lý nhưng chưa phải annotation thủ công. Khóa luận chưa có tập dữ liệu CV--JD tiếng Việt được gắn nhãn thủ công để xác nhận chất lượng pipeline trong ngữ cảnh tuyển dụng Việt Nam.
 
-\textbf{Hạn chế về phạm vi dữ liệu.} Thí nghiệm chỉ dùng 400 cặp tiếng Anh. Kết quả có thể khác trên dữ liệu tiếng Việt do mô hình embedding chủ yếu được huấn luyện trên tiếng Anh.
+\textbf{Hạn chế của quy trình RAG.} Embedding tổng quát (\texttt{text-embedding-3-small}) chưa được fine-tune cho domain tuyển dụng. Structural Score hiện chỉ đánh giá ba tiêu chí cứng (kinh nghiệm, bằng cấp, kỹ năng); các yếu tố mềm phụ thuộc hoàn toàn vào LLM. Chất lượng kết quả cũng phụ thuộc vào chất lượng kho JD được crawl.
+
+\textbf{Hạn chế về phạm vi ngôn ngữ.} Hệ thống hỗ trợ tiếng Việt và tiếng Anh nhưng các mô hình LLM và embedding được tối ưu chủ yếu cho tiếng Anh, nên chất lượng phân tích CV tiếng Việt có thể thấp hơn trong một số tình huống phức tạp.
 
 \textbf{Hạn chế về tính năng hệ thống.} Hệ thống hiện chỉ xuất CV ra PDF và DOCX; chưa hỗ trợ các định dạng khác như LaTeX hay TXT. Module phân tích CV chưa hỗ trợ tệp scan PDF (cần OCR).
 
-\textbf{Hạn chế về quy mô đánh giá.} Số cặp ($n = 400$) đủ để có kiểm định thống kê có ý nghĩa nhưng vẫn nhỏ so với các benchmark IR chuẩn.
-
 \section{Hướng phát triển trong tương lai}
 
-\textbf{Mở rộng dữ liệu sang tiếng Việt.} Thu thập một bộ dữ liệu CV--JD tiếng Việt với ít nhất vài trăm cặp được người chuyên gia tuyển dụng gắn nhãn. Lặp lại thí nghiệm để kiểm tra xem kết luận có còn đúng trên ngôn ngữ Việt hay không, đặc biệt khi các mô hình embedding hiện tại chưa được tối ưu cho tiếng Việt.
+\textbf{Mở rộng đánh giá sang tiếng Việt.} Thí nghiệm trong Chương~5 được thực hiện trên 229 CV và 307 JD tiếng Anh (14 ngành) từ Kaggle Resume Dataset \cite{kaggle_resume2023}. Hướng phát triển tiếp theo là thu thập tập dữ liệu CV--JD tiếng Việt được gắn nhãn thủ công để xác nhận chất lượng pipeline trong ngữ cảnh tuyển dụng Việt Nam, nơi các mô hình embedding và LLM hiện tại chưa được tối ưu.
+
+\textbf{Cải thiện hỗ trợ tiếng Việt.} Thu thập thêm CV--JD tiếng Việt để kiểm thử và cải thiện chất lượng phân tích, đặc biệt với các mô hình embedding và LLM chưa được tối ưu cho tiếng Việt.
 
 \textbf{Tích hợp OCR cho CV scan.} Tích hợp một mô hình OCR (như Tesseract hoặc PaddleOCR) để xử lý các CV đã được scan thành ảnh -- một dạng phổ biến trong thực tế tuyển dụng.
 
 \textbf{Cải thiện gợi ý chỉnh sửa CV.} Phát triển một module riêng dùng LLM để gợi ý cách viết lại các mục trong CV cho phù hợp với một mô tả công việc cụ thể, kết hợp kết quả của Embedding (chấm điểm tổng thể) và LLM (gợi ý sửa chi tiết).
 
-\textbf{Mở rộng nghiên cứu.} Thử các phương pháp khác như Cross-Encoder (so sánh ngữ nghĩa với mô hình re-ranker), hoặc kết hợp Embedding + LLM cho top-k tái xếp hạng -- để kiểm tra xem có cải thiện được ROC-AUC vượt 0,766 hay không.
+\textbf{Fine-tune embedding cho domain tuyển dụng tiếng Việt.} Embedding tổng quát hiện tại không được tối ưu cho ngữ cảnh tuyển dụng, đặc biệt với thuật ngữ kỹ thuật tiếng Việt. Hướng phát triển là thu thập tập dữ liệu cặp (CV, JD) có nhãn lớn hơn và fine-tune mô hình embedding với contrastive learning, tương tự cách các mô hình như BGE-M3 được huấn luyện cho tiếng Trung.
+
+\textbf{Mở rộng luồng xử lý RAG tìm kiếm JD.} Bổ sung tính năng lọc cứng trước bước retrieval (theo địa điểm, mức lương, loại hợp đồng) để giảm kích thước corpus và tăng precision. Tích hợp feedback vòng lặp: ứng viên đánh giá kết quả (ứng tuyển/bỏ qua) để cải thiện xếp hạng JD theo thời gian.
 
 \textbf{Phát triển sản phẩm thương mại.} Hệ thống hiện tại đã đủ tính năng cốt lõi để mang ra phục vụ người dùng thật. Hướng tiếp theo gồm: thêm gói trả phí (xuất nhiều CV/tháng, tính năng AI nâng cao), tích hợp thanh toán, và triển khai trên hạ tầng đám mây có khả năng mở rộng tự động.
 

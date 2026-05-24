@@ -12,15 +12,17 @@ interface CVCardProps {
   onDownload?: (cvId: string) => void
   onDelete?: (cvId: string) => void
   onTitleUpdate?: (cvId: string, newTitle: string) => void
+  onFindJobs?: (cvId: string) => void
 }
 
-export default function CVCard({ 
-  cv, 
-  onContinue, 
-  onEdit, 
-  onDownload, 
+export default function CVCard({
+  cv,
+  onContinue,
+  onEdit,
+  onDownload,
   onDelete,
-  onTitleUpdate 
+  onTitleUpdate,
+  onFindJobs
 }: CVCardProps) {
   const [workspace, setWorkspace] = useState<any>(null)
   const [currentLanguage, setCurrentLanguage] = useState<'vi' | 'en'>('vi')
@@ -440,6 +442,40 @@ export default function CVCard({
               {workspace.cvCard.actions.download}
             </span>
           </button>
+
+          {/* Find Jobs Button */}
+          {onFindJobs && (
+            <button
+              onClick={(e) => handleActionClick(e, () => onFindJobs(cv.id))}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '12px 14px',
+                height: '36px',
+                background: '#FFFFFF',
+                borderRadius: '6px',
+                border: '1px solid #6B7280',
+                cursor: 'pointer',
+                flex: 'none',
+                flexGrow: 0,
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#F9FAFB'
+                e.currentTarget.style.borderColor = '#374151'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '#FFFFFF'
+                e.currentTarget.style.borderColor = '#6B7280'
+              }}
+            >
+              <span className="font-inter font-medium text-sm leading-[17px] text-gray-600 whitespace-nowrap">
+                Tìm JD phù hợp
+              </span>
+            </button>
+          )}
 
           {/* Delete Button */}
           <button

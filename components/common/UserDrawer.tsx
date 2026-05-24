@@ -170,37 +170,6 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
           </div>
         )}
 
-        {/* Language Toggle Section */}
-        <div className="p-6 border-b border-gray-200">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">
-            {userDrawer.language.title}
-          </h4>
-          <button
-            onClick={handleLanguageToggle}
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full overflow-hidden bg-gray-100">
-                {currentLanguage === 'vi' ? (
-                  <div className="w-full h-full bg-red-500 flex items-center justify-center text-white text-xs font-bold">
-                    🇻🇳
-                  </div>
-                ) : (
-                  <div className="w-full h-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
-                    🇺🇸
-                  </div>
-                )}
-              </div>
-              <span className="text-sm font-medium text-gray-900">
-                {currentLanguage === 'vi' ? userDrawer.language.options.vi : userDrawer.language.options.en}
-              </span>
-            </div>
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-          </button>
-        </div>
-
         {/* Navigation Section */}
         <div className="p-6 border-b border-gray-200">
           <div className="space-y-2">

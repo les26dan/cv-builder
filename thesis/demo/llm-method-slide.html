@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1e1e2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+  .slide {
+    background: #ffffff;
+    width: 960px;
+    border-radius: 16px;
+    padding: 44px 52px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 6px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #8b5cf6;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 32px;
+  }
+
+  /* Main layout */
+  .main { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+  /* Left — flow */
+  .flow { display: flex; flex-direction: column; gap: 4px; }
+
+  .step-row { display: flex; align-items: stretch; gap: 12px; }
+  .step-connector {
+    display: flex; flex-direction: column; align-items: center;
+    flex-shrink: 0; width: 30px;
+  }
+  .circle {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: white; flex-shrink: 0;
+    background: #8b5cf6;
+  }
+  .vline { width: 2px; flex: 1; min-height: 12px; margin: 3px 0; background: #ddd6fe; }
+
+  .step-content { flex: 1; padding-bottom: 16px; }
+  .step-title { font-size: 12px; font-weight: 700; color: #6d28d9; margin-bottom: 6px; }
+  .box {
+    border-radius: 8px; padding: 11px 14px;
+    font-size: 12px; line-height: 1.7;
+    background: #f5f3ff; border: 1px solid #ddd6fe; color: #3b0764;
+  }
+  .box .dim { color: #a78bfa; font-size: 11px; }
+
+  /* Prompt box */
+  .prompt-block {
+    background: #1e1b4b;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: #c7d2fe;
+  }
+  .prompt-block .label {
+    font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #818cf8; margin-bottom: 8px;
+  }
+  .prompt-block .system { color: #a5b4fc; }
+  .prompt-block .user-msg { color: #e0e7ff; margin-top: 10px; }
+  .prompt-block strong { color: #ffffff; }
+
+  /* JSON response */
+  .json-block {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 12px;
+    line-height: 1.9;
+    color: #94a3b8;
+    font-family: 'Courier New', monospace;
+  }
+  .json-block .label {
+    font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #64748b; margin-bottom: 10px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .jk { color: #7dd3fc; }
+  .jv { color: #86efac; }
+  .jn { color: #fbbf24; font-weight: 800; font-size: 14px; }
+  .ja { color: #f9a8d4; }
+  .js { color: #d1fae5; }
+
+  /* Result card */
+  .result {
+    background: #f5f3ff; border: 2px solid #8b5cf6;
+    border-radius: 10px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 16px; margin-top: 4px;
+  }
+  .score { font-size: 38px; font-weight: 900; color: #6d28d9; flex-shrink: 0; }
+  .rdesc { font-size: 12px; line-height: 1.9; color: #4c1d95; }
+
+  /* Params */
+  .params {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 16px;
+  }
+  .param {
+    background: #faf5ff; border: 1px solid #ddd6fe;
+    border-radius: 7px; padding: 8px 12px;
+    font-size: 11.5px; color: #4c1d95;
+  }
+  .param .pk { color: #8b5cf6; font-weight: 700; font-size: 11px; }
+
+  /* insight */
+  .insight {
+    background: #f5f3ff; border-left: 3px solid #8b5cf6;
+    border-radius: 0 8px 8px 0; padding: 12px 16px;
+    font-size: 12px; line-height: 1.8; color: #4c1d95;
+    margin-top: 12px;
+  }
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 7px; border-radius: 10px; margin-left: 4px;
+  }
+  .win    { background: #dcfce7; color: #166534; }
+  .lose   { background: #fee2e2; color: #991b1b; }
+  .purple { background: #ede9fe; color: #6d28d9; }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <h1>Phương pháp 3 — Nhờ AI suy luận (LLM)</h1>
+  <p class="subtitle">GPT-4o-mini · temperature = 0 · seed = 42 · trả về JSON</p>
+
+  <div class="main">
+
+    <!-- LEFT: flow -->
+    <div>
+      <div class="flow">
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle">1</div>
+            <div class="vline"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Gửi CV + JD kèm hướng dẫn cho GPT</div>
+            <div class="box">
+              Không tách từ, không tính toán.<br>
+              GPT đọc cả hai, <strong>suy luận như người thật</strong>.<br>
+              <span class="dim">Hướng dẫn viết sẵn trong system prompt.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle">2</div>
+            <div class="vline"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">GPT đánh giá và trả về điểm + lý do</div>
+            <div class="box">
+              Keyword nào khớp, keyword nào thiếu,<br>
+              tại sao CV này phù hợp hoặc không phù hợp.<br>
+              <span class="dim">Phương pháp duy nhất có giải thích.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">So với ngưỡng 50 → kết luận</div>
+            <div class="box">
+              Điểm ≥ 50 → Phù hợp<br>
+              Điểm &lt; 50 → Không phù hợp<br>
+              <span class="dim">Ứng viên đọc lý do và biết cần bổ sung gì.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result">
+          <div class="score">78</div>
+          <div class="rdesc">
+            <strong>78 / 100</strong> — ≥ 50 → ✓ Phù hợp<br>
+            F1 = <strong>0.717</strong> — cao nhất trong 3 phương pháp<br>
+            <span style="color:#8b5cf6">~2.5 giây · $0.28 / 1.000 cặp</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: prompt + JSON -->
+    <div>
+
+      <!-- Params -->
+      <div class="params">
+        <div class="param"><span class="pk">model</span><br>gpt-4o-mini</div>
+        <div class="param"><span class="pk">temperature</span><br>0 — kết quả ổn định</div>
+        <div class="param"><span class="pk">seed</span><br>42 — reproducible</div>
+        <div class="param"><span class="pk">response_format</span><br>json_object</div>
+      </div>
+
+      <!-- Prompt -->
+      <div class="prompt-block">
+        <div class="label">System Prompt</div>
+        <div class="system">
+          "Bạn là <strong>chuyên gia tuyển dụng</strong>.<br>
+          Đánh giá mức độ phù hợp giữa CV và JD.<br>
+          Trả về JSON với <strong>overallScore</strong> từ 0–100,<br>
+          danh sách keyword khớp và keyword thiếu."
+        </div>
+        <div class="user-msg">
+          <strong>User:</strong> === CV === Frontend Developer, 3 năm React...<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=== JD === Tuyển Frontend, cần React, AWS...
+        </div>
+      </div>
+
+      <!-- JSON response -->
+      <div class="json-block">
+        <div class="label">Kết quả trả về</div>
+        <span class="jk">"overallScore"</span>: <span class="jn">78</span>,<br>
+        <span class="jk">"matchedKeywords"</span>: [<span class="ja">"React"</span>, <span class="ja">"TypeScript"</span>],<br>
+        <span class="jk">"missingKeywords"</span>:  [<span class="ja">"AWS"</span>, <span class="ja">"Node.js"</span>],<br>
+        <span class="jk">"reasoning"</span>: <span class="js">"Đủ kỹ năng frontend,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;thiếu kinh nghiệm backend"</span>
+      </div>
+
+      <div class="insight">
+        <strong>Tại sao production dùng LLM?</strong><br>
+        Embedding có AUC cao hơn nhưng chỉ ra một con số.<br>
+        LLM cho biết <strong>thiếu keyword gì</strong> → ứng viên biết cần bổ sung gì để tăng điểm. <span class="badge win">Giá trị thực tế</span>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

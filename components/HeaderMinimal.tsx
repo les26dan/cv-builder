@@ -53,9 +53,7 @@ export default function HeaderMinimal({
       if (savedLanguage && ['vi', 'en'].includes(savedLanguage)) {
         language = savedLanguage
       } else {
-        // Use language detection system
-        const detectedLanguage = detectLanguage()
-        language = detectedLanguage.language
+        language = 'vi'
         localStorage.setItem('okbuddy_language', language)
       }
       

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1e1e2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+  .slide {
+    background: #ffffff;
+    width: 1100px;
+    border-radius: 16px;
+    padding: 40px 48px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 21px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #3b82f6;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* Method header */
+  .method-header {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .gray-header   { background: #f1f5f9; border: 2px solid #94a3b8; }
+  .blue-header   { background: #dbeafe; border: 2px solid #3b82f6; }
+  .purple-header { background: #f5f3ff; border: 2px solid #8b5cf6; }
+
+  .method-name { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+  .gray-header   .method-name { color: #334155; }
+  .blue-header   .method-name { color: #1d4ed8; }
+  .purple-header .method-name { color: #6d28d9; }
+
+  .method-sub { font-size: 11px; }
+  .gray-header   .method-sub { color: #64748b; }
+  .blue-header   .method-sub { color: #3b82f6; }
+  .purple-header .method-sub { color: #8b5cf6; }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 4px; }
+
+  .step-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .step-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 26px;
+  }
+  .circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+  .gc { background: #64748b; }
+  .bc { background: #3b82f6; }
+  .pc { background: #8b5cf6; }
+
+  .vline {
+    width: 2px;
+    flex: 1;
+    min-height: 10px;
+    margin: 2px 0;
+  }
+  .gv { background: #e2e8f0; }
+  .bv { background: #bfdbfe; }
+  .pv { background: #ddd6fe; }
+
+  .step-content {
+    flex: 1;
+    padding-bottom: 12px;
+  }
+  .step-title {
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .gt { color: #475569; }
+  .bt { color: #1d4ed8; }
+  .pt { color: #6d28d9; }
+
+  .box {
+    border-radius: 7px;
+    padding: 9px 12px;
+    font-size: 11.5px;
+    line-height: 1.65;
+  }
+  .gbox { background: #f8fafc; border: 1px solid #e2e8f0; color: #334155; }
+  .bbox { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+  .pbox { background: #f5f3ff; border: 1px solid #ddd6fe; color: #4c1d95; }
+
+  .sub { font-size: 10.5px; color: #94a3b8; margin-top: 4px; font-style: italic; }
+
+  /* Result */
+  .result {
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .gresult { background: #f1f5f9; border: 2px solid #94a3b8; }
+  .bresult { background: #dbeafe; border: 2px solid #3b82f6; }
+  .presult { background: #f5f3ff; border: 2px solid #8b5cf6; }
+
+  .score { font-size: 32px; font-weight: 900; flex-shrink: 0; }
+  .gresult .score { color: #475569; }
+  .bresult .score { color: #1d4ed8; }
+  .presult .score { color: #6d28d9; }
+
+  .rdesc { font-size: 11px; line-height: 1.8; }
+  .gresult .rdesc { color: #334155; }
+  .bresult .rdesc { color: #1e3a8a; }
+  .presult .rdesc { color: #4c1d95; }
+
+  /* Bottom comparison */
+  .insight-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 2px dashed #e2e8f0;
+  }
+  .insight {
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 11.5px;
+    line-height: 1.8;
+  }
+  .gi { background: #f8fafc; border-left: 3px solid #94a3b8; color: #334155; }
+  .bi { background: #eff6ff; border-left: 3px solid #3b82f6; color: #1e3a8a; }
+  .pi { background: #f5f3ff; border-left: 3px solid #8b5cf6; color: #4c1d95; }
+  .insight strong { font-weight: 700; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 3px;
+  }
+  .win  { background: #dcfce7; color: #166534; }
+  .lose { background: #fee2e2; color: #991b1b; }
+  .neu  { background: #f1f5f9; color: #475569; }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <h1>Cách đo độ phù hợp giữa CV và JD — 3 phương pháp</h1>
+
+  <div class="three-col">
+
+    <!-- TF-IDF -->
+    <div>
+      <div class="method-header gray-header">
+        <div class="method-name">Phương pháp 1 — Đếm từ trùng</div>
+        <div class="method-sub">TF-IDF + Cosine Similarity</div>
+      </div>
+
+      <div class="steps">
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle gc">1</div>
+            <div class="vline gv"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title gt">Tách từ — bỏ từ thông dụng</div>
+            <div class="box gbox">
+              "Tôi có 3 năm kinh nghiệm React"<br>
+              → <strong>["kinh", "nghiem", "react"]</strong><br>
+              <span style="color:#94a3b8">bỏ: "tôi", "có", "năm"</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle gc">2</div>
+            <div class="vline gv"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title gt">Tính độ quan trọng từng từ</div>
+            <div class="box gbox">
+              "react" — nhiều JD dùng → ít quan trọng<br>
+              "aws" — ít JD dùng → <strong>quan trọng hơn</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle gc">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title gt">Đếm từ trùng CV ↔ JD</div>
+            <div class="box gbox">
+              CV:  react ✓ · typescript ✓ · aws ✗<br>
+              JD:  react ✓ · typescript ✓ · aws ✗<br>
+              → Trùng 2/3 → <strong>điểm cao</strong>
+            </div>
+            <div class="sub">Từ khác nhau dù nghĩa giống → không tính</div>
+          </div>
+        </div>
+
+        <div class="result gresult">
+          <div class="score">61</div>
+          <div class="rdesc">
+            <strong>61 / 100</strong><br>
+            ≥ ngưỡng 5 → ✓ Phù hợp<br>
+            <span style="color:#94a3b8">Nhanh &lt; 1ms · Chi phí $0</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Embedding -->
+    <div>
+      <div class="method-header blue-header">
+        <div class="method-name">Phương pháp 2 — Hiểu nghĩa</div>
+        <div class="method-sub">OpenAI Embedding · 1536 chiều</div>
+      </div>
+
+      <div class="steps">
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle bc">1</div>
+            <div class="vline bv"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title bt">Gửi toàn bộ text lên OpenAI</div>
+            <div class="box bbox">
+              "Tôi có 3 năm kinh nghiệm React..."<br>
+              → OpenAI <strong>hiểu ý nghĩa</strong> cả câu<br>
+              <span style="color:#93c5fd">không tách từ, không đếm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle bc">2</div>
+            <div class="vline bv"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title bt">Nhận về vector — "tọa độ ý nghĩa"</div>
+            <div class="box bbox">
+              CV → [0.023, −0.187, 0.341, <span style="color:#93c5fd">...1536 số</span>]<br>
+              JD → [0.019, −0.201, 0.318, <span style="color:#93c5fd">...1536 số</span>]<br>
+              Nghĩa giống → <strong>tọa độ gần nhau</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle bc">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title bt">Đo góc giữa 2 vector</div>
+            <div class="box bbox">
+              Góc nhỏ = ý nghĩa gần = điểm cao<br>
+              "Frontend" ≈ "UI Engineer" → góc nhỏ ✓<br>
+              "Frontend" ≈ "Kế toán" → góc lớn ✗
+            </div>
+            <div class="sub">Hiểu nghĩa dù dùng từ khác nhau</div>
+          </div>
+        </div>
+
+        <div class="result bresult">
+          <div class="score">73</div>
+          <div class="rdesc">
+            <strong>73 / 100</strong><br>
+            ≥ ngưỡng 40 → ✓ Phù hợp<br>
+            <span style="color:#3b82f6">ROC-AUC 0.766 — cao nhất</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LLM -->
+    <div>
+      <div class="method-header purple-header">
+        <div class="method-name">Phương pháp 3 — Nhờ AI suy luận</div>
+        <div class="method-sub">GPT-4o-mini · temperature=0</div>
+      </div>
+
+      <div class="steps">
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle pc">1</div>
+            <div class="vline pv"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title pt">Gửi CV + JD kèm hướng dẫn chấm điểm</div>
+            <div class="box pbox">
+              "Bạn là chuyên gia tuyển dụng.<br>
+              Đánh giá CV sau với JD sau.<br>
+              Trả về JSON: điểm, lý do..."
+            </div>
+            <div class="sub">GPT đọc toàn bộ, suy luận như người thật</div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle pc">2</div>
+            <div class="vline pv"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title pt">GPT suy luận và trả về JSON</div>
+            <div class="box pbox">
+              overallScore: <strong>78</strong><br>
+              matched: ["React", "TypeScript"]<br>
+              missing: ["Node.js", "AWS"]<br>
+              reasoning: "Đủ frontend, thiếu backend"
+            </div>
+          </div>
+        </div>
+
+        <div class="step-row">
+          <div class="step-connector">
+            <div class="circle pc">3</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title pt">Lấy điểm và giải thích</div>
+            <div class="box pbox">
+              Điểm: <strong>78</strong> / 100<br>
+              Thiếu: Node.js, AWS<br>
+              → Ứng viên biết cần bổ sung gì
+            </div>
+            <div class="sub">Phương pháp duy nhất giải thích được lý do</div>
+          </div>
+        </div>
+
+        <div class="result presult">
+          <div class="score">78</div>
+          <div class="rdesc">
+            <strong>78 / 100</strong><br>
+            ≥ ngưỡng 50 → ✓ Phù hợp<br>
+            <span style="color:#8b5cf6">F1 = 0.717 — cao nhất · ~2.5 giây</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom comparison -->
+  <div class="insight-row">
+    <div class="insight gi">
+      <strong>TF-IDF:</strong> "ReactJS" ≠ "React" <span class="badge lose">Bỏ sót</span><br>
+      Không giải thích được lý do <span class="badge lose">Không</span><br>
+      Tốc độ cực nhanh, miễn phí <span class="badge win">$0 · &lt;1ms</span>
+    </div>
+    <div class="insight bi">
+      <strong>Embedding:</strong> "ReactJS" ≈ "React" <span class="badge win">Hiểu đúng</span><br>
+      Không giải thích được lý do <span class="badge lose">Không</span><br>
+      Phân biệt CV tốt nhất <span class="badge win">AUC 0.766</span>
+    </div>
+    <div class="insight pi">
+      <strong>LLM:</strong> Hiểu ngữ cảnh sâu nhất <span class="badge win">Tốt nhất</span><br>
+      Giải thích chi tiết keyword nào thiếu <span class="badge win">Có</span><br>
+      Chậm ~2.5 giây, tốn chi phí <span class="badge neu">$0.28/1000</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

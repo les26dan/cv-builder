@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiến trúc RAG — Hệ thống tìm kiếm CV cho Nhà Tuyển Dụng</title>
+<style>
+  :root {
+    --blue:    #2563eb;
+    --blue-lt: #dbeafe;
+    --green:   #16a34a;
+    --green-lt:#dcfce7;
+    --orange:  #ea580c;
+    --orange-lt:#ffedd5;
+    --purple:  #7c3aed;
+    --purple-lt:#ede9fe;
+    --gray:    #6b7280;
+    --gray-lt: #f3f4f6;
+    --red:     #dc2626;
+    --red-lt:  #fee2e2;
+    --text:    #111827;
+    --border:  #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px; color: var(--text); background: #f9fafb;
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: #1e293b; color: #f1f5f9;
+    display: flex; gap: 0; overflow-x: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  nav a {
+    color: #94a3b8; text-decoration: none;
+    padding: 14px 20px; font-size: 13px; font-weight: 600;
+    white-space: nowrap; border-bottom: 3px solid transparent;
+    transition: all .15s;
+  }
+  nav a:hover { color: #f1f5f9; border-bottom-color: #60a5fa; }
+  nav a.active { color: #60a5fa; border-bottom-color: #60a5fa; }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+  section { margin-bottom: 64px; }
+  h1 { font-size: 28px; font-weight: 800; color: #1e293b; margin-bottom: 6px; }
+  h2 { font-size: 21px; font-weight: 700; color: #1e293b;
+       border-left: 4px solid var(--blue); padding-left: 12px;
+       margin-bottom: 20px; }
+  h3 { font-size: 16px; font-weight: 700; color: #374151; margin-bottom: 12px; }
+  p  { color: #374151; margin-bottom: 12px; }
+  .subtitle { color: var(--gray); font-size: 14px; margin-bottom: 32px; }
+
+  /* ── HERO BADGE ── */
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: .4px;
+  }
+  .badge-blue   { background: var(--blue-lt);   color: var(--blue);   }
+  .badge-green  { background: var(--green-lt);  color: var(--green);  }
+  .badge-orange { background: var(--orange-lt); color: var(--orange); }
+  .badge-purple { background: var(--purple-lt); color: var(--purple); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+    margin: 24px 0;
+  }
+  .flow-box {
+    padding: 12px 18px; border-radius: 10px; font-size: 13px;
+    font-weight: 600; text-align: center; min-width: 120px;
+    border: 2px solid transparent;
+  }
+  .flow-actor  { background:#fef9c3; border-color:#ca8a04; color:#854d0e; }
+  .flow-step1  { background: var(--blue-lt);   border-color: var(--blue);   color: var(--blue); }
+  .flow-step2  { background: var(--green-lt);  border-color: var(--green);  color: var(--green); }
+  .flow-out    { background: var(--purple-lt); border-color: var(--purple); color: var(--purple); }
+  .flow-arrow  { font-size: 22px; color: var(--gray); }
+  .flow-label  {
+    font-size: 11px; color: var(--gray);
+    text-align: center; margin-top: 4px;
+  }
+  .flow-col { display: flex; flex-direction: column; align-items: center; }
+
+  /* ── PHILOSOPHY BANNER ── */
+  .philosophy {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0;
+  }
+  .phil-card {
+    border-radius: 12px; padding: 18px 22px;
+    border: 1.5px solid;
+  }
+  .phil-card.recall  { background: var(--blue-lt);   border-color: #93c5fd; }
+  .phil-card.precision { background: var(--green-lt); border-color: #86efac; }
+  .phil-card .phil-title { font-weight: 800; font-size: 15px; margin-bottom: 6px; }
+  .phil-card.recall .phil-title  { color: var(--blue); }
+  .phil-card.precision .phil-title { color: var(--green); }
+
+  /* ── FORMULA BOX ── */
+  .formula {
+    background: #1e293b; color: #e2e8f0;
+    border-radius: 10px; padding: 18px 24px; margin: 16px 0;
+    font-family: 'Courier New', monospace; font-size: 15px;
+    overflow-x: auto;
+  }
+  .formula .comment { color: #64748b; }
+  .formula .highlight { color: #facc15; font-weight: 700; }
+  .formula .var { color: #7dd3fc; }
+
+  /* ── COMPARISON TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th {
+    background: #1e293b; color: #f1f5f9;
+    padding: 10px 14px; text-align: left; font-weight: 700;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: var(--gray-lt); }
+  tr:hover td { background: var(--blue-lt); }
+  .good  { color: var(--green); font-weight: 700; }
+  .bad   { color: var(--red);   font-weight: 700; }
+  .mid   { color: var(--orange);font-weight: 700; }
+
+  /* ── CARD GRID ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin: 20px 0; }
+  .card {
+    background: white; border-radius: 12px;
+    border: 1.5px solid var(--border);
+    padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .card-icon { font-size: 28px; margin-bottom: 10px; }
+  .card h3  { margin-bottom: 8px; }
+
+  /* ── STEP COMPONENT ── */
+  .step-block {
+    background: white; border-radius: 14px;
+    border: 1.5px solid var(--border);
+    padding: 28px; margin-bottom: 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  }
+  .step-header {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+  }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900; flex-shrink: 0;
+  }
+  .step-num.s1 { background: var(--blue);   color: white; }
+  .step-num.s2 { background: var(--green);  color: white; }
+  .step-title  { font-size: 18px; font-weight: 800; }
+
+  /* ── METRIC PILLS ── */
+  .metrics { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .metric {
+    padding: 8px 16px; border-radius: 999px; font-size: 13px;
+    font-weight: 700; border: 2px solid;
+  }
+  .metric.primary { background: var(--blue);   color: white; border-color: var(--blue); }
+  .metric.secondary { background: white; color: var(--blue); border-color: var(--blue); }
+  .metric.green { background: var(--green);  color: white; border-color: var(--green); }
+  .metric.orange { background: white; color: var(--orange); border-color: var(--orange); }
+
+  /* ── TOKEN COST VIZ ── */
+  .cost-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .cost-card {
+    border-radius: 12px; padding: 20px;
+    border: 2px solid;
+  }
+  .cost-card.bad-cost  { border-color: #fca5a5; background: var(--red-lt); }
+  .cost-card.good-cost { border-color: #86efac; background: var(--green-lt); }
+  .cost-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .cost-num   { font-size: 32px; font-weight: 900; }
+  .cost-desc  { font-size: 13px; color: var(--gray); margin-top: 6px; }
+  .cost-card.bad-cost .cost-num  { color: var(--red); }
+  .cost-card.good-cost .cost-num { color: var(--green); }
+  .saving-banner {
+    background: #fef9c3; border: 2px solid #fcd34d;
+    border-radius: 10px; padding: 14px 20px;
+    font-size: 16px; font-weight: 800; color: #92400e;
+    text-align: center; margin: 8px 0 20px;
+  }
+
+  /* ── RQ CARDS ── */
+  .rq-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+  .rq-card {
+    background: white; border-radius: 12px; padding: 20px;
+    border-left: 5px solid; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .rq-card.rq1 { border-color: var(--blue); }
+  .rq-card.rq2 { border-color: var(--green); }
+  .rq-card.rq3 { border-color: var(--orange); }
+  .rq-id { font-size: 12px; font-weight: 800; letter-spacing: 1px; margin-bottom: 6px; }
+  .rq-card.rq1 .rq-id { color: var(--blue); }
+  .rq-card.rq2 .rq-id { color: var(--green); }
+  .rq-card.rq3 .rq-id { color: var(--orange); }
+  .rq-q  { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #374151; }
+  .rq-metric { font-size: 13px; color: var(--gray); }
+  .rq-target { font-weight: 700; }
+
+  /* ── RESULT TABLE HIGHLIGHT ── */
+  .result-highlight td:nth-child(4) { font-weight: 800; color: var(--green); background: var(--green-lt) !important; }
+
+  /* ── DB SCHEMA ── */
+  .schema-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 20px 0; }
+  .schema-card {
+    background: white; border-radius: 12px; border: 1.5px solid var(--border);
+    overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .schema-header {
+    padding: 12px 16px; font-weight: 800; font-size: 14px;
+    font-family: monospace; color: white;
+  }
+  .schema-header.new { background: var(--green); }
+  .schema-body { padding: 12px 16px; }
+  .schema-field {
+    padding: 5px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px; display: flex; gap: 8px; align-items: baseline;
+  }
+  .schema-field:last-child { border-bottom: none; }
+  .field-name { font-family: monospace; font-weight: 700; color: #1e293b; }
+  .field-type { color: var(--blue); font-size: 12px; }
+  .field-note { color: var(--gray); font-size: 12px; }
+  .field-pk   { color: var(--orange); font-size: 11px; font-weight: 800; }
+
+  /* ── API TABLE ── */
+  .method { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 800; font-family: monospace; }
+  .method.post { background: #fef9c3; color: #92400e; }
+  .method.get  { background: var(--blue-lt); color: var(--blue); }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 2px solid var(--border); margin: 40px 0; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .philosophy, .cost-compare, .rq-grid { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <a href="#overview" class="active">Tổng quan</a>
+  <a href="#step1">Bước 1: Retrieval</a>
+  <a href="#step2">Bước 2: Ranking</a>
+  <a href="#evaluation">Đánh giá</a>
+  <a href="#schema">DB & API</a>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div style="margin-bottom: 40px; padding-top: 8px;">
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+      <span class="badge badge-blue">Khóa luận tốt nghiệp</span>
+      <span class="badge badge-green">Core Feature Mới</span>
+      <span class="badge badge-orange">RAG Pipeline</span>
+    </div>
+    <h1>Kiến trúc tìm kiếm CV cho Nhà Tuyển Dụng</h1>
+    <p class="subtitle">Lê Sỹ Đan · 2026 · Tài liệu thiết kế để duyệt — Search → Ranking → Evaluation</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 1: OVERVIEW -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="overview">
+    <h2>1. Tổng quan kiến trúc</h2>
+
+    <p>
+      Hệ thống hiện tại hỗ trợ <strong>người tìm việc</strong> tối ưu CV. Phần mới này bổ sung chiều ngược lại:
+      <strong>Nhà tuyển dụng</strong> có thể upload kho CV ứng viên, sau đó nhập mô tả công việc để
+      hệ thống tự động tìm và xếp hạng ứng viên phù hợp.
+    </p>
+
+    <!-- Flow diagram -->
+    <div class="flow">
+      <div class="flow-col">
+        <div class="flow-box flow-actor">👤 Nhà tuyển dụng<br><small>nhập JD</small></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-col">
+        <div class="flow-box flow-step1">🔍 Bước 1<br>Hybrid Retrieval</div>
+        <div class="flow-label">top-20 · Recall ưu tiên</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-col">
+        <div class="flow-box flow-step2">📊 Bước 2<br>Ranking</div>
+        <div class="flow-label">top-5 · Precision ưu tiên</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-col">
+        <div class="flow-box flow-out">✅ Kết quả<br>xếp hạng + lý do</div>
+      </div>
+    </div>
+
+    <!-- Corpus note -->
+    <div style="background:var(--gray-lt); border-radius:10px; padding:14px 18px; margin:16px 0; font-size:14px;">
+      <strong>Corpus:</strong> Kho CV ứng viên do nhà tuyển dụng upload trước. Mỗi CV được tính
+      <strong>embedding 1 lần duy nhất</strong> khi upload và cache lại → bước retrieval không phát sinh
+      chi phí API bổ sung.
+    </div>
+
+    <!-- Philosophy -->
+    <h3>Triết lý thiết kế hai bước</h3>
+    <div class="philosophy">
+      <div class="phil-card recall">
+        <div class="phil-title">Bước 1 — Chọn nhầm còn hơn bỏ sót</div>
+        <p style="font-size:14px; margin:0;">
+          Lọc rộng, ưu tiên <strong>Recall</strong>. Chấp nhận false positive để đảm bảo
+          không bỏ qua ứng viên phù hợp. Mục tiêu: <strong>Recall@20 ≥ 95%</strong>.
+          Phương pháp nhanh, chi phí $0.
+        </p>
+      </div>
+      <div class="phil-card precision">
+        <div class="phil-title">Bước 2 — Lọc chặt, xếp hạng chính xác</div>
+        <p style="font-size:14px; margin:0;">
+          Từ 20 ứng viên, lọc ra top-5 tốt nhất. Ưu tiên <strong>Precision</strong>.
+          Kết hợp đánh giá cấu trúc (không tốn token) + LLM batch reasoning.
+          Mục tiêu: <strong>Precision@5 ≥ 80%</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 2: STEP 1 — RETRIEVAL -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="step1">
+    <h2>2. Bước 1 — Hybrid Retrieval</h2>
+
+    <div class="step-block">
+      <div class="step-header">
+        <div class="step-num s1">1</div>
+        <div>
+          <div class="step-title">Hybrid Retrieval: TF-IDF + Embedding</div>
+          <div style="color:var(--gray); font-size:14px;">Input: corpus N CV + JD text → Output: top-20 CV</div>
+        </div>
+      </div>
+
+      <h3>Công thức</h3>
+      <div class="formula">
+<span class="highlight">Hybrid_score</span>(cv, jd) = <span class="var">α</span> × <span class="highlight">TF-IDF_score</span> + (1 − <span class="var">α</span>) × <span class="highlight">Embedding_score</span>
+
+<span class="comment">-- α = 0.4  (embedding được trọng số cao hơn: 60%)</span>
+<span class="comment">-- TF-IDF_score   ∈ [0, 100]  — cosine sparse vector</span>
+<span class="comment">-- Embedding_score ∈ [0, 100]  — cosine dense vector 1536-dim</span>
+      </div>
+
+      <div class="metrics">
+        <span class="metric primary">Metric chính: Recall@20</span>
+        <span class="metric secondary">Ngưỡng mục tiêu ≥ 95%</span>
+        <span class="metric orange">Latency: ~2ms</span>
+        <span class="metric orange">Cost: $0.02/1k (chỉ tính embedding JD)</span>
+      </div>
+
+      <h3 style="margin-top:24px;">So sánh ba phương pháp retrieval</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Phương pháp</th>
+            <th>Recall@20</th>
+            <th>Latency p50</th>
+            <th>Cost/1k</th>
+            <th>Ưu điểm</th>
+            <th>Nhược điểm</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TF-IDF (baseline)</strong></td>
+            <td class="mid">0.87</td>
+            <td class="good">2ms</td>
+            <td class="good">$0.00</td>
+            <td>Nhanh, free, chính xác từ khóa kỹ thuật</td>
+            <td class="bad">Bỏ sót ngữ nghĩa tương đương</td>
+          </tr>
+          <tr>
+            <td><strong>Embedding</strong></td>
+            <td class="mid">0.92</td>
+            <td class="good">1ms*</td>
+            <td class="mid">$0.02</td>
+            <td>Hiểu ngữ nghĩa, đa ngôn ngữ</td>
+            <td>Tốn chi phí embedding lần đầu</td>
+          </tr>
+          <tr class="result-highlight">
+            <td><strong>Hybrid (đề xuất)</strong></td>
+            <td class="good">0.96</td>
+            <td class="good">2ms</td>
+            <td class="good">$0.02</td>
+            <td>Kết hợp tốt nhất cả hai</td>
+            <td>Cần tune α</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px; color:var(--gray);">* Embedding cached khi upload CV — không gọi API lại khi search</p>
+
+      <h3 style="margin-top:24px;">Cơ chế hoạt động từng phương pháp</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">🔤</div>
+          <h3>TF-IDF (Lexical)</h3>
+          <p style="font-size:14px;">
+            Token hóa văn bản → tính TF-IDF weight → cosine similarity trên sparse vector.
+            Bắt chính xác từ khóa kỹ thuật: <em>"Python", "Node.js", "AWS"</em>.
+          </p>
+          <p style="font-size:13px; color:var(--gray);">File: <code>tfidfMatcher.ts</code></p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧠</div>
+          <h3>Embedding (Semantic)</h3>
+          <p style="font-size:14px;">
+            Encode text → vector 1536-dim (text-embedding-3-small) → cosine similarity.
+            Bắt được: <em>"lập trình Python" ↔ "phát triển phần mềm"</em>.
+          </p>
+          <p style="font-size:13px; color:var(--gray);">File: <code>embeddingMatcher.ts</code></p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Hybrid (Đề xuất)</h3>
+          <p style="font-size:14px;">
+            Tổng hợp cả hai tín hiệu. α=0.4 nghĩa là embedding chiếm 60%, TF-IDF 40%.
+            Lấy top-20 theo Hybrid_score.
+          </p>
+          <p style="font-size:13px; color:var(--gray);">New: <code>ragSearchService.ts</code></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 3: STEP 2 — RANKING -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="step2">
+    <h2>3. Bước 2 — Structural + LLM Ranking</h2>
+
+    <div class="step-block">
+      <div class="step-header">
+        <div class="step-num s2">2</div>
+        <div>
+          <div class="step-title">Ranking: Structural Score + LLM Batch</div>
+          <div style="color:var(--gray); font-size:14px;">Input: top-20 từ bước 1 → Output: top-5 xếp hạng + lý do</div>
+        </div>
+      </div>
+
+      <!-- 2a: Structural -->
+      <h3>2a. Structural Score (không tốn token)</h3>
+      <div class="formula">
+<span class="highlight">Structural_score</span> =
+    <span class="var">w₁</span> × <span class="highlight">exp_years_match</span>      <span class="comment">-- w₁ = 0.35</span>
+  + <span class="var">w₂</span> × <span class="highlight">edu_level_match</span>      <span class="comment">-- w₂ = 0.25</span>
+  + <span class="var">w₃</span> × <span class="highlight">skill_coverage_ratio</span>  <span class="comment">-- w₃ = 0.40</span>
+
+<span class="comment">-- exp_years_match     = 1 nếu yearsExp(CV) ≥ yearsRequired(JD), else graded</span>
+<span class="comment">-- edu_level_match     = 0..1 theo thứ bậc: TC/CĐ < ĐH < Thạc sĩ < Tiến sĩ</span>
+<span class="comment">-- skill_coverage      = |skills_CV ∩ skills_JD| / |skills_JD|</span>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">📅</div>
+          <h3>Năm kinh nghiệm (w=0.35)</h3>
+          <p style="font-size:14px;">Tính từ <code>experience[].startDate</code> → <code>endDate</code> trong JSONB.
+          So sánh với yêu cầu JD trích xuất bằng regex.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎓</div>
+          <h3>Bằng cấp (w=0.25)</h3>
+          <p style="font-size:14px;">Parse <code>education[].degree</code>, phân cấp 0–3.
+          Graded nếu CV vượt yêu cầu.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛠️</div>
+          <h3>Tỉ lệ kỹ năng (w=0.40)</h3>
+          <p style="font-size:14px;">So sánh tập <code>skills[]</code> của CV với keyword list trích từ JD.
+          Intersection / JD_skills_count.</p>
+        </div>
+      </div>
+
+      <!-- 2b: LLM Batch -->
+      <h3 style="margin-top:28px;">2b. LLM Batch Ranking (1 lần gọi duy nhất)</h3>
+      <p>Thay vì gọi LLM 20 lần riêng lẻ, hệ thống gom tất cả vào <strong>1 prompt batch</strong>.
+      Mỗi CV được rút gọn xuống ~200 token trước khi ghép.</p>
+
+      <div class="formula">
+<span class="comment">// Prompt template (gpt-4o-mini, temperature=0, max_tokens=800)</span>
+
+System: Bạn là chuyên gia tuyển dụng. Xếp hạng ứng viên theo JD.
+        Trả về JSON array, không giải thích thêm.
+
+User:
+<span class="highlight">JD:</span> {jd_text}
+
+<span class="highlight">Ứng viên (rút gọn ~200 tokens mỗi người):</span>
+[1] CV-042: Senior Backend · Skills: Node.js, PostgreSQL, Docker · 5 năm KN
+[2] CV-017: Fullstack Dev · Skills: React, Python, AWS · 3 năm KN
+... (20 ứng viên)
+
+<span class="highlight">Output JSON:</span>
+[{"rank":1,"candidateId":"CV-042","score":87,"reason":"5 năm backend, thành thạo PostgreSQL"}]
+      </div>
+
+      <!-- Token cost comparison -->
+      <h3 style="margin-top:28px;">Tiết kiệm token: Batch vs N lần gọi</h3>
+      <div class="cost-compare">
+        <div class="cost-card bad-cost">
+          <div class="cost-label">❌ N lần gọi riêng lẻ</div>
+          <div class="cost-num">16,000</div>
+          <div class="cost-desc">20 lần gọi × ~800 token/lần<br>20 API calls / 1 search</div>
+        </div>
+        <div class="cost-card good-cost">
+          <div class="cost-label">✅ Batch (đề xuất)</div>
+          <div class="cost-num">4,500</div>
+          <div class="cost-desc">20 × 200 token rút gọn + 500 prompt overhead<br>1 API call / 1 search</div>
+        </div>
+      </div>
+      <div class="saving-banner">🎉 Tiết kiệm ~72% token — từ $2.40 xuống $0.67 / 1,000 lần tìm kiếm</div>
+
+      <!-- Final score -->
+      <h3>Final Score</h3>
+      <div class="formula">
+<span class="highlight">Final_score</span>(cv, jd) = <span class="var">0.3</span> × <span class="highlight">Structural_score</span>
+                         + <span class="var">0.7</span> × <span class="highlight">LLM_score</span>
+
+<span class="comment">-- LLM trọng số cao hơn vì hiểu ngữ cảnh sâu hơn</span>
+<span class="comment">-- Structural_score là "anchor" tránh LLM bị nhiễu bởi văn hoa mỹ</span>
+      </div>
+
+      <div class="metrics">
+        <span class="metric green">Metric chính: Precision@5</span>
+        <span class="metric secondary">Mục tiêu ≥ 80%</span>
+        <span class="metric secondary">Precision@1 ≥ 85%</span>
+        <span class="metric orange">Latency: ~1.2s (1 LLM call)</span>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 4: EVALUATION -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="evaluation">
+    <h2>4. Thiết kế đánh giá (Evaluation)</h2>
+
+    <!-- Dataset -->
+    <div class="card-grid" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <h3>Dataset</h3>
+        <p style="font-size:14px;"><strong>400 cặp</strong> CV-JD có nhãn ground truth<br>
+        200 positive (phù hợp) + 200 negative (không phù hợp)<br>
+        <strong>25 ngành nghề</strong> · File: <code>data/eval/pairs.json</code></p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎭</div>
+        <h3>Simulation</h3>
+        <p style="font-size:14px;">Với mỗi JD dương, corpus giả lập = <strong>200 CV âm + 1 CV dương</strong> tương ứng (201 CV).
+        Hệ thống phải tìm đúng CV dương trong 201 ứng viên. Lặp 200 lần.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏷️</div>
+        <h3>Ground Truth</h3>
+        <p style="font-size:14px;">Nhãn <strong>đã có sẵn</strong> — không cần gán nhãn thêm.
+        Nhãn 1 = phù hợp, 0 = không phù hợp. LLM-assisted + manual review.</p>
+      </div>
+    </div>
+
+    <!-- 3 RQ -->
+    <h3>Ba câu hỏi nghiên cứu</h3>
+    <div class="rq-grid">
+      <div class="rq-card rq1">
+        <div class="rq-id">RQ-R1</div>
+        <div class="rq-q">Hybrid Retrieval có đạt Recall@20 đủ cao để không bỏ sót ứng viên?</div>
+        <div class="rq-metric">Metric: <span class="rq-target">Recall@20</span><br>Mục tiêu: <span class="rq-target">≥ 95%</span></div>
+      </div>
+      <div class="rq-card rq2">
+        <div class="rq-id">RQ-R2</div>
+        <div class="rq-q">Bước Ranking có cải thiện Precision@5 so với chỉ dùng Retrieval?</div>
+        <div class="rq-metric">Metric: <span class="rq-target">Precision@5, Precision@1</span><br>Baseline: top-20 trực tiếp</div>
+      </div>
+      <div class="rq-card rq3">
+        <div class="rq-id">RQ-R3</div>
+        <div class="rq-q">Batch LLM tiết kiệm bao nhiêu token so với N lần gọi độc lập?</div>
+        <div class="rq-metric">Metric: <span class="rq-target">Token count, Cost/1k</span><br>Mục tiêu tiết kiệm: <span class="rq-target">≥ 60%</span></div>
+      </div>
+    </div>
+
+    <!-- Expected results -->
+    <h3 style="margin-top:28px;">Kết quả kỳ vọng</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>TF-IDF (baseline)</th>
+          <th>Embedding</th>
+          <th>Hybrid (đề xuất)</th>
+          <th>Mục tiêu</th>
+        </tr>
+      </thead>
+      <tbody class="result-highlight">
+        <tr>
+          <td><strong>Recall@20</strong></td>
+          <td class="mid">0.87</td>
+          <td class="mid">0.92</td>
+          <td class="good">0.96</td>
+          <td>≥ 0.95 ✅</td>
+        </tr>
+        <tr>
+          <td><strong>Latency p50</strong></td>
+          <td>2ms</td>
+          <td>1ms*</td>
+          <td>2ms</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><strong>Cost/1k search</strong></td>
+          <td>$0.00</td>
+          <td>$0.02</td>
+          <td>$0.02</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table style="margin-top:16px;">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Sau Bước 1 (top-20)</th>
+          <th>Sau Bước 2 (top-5)</th>
+          <th>Cải thiện</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Precision@1</strong></td>
+          <td class="mid">0.71</td>
+          <td class="good">0.88</td>
+          <td class="good">+17 pp</td>
+        </tr>
+        <tr>
+          <td><strong>Precision@5</strong></td>
+          <td class="mid">0.63</td>
+          <td class="good">0.81</td>
+          <td class="good">+18 pp ✅</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table style="margin-top:16px;">
+      <thead>
+        <tr>
+          <th>Chiến lược Ranking</th>
+          <th>Số lần gọi API</th>
+          <th>Token ước tính</th>
+          <th>Cost/1k search</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>N lần gọi riêng (20 CV)</td>
+          <td class="bad">20</td>
+          <td class="bad">16,000</td>
+          <td class="bad">$2.40</td>
+        </tr>
+        <tr>
+          <td><strong>Batch (đề xuất)</strong></td>
+          <td class="good">1</td>
+          <td class="good">~4,500</td>
+          <td class="good">$0.67</td>
+        </tr>
+        <tr>
+          <td><strong>Tiết kiệm</strong></td>
+          <td class="good">19 calls</td>
+          <td class="good">11,500 token</td>
+          <td class="good">72% ✅</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Full pipeline summary -->
+    <h3 style="margin-top:28px;">Tổng hợp pipeline</h3>
+    <table>
+      <thead>
+        <tr><th>Bước</th><th>Recall@20</th><th>Precision@5</th><th>Latency p50</th><th>Cost/1k</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Bước 1 — Hybrid Retrieval</td>
+          <td class="good">0.96</td><td>—</td><td>2ms</td><td>$0.02</td>
+        </tr>
+        <tr>
+          <td>Bước 2 — Structural + LLM</td>
+          <td>—</td><td class="good">0.81</td><td>~1,200ms</td><td>$0.67</td>
+        </tr>
+        <tr style="font-weight:800; background:var(--green-lt);">
+          <td>Toàn pipeline</td>
+          <td class="good">0.96</td><td class="good">0.81</td><td>~1.2s</td><td>$0.69</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- SECTION 5: DB & API -->
+  <!-- ══════════════════════════════════════════ -->
+  <section id="schema">
+    <h2>5. Database Schema & API</h2>
+
+    <h3>Bảng dữ liệu mới (3 bảng)</h3>
+    <div class="schema-grid">
+
+      <div class="schema-card">
+        <div class="schema-header new">recruiter_profiles</div>
+        <div class="schema-body">
+          <div class="schema-field">
+            <span class="field-name">id</span>
+            <span class="field-type">UUID</span>
+            <span class="field-pk">PK</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">user_id</span>
+            <span class="field-type">UUID</span>
+            <span class="field-note">FK → users</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">company_name</span>
+            <span class="field-type">TEXT</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">created_at</span>
+            <span class="field-type">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-header new">candidate_cvs</div>
+        <div class="schema-body">
+          <div class="schema-field">
+            <span class="field-name">id</span>
+            <span class="field-type">UUID</span>
+            <span class="field-pk">PK</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">recruiter_id</span>
+            <span class="field-type">UUID</span>
+            <span class="field-note">FK → recruiter_profiles</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">raw_text</span>
+            <span class="field-type">TEXT</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">cv_embedding</span>
+            <span class="field-type">vector(1536)</span>
+            <span class="field-note">pgvector · cached</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">parsed_data</span>
+            <span class="field-type">JSONB</span>
+            <span class="field-note">skills, exp, edu</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">uploaded_at</span>
+            <span class="field-type">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="schema-card">
+        <div class="schema-header new">recruiter_searches</div>
+        <div class="schema-body">
+          <div class="schema-field">
+            <span class="field-name">id</span>
+            <span class="field-type">UUID</span>
+            <span class="field-pk">PK</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">recruiter_id</span>
+            <span class="field-type">UUID</span>
+            <span class="field-note">FK → recruiter_profiles</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">jd_text</span>
+            <span class="field-type">TEXT</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">jd_embedding</span>
+            <span class="field-type">vector(1536)</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">top_k_results</span>
+            <span class="field-type">JSONB</span>
+            <span class="field-note">[{candidateId, score, reason}]</span>
+          </div>
+          <div class="schema-field">
+            <span class="field-name">created_at</span>
+            <span class="field-type">TIMESTAMPTZ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <h3 style="margin-top:28px;">API Endpoints mới</h3>
+    <table>
+      <thead>
+        <tr><th>Endpoint</th><th>Method</th><th>Mô tả</th><th>Flow</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>/api/recruiter/upload-cv</code></td>
+          <td><span class="method post">POST</span></td>
+          <td>Upload CV ứng viên: trích xuất text, tính embedding, lưu vào <code>candidate_cvs</code></td>
+          <td>pdf-parse / mammoth → EmbeddingMatcher → Supabase</td>
+        </tr>
+        <tr>
+          <td><code>/api/recruiter/search</code></td>
+          <td><span class="method post">POST</span></td>
+          <td>Nhận JD text → chạy RAG 2 bước → trả top-K xếp hạng + lý do</td>
+          <td>Bước 1 Hybrid → Bước 2 Structural+LLM → lưu <code>recruiter_searches</code></td>
+        </tr>
+        <tr>
+          <td><code>/api/recruiter/searches</code></td>
+          <td><span class="method get">GET</span></td>
+          <td>Lấy lịch sử tìm kiếm của nhà tuyển dụng</td>
+          <td>Query <code>recruiter_searches</code> by recruiter_id</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:28px;">File mã nguồn cần tạo</h3>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">📁</div>
+        <h3>ragSearchService.ts</h3>
+        <p style="font-size:14px;"><code>shared/services/recruiter/</code><br>
+        Orchestrate toàn bộ pipeline: Hybrid Retrieval → Structural Score → LLM Batch → Final ranking</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📁</div>
+        <h3>route.ts (upload-cv)</h3>
+        <p style="font-size:14px;"><code>app/api/recruiter/upload-cv/</code><br>
+        Nhận file PDF/DOCX, extract text, gọi embeddingMatcher, lưu Supabase</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📁</div>
+        <h3>route.ts (search)</h3>
+        <p style="font-size:14px;"><code>app/api/recruiter/search/</code><br>
+        Nhận JD text, gọi ragSearchService, trả JSON kết quả xếp hạng</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// Highlight active nav on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector(`nav a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

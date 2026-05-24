@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1e1e2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px;
+  }
+  .slide {
+    background: #ffffff;
+    width: 980px;
+    border-radius: 16px;
+    padding: 40px 50px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid #3b82f6;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .method-title {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .gray-title   { background: #f1f5f9; color: #475569; }
+  .blue-title   { background: #dbeafe; color: #1d4ed8; }
+
+  /* Flow steps */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 32px;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+  .gray-num  { background: #64748b; }
+  .blue-num  { background: #3b82f6; }
+
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 16px;
+    margin: 3px 0;
+  }
+  .gray-line { background: #e2e8f0; }
+  .blue-line { background: #bfdbfe; }
+
+  .step-body {
+    padding-bottom: 18px;
+    flex: 1;
+  }
+  .step-label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .gray-label { color: #475569; }
+  .blue-label { color: #1d4ed8; }
+
+  .step-box {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11.5px;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+  }
+  .gray-box { background: #f8fafc; border: 1px solid #e2e8f0; color: #334155; }
+  .blue-box { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+
+  .step-note {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  /* result box */
+  .result-box {
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .gray-result { background: #f1f5f9; border: 2px solid #94a3b8; }
+  .blue-result { background: #dbeafe; border: 2px solid #3b82f6; }
+
+  .result-score {
+    font-size: 32px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .gray-result .result-score { color: #475569; }
+  .blue-result .result-score { color: #1d4ed8; }
+
+  .result-detail { font-size: 12px; line-height: 1.7; }
+  .gray-result .result-detail { color: #334155; }
+  .blue-result .result-detail { color: #1e3a8a; }
+
+  /* bottom comparison */
+  .diff-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .diff-card {
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .diff-gray   { background: #f8fafc; border-left: 3px solid #94a3b8; color: #334155; }
+  .diff-blue   { background: #eff6ff; border-left: 3px solid #3b82f6; color: #1e3a8a; }
+  .diff-title  { font-weight: 800; margin-bottom: 4px; }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tag-win  { background: #dcfce7; color: #166534; }
+  .tag-lose { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <h1>Cách tính điểm phù hợp — TF-IDF vs Embedding</h1>
+
+  <div class="two-col">
+
+    <!-- TF-IDF -->
+    <div>
+      <div class="method-title gray-title">Phương pháp 1 — TF-IDF</div>
+
+      <div class="flow">
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num gray-num">1</div>
+            <div class="step-line gray-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label gray-label">Tách từ (Tokenize)</div>
+            <div class="step-box gray-box">
+              "React TypeScript 3 năm kinh nghiệm"<br>
+              → ["react", "typescript", "kinh", "nghiem"]
+            </div>
+            <div class="step-note">Bỏ stop words: "và", "của", "the", "a"...</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num gray-num">2</div>
+            <div class="step-line gray-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label gray-label">Tính TF — tần suất từ trong văn bản</div>
+            <div class="step-box gray-box">
+              "react" xuất hiện 3 lần / 50 từ → TF = 0.06<br>
+              "typescript" xuất hiện 2 lần / 50 từ → TF = 0.04
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num gray-num">3</div>
+            <div class="step-line gray-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label gray-label">Tính IDF — độ hiếm trên 676 JD</div>
+            <div class="step-box gray-box">
+              IDF("react")  = ln(677/501) + 1 = 1.30<br>
+              IDF("aws")    = ln(677/89)  + 1 = 2.93<br>
+              <span style="color:#94a3b8">← "aws" hiếm hơn → quan trọng hơn</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num gray-num">4</div>
+            <div class="step-line gray-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label gray-label">TF-IDF vector → Cosine Similarity</div>
+            <div class="step-box gray-box">
+              CV  = [0.078, 0.117, 0, 0.293, ...]<br>
+              JD  = [0.065, 0.093, 0.146, 0, ...]<br>
+              cos(CV, JD) = (CV·JD) / (|CV|×|JD|) = 0.61
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num gray-num">5</div>
+          </div>
+          <div class="step-body">
+            <div class="step-label gray-label">× 100 → Điểm cuối</div>
+            <div class="result-box gray-result">
+              <div class="result-score">61</div>
+              <div class="result-detail">
+                0.61 × 100 = <strong>61 điểm</strong><br>
+                ≥ ngưỡng 5 → <strong style="color:#16a34a">✓ Phù hợp</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Embedding -->
+    <div>
+      <div class="method-title blue-title">Phương pháp 2 — Embedding</div>
+
+      <div class="flow">
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num blue-num">1</div>
+            <div class="step-line blue-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label blue-label">Kiểm tra cache (SHA256)</div>
+            <div class="step-box blue-box">
+              SHA256("React TypeScript...") → "a3f9c2..."<br>
+              Có trong cache? → Dùng ngay, không gọi API
+            </div>
+            <div class="step-note">Cache giúp tốc độ ~0ms sau lần đầu</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num blue-num">2</div>
+            <div class="step-line blue-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label blue-label">Gọi OpenAI API → Vector 1536 chiều</div>
+            <div class="step-box blue-box">
+              POST /v1/embeddings<br>
+              model: text-embedding-3-small<br>
+              → [0.023, -0.187, 0.341, ..., -0.052]<br>
+              <span style="color:#93c5fd">← 1536 số thực, biểu diễn "ý nghĩa"</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num blue-num">3</div>
+            <div class="step-line blue-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label blue-label">Hai vector trong không gian 1536 chiều</div>
+            <div class="step-box blue-box">
+              CV_vec  = [0.023, -0.187, 0.341, ...]<br>
+              JD_vec  = [0.019, -0.201, 0.318, ...]<br>
+              <span style="color:#93c5fd">← Gần nghĩa → tọa độ gần nhau</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num blue-num">4</div>
+            <div class="step-line blue-line"></div>
+          </div>
+          <div class="step-body">
+            <div class="step-label blue-label">Cosine Similarity — đo góc giữa 2 vector</div>
+            <div class="step-box blue-box">
+              cos(CV_vec, JD_vec)<br>
+              = (CV·JD) / (|CV| × |JD|) = 0.734<br>
+              <span style="color:#93c5fd">← Góc nhỏ = ý nghĩa gần nhau</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num blue-num">5</div>
+          </div>
+          <div class="step-body">
+            <div class="step-label blue-label">× 100 → Điểm cuối</div>
+            <div class="result-box blue-result">
+              <div class="result-score">73</div>
+              <div class="result-detail">
+                0.734 × 100 = <strong>73.4 điểm</strong><br>
+                ≥ ngưỡng 40 → <strong style="color:#1d4ed8">✓ Phù hợp</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom comparison -->
+  <div class="diff-row">
+    <div class="diff-card diff-gray">
+      <div class="diff-title">TF-IDF — Đếm từ trùng nhau</div>
+      "Frontend" ≠ "UI Engineer" <span class="tag tag-lose">Bỏ sót</span><br>
+      "ReactJS" ≠ "React" <span class="tag tag-lose">Bỏ sót</span><br>
+      Tốc độ: &lt; 1ms &nbsp;·&nbsp; Chi phí: $0 <span class="tag tag-win">Nhanh & miễn phí</span>
+    </div>
+    <div class="diff-card diff-blue">
+      <div class="diff-title">Embedding — Hiểu ý nghĩa</div>
+      "Frontend" ≈ "UI Engineer" <span class="tag tag-win">Hiểu đúng</span><br>
+      "ReactJS" ≈ "React" <span class="tag tag-win">Hiểu đúng</span><br>
+      ROC-AUC: <strong>0.766</strong> — cao nhất trong 3 phương pháp
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
