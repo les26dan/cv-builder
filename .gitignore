@@ -107,6 +107,9 @@ public/googlee1ea207e1360c50e.html
 # Test pages with real people's names
 app/cv-uploaded-test/
 
+# Thesis document (keep local only)
+thesis/
+
 # Thesis — extracted PPTX contents and temp files
 thesis/demo/pptx_extracted/
 thesis/demo/~$*.pptx
