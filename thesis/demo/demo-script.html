@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kịch bản Demo — Bảo vệ Khóa luận</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+
+  .header { background: linear-gradient(135deg, #1e40af, #4338ca); color: white; padding: 32px 40px; }
+  .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .header p { font-size: 14px; opacity: 0.8; }
+  .header .meta { display: flex; gap: 24px; margin-top: 16px; font-size: 13px; opacity: 0.9; }
+  .header .meta span { background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+  .timeline { position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 28px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+
+  .step { position: relative; padding-left: 72px; margin-bottom: 32px; }
+  .step-number {
+    position: absolute; left: 0; top: 0;
+    width: 56px; height: 56px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 1;
+  }
+  .step-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid; }
+
+  .part-header { padding-left: 72px; margin-bottom: 20px; margin-top: 8px; }
+  .part-badge { display: inline-flex; align-items: center; gap-8px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 6px 16px; border-radius: 20px; }
+
+  /* Colors per part */
+  .part1 .step-number { background: #2563eb; }
+  .part1 .step-card { border-color: #2563eb; }
+  .part1 .part-badge { background: #dbeafe; color: #1d4ed8; }
+
+  .part2 .step-number { background: #7c3aed; }
+  .part2 .step-card { border-color: #7c3aed; }
+  .part2 .part-badge { background: #ede9fe; color: #6d28d9; }
+
+  .step-title { font-size: 19px; font-weight: 700; margin-bottom: 4px; }
+  .step-time { font-size: 14px; font-weight: 600; opacity: 0.5; margin-bottom: 12px; }
+
+  .say { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 12px 0; font-style: italic; font-size: 17px; color: #166534; line-height: 1.7; }
+  .say::before { content: '🎤 Nói: '; font-style: normal; font-weight: 700; }
+
+  .do { background: #fff7ed; border-left: 4px solid #f97316; padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 12px 0; font-size: 17px; color: #9a3412; line-height: 1.7; }
+  .do::before { content: '👆 Làm: '; font-weight: 700; }
+
+  .url { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #475569; display: inline-block; margin: 4px 0; }
+
+  .tip { background: #fefce8; border: 1px solid #fde047; padding: 12px 16px; border-radius: 6px; font-size: 15px; color: #854d0e; margin: 12px 0; line-height: 1.7; }
+  .tip::before { content: '💡 Lưu ý: '; font-weight: 700; }
+
+  .highlight { background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-weight: 600; color: #92400e; }
+
+  .data-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin: 10px 0; font-size: 13px; }
+  .data-box table { width: 100%; border-collapse: collapse; }
+  .data-box th { text-align: left; padding: 4px 8px; font-weight: 600; color: #64748b; font-size: 12px; border-bottom: 1px solid #e2e8f0; }
+  .data-box td { padding: 6px 8px; border-bottom: 1px solid #f1f5f9; }
+  .data-box .win { color: #2563eb; font-weight: 700; }
+  .data-box .win2 { color: #7c3aed; font-weight: 700; }
+
+  .qa-section { margin-top: 40px; }
+  .qa-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+  .qa-item { background: white; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .qa-q { font-weight: 700; color: #dc2626; margin-bottom: 8px; font-size: 14px; }
+  .qa-q::before { content: 'Q: '; }
+  .qa-a { font-size: 14px; color: #374151; line-height: 1.7; }
+  .qa-a::before { content: 'A: '; font-weight: 700; color: #16a34a; }
+
+  .progress-bar { background: #e2e8f0; height: 6px; border-radius: 3px; margin: 24px 0 8px; }
+  .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #2563eb, #7c3aed); }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
+
+  .total-time { text-align: center; background: #1e293b; color: white; padding: 16px; border-radius: 10px; margin: 24px 0; font-size: 14px; }
+  .total-time strong { font-size: 20px; color: #fbbf24; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Kịch bản Demo — Bảo vệ Khóa luận</h1>
+  <p>Ứng dụng Xây dựng Hồ sơ Việc làm bằng Mô hình Ngôn ngữ Lớn · Lê Sỹ Đan</p>
+  <div class="meta">
+    <span>⏱ Tổng thời gian: ~10 phút</span>
+    <span>🖥 localhost:3000</span>
+    <span>🔬 localhost:3000/experiment</span>
+  </div>
+  <div style="margin-top:16px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); border-radius:8px; padding:14px 20px; font-size:16px; display:inline-block;">
+    🔑 &nbsp;<span style="opacity:0.8;">Tài khoản demo:</span>
+    &nbsp;<strong style="font-size:18px;">adminbuddy</strong>
+    <span style="opacity:0.4; margin:0 10px;">/</span>
+    <strong style="font-size:18px;">Startquicker1!</strong>
+    <span style="opacity:0.4; margin:0 14px;">·</span>
+    <span style="opacity:0.8;">Email:</span>
+    &nbsp;<strong style="font-size:18px;">okbuddy2025@gmail.com</strong>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  <div class="progress-labels">
+    <span>Phần 1: Sản phẩm (6 phút)</span>
+    <span>Phần 2: Nghiên cứu (4 phút)</span>
+  </div>
+
+  <div class="timeline" style="margin-top: 32px;">
+
+    <!-- PART 1 -->
+    <div class="part1">
+      <div class="part-header">
+        <span class="part-badge">Phần 1 — Demo Sản phẩm · 6 phút</span>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step part1">
+        <div class="step-number">1</div>
+        <div class="step-card">
+          <div class="step-title">Giới thiệu tổng quan hệ thống</div>
+          <div class="step-time">⏱ 30 giây</div>
+          <div class="do">Mở <span class="url">localhost:3000</span> — trang chủ</div>
+          <div class="say">Hầu hết CV bị phần mềm tuyển dụng loại tự động trước khi có người đọc — theo khảo sát của TopCV, hơn 75% CV tại Việt Nam bị loại ở bước này. Nhưng không có công cụ nào giúp ứng viên hiểu CV mình đang thiếu gì và cần sửa chỗ nào. Em xây hệ thống này để giải quyết đúng vấn đề đó.</div>
+          <div class="tip">Nếu hội đồng hỏi về OAuth: "Hệ thống dùng chuẩn OAuth 2.0 — người dùng xác thực ở phía Google/LinkedIn, hệ thống nhận token, không lưu mật khẩu Google."</div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step part1">
+        <div class="step-number">2</div>
+        <div class="step-card">
+          <div class="step-title">Upload CV và phân tích tự động (Hybrid Parser)</div>
+          <div class="step-time">⏱ 2 phút</div>
+          <div class="do">Vào <span class="url">localhost:3000/cv-upload</span> → upload file <span class="highlight">CV_LapTrinhVien_TranMinhKhoa.docx</span></div>
+          <div class="say">Thay vì tạo CV từ đầu, người dùng có thể upload file có sẵn. Hệ thống sẽ đọc và điền dữ liệu vào các trường tự động.</div>
+          <div class="do">Chờ phân tích xong — khi kết quả hiện ra, chỉ vào các trường đã được điền</div>
+          <div class="say">Đây là điểm kỹ thuật quan trọng: hệ thống dùng phương pháp phân tích lai — hybrid parser. Những trường có cấu trúc cố định như email, số điện thoại, LinkedIn thì dùng biểu thức chính quy — nhanh và không tốn tiền. Chỉ phần kinh nghiệm làm việc — vì người viết theo nhiều cách khác nhau — mới gọi LLM. Kết quả: tiết kiệm được 56% lượng token API so với để LLM đọc toàn bộ, trong khi độ chính xác chỉ giảm 2–3%.</div>
+          <div class="tip">Nếu bị hỏi "tại sao không dùng LLM hết cho đơn giản?": chi phí và tốc độ — LLM mất 8,5 giây và tốn gấp đôi chi phí so với hybrid 4,2 giây.</div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step part1">
+        <div class="step-number">3</div>
+        <div class="step-card">
+          <div class="step-title">Trình soạn thảo CV — editor + preview real-time</div>
+          <div class="step-time">⏱ 2 phút</div>
+          <div class="do">Vào editor của CV vừa phân tích</div>
+          <div class="say">Đây là trình soạn thảo layout 2 cột. Bên trái chỉnh nội dung, bên phải xem trước định dạng A4 ngay lập tức.</div>
+          <div class="do">Sửa một trường bất kỳ — ví dụ thêm một kỹ năng → show preview cập nhật ngay</div>
+          <div class="say">Preview cập nhật real-time — không cần nhấn lưu thủ công.</div>
+          <div class="do">Kéo thả để đổi thứ tự một section — ví dụ kéo "Kỹ năng" lên trên "Kinh nghiệm"</div>
+          <div class="say">Có thể kéo thả để sắp xếp lại thứ tự các mục theo ý muốn.</div>
+          <div class="do">Đợi 2 giây → chỉ vào trạng thái "Đã lưu"</div>
+          <div class="say">Tự động lưu sau 2 giây không có thao tác — người dùng không bao giờ mất dữ liệu.</div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step part1">
+        <div class="step-number">4</div>
+        <div class="step-card">
+          <div class="step-title">Xuất CV ra PDF và DOCX</div>
+          <div class="step-time">⏱ 30 giây</div>
+          <div class="do">Nhấn Export → PDF → show file tải về</div>
+          <div class="say">Hệ thống hỗ trợ xuất ra hai định dạng phổ biến nhất: PDF để nộp và DOCX để tiếp tục chỉnh bằng Word.</div>
+          <div class="do">Nhấn Export → DOCX → mở file bằng Word nếu có thời gian</div>
+        </div>
+      </div>
+
+    </div><!-- end part1 -->
+
+    <!-- PART 2 -->
+    <div class="part2" style="margin-top: 16px;">
+      <div class="part-header">
+        <span class="part-badge">Phần 2 — Đóng góp Nghiên cứu · 4 phút</span>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step part2">
+        <div class="step-number">5</div>
+        <div class="step-card">
+          <div class="step-title">Giới thiệu thí nghiệm</div>
+          <div class="step-time">⏱ 30 giây</div>
+          <div class="do">Mở <span class="url">localhost:3000/experiment</span></div>
+          <div class="say">Ngoài phần sản phẩm, khóa luận còn có đóng góp nghiên cứu: em so sánh 3 phương pháp đo độ phù hợp giữa CV và mô tả công việc — để trả lời câu hỏi: cách nào phân biệt "cặp phù hợp" và "cặp không phù hợp" chính xác nhất, và cách nào đáng tiền nhất khi dùng thực tế.</div>
+          <div class="say">Em lấy 400 cặp CV và JD từ Kaggle. 200 cặp phù hợp — CV và JD cùng ngành. 200 cặp không phù hợp — khác ngành hoàn toàn. Rồi cho 3 phương pháp cùng chấm điểm tất cả.</div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step part2">
+        <div class="step-number">6</div>
+        <div class="step-card">
+          <div class="step-title">Mở 2 cặp cụ thể — positive và negative</div>
+          <div class="step-time">⏱ 1,5 phút</div>
+          <div class="do">Click mở cặp <span class="highlight">HR → HR</span> (positive)</div>
+          <div class="say">Cặp này đúng là phù hợp — CV HR Manager ghép với JD tuyển HR Manager. Embedding cho 58 điểm, LLM cho 75 — cả hai nhận ra đây là cặp đúng.</div>
+          <div class="do">Click mở cặp <span class="highlight">CONSULTANT → HEALTHCARE</span> (negative)</div>
+          <div class="say">Cặp này không phù hợp — tư vấn quản lý ghép với JD tuyển y tá ICU. TF-IDF 3,2, Embedding 35,8, LLM cho 0 — cả ba đều nhận ra cặp này lạc đề hoàn toàn. Đây là trường hợp dễ nhất.</div>
+          <div class="do">Click mở cặp <span class="highlight">ADVOCATE → BUSINESS-DEVELOPMENT</span> (negative)</div>
+          <div class="say">Cặp này thú vị hơn — luật sư ghép với JD Business Development. TF-IDF cho 16,9 — cao, vì hai văn bản dùng nhiều từ chung như "negotiations", "contracts". Nhưng LLM cho 60 — cũng cao, và đây là lỗi phân loại. Đây là điểm yếu của cả hai phương pháp trên ground truth dạng category-proxy.</div>
+          <div class="tip">Nếu bị hỏi về trường hợp sai: "Ground truth dùng category-mapping là silver-standard — cùng ngành chưa chắc hoàn toàn phù hợp, khác ngành chưa chắc hoàn toàn không phù hợp. Đây là hạn chế em đã nêu trong phần hạn chế của khóa luận."</div>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step part2">
+        <div class="step-number">7</div>
+        <div class="step-card">
+          <div class="step-title">Kết quả đầy đủ 400 cặp</div>
+          <div class="step-time">⏱ 1,5 phút</div>
+          <div class="do">Scroll xuống cuối trang — chỉ vào bảng "Kết quả đầy đủ 400 cặp"</div>
+          <div class="say">Đây là kết quả trên toàn bộ 400 cặp.</div>
+
+          <div class="data-box">
+            <table>
+              <tr><th>Phương pháp</th><th>ROC-AUC</th><th>F1</th><th>Tốc độ</th><th>Chi phí/1000</th></tr>
+              <tr><td>Đếm trùng từ (TF-IDF)</td><td>0,755</td><td>0,695</td><td>1 ms</td><td>$0</td></tr>
+              <tr><td>So sánh nghĩa (Embedding)</td><td class="win">0,766 ★</td><td>0,695</td><td>~0 ms</td><td>$0</td></tr>
+              <tr><td>Nhờ LLM chấm điểm</td><td>0,755</td><td class="win2">0,717 ★</td><td>2.527 ms</td><td>$0,28</td></tr>
+            </table>
+          </div>
+
+          <div class="say">Embedding cho ROC-AUC cao nhất — 0,766. LLM cho F1 cao nhất — 0,717. Kiểm định Wilcoxon xác nhận sự khác biệt không phải do may rủi — p = 0,0038 giữa Embedding và LLM.</div>
+          <div class="do">Chỉ vào 3 ô Wilcoxon p-value</div>
+          <div class="say">Tất cả ba cặp so sánh đều có p dưới 0,05 — nghĩa là kết quả có ý nghĩa thống kê, không phải ngẫu nhiên.</div>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="step part2">
+        <div class="step-number">8</div>
+        <div class="step-card">
+          <div class="step-title">Câu chốt — tại sao sản phẩm dùng LLM</div>
+          <div class="step-time">⏱ 30 giây</div>
+          <div class="say">Vậy tại sao sản phẩm vẫn dùng LLM thay vì Embedding — dù Embedding thắng trên ROC-AUC? Vì thí nghiệm đo khả năng phân biệt trên tập cố định — bài toán offline. Sản phẩm giải quyết bài toán khác: giải thích cho người dùng CV thiếu gì và cần sửa chỗ nào. Embedding và TF-IDF chỉ trả về một con số — không giải thích được. Chỉ LLM mới nói được: "Kinh nghiệm React của bạn khớp tốt, nhưng JD yêu cầu TypeScript mà CV chưa đề cập."</div>
+          <div class="tip">Đây là câu kết thúc demo — dừng ở đây, không nói thêm. Để hội đồng hỏi.</div>
+        </div>
+      </div>
+
+    </div><!-- end part2 -->
+  </div><!-- end timeline -->
+
+  <div class="total-time">
+    Tổng thời gian demo: <strong>~10 phút</strong> · Còn lại cho hỏi đáp: ~20 phút
+  </div>
+
+  <!-- Q&A -->
+  <div class="qa-section">
+    <h2>Câu hỏi thường gặp — Chuẩn bị sẵn</h2>
+
+    <div class="qa-item">
+      <div class="qa-q">Tại sao Embedding thắng ROC-AUC nhưng em lại không dùng trong sản phẩm?</div>
+      <div class="qa-a">Thí nghiệm đo khả năng phân biệt positive/negative — bài toán offline. Sản phẩm cần giải thích cho người dùng: CV thiếu gì, sửa chỗ nào. Embedding chỉ trả về một con số, không giải thích được. Chỉ LLM mới trả lời được câu đó. Đây là hai bài toán khác nhau nên chọn công cụ khác nhau.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Ground truth của em có tin cậy không? Cùng ngành chưa chắc phù hợp?</div>
+      <div class="qa-a">Đúng — đây là hạn chế em đã nhận thức và nêu rõ trong phần hạn chế. Category-mapping là silver-standard, không phải gold-standard. Ground truth lý tưởng phải do recruiter thực sự gán nhãn. Tuy nhiên với 400 cặp và kiểm định thống kê đầy đủ, kết quả đủ đáng tin để so sánh phương pháp trên cùng điều kiện.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Tại sao LLM thắng F1 nhưng thua ROC-AUC?</div>
+      <div class="qa-a">ROC-AUC đo khả năng xếp hạng — cho cặp phù hợp điểm cao hơn cặp không phù hợp. F1 đo phân loại đúng/sai tại một ngưỡng cố định. LLM thắng F1 vì ngưỡng trung vị của LLM (20 điểm) phân cắt dữ liệu tốt hơn. Hai chỉ số đo hai khía cạnh khác nhau của cùng một vấn đề.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Tại sao P@10 và nDCG@10 cả 3 đều đạt 1,0? Có nghĩa là cả 3 như nhau?</div>
+      <div class="qa-a">Không. P@10 = 1,0 chỉ nghĩa là trong top 10 kết quả đứng đầu thì cả 3 đều xếp đúng — vì dataset phân tách rõ, các CV phù hợp thường được xếp cao hơn nhiều so với không phù hợp. ROC-AUC mới là chỉ số phân biệt được sự khác nhau giữa 3 phương pháp vì nó xét toàn bộ phổ điểm, không chỉ top k.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Nếu fine-tune LLM thì kết quả có thay đổi không?</div>
+      <div class="qa-a">Rất có thể đảo ngược. Embedding thắng một phần vì model đã được OpenAI pre-train trên hàng tỷ cặp văn bản bao gồm CV và JD thật — về cơ bản đã được "luyện tập" trên đúng bài kiểm tra này. LLM chạy hoàn toàn zero-shot, không có fine-tune. Nếu fine-tune LLM trên tập CV–JD có nhãn chất lượng cao từ recruiter thực, kết quả hoàn toàn có thể đảo ngược. Em đã nêu điều này trong phần hướng phát triển.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Hệ thống có thể mở rộng lên hàng nghìn người dùng không?</div>
+      <div class="qa-a">Kiến trúc hiện tại đã có nền tảng tốt: Next.js trên Vercel tự động scale, Supabase PostgreSQL có thể mở rộng, Vercel Blob cho file storage. Bottleneck chính sẽ là chi phí OpenAI API — giải pháp là cache kết quả phân tích CV và dùng Embedding thay LLM cho batch matching. Em đã đề cập hướng này trong phần phát triển tương lai.</div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-q">Tại sao chọn gpt-4o-mini mà không phải GPT-4o?</div>
+      <div class="qa-a">Chi phí và tốc độ. gpt-4o-mini nhanh hơn và rẻ hơn khoảng 15 lần so với GPT-4o, trong khi chất lượng cho task phân tích CV và chấm điểm phù hợp là tương đương. Với ứng dụng cần phản hồi nhanh cho người dùng cuối, đây là lựa chọn thực tế hơn.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

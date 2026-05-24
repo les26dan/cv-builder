@@ -6,58 +6,33 @@ Chương này trình bày lý do lựa chọn đề tài, định nghĩa bài to
 \section{Lý do lựa chọn đề tài}
 \label{sec:dvd}
 
-Mỗi năm, hàng triệu người Việt Nam đi xin việc. Tài liệu đầu tiên họ gửi cho nhà tuyển dụng là \textit{hồ sơ việc làm}, hay còn gọi là CV. Một bản CV viết tốt giúp người xin việc có nhiều cơ hội được mời phỏng vấn hơn. Ngược lại, một bản CV không phù hợp với vị trí ứng tuyển có thể bị loại ngay từ vòng đầu.
+Tìm việc làm là một trong những việc tốn thời gian và công sức nhất mà một người lao động phải trải qua. Chỉ riêng trên TopCV -- nền tảng tuyển dụng lớn nhất Việt Nam với hơn 9,5 triệu ứng viên đăng ký \cite{topcv2024} -- mỗi ngày có hơn 40.000 tin tuyển dụng mới được đăng lên \cite{topcv2024report}. Trên VietnamWorks, con số lượt truy cập hàng tháng đạt 9,4 triệu \cite{vietnamworks2023}. Thị trường lao động không thiếu cơ hội -- nhưng đó cũng chính là vấn đề: quá nhiều tin, quá ít thời gian.
 
-Hiện nay, phần lớn các công ty lớn không đọc CV bằng tay nữa. Thay vào đó, họ dùng \textit{phần mềm sàng lọc tự động} để chọn ra những bản CV phù hợp nhất với vị trí cần tuyển. Phần mềm này đọc văn bản trong CV, đối chiếu với mô tả công việc, rồi xếp hạng các ứng viên. Những bản CV không phù hợp thường bị loại trước khi nhà tuyển dụng đọc tới. Theo một báo cáo của Jobscan \cite{jobscan2023}, hơn 98\% các công ty lớn nhất tại Mỹ dùng loại phần mềm này. Một khảo sát của TopCV \cite{topcv2023} cho thấy hơn 75\% CV của ứng viên Việt Nam bị loại ngay ở vòng sàng lọc -- thường là do lỗi định dạng, thiếu từ khóa, hoặc trình bày không rõ ràng.
+Quy trình tìm việc thông thường của một ứng viên hiện nay vẫn mang tính thủ công rất cao. Họ phải vào từng trang tuyển dụng, dùng bộ lọc theo ngành nghề và địa điểm, rồi đọc lần lượt từng mô tả công việc để xem vị trí đó có thực sự phù hợp với kinh nghiệm và kỹ năng của mình không. Một tin tuyển dụng trung bình có thể dài vài trăm từ, bao gồm yêu cầu kinh nghiệm, bằng cấp, kỹ năng kỹ thuật, kỹ năng mềm và văn hóa công ty -- tất cả đều cần đọc kỹ mới đánh giá được mức độ phù hợp. Nhân lên với hàng chục tin mỗi buổi tìm kiếm, đây là công việc lặp đi lặp lại và dễ bỏ sót những cơ hội tốt.
 
-Với người đi xin việc tại Việt Nam, việc viết một bản CV tốt còn khó hơn vì:
+Bản CV đóng vai trò trung tâm trong toàn bộ quá trình này -- đó là thứ duy nhất đại diện cho ứng viên trước khi nhà tuyển dụng gặp mặt. Thế nhưng việc chuẩn bị CV cũng không đơn giản: định dạng khác nhau tùy nơi nộp, nội dung cần điều chỉnh theo từng vị trí, và người dùng phổ thông thường không biết CV của mình đang thiếu gì so với yêu cầu thực tế. Các công cụ như Canva hay Zety chỉ giải quyết phần trình bày cho đẹp, không giúp gì về nội dung. Các dịch vụ phân tích CV chuyên sâu như Sovren hay Textkernel thì giá cao và chỉ bán cho doanh nghiệp tuyển dụng, không dành cho ứng viên cá nhân. Công cụ tiếng Việt phù hợp với thị trường trong nước lại gần như không có.
 
-\begin{itemize}
-    \item Các công cụ tạo CV phổ biến (Canva, Zety\dots) chỉ cho mẫu thiết kế đẹp, không kiểm tra xem nội dung CV có thực sự phù hợp với vị trí ứng tuyển hay không.
-    \item Các dịch vụ phân tích CV chuyên nghiệp (Sovren, Textkernel\dots) có giá cao và chỉ phục vụ doanh nghiệp tuyển dụng, không phải ứng viên.
-    \item Phần lớn công cụ trên thị trường được thiết kế cho tiếng Anh; hỗ trợ tiếng Việt còn rất hạn chế.
-\end{itemize}
-
-Trong vài năm gần đây, các \textit{mô hình ngôn ngữ lớn} -- nổi tiếng nhất là ChatGPT \cite{openai2023gpt4} -- đã chứng minh khả năng đọc hiểu văn bản gần như con người. Khả năng này có thể dùng vào hai việc: (i) tự động đọc một bản CV và tách ra các thông tin cần thiết như tên, kinh nghiệm, kỹ năng; và (ii) so sánh CV với mô tả công việc để gợi ý cách viết lại cho phù hợp hơn. Tận dụng cơ hội đó, sinh viên chọn đề tài xây dựng một ứng dụng web giúp người dùng tạo và tối ưu CV, đồng thời thực hiện một thí nghiệm để so sánh ba cách \textit{đo độ phù hợp} giữa CV và mô tả công việc.
+Sự xuất hiện của \textit{mô hình ngôn ngữ lớn} (LLM) như ChatGPT \cite{openai2023gpt4} thay đổi bức tranh này. Lần đầu tiên máy tính có thể đọc một bản CV viết tự do và hiểu nội dung bên trong ở mức gần như người thật -- không cần quy tắc cứng hay dữ liệu gán nhãn. Kết hợp với kỹ thuật \textit{Retrieval-Augmented Generation} (RAG), hệ thống có thể so khớp CV của ứng viên với hàng nghìn tin tuyển dụng về mặt nội dung và ngữ nghĩa, thay vì để ứng viên tự đọc từng tin một. Thay vì mất hàng giờ lọc thủ công, ứng viên chỉ cần tải CV lên -- hệ thống tự phân tích hồ sơ và trả về danh sách những vị trí tốt nhất. Đó là xuất phát điểm của khóa luận này.
 
 \section{Định nghĩa bài toán}
 \label{sec:def_problem}
 
-Khóa luận giải quyết hai bài toán liên quan đến nhau:
+Khóa luận giải quyết hai bài toán liên quan đến nhau.
 
-\textbf{Bài toán 1 -- Hỗ trợ tạo và phân tích CV.} Xây dựng một ứng dụng web cho phép người dùng:
+\textbf{Bài toán 1 -- Giúp ứng viên tạo và chỉnh sửa CV.} Bài toán đặt ra là xây dựng một trang web cho phép ứng viên tải lên CV có sẵn (PDF hoặc Word) -- hệ thống tự đọc và chia nội dung thành từng phần rõ ràng: liên hệ, tóm tắt, kinh nghiệm, học vấn, kỹ năng. Sau đó ứng viên có thể chỉnh sửa từng phần và xem kết quả ngay trên màn hình, rồi tải về ở định dạng PDF hoặc Word tuỳ nơi nộp. Hệ thống cần hỗ trợ cả tiếng Việt lẫn tiếng Anh. Một ràng buộc thực tế cần xử lý: nhờ AI đọc CV thì tốn chi phí API -- vì vậy khóa luận cũng tìm cách giảm chi phí mà không làm giảm đáng kể chất lượng.
 
-\begin{itemize}
-    \item Tải lên bản CV có sẵn (định dạng PDF hoặc DOCX), ứng dụng tự động tách thông tin trong CV thành các phần rõ ràng: thông tin liên hệ, tóm tắt nghề nghiệp, kinh nghiệm làm việc, học vấn, kỹ năng.
-    \item Chỉnh sửa CV theo từng phần, vừa sửa vừa xem trước kết quả ngay lập tức.
-    \item Tải CV về máy ở hai định dạng phổ biến (PDF, DOCX) tuỳ theo nơi nộp.
-    \item Sử dụng được bằng cả tiếng Việt và tiếng Anh.
-\end{itemize}
-
-Một yêu cầu thêm là: việc dùng mô hình ngôn ngữ lớn để phân tích CV tốn phí (mỗi lần gọi đều mất một khoản tiền cho nhà cung cấp dịch vụ). Vì vậy cần tìm cách giảm chi phí mà vẫn giữ được độ chính xác.
-
-\textbf{Bài toán 2 -- So sánh ba cách đo độ phù hợp giữa CV và mô tả công việc.} Cho trước một bản CV và một mô tả công việc, cần \textit{tự động cho ra một con số trong khoảng 0--100} thể hiện độ phù hợp giữa CV và công việc đó. Khi có nhiều CV ứng tuyển vào cùng một vị trí (hoặc một ứng viên muốn xét nhiều vị trí cùng lúc), con số này dùng để sắp xếp thứ tự từ phù hợp nhất đến ít phù hợp nhất.
-
-Có ba cách làm phổ biến để tính ra con số đó:
-
-\begin{enumerate}
-    \item \textit{Cách 1 -- Đếm trùng từ:} đếm xem CV và mô tả công việc có chung những từ nào, rồi tính một con số đại diện cho mức độ trùng lặp. Cách này đơn giản, nhanh, miễn phí, dùng làm điểm so sánh nền.
-    \item \textit{Cách 2 -- So sánh nghĩa:} dùng một mô hình đã huấn luyện trước để biến CV và mô tả công việc thành dạng số học, sau đó so sánh xem hai văn bản có gần nhau về mặt ngữ nghĩa hay không. Cách này nhận ra được cả những trường hợp viết khác từ nhưng cùng nghĩa (ví dụ ``frontend developer'' và ``UI engineer'').
-    \item \textit{Cách 3 -- Nhờ mô hình ngôn ngữ lớn chấm điểm:} đưa cả CV và mô tả công việc cho mô hình đọc, rồi yêu cầu cho điểm trực tiếp. Cách này thường thông minh nhất nhưng cũng tốn chi phí và chậm nhất.
-\end{enumerate}
-
-Câu hỏi đặt ra là: cách nào cho kết quả xếp hạng tốt nhất? Cách nào đáng đồng tiền nhất khi đưa vào sử dụng thực tế? Khóa luận trả lời hai câu hỏi này qua một thí nghiệm có kiểm định thống kê đầy đủ, được trình bày chi tiết trong Chương 5.
+\textbf{Bài toán 2 -- Tìm kiếm JD phù hợp qua quy trình RAG.} Từ góc độ ứng viên, bài toán đặt ra là: cho CV của ứng viên và kho N tin tuyển dụng (được hệ thống crawl tự động), hệ thống phải tìm ra top-K JD phù hợp nhất với ứng viên đó, với hai ràng buộc mâu thuẫn -- (i)~không bỏ sót JD phù hợp, và (ii)~chi phí thấp, không thể gọi LLM cho từng cặp (CV, JD) trong kho.
 
 \section{Đóng góp của khóa luận}
 \label{sec:contributions}
 
-Trong khóa luận này, sinh viên đã phát triển một hệ thống web hoàn chỉnh và thực hiện một thí nghiệm so sánh ba cách đo độ phù hợp giữa CV và mô tả công việc. Kết quả được đánh giá qua kiểm thử chức năng và bộ độ đo chuẩn dùng cho xếp hạng. Khóa luận có bốn đóng góp chính:
+Trong khóa luận này, sinh viên đã phát triển một hệ thống web hoàn chỉnh và thiết kế quy trình RAG tìm kiếm JD cho ứng viên. Khóa luận có bốn đóng góp chính:
 
 \begin{enumerate}
-\item Sinh viên đã đề xuất và hiện thực phương pháp \textit{phân tích CV lai} -- kết hợp giữa cách xử lý văn bản truyền thống bằng biểu thức chính quy (cho các trường có cấu trúc rõ như email, số điện thoại) và mô hình ngôn ngữ lớn (cho phần kinh nghiệm làm việc viết tự do). Kết quả đánh giá trên 20 CV mẫu cho thấy cách lai giảm khoảng 56\% lượng dữ liệu phải gửi cho mô hình ngôn ngữ lớn, trong khi độ chính xác chỉ giảm 2--3\% -- một mức giảm chấp nhận được so với phần chi phí tiết kiệm được.
+\item Sinh viên đã đề xuất và hiện thực phương pháp \textit{phân tích CV lai} -- kết hợp giữa cách xử lý văn bản truyền thống bằng biểu thức chính quy (cho các trường có cấu trúc rõ như email, số điện thoại) và mô hình ngôn ngữ lớn (cho phần kinh nghiệm làm việc viết tự do). Thiết kế này tận dụng được sự ổn định và miễn phí của regex cho các trường có khuôn mẫu, đồng thời chỉ gọi LLM cho phần cần hiểu ngữ nghĩa -- giảm phụ thuộc vào LLM cho các trường đơn giản và tiết kiệm chi phí gọi API.
 \item Sinh viên đã xây dựng trình soạn thảo CV tương tác cho phép chỉnh sửa theo từng phần, kéo thả sắp xếp thứ tự các mục, lưu tự động, và xem trước định dạng A4 ngay khi đang sửa. Trình soạn thảo hỗ trợ xuất CV ra hai định dạng phổ biến: PDF và DOCX.
-\item Sinh viên đã phát triển hệ thống web hoàn chỉnh với nhiều cách đăng nhập (email, Google, LinkedIn), quản lý nhiều CV trực tuyến cho từng người dùng, và giao diện song ngữ Việt -- Anh. Hệ thống đã được kiểm thử qua 28 trường hợp kiểm thử chức năng (chi tiết ở Chương 5).
-\item \textbf{Đóng góp nghiên cứu chính:} sinh viên đã thiết kế và thực hiện một thí nghiệm so sánh định lượng ba cách đo độ phù hợp CV -- mô tả công việc (đếm trùng từ, so sánh nghĩa, và nhờ mô hình ngôn ngữ lớn) trên 400 cặp dữ liệu công khai từ Kaggle. Kết quả được đánh giá bằng các chỉ số chuẩn cho bài toán xếp hạng, có kiểm định thống kê và khoảng tin cậy đầy đủ. Toàn bộ pipeline đánh giá -- gồm script, dữ liệu trung gian, kết quả -- được công bố mã nguồn mở để người khác có thể tái lập và tham chiếu khi lựa chọn phương pháp cho hệ thống tuyển dụng thực tế. Đây là đóng góp được trình bày chi tiết trong Chương 5.
+\item Sinh viên đã phát triển hệ thống web hoàn chỉnh với đăng nhập bằng email/mật khẩu, hỗ trợ phiên khách, quản lý nhiều CV trực tuyến cho từng người dùng, và giao diện song ngữ Việt -- Anh. Hệ thống đã được kiểm thử qua 24 trường hợp kiểm thử chức năng (chi tiết ở Chương 5).
+\item Sinh viên đã thiết kế luồng xử lý RAG hai bước tìm kiếm JD phù hợp cho ứng viên: bước Hybrid Retrieval (TF-IDF + Embedding) lọc top-20 JD với chi phí gần như bằng không, bước Structural + LLM Batch Ranking xếp hạng top-5 bằng cách gom toàn bộ JD vào một lần gọi LLM duy nhất thay vì nhiều lần gọi riêng lẻ.
 \end{enumerate}
 
 Toàn bộ mã nguồn của hệ thống và pipeline đánh giá được công bố tại kho lưu trữ: \url{https://github.com/les26dan/cv-builder}.
@@ -66,13 +41,13 @@ Toàn bộ mã nguồn của hệ thống và pipeline đánh giá được côn
 
 Phần còn lại của báo cáo khóa luận được tổ chức như sau:
 
-Chương 2 trình bày cơ sở lý thuyết liên quan, gồm tổng quan về mô hình ngôn ngữ lớn và kiến trúc Transformer, các kỹ thuật xử lý ngôn ngữ tự nhiên cho phân tích CV, kiến trúc ứng dụng web hiện đại, cơ chế hoạt động của phần mềm sàng lọc CV, các công nghệ nền tảng được sử dụng, và đặc biệt là cơ sở lý thuyết cho thí nghiệm so sánh ở Chương 5 (truy hồi thông tin, biểu diễn ngữ nghĩa, dùng mô hình ngôn ngữ lớn để chấm điểm, kiểm định thống kê).
+Chương 2 trình bày cơ sở lý thuyết liên quan: mô hình ngôn ngữ lớn và cách điều khiển bằng prompt, ba cách tiếp cận bài toán phân tích CV, các kỹ thuật so khớp CV--JD (TF-IDF, Embedding, RAG), và khảo sát các giải pháp hiện có cùng khoảng trống nghiên cứu.
 
-Chương 3 trình bày quá trình phân tích yêu cầu và thiết kế hệ thống: đặc tả yêu cầu chức năng và phi chức năng, kiến trúc tổng thể ba lớp, thiết kế cơ sở dữ liệu với sáu bảng, thiết kế giao tiếp giữa các thành phần, thiết kế giao diện, và thiết kế quy trình phân tích CV.
+Chương 3 trình bày quá trình phân tích yêu cầu và thiết kế hệ thống: đặc tả yêu cầu chức năng và phi chức năng, kiến trúc tổng thể ba lớp, thiết kế cơ sở dữ liệu với bảy bảng, thiết kế API, quy trình phân tích CV hybrid, và thiết kế quy trình RAG tìm kiếm JD cho ứng viên.
 
-Chương 4 mô tả quá trình hiện thực các thành phần chính của hệ thống: đăng nhập, tải lên và phân tích CV bằng phương pháp lai, trình soạn thảo CV tương tác, xuất CV và quản lý nhiều CV.
+Chương 4 mô tả quá trình hiện thực các thành phần chính của hệ thống: đăng nhập, tải lên và phân tích CV bằng phương pháp lai, trình soạn thảo CV tương tác, xuất CV, và hiện thực luồng xử lý RAG tìm kiếm JD phù hợp cho ứng viên.
 
-Chương 5 trình bày đóng góp nghiên cứu chính: thiết kế thí nghiệm và đánh giá định lượng ba cách đo độ phù hợp CV -- mô tả công việc trên dữ liệu công khai, trả lời hai câu hỏi nghiên cứu đặt ra. Chương gồm thiết kế thí nghiệm, xây dựng dữ liệu nhãn, các chỉ số đánh giá, kết quả định lượng kèm kiểm định thống kê, phân tích lỗi, và thảo luận các yếu tố ảnh hưởng đến tính tin cậy của kết quả.
+Chương 5 trình bày kết quả kiểm thử chức năng và phân tích định tính các quyết định thiết kế then chốt trong pipeline AI (Hybrid Parser và Pipeline RAG hai bước).
 
 Chương 6 tổng kết các kết quả đạt được, nêu các hạn chế của khóa luận và đề xuất hướng phát triển trong tương lai.
 

@@ -133,10 +133,14 @@ export default function WorkspacePage() {
 
   const handleEdit = async (cvId: string) => {
     if (!user) return
-    
+
     console.log('Edit CV:', cvId)
     // Navigate to editor with CV data
     router.push(`/cv-guided-editing/${cvId}`)
+  }
+
+  const handleFindJobs = (cvId: string) => {
+    router.push(`/jobs/${cvId}`)
   }
 
   const handleDownload = (cvId: string) => {
@@ -363,6 +367,7 @@ export default function WorkspacePage() {
                   onDownload={handleDownload}
                   onDelete={handleDeleteClick}
                   onTitleUpdate={handleTitleUpdate}
+                  onFindJobs={handleFindJobs}
                 />
               ))}
             </div>
