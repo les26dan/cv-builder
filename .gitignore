@@ -75,5 +75,34 @@ Projects/
 thesis_backup_*/
 ADMIN_ACCESS.md
 
+# Setup/fix notes (internal)
+LANGUAGE_DETECTION_FIX.md
+OAUTH_SETUP_INSTRUCTIONS.md
+PRODUCTION_USER_CREATION.sql
+SETUP_SUMMARY.md
+SUPABASE_SETUP_INSTRUCTIONS.md
+TEMPLATE_SETUP_GUIDE.md
+VIETNAMESE_LOCALIZATION_FIX.md
+
+# CV data of real people (privacy)
+scripts/cv-responses/
+
+# One-off debug/fix scripts
+scripts/audit-cv-user-relationships.js
+scripts/create-cv-test-sites.js
+scripts/create-dev-cv.js
+scripts/deploy-schema-direct.js
+scripts/fix-cv-responses.js
+scripts/fix-test-page-uuids.js
+scripts/manual-cv-data.js
+scripts/permanent-fix.sh
+scripts/process-sample-cvs.js
+scripts/process-single-cv.js
+scripts/reprocess-tu-bryan-simple.js
+scripts/reprocess-tu-bryan.js
+
+# Google Search Console verification
+public/googlee1ea207e1360c50e.html
+
 # Debug/temp scripts
 server.pid
