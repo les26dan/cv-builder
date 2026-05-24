@@ -24,13 +24,18 @@ interface JobPosting {
   category: string
   jd_text: string
   jd_embedding: number[] | null
+  source: string
+  source_url: string | null
 }
 
 export interface JobSearchResult {
   id: string
   title: string
   category: string
+  source: string
+  sourceUrl: string | null
   jdPreview: string       // first 200 chars of jd_text
+  jdFull: string          // full jd_text
   hybridScore: number     // 0-100, step 1
   structuralScore: number // 0-100, step 2a
   llmScore: number        // 0-100, step 2b
@@ -349,6 +354,7 @@ function fallbackRankings(jobs: JobWithHybrid[]): LLMBatchResult {
 
 export async function ragSearch(
   cvId: string,
+  query?: string,
 ): Promise<{ results: JobSearchResult[]; meta: SearchMeta }> {
   const totalStart = Date.now()
 
@@ -386,10 +392,19 @@ export async function ragSearch(
       .eq('id', cvId)
   }
 
-  // Load all job postings.
-  const { data: jobRows, error: jobsError } = await db
+  // Load job postings — filter by query keyword if provided.
+  let jobQuery = db
     .from('job_postings')
-    .select('id, title, category, jd_text, jd_embedding')
+    .select('id, title, category, jd_text, jd_embedding, source, source_url')
+
+  if (query) {
+    // Filter by title or category containing query (case-insensitive)
+    jobQuery = jobQuery.or(
+      `title.ilike.%${query}%,category.ilike.%${query}%,jd_text.ilike.%${query}%`
+    )
+  }
+
+  const { data: jobRows, error: jobsError } = await jobQuery
 
   if (jobsError) throw new Error(`Failed to load job postings: ${jobsError.message}`)
 
@@ -434,8 +449,11 @@ export async function ragSearch(
       id: job.id,
       title: job.title,
       category: job.category,
+      source: job.source,
+      sourceUrl: job.source_url ?? null,
       jdPreview: job.jd_text.slice(0, 200),
-      hybridScore: Math.round(job.hybridScore * 100) / 100,
+      jdFull: job.jd_text,
+      hybridScore: Math.round(job.hybridScore * 10) / 10,
       structuralScore: sScore,
       llmScore: lScore,
       finalScore: Math.round(finalScore * 100) / 100,
