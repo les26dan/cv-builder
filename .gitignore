@@ -104,5 +104,16 @@ scripts/reprocess-tu-bryan.js
 # Google Search Console verification
 public/googlee1ea207e1360c50e.html
 
+# Test pages with real people's names
+app/cv-uploaded-test/
+
+# Thesis — extracted PPTX contents and temp files
+thesis/demo/pptx_extracted/
+thesis/demo/~$*.pptx
+thesis/latex/sample/
+
+# Eval lock files
+data/eval/*.lock
+
 # Debug/temp scripts
 server.pid
