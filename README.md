@@ -2,7 +2,7 @@
 
 Ứng dụng web giúp tạo CV chuyên nghiệp, kèm công cụ **so khớp CV với mô tả công việc (JD)** sử dụng 3 phương pháp: TF-IDF (từ khoá), Embedding (ngữ nghĩa), và LLM (suy luận).
 
-Dự án được xây dựng bằng **Next.js 15 (App Router)** + **TypeScript** + **Tailwind CSS**.
+Dự án được xây dựng bằng **Next.js 15 (App Router)** + **TypeScript** + **Tailwind CSS** + **Supabase**.
 
 ---
 
@@ -12,10 +12,16 @@ Dự án được xây dựng bằng **Next.js 15 (App Router)** + **TypeScript*
 - Soạn CV theo từng phần: Thông tin liên hệ, Tóm tắt, Kinh nghiệm, Kỹ năng, Học vấn.
 - Thêm/bớt linh hoạt các phần mở rộng: **Dự án**, **Hoạt động tình nguyện**, **Chứng chỉ**, **Sở thích**, hoặc phần tuỳ chỉnh.
 - Hỗ trợ **ghi chú dạng Markdown** cho từng mục (in đậm, in nghiêng, danh sách, link).
-- Tự động lưu vào `localStorage` (`cv_workflow_{cvId}`), không cần đăng nhập để dùng thử.
+- Tự động lưu vào Supabase (đã đăng nhập) hoặc `localStorage` (dùng thử).
 - Xuất CV ra **DOCX** giữ nguyên định dạng.
 
-### 2. So khớp CV ↔ JD (3 phương pháp)
+### 2. CV Workspace — soạn thảo + phân tích JD
+Truy cập tại `/cv-workspace` — không gian làm việc tích hợp:
+- Soạn thảo CV và **nháp mô tả công việc (JD)** trong cùng một màn hình.
+- **Phân tích JD tự động** bằng AI: trích xuất kỹ năng yêu cầu, highlight điểm khớp/thiếu với CV.
+- Mỗi CV có JD draft và kết quả phân tích riêng biệt.
+
+### 3. So khớp CV ↔ JD (3 phương pháp)
 Truy cập tại `/cv-match/[cvId]` — tự động lấy CV bạn vừa soạn từ trình soạn thảo.
 
 | Phương pháp | Cách hoạt động | Tốc độ | Chi phí | Khi nào dùng |
@@ -26,13 +32,24 @@ Truy cập tại `/cv-match/[cvId]` — tự động lấy CV bạn vừa soạn
 
 Mỗi phương pháp hiển thị **panel riêng** với điểm số, từ khoá khớp, và biểu đồ so sánh trade-off chi phí ↔ chất lượng.
 
-### 3. Pipeline đánh giá (cho khoá luận)
+### 4. Gợi ý việc làm
+Truy cập tại `/jobs/[cvId]` — tìm việc làm phù hợp dựa trên CV:
+- Tìm kiếm job postings từ database qua `/api/jobs/search`.
+- Hiển thị điểm khớp và lý do phù hợp cho từng vị trí.
+
+### 5. RAG Pipeline (thực nghiệm)
+Pipeline kết hợp retrieval + generation để cải thiện chất lượng so khớp:
+- Embedding corpus job postings vào vector store.
+- Retrieve top-K candidates trước khi gọi LLM rerank.
+
+### 6. Pipeline đánh giá (cho khoá luận)
 Bộ script tính các chỉ số chuẩn xếp hạng: **nDCG@10, MAP, MRR, P@K, ROC/AUC** trên ground truth tự dán nhãn.
 
 ```bash
-npm run eval:build-truth   # dán nhãn ground truth từ tập CV-JD
-npm run eval:embed         # cache embedding cho corpus
-npm run eval:run           # chạy đánh giá 3 phương pháp
+npm run eval:build-truth        # dán nhãn ground truth từ tập CV-JD
+npm run eval:embed              # cache embedding cho corpus
+npm run eval:run                # chạy đánh giá 3 phương pháp
+python scripts/evaluate-rag.py  # đánh giá RAG pipeline
 python scripts/analyze-results.py   # vẽ biểu đồ + báo cáo
 ```
 
@@ -66,10 +83,10 @@ VOYAGE_API_KEY=...
 # Anthropic — cho LLM matcher (Claude)
 ANTHROPIC_API_KEY=...
 
-# OpenAI — cho LLM matcher fallback (tuỳ chọn)
+# OpenAI — cho CV parser và LLM matcher fallback
 OPENAI_API_KEY=...
 
-# Supabase — lưu CV của user đã đăng nhập (tuỳ chọn)
+# Supabase — lưu CV, job postings của user đã đăng nhập
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
@@ -85,21 +102,30 @@ Xem file `.env.example` để biết danh sách đầy đủ.
 app/
   page.tsx                  # Trang chủ
   cv-builder/[cvId]/        # Trình soạn thảo CV
+  cv-workspace/             # Workspace tích hợp soạn CV + phân tích JD
   cv-match/[cvId]/          # Trang so khớp 3 phương pháp
+  jobs/[cvId]/              # Gợi ý việc làm theo CV
   api/
     cv/match/               # API gọi 3 matcher song song
     cv/embed/               # API tạo embedding
+    jobs/search/            # API tìm kiếm job postings
 components/
   CVEditor.tsx              # State chính của editor
   EditorPanel.tsx           # UI từng phần CV
+  JobCard.tsx               # Card hiển thị job posting
   match/                    # Các panel TF-IDF / Embedding / LLM
+lib/
+  ragPipeline.ts            # RAG pipeline (retrieval + rerank)
 shared/services/matching/
   tfidfMatcher.ts           # Cài đặt TF-IDF
   embeddingMatcher.ts       # Voyage embedding + cosine
   llmMatcher.ts             # Prompt + parse Claude/GPT
 scripts/                    # Script đánh giá thực nghiệm
-data/eval/                  # Ground truth + cache embedding
-thesis/                     # Báo cáo khoá luận (LaTeX, .gitignore)
+  evaluate-rag.py           # Đánh giá RAG pipeline
+  evaluate-rag-full.py      # Đánh giá đầy đủ toàn bộ corpus
+  embed-large.py            # Tạo embedding cho corpus lớn
+data/eval/                  # Ground truth + cache embedding + kết quả
+thesis/                     # Báo cáo khoá luận (LaTeX)
 ```
 
 ---
