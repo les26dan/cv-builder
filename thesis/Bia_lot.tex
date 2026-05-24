@@ -1,40 +1,53 @@
 \documentclass[DoAn.tex]{subfiles}
-\newcommand{\underwrite}[3][]{% \underwrite[<thickness>]{<numerator>}{<denominator>}
-  \genfrac{}{}{#1}{}{\textstyle #2}{\scriptstyle #3}
-}
 \begin{document}
 \begin{titlepage}
 \thispagestyle{empty}
-\begin{center}
+\begin{tikzpicture}[remember picture, overlay]
+  % University name — 2.4cm from top
+  \node[anchor=north] at ([yshift=-2.4cm]current page.north) {%
+    \begin{minipage}{16cm}\centering
+      \textbf{\large ĐẠI HỌC QUỐC GIA HÀ NỘI}\\[0.15cm]
+      \textbf{\large TRƯỜNG ĐẠI HỌC CÔNG NGHỆ}
+    \end{minipage}
+  };
 
-{\textbf{\large{ĐẠI HỌC QUỐC GIA HÀ NỘI}}}\\[0.3cm]
-{\textbf{\large{TRƯỜNG ĐẠI HỌC CÔNG NGHỆ}}}\\[3.5cm]
+  % Logo — 6.5cm from top
+  \node[anchor=north] at ([yshift=-6.5cm]current page.north) {%
+    \includegraphics[width=3.5cm]{UET_logo.png}
+  };
 
-{\textbf{\huge{ KHÓA LUẬN TỐT NGHIỆP}}}\\[1cm]
-{\textbf{\Large{Ứng dụng xây dựng Hồ sơ việc làm\\bằng Mô hình Ngôn ngữ lớn}}}\\[1cm]
+  % Author — 11cm from top
+  \node[anchor=north] at ([yshift=-11cm]current page.north) {%
+    \textbf{\large Lê Sỹ Đan}
+  };
 
-{\textbf{\large{LÊ SỸ ĐAN}}}\\
-{\large{les72dan@gmail.com}}\\[0.5cm]
+  % Title — 14cm from top
+  \node[anchor=north] at ([yshift=-14cm]current page.north) {%
+    \begin{minipage}{16cm}\centering
+      \textbf{\Large ỨNG DỤNG XÂY DỰNG HỒ SƠ VIỆC LÀM\\[0.25cm]BẰNG MÔ HÌNH NGÔN NGỮ LỚN}
+    \end{minipage}
+  };
 
-{\textbf{\large{Ngành: Công nghệ thông tin}}}\\
+  % Degree label — 19.5cm from top
+  \node[anchor=north] at ([yshift=-19.5cm]current page.north) {%
+    \begin{minipage}{16cm}\centering
+      \textbf{\large KHÓA LUẬN TỐT NGHIỆP}\\[0.4cm]
+      {\large Ngành: Công nghệ thông tin}
+    \end{minipage}
+  };
 
-\vspace{4cm}
-\begin{table}[H]
-\centering
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{ll}
-\multicolumn{1}{c}{\textbf{Giảng viên hướng dẫn:}} & TS. Ma Thị Châu \hspace{0.5cm} \underline{\hspace{3cm}}  \\[0.5cm]
-  & \multicolumn{1}{r}{Chữ kí GVHD}     \\[0.5cm]
-\textbf{Khoa:} & Công nghệ Thông tin                 \\[0.5cm]
-\textbf{Trường:} & Đại học Công nghệ -- ĐHQGHN \\[4cm]
-\multicolumn{2}{c}{\textbf{HÀ NỘI, 06/2026}}                                            
-\end{tabular}%
-}
-\end{table}
-\end{center}
+  % Advisors — 22cm from top, left-aligned
+  \node[anchor=north west] at ([xshift=2.5cm, yshift=-22cm]current page.north west) {%
+    \begin{minipage}{14cm}
+      \textbf{\large Cán bộ hướng dẫn: TS. Ma Thị Châu}\\[0.5cm]
+      \textbf{\large Cán bộ đồng hướng dẫn: TS. Nguyễn Quang Trung}
+    \end{minipage}
+  };
 
-
-
+  % City/year — 3.5cm from bottom
+  \node[anchor=south] at ([yshift=3.5cm]current page.south) {%
+    \textbf{\large HÀ NỘI -- 2026}
+  };
+\end{tikzpicture}
 \end{titlepage}
-
 \end{document}

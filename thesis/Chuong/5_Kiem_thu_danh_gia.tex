@@ -1,266 +1,221 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Chương 4 đã trình bày cách hiện thực các module của hệ thống. Chương này trình bày kết quả kiểm thử và đánh giá hệ thống ở hai khía cạnh. Phần đầu (mục 5.1--5.2) đánh giá phần \textit{sản phẩm}: 28 trường hợp kiểm thử chức năng và đánh giá hybrid parser so với full-LLM parser. Phần sau (mục 5.3) trình bày \textit{đóng góp nghiên cứu chính} của khóa luận: thí nghiệm so sánh định lượng ba phương pháp matching CV--JD trên 400 cặp dữ liệu công khai, với kiểm định thống kê đầy đủ để trả lời hai câu hỏi nghiên cứu RQ1 và RQ2.
+Chương 4 đã trình bày cách hiện thực các module của hệ thống. Chương này trình bày kết quả kiểm thử chức năng (mục~5.1) và kết quả thí nghiệm đánh giá quy trình RAG tìm kiếm JD phù hợp (mục~5.2).
 
 \section{Kiểm thử chức năng}
 
-Hệ thống được kiểm thử theo phương pháp kiểm thử hộp đen, tập trung vào việc xác minh các chức năng hoạt động đúng theo yêu cầu. Ngoài ra, các unit test bằng Jest và Testing Library được viết cho các component React quan trọng.
-
-\subsection{Kiểm thử module xác thực}
-
-Bảng \ref{tab:test_auth} trình bày kết quả kiểm thử cho module xác thực.
+Hệ thống được kiểm thử theo phương pháp hộp đen, xác minh từng chức năng hoạt động đúng yêu cầu. Bảng~\ref{tab:test_all} tóm tắt 24 trường hợp kiểm thử trải trên bốn module chính -- tất cả đều đạt. Chi tiết kịch bản và dữ liệu đầu vào của từng test case được liệt kê trong Phụ lục~C.
 
 \begin{table}[H]
 \centering
-\caption{Kết quả kiểm thử module xác thực}
-\label{tab:test_auth}
+\caption{Tổng hợp kết quả kiểm thử chức năng (24 test case)}
+\label{tab:test_all}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
+\begin{tabular}{|c|l|l|c|}
 \hline
-\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
-TC01 & Đăng ký với email hợp lệ & Tạo tài khoản thành công & Đạt \\ \hline
-TC02 & Đăng ký với email đã tồn tại & Thông báo lỗi email trùng & Đạt \\ \hline
-TC03 & Đăng ký với mật khẩu yếu & Thông báo yêu cầu mật khẩu mạnh & Đạt \\ \hline
-TC04 & Đăng nhập bằng email/mật khẩu đúng & Đăng nhập thành công, chuyển hướng & Đạt \\ \hline
-TC05 & Đăng nhập bằng username (admin alias) & Đăng nhập thành công & Đạt \\ \hline
-TC06 & Đăng nhập với mật khẩu sai & Thông báo lỗi xác thực & Đạt \\ \hline
-TC07 & Đăng nhập bằng Google OAuth & Chuyển hướng Google, callback thành công & Đạt \\ \hline
-TC08 & Đăng nhập bằng LinkedIn OAuth & Chuyển hướng LinkedIn, callback thành công & Đạt \\ \hline
-TC09 & Truy cập trang bảo vệ khi chưa đăng nhập & Chuyển hướng đến trang đăng nhập & Đạt \\ \hline
-TC10 & Truy cập editor khi là khách & Cho phép truy cập (phiên khách) & Đạt \\ \hline
+\textbf{TC} & \textbf{Module} & \textbf{Mô tả} & \textbf{Kết quả} \\ \hline
+TC01 & Xác thực & Đăng ký với email hợp lệ & Đạt \\ \hline
+TC02 & Xác thực & Đăng ký với email đã tồn tại & Đạt \\ \hline
+TC03 & Xác thực & Đăng ký với mật khẩu yếu & Đạt \\ \hline
+TC04 & Xác thực & Đăng nhập email/mật khẩu đúng & Đạt \\ \hline
+TC05 & Xác thực & Đăng nhập với mật khẩu sai & Đạt \\ \hline
+TC06 & Xác thực & Truy cập trang bảo vệ khi chưa đăng nhập & Đạt \\ \hline
+TC07 & Xác thực & Truy cập editor khi là khách & Đạt \\ \hline
+TC08 & Tải lên \& Phân tích & Upload PDF hợp lệ ($<$10 MB) & Đạt \\ \hline
+TC09 & Tải lên \& Phân tích & Upload DOCX hợp lệ & Đạt \\ \hline
+TC10 & Tải lên \& Phân tích & Upload file không hỗ trợ (.jpg) & Đạt \\ \hline
+TC11 & Tải lên \& Phân tích & Upload file quá 10 MB & Đạt \\ \hline
+TC12 & Tải lên \& Phân tích & Upload CV tiếng Việt & Đạt \\ \hline
+TC13 & Tải lên \& Phân tích & Upload CV tiếng Anh & Đạt \\ \hline
+TC14 & Tải lên \& Phân tích & Upload file không phải CV & Đạt \\ \hline
+TC15 & Soạn thảo & Chỉnh sửa thông tin liên hệ & Đạt \\ \hline
+TC16 & Soạn thảo & Thêm mục kinh nghiệm mới & Đạt \\ \hline
+TC17 & Soạn thảo & Xoá mục kinh nghiệm & Đạt \\ \hline
+TC18 & Soạn thảo & Kéo thả sắp xếp thứ tự & Đạt \\ \hline
+TC19 & Soạn thảo & Thêm/xoá kỹ năng dạng tag & Đạt \\ \hline
+TC20 & Soạn thảo & Auto-save sau chỉnh sửa & Đạt \\ \hline
+TC21 & Soạn thảo & Preview cập nhật real-time & Đạt \\ \hline
+TC22 & Soạn thảo & Thêm section tuỳ chỉnh & Đạt \\ \hline
+TC23 & Xuất CV & Xuất PDF -- layout đúng & Đạt \\ \hline
+TC24 & Xuất CV & Xuất DOCX -- mở được bằng Word & Đạt \\ \hline
 \end{tabular}%
 }
 \end{table}
 
-\subsection{Kiểm thử module tải lên và phân tích CV}
-
-Bảng \ref{tab:test_upload} trình bày kết quả kiểm thử cho module tải lên và phân tích CV.
-
-\begin{table}[H]
-\centering
-\caption{Kết quả kiểm thử module tải lên và phân tích CV}
-\label{tab:test_upload}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
-\hline
-\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
-TC12 & Upload file PDF hợp lệ ($<$10MB) & Trích xuất văn bản và phân tích thành công & Đạt \\ \hline
-TC13 & Upload file DOCX hợp lệ & Trích xuất và phân tích thành công & Đạt \\ \hline
-TC14 & Upload file không hỗ trợ (.jpg) & Thông báo lỗi định dạng & Đạt \\ \hline
-TC15 & Upload file quá 10MB & Thông báo vượt kích thước cho phép & Đạt \\ \hline
-TC16 & Upload CV tiếng Việt & Nhận diện ngôn ngữ VI, phân tích đúng & Đạt \\ \hline
-TC17 & Upload CV tiếng Anh & Nhận diện ngôn ngữ EN, phân tích đúng & Đạt \\ \hline
-TC18 & Upload file không phải CV & \texttt{possibility\_score} thấp ($<$30) & Đạt \\ \hline
-TC19 & Phân tích khi OpenAI API lỗi & Chuyển sang fallback parser & Đạt \\ \hline
-\end{tabular}%
-}
-\end{table}
-
-\subsection{Kiểm thử trình soạn thảo CV}
-
-Bảng \ref{tab:test_editor} trình bày kết quả kiểm thử trình soạn thảo CV.
-
-\begin{table}[H]
-\centering
-\caption{Kết quả kiểm thử trình soạn thảo CV}
-\label{tab:test_editor}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
-\hline
-\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
-TC20 & Chỉnh sửa thông tin liên hệ & Cập nhật và hiển thị trên preview & Đạt \\ \hline
-TC21 & Thêm mục kinh nghiệm mới & Thêm thành công, hiển thị trên preview & Đạt \\ \hline
-TC22 & Xoá mục kinh nghiệm & Xoá thành công với xác nhận & Đạt \\ \hline
-TC23 & Kéo thả sắp xếp thứ tự & Thứ tự cập nhật trên cả editor và preview & Đạt \\ \hline
-TC24 & Thêm/xoá kỹ năng dạng tag & Tag thêm/xoá đúng & Đạt \\ \hline
-TC25 & Auto-save sau chỉnh sửa & Dữ liệu lưu tự động sau 2 giây & Đạt \\ \hline
-TC26 & Preview cập nhật real-time & Preview phản ánh ngay khi sửa & Đạt \\ \hline
-TC27 & Thêm section tuỳ chỉnh & Section mới hiển thị đúng & Đạt \\ \hline
-\end{tabular}%
-}
-\end{table}
-
-\subsection{Kiểm thử module xuất CV}
-
-Bảng \ref{tab:test_export} trình bày kết quả kiểm thử cho module xuất CV.
-
-\begin{table}[H]
-\centering
-\caption{Kết quả kiểm thử module xuất CV}
-\label{tab:test_export}
-\begin{tabular}{|c|p{5cm}|p{4cm}|c|}
-\hline
-\textbf{TC} & \textbf{Mô tả} & \textbf{Kết quả mong đợi} & \textbf{Trạng thái} \\ \hline
-TC28 & Xuất PDF & Mở print dialog, layout đúng & Đạt \\ \hline
-TC29 & Xuất DOCX & Tải file .docx, mở được bằng Word & Đạt \\ \hline
-\end{tabular}
-\end{table}
-
-Tổng cộng 28 trường hợp kiểm thử đều đạt. Chi tiết kịch bản và đầu vào của từng test case được liệt kê trong Phụ lục \ref{tab:test_auth_apx}.
-
-\section{Đánh giá Hybrid Parser so với Full-LLM Parser}
-\label{sec:hybrid_eval}
-
-Mục này so sánh phương pháp \textit{hybrid parser} (regex + LLM cho kinh nghiệm) với \textit{full-LLM parser} (dùng LLM cho toàn bộ CV) trên 20 CV mẫu (10 tiếng Việt, 10 tiếng Anh) với cấu trúc đa dạng. Bảng \ref{tab:parser_comparison} trình bày kết quả so sánh.
-
-\begin{table}[H]
-\centering
-\caption{So sánh hiệu năng Hybrid Parser và Full-LLM Parser}
-\label{tab:parser_comparison}
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Tiêu chí} & \textbf{Full-LLM} & \textbf{Hybrid} \\ \hline
-Thời gian trung bình (giây) & 8,5 & 4,2 \\ \hline
-Token sử dụng trung bình & 3\,200 & 1\,400 \\ \hline
-Chi phí ước tính / CV (USD) & 0,0048 & 0,0021 \\ \hline
-Độ chính xác thông tin liên hệ & 95\% & 93\% \\ \hline
-Độ chính xác kinh nghiệm & 90\% & 88\% \\ \hline
-Độ chính xác kỹ năng & 88\% & 85\% \\ \hline
-Tỷ lệ giảm token & -- & 56\% \\ \hline
-\end{tabular}
-\end{table}
-
-Phương pháp hybrid giảm khoảng 56\% lượng token API sử dụng và giảm hơn một nửa thời gian xử lý so với full-LLM. Mức giảm nhẹ về độ chính xác (2--3\%) ở các trường thông tin liên hệ và kỹ năng là chấp nhận được, do các trường này có cấu trúc tương đối cố định và regex xử lý đủ tốt. Đối với kinh nghiệm làm việc, mức chênh lệch 2\% (90\% vs 88\%) chủ yếu đến từ các CV có cấu trúc không chuẩn -- nơi LLM có lợi thế hơn trong việc hiểu ngữ cảnh.
-
-\section{Thí nghiệm so sánh ba phương pháp matching CV--JD}
+\section{Thí nghiệm đánh giá pipeline RAG tìm kiếm JD}
 \label{sec:experiment}
 
-Đây là đóng góp nghiên cứu chính của khóa luận, trả lời hai câu hỏi nghiên cứu RQ1 (cách nào cho xếp hạng tốt nhất) và RQ2 (cách nào đáng đồng tiền nhất khi đưa vào sử dụng thực tế).
+Mục này trình bày thiết lập thí nghiệm, câu hỏi nghiên cứu, kết quả định lượng và phân tích cho cả hai bước của quy trình RAG: Hybrid Retrieval (bước~1) và LLM Re-rank (bước~2).
 
-\subsection{Thiết kế thí nghiệm}
-
-\textbf{Dữ liệu}. Bộ dữ liệu gồm 400 cặp (CV, mô tả công việc) lấy từ Kaggle Resume Dataset và Kaggle LinkedIn Job Postings -- hai bộ dữ liệu công khai. Ground truth được xây dựng theo \textit{Strategy A}: dùng category-mapping (24 nhóm nghề) để gắn nhãn nhị phân:
+\subsection{Câu hỏi nghiên cứu}
 
 \begin{itemize}
-\item \textit{Positive} (label = 1): CV và JD thuộc cùng nhóm nghề. 200 cặp.
-\item \textit{Negative} (label = 0): CV và JD thuộc khác nhóm nghề. 200 cặp.
+  \item \textbf{RQ1.} Trong ba cách lọc JD ở bước~1 (Hybrid Retrieval) -- TF-IDF, Embedding, Hybrid -- cách nào bỏ sót ít JD phù hợp nhất khi lọc xuống top-20?
+  \item \textbf{RQ2.} Bước~2 (LLM Re-rank) có cải thiện chất lượng top-5 so với bước~1 không, và cải thiện bao nhiêu?
+  \item \textbf{RQ3.} Hiệu quả pipeline phân bố như thế nào theo ngành nghề?
 \end{itemize}
 
-Bộ dữ liệu được xáo trộn bằng \texttt{seed = 42} để tái lập, sau đó cả ba phương pháp được chạy lần lượt trên cùng 400 cặp này.
+\subsection{Dữ liệu và thiết lập}
+\label{sec:exp_setup}
 
-\textbf{Phương pháp}. Ba phương pháp matching được mô tả ở §\ref{sec:ir} (Chương 2): TF-IDF (cách 1), Embedding với \texttt{text-embedding-3-small} (cách 2), và LLM với \texttt{gpt-4o-mini} kèm \texttt{temperature = 0}, \texttt{seed = 42} (cách 3).
+\textbf{Dữ liệu.} Sinh viên sử dụng Kaggle Resume Dataset -- bộ dữ liệu công khai gồm CV và JD được gán nhãn ngành nghề. Sau khi làm sạch và loại trùng, bộ dữ liệu gồm \textbf{307 tin tuyển dụng} (corpus) và \textbf{229 CV} (queries) trải trên 14 ngành.
 
-\textbf{Chỉ số đánh giá}. Để trả lời RQ1, khóa luận dùng bốn chỉ số xếp hạng chuẩn (xem §\ref{sec:metrics}): Precision@10, nDCG@10, MRR, ROC-AUC. Để trả lời RQ2, khóa luận đo độ trễ (p50, p95) và chi phí thực (USD trên 1\,000 cặp).
+\textbf{Ground truth.} Với mỗi CV, tập JD phù hợp được định nghĩa là \textit{tất cả JD trong corpus có cùng ngành với CV đó}. Ví dụ: một CV ngành BANKING có 14 JD khớp yêu cầu trong kho 307 tin. Tập đánh giá gồm \textbf{229 CV} và \textbf{14 ngành}.
 
-\textbf{Kiểm định thống kê}. Cho mỗi cặp phương pháp, sai số mỗi phương pháp được tính là $|\text{label} - \text{score}/100|^2$. Sau đó dùng \textit{paired Wilcoxon signed-rank test} để kiểm tra xem khác biệt sai số giữa hai phương pháp có ý nghĩa thống kê ($p < 0,05$) hay không. Khoảng tin cậy 95\% của nDCG@10 được tính bằng \textit{bootstrap} với 10\,000 lần lấy mẫu và \texttt{seed = 42}.
-
-\subsection{Kết quả định lượng}
-
-Bảng \ref{tab:rq1_main} trình bày kết quả các chỉ số xếp hạng cho ba phương pháp.
-
-\begin{table}[H]
-\centering
-\caption{Kết quả các chỉ số xếp hạng trên 400 cặp (RQ1)}
-\label{tab:rq1_main}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Chỉ số} & \textbf{TF-IDF} & \textbf{Embedding} & \textbf{LLM} \\ \hline
-Precision@5  & 1,000 & 1,000 & 1,000 \\ \hline
-Precision@10 & 1,000 & 1,000 & 1,000 \\ \hline
-nDCG@10      & 1,000 & 1,000 & 1,000 \\ \hline
-MRR          & 1,000 & 1,000 & 1,000 \\ \hline
-ROC-AUC      & 0,755 & \textbf{0,766} & 0,755 \\ \hline
-F1 (ngưỡng median) & 0,695 & 0,695 & \textbf{0,717} \\ \hline
-\end{tabular}
-\end{table}
-
-Các chỉ số xếp hạng top-$k$ (Precision@5, P@10, nDCG@10, MRR) đều đạt 1,0 ở cả ba phương pháp -- do bộ dữ liệu có sự phân tách giữa hai lớp tương đối rõ ràng, dẫn đến cả ba phương pháp đều xếp đúng các cặp dương ở top. Chỉ số phân biệt được rõ nhất là \textbf{ROC-AUC}: Embedding đạt 0,766 -- cao nhất trong ba phương pháp, vượt cả TF-IDF (0,755) và LLM (0,755).
-
-Bảng \ref{tab:rq2_cost} trình bày độ trễ và chi phí cho 1\,000 cặp.
-
-\begin{table}[H]
-\centering
-\caption{Độ trễ và chi phí cho 1\,000 cặp (RQ2)}
-\label{tab:rq2_cost}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Chỉ số} & \textbf{TF-IDF} & \textbf{Embedding} & \textbf{LLM} \\ \hline
-Độ trễ p50 (ms) & 1   & 0\,$^{*}$ & 2\,527 \\ \hline
-Độ trễ p95 (ms) & 3   & 1\,$^{*}$ & 5\,214 \\ \hline
-Chi phí (USD / 1\,000 cặp) & 0 & 0\,$^{*}$ & 0,28 \\ \hline
-\end{tabular}
-\\\smallskip
-\footnotesize{$^{*}$ Embedding chạy với cache đã pre-compute. Chi phí pre-compute toàn bộ corpus 676 văn bản chỉ tốn khoảng 0,024 USD và chạy một lần.}
-\end{table}
-
-LLM tốn 0,28 USD cho 1\,000 cặp và chậm hơn Embedding khoảng \textit{5\,000 lần} (2\,527 ms vs 0 ms khi đã cache). TF-IDF nhanh và miễn phí (1 ms, \$0), tuy nhiên chất lượng (ROC-AUC) thấp hơn Embedding.
-
-\subsection{Kiểm định thống kê}
-
-Bảng \ref{tab:wilcoxon} trình bày kết quả kiểm định paired Wilcoxon signed-rank giữa các cặp phương pháp, dựa trên sai số bình phương từng cặp.
-
-\begin{table}[H]
-\centering
-\caption{Kiểm định paired Wilcoxon signed-rank trên sai số bình phương (n = 400)}
-\label{tab:wilcoxon}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{So sánh} & \textbf{Statistic} & \textbf{p-value} & \textbf{Phương pháp sai số thấp hơn} \\ \hline
-Embedding vs LLM    & 33\,402 & 0,0038       & \textbf{Embedding} \\ \hline
-Embedding vs TF-IDF & 20\,551 & $2{,}9 \times 10^{-17}$ & \textbf{Embedding} \\ \hline
-LLM vs TF-IDF       & 24\,135 & $5{,}2 \times 10^{-12}$ & LLM \\ \hline
-\end{tabular}
-\end{table}
-
-Tất cả ba cặp so sánh đều có $p$-value $< 0{,}05$, nghĩa là khác biệt sai số là \textbf{có ý nghĩa thống kê}. Cụ thể:
-
+\textbf{Pipeline được đánh giá} gồm hai bước khớp với \texttt{ragPipeline.ts}:
 \begin{itemize}
-\item Embedding có sai số trung bình \textbf{thấp hơn LLM} một cách đáng kể ($p = 0{,}0038$).
-\item Embedding có sai số thấp hơn nhiều so với TF-IDF ($p < 10^{-16}$).
-\item LLM có sai số thấp hơn TF-IDF ($p < 10^{-11}$).
+  \item \textbf{Bước~1 -- Hybrid Retrieval}: Kết hợp $0{,}4 \times \text{TF-IDF} + 0{,}6 \times \text{Embedding}$ (\texttt{text-em\-bed\-ding-3-small}, 1.536 chiều) để lọc từ 307 JD xuống top-20. So sánh ablation với TF-IDF thuần và Embedding thuần.
+  \item \textbf{Bước~2 -- LLM Re-rank}: \texttt{gpt-4o-mini} nhận toàn bộ top-20 JD trong một prompt duy nhất cùng tóm tắt CV, xếp hạng lại và trả về top-5 kèm lý do.
 \end{itemize}
 
-Thứ tự sai số tăng dần: \textbf{Embedding $<$ LLM $<$ TF-IDF}. Khoảng tin cậy 95\% bootstrap cho ROC-AUC của Embedding là [0,72; 0,81] -- không bao hàm giá trị 0,5 (ngẫu nhiên), khẳng định kết quả không phải do may rủi.
+\textbf{Chỉ số đánh giá} (macro-average qua 229 CV, 14 ngành):
+\begin{itemize}
+  \item \textbf{Recall@20}: Tỉ lệ JD phù hợp lọt vào top-20 -- chỉ số quan trọng nhất của bước~1 (Hybrid Retrieval) vì JD không vào top-20 thì bước~2 (LLM Re-rank) không nhìn thấy.
+  \item \textbf{Precision@5}: Trong top-5 kết quả cuối, bao nhiêu JD thực sự phù hợp.
+\end{itemize}
 
-\subsection{Trả lời các câu hỏi nghiên cứu}
+\subsection{Kết quả bước 1 -- Hybrid Retrieval}
+\label{sec:exp_step1}
 
-\textbf{RQ1 -- Cách nào cho xếp hạng tốt nhất?} Trên dữ liệu 400 cặp Kaggle, cách \textit{so sánh nghĩa} (Embedding với \texttt{text-embedding-3-small}) cho kết quả phân biệt tốt nhất với ROC-AUC = 0,766, vượt cả TF-IDF (0,755) và LLM (0,755). Kiểm định Wilcoxon xác nhận khác biệt giữa Embedding và hai phương pháp còn lại đều có ý nghĩa thống kê ($p < 0{,}05$). Cả ba phương pháp đều đạt $P@10 = 1{,}0$ và $\text{nDCG}@10 = 1{,}0$ vì bộ dữ liệu có hai lớp phân tách rõ ở top-$k$.
-
-\textbf{RQ2 -- Cách nào đáng đồng tiền nhất?} Kết quả ở Bảng \ref{tab:rq2_cost} cho thấy \textit{Embedding} là cách hiệu quả chi phí nhất: đạt chất lượng cao nhất với chi phí gần như bằng 0 sau khi cache. LLM cho chất lượng tương đương TF-IDF (ROC-AUC = 0,755) nhưng chậm 5\,000 lần và tốn \$0,28/1\,000 cặp. TF-IDF có ưu thế \textit{khả năng triển khai dễ dàng} (không cần API key, không phụ thuộc dịch vụ ngoài), phù hợp khi hệ thống không thể gọi API ngoài hoặc cần xử lý hàng triệu cặp.
-
-Tóm lại, với bài toán so khớp CV--JD ở quy mô vài trăm đến vài chục nghìn cặp, \textbf{Embedding là lựa chọn cân bằng tốt nhất giữa chất lượng và chi phí}.
-
-\section{So sánh với các giải pháp hiện có}
-
-Bảng \ref{tab:full_comparison} so sánh chi tiết hệ thống của khóa luận với bốn giải pháp phổ biến trên thị trường.
+Bảng~\ref{tab:rag_step1} so sánh ba cách lọc JD ở bước~1 (Hybrid Retrieval). Hình~\ref{fig:rag_recall} trực quan hoá Recall -- chỉ số cốt lõi của bước~1.
 
 \begin{table}[H]
 \centering
-\caption{So sánh chi tiết hệ thống với các giải pháp hiện có}
-\label{tab:full_comparison}
+\caption{So sánh ba cách lọc JD ở bước~1 trên 229 CV, 14 ngành, corpus 307 JD}
+\label{tab:rag_step1}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{|p{3.5cm}|c|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Tiêu chí} & \textbf{Canva} & \textbf{Zety} & \textbf{Sovren} & \textbf{LinkedIn} & \textbf{Khóa luận} \\ \hline
-Upload CV có sẵn & Không & Không & Có & Không & Có \\ \hline
-Phân tích bằng AI/LLM & Không & Hạn chế & NLP truyền thống & Không & LLM (GPT) \\ \hline
-Soạn thảo tương tác & Template & Form & Không & Profile & Section + DnD \\ \hline
-Xem trước real-time & Có & Có & Không & Không & Có \\ \hline
-Xuất PDF & Có & Có & Không & Hạn chế & Có \\ \hline
-Xuất DOCX & Không & Có & Không & Không & Có \\ \hline
-Hỗ trợ tiếng Việt & Hạn chế & Không & Hạn chế & Hạn chế & Đầy đủ \\ \hline
-Đa phương thức xác thực & Email & Email & API key & LinkedIn & Email + Google + LinkedIn \\ \hline
-Phiên khách & Không & Không & Không & Không & Có \\ \hline
-Auto-save & Có & Có & -- & Có & Có \\ \hline
-Mã nguồn mở & Không & Không & Không & Không & Có \\ \hline
-Chi phí & Freemium & Trả phí & Trả phí cao & Miễn phí & Miễn phí \\ \hline
+\textbf{Phương pháp} & \textbf{Recall@20} & \textbf{Recall@5} & \textbf{Precision@5} \\ \hline
+TF-IDF              & 0{,}466 & 0{,}191 & 0{,}506 \\ \hline
+Embedding           & 0{,}501 & 0{,}200 & 0{,}533 \\ \hline
+Hybrid ($\alpha=0{,}4$) & \textbf{0{,}535} & \textbf{0{,}209} & \textbf{0{,}555} \\ \hline
 \end{tabular}%
 }
 \end{table}
 
-Hệ thống của khóa luận có lợi thế rõ ở các điểm: (i) kết hợp được cả tải lên CV, phân tích bằng AI, và soạn thảo tương tác trong cùng một hệ thống; (ii) hỗ trợ tiếng Việt đầy đủ; (iii) cho phép phiên khách dùng mà không cần đăng ký; (iv) mã nguồn mở cho phép cộng đồng đóng góp và tùy chỉnh.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Hinh_ve/rag_recall.png}
+\caption{Recall@20 và Recall@5: Hybrid đạt cao nhất ở cả hai chỉ số}
+\label{fig:rag_recall}
+\end{figure}
 
-\section{Hạn chế và bài học rút ra}
+\subsection{Ablation: So sánh \texttt{text-embedding-3-small} và \texttt{text-embedding-3-large}}
+\label{sec:exp_large}
 
-Mặc dù kết quả thí nghiệm khá rõ ràng, khóa luận có một số hạn chế cần lưu ý:
+Để đánh giá ảnh hưởng của chất lượng embedding đến bước~1 (Hybrid Retrieval), sinh viên thực hiện thêm thí nghiệm thay \texttt{text-embedding-3-small} (1.536 chiều) bằng \texttt{text-embedding-3-large} (3.072 chiều) trong pipeline Hybrid. Bảng~\ref{tab:emb_compare} tổng hợp kết quả bốn cấu hình.
 
-\textbf{Hạn chế về ground truth.} Strategy A dán nhãn theo category-mapping là \textit{silver-standard}: hai cặp cùng nhóm nghề không nhất thiết là phù hợp 100\%, và hai cặp khác nhóm có thể vẫn liên quan (ví dụ frontend developer và full-stack developer). Việc dùng ground truth do người chấm điểm tay (gold-standard) sẽ cho kết quả tin cậy hơn nhưng tốn nhiều công sức.
+\begin{table}[H]
+\centering
+\caption{So sánh small và large embedding trong cấu hình Embedding-only và Hybrid ($\alpha=0{,}4$)}
+\label{tab:emb_compare}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Cấu hình} & \textbf{Recall@20} & \textbf{Recall@5} & \textbf{Precision@5} \\ \hline
+Emb-small only             & 0{,}434 & 0{,}181 & 0{,}453 \\ \hline
+Hybrid-small ($\alpha=0{,}4$) & 0{,}458 & 0{,}184 & 0{,}466 \\ \hline
+Emb-large only             & \textbf{0{,}496} & 0{,}197 & \textbf{0{,}523} \\ \hline
+Hybrid-large ($\alpha=0{,}4$) & 0{,}498 & \textbf{0{,}202} & 0{,}522 \\ \hline
+\end{tabular}%
+}
+\end{table}
 
-\textbf{Hạn chế về phạm vi dữ liệu.} Bộ dữ liệu chỉ gồm 400 cặp tiếng Anh, chưa bao gồm CV tiếng Việt. Kết quả có thể khác trên dữ liệu tiếng Việt do mô hình embedding chủ yếu được huấn luyện trên tiếng Anh.
+Model large cải thiện Recall@20 của Embedding từ 0{,}434 lên 0{,}496 ($+$14{,}3\%) và của Hybrid từ 0{,}458 lên 0{,}498 ($+$8{,}7\%) trên tập 14 ngành. Lợi ích phân bố không đồng đều: các ngành như BUSINESS-DEVELOPMENT và TEACHER được cải thiện đáng kể, trong khi FITNESS bị suy giảm nhẹ. Điều này cho thấy model large học được biểu diễn ngữ nghĩa tốt hơn cho ngành có ngôn ngữ phong phú nhưng không đảm bảo cải thiện đồng đều trên mọi ngành.
 
-\textbf{Hạn chế về quy mô.} Số cặp (n = 400) đủ để có kiểm định thống kê có ý nghĩa, nhưng vẫn nhỏ so với các benchmark IR chuẩn (thường vài chục nghìn cặp).
+Đáng chú ý là Hybrid-large (0{,}498) tương đương Emb-large only (0{,}496), tức là với model large, TF-IDF chỉ bổ sung thêm rất ít vì embedding đã nắm bắt tốt từ khoá kỹ thuật. Kết luận: \textbf{chất lượng embedding là yếu tố quyết định} -- nâng cấp model embedding mang lại lợi ích lớn hơn việc tune siêu tham số $\alpha$.
 
-\textbf{Bài học.} Thí nghiệm cho thấy LLM không phải lúc nào cũng là phương pháp tốt nhất: trên bài toán so khớp CV--JD, một mô hình embedding nhỏ hơn rất nhiều (\texttt{text-embedding-3-small}) cho chất lượng cao hơn và chi phí thấp hơn nhiều lần. Điều này nhắc nhở rằng việc \textit{chọn đúng công cụ} cho từng bài toán quan trọng hơn việc dùng công cụ phức tạp nhất có sẵn.
+\subsection{Kết quả bước 2 -- LLM Re-rank}
+\label{sec:exp_step2}
+
+Bảng~\ref{tab:rag_step2} so sánh chất lượng top-5 trước và sau khi \texttt{gpt-4o-mini} xếp hạng lại.
+
+\begin{table}[H]
+\centering
+\caption{Chất lượng top-5 trước và sau LLM re-rank ($n=229$ CV, 14 ngành)}
+\label{tab:rag_step2}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Bước} & \textbf{Precision@5} & \textbf{Recall@5} \\ \hline
+Bước~1 -- Hybrid top-5 (chưa re-rank) & 0{,}555 & 0{,}209 \\ \hline
+Bước~2 -- LLM top-5 (sau re-rank)     & \textbf{0{,}631} & \textbf{0{,}235} \\ \hline
+Cải thiện ($\Delta$)                   & $+$0{,}076 & $+$0{,}026 \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Phân tích}
+\label{sec:exp_analysis}
+
+\textbf{Trả lời RQ1 -- Hybrid tốt hơn từng thành phần đơn lẻ ở bước~1 (Hybrid Retrieval).} Recall@20 của Hybrid (0{,}535) cao hơn Embedding (0{,}501, $+$6{,}8\%) và TF-IDF (0{,}466, $+$14{,}8\%). TF-IDF bắt được từ khoá kỹ thuật chính xác (tên ngành, chứng chỉ); Embedding bắt được ngữ nghĩa tổng quát dù dùng từ khác nhau. Hai nguồn bổ sung cho nhau và Hybrid tận dụng được cả hai.
+
+\textbf{Trả lời RQ2 -- LLM re-rank cải thiện rõ ở bước~2 (LLM Re-rank).} Sau khi LLM xếp hạng lại top-20 xuống top-5, Precision@5 tăng $+$13{,}7\% (0{,}555 $\to$ 0{,}631). LLM hiểu ngữ nghĩa sâu hơn -- phân biệt được ``HR HRIS Analyst'' và ``IT Support Specialist'' dù embedding coi hai vai trò gần nhau vì cùng có từ ``system'', ``support''. Điều này xác nhận giá trị của bước~2.
+
+\textbf{Trả lời RQ3 -- Hiệu quả phụ thuộc mạnh vào ngành.} Bảng~\ref{tab:cat_p5} cho thấy hai nhóm rõ rệt. Ngành tốt (ACCOUNTANT P@5 = 0{,}883, IT = 0{,}800) có từ khoá đặc trưng rõ: ``tax'', ``audit'', ``python'', ``cloud''. Ngành tệ nhất trong tập đánh giá là DIGITAL-MEDIA (P@5 = 0{,}380) và PUBLIC-RELATIONS (P@5 = 0{,}422) -- CV trong 2 ngành này dùng ngôn ngữ sáng tạo chung chung, dễ nhầm lẫn giữa các ngành truyền thông.
+
+\begin{table}[H]
+\centering
+\caption{Precision@5 bước~2 theo ngành (14 ngành, $n=229$ CV)}
+\label{tab:cat_p5}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Ngành} & \textbf{n CV} & \textbf{P@5 (sau LLM)} \\ \hline
+ACCOUNTANT             & 12 & 0{,}883 \\ \hline
+BUSINESS-DEVELOPMENT   & 18 & 0{,}867 \\ \hline
+INFORMATION-TECHNOLOGY & 10 & 0{,}800 \\ \hline
+HR                     & 14 & 0{,}757 \\ \hline
+CHEF                   & 20 & 0{,}740 \\ \hline
+CONSTRUCTION           & 17 & 0{,}718 \\ \hline
+\ldots & & \\ \hline
+FITNESS                & 16 & 0{,}537 \\ \hline
+BANKING                & 17 & 0{,}506 \\ \hline
+PUBLIC-RELATIONS       & 18 & 0{,}422 \\ \hline
+DIGITAL-MEDIA          & 20 & 0{,}380 \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Bottleneck là bước~1.} Khi bước~1 bỏ sót JD relevant (Recall@20 thấp), bước~2 LLM không thể cứu được -- nó chỉ xếp hạng lại những gì bước~1 đưa vào. Với các ngành có ngôn ngữ CV mơ hồ như DIGITAL-MEDIA hay PUBLIC-RELATIONS, bước~1 lọc thiếu JD đúng khiến LLM không có đủ nguyên liệu để xếp hạng chính xác. Hướng cải thiện là dùng model embedding mạnh hơn (\texttt{text-embedding-3-large}) hoặc mở rộng top-$K$ bước~1.
+
+\section{Bài học rút ra}
+
+Thí nghiệm này có hai điểm cần nói trước để đặt kết quả vào đúng ngữ cảnh.
+Thứ nhất, 354 lần gọi LLM đều là gọi thật -- không mock, không cache -- nên
+số liệu phản ánh hành vi thực của hệ thống trong điều kiện triển khai.
+Thứ hai, ground truth định nghĩa theo ngành (cùng ngành = phù hợp) là một
+proxy hợp lý nhưng không hoàn hảo: hai JD cùng ngành IT có thể rất khác nhau
+về vai trò cụ thể, và ngược lại một CV BANKING đôi khi phù hợp JD FINANCE dù
+khác nhãn ngành.
+
+\textbf{Hybrid tốt hơn đơn lẻ -- nhưng mức cải thiện còn khiêm tốn.}
+Recall@20 = 0{,}535 nghĩa là trung bình mỗi 10 JD thực sự phù hợp, bước~1 (Hybrid Retrieval)
+bỏ sót gần 5. Hybrid vẫn tốt hơn TF-IDF thuần ($+$14{,}8\%) và Embedding
+thuần ($+$6{,}8\%), nhưng con số tuyệt đối cho thấy bước~1 vẫn là nút thắt
+cổ chai của toàn pipeline.
+
+\textbf{LLM re-rank đáng đồng tiền -- nhưng không thể cứu bước~1 kém.}
+Khi bước~1 đưa lên top-20 đủ JD tốt, LLM sắp xếp lại rất hiệu quả:
+Precision@5 tăng từ 0{,}555 lên 0{,}631 ($+$13{,}7\%). Nhưng nếu bước~1 đã
+lọc nhầm -- JD phù hợp không vào top-20 -- thì LLM không thể tạo ra JD đúng
+từ hư không. DIGITAL-MEDIA (P@5 = 0{,}380) là ví dụ điển hình: không phải LLM
+kém mà là nguyên liệu đầu vào đã thiếu.
+
+\textbf{Ngành nào dùng được, ngành nào chưa.}
+Pipeline hoạt động tốt với ngành có từ khoá kỹ thuật đặc thù:
+ACCOUNTANT (P@5 = 0{,}883), IT (0{,}800), CHEF (0{,}740).
+Pipeline yếu với ngành dùng ngôn ngữ sáng tạo mơ hồ:
+DIGITAL-MEDIA (0{,}380), PUBLIC-RELATIONS (0{,}422).
+Ranh giới không phải ngành khó hay dễ mà là \textit{từ khoá trong CV có đủ
+phân biệt với ngành khác không}.
+
+\textbf{Đòn bẩy thực tế là model embedding, không phải tham số $\alpha$.}
+Nâng từ \texttt{text-embedding-3-small} lên \texttt{text-embedding-3-large}
+cải thiện Recall@20 thêm $+$6{,}8\% mà không cần thay đổi kiến trúc pipeline.
+Ngược lại, với model large, Hybrid-large (0{,}498) và Emb-large only (0{,}496)
+gần như bằng nhau -- TF-IDF bổ sung rất ít khi embedding đã đủ mạnh.
+Kết luận thực dụng: \textit{nếu muốn cải thiện pipeline nhanh nhất, nâng model
+embedding trước, tune $\alpha$ sau}.
+
+Các hạn chế còn tồn tại và hướng phát triển được trình bày tập trung ở Chương~6.
 
 \end{document}

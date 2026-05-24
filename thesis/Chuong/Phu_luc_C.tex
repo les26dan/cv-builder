@@ -1,15 +1,15 @@
 \documentclass[../DoAn.tex]{subfiles}
 \begin{document}
 
-Phụ lục này mô tả cấu hình và nội dung tổng quát của các prompt dùng cho phương pháp LLM Reasoning trong Chương 5 và cho module phân tích CV trong hệ thống. Nội dung đầy đủ của prompt cùng schema JSON được công bố trong mã nguồn của khóa luận.
+Phụ lục này mô tả cấu hình và nội dung tổng quát của các prompt dùng cho module so khớp CV--JD và module phân tích CV trong hệ thống. Nội dung đầy đủ của prompt cùng schema JSON được công bố trong mã nguồn của khóa luận.
 
-\section{Cấu hình LLM dùng cho thí nghiệm Chương 5}
+\section{Cấu hình LLM dùng cho module so khớp CV--JD}
 
-Bảng~\ref{tab:llm-config-ch5} liệt kê các tham số gọi mô hình \texttt{gpt-4o-mini} của OpenAI thông qua giao thức Chat Completions trong module đánh giá.
+Bảng~\ref{tab:llm-config-ch5} liệt kê các tham số gọi mô hình \texttt{gpt-4o-mini} của OpenAI thông qua giao thức Chat Completions trong module so khớp.
 
 \begin{table}[H]
 \centering
-\caption{Tham số gọi LLM cho thí nghiệm matching CV–JD}
+\caption{Tham số gọi LLM trong module so khớp CV--JD}
 \label{tab:llm-config-ch5}
 \begin{tabular}{|l|l|}
 \hline
@@ -51,11 +51,11 @@ User prompt nối JD và CV theo cấu trúc cố định, đóng khung bằng n
 
 \subsection{Schema đầu ra}
 
-Bảng~\ref{tab:llm-schema} mô tả các trường trong JSON đầu ra của LLM. Module \texttt{llmMatcher.ts} parse JSON, ép kiểu và giới hạn miền giá trị cho từng trường trước khi ghi vào tệp kết quả.
+Bảng~\ref{tab:llm-schema} mô tả các trường trong JSON đầu ra của LLM. Module so khớp parse JSON, ép kiểu và giới hạn miền giá trị cho từng trường trước khi trả về kết quả.
 
 \begin{table}[H]
 \centering
-\caption{Schema JSON đầu ra của LLM matcher (Chương 5)}
+\caption{Schema JSON đầu ra của module so khớp CV--JD}
 \label{tab:llm-schema}
 \begin{tabular}{|l|l|p{7cm}|}
 \hline
@@ -80,15 +80,15 @@ Tham số \texttt{seed = 42} kết hợp \texttt{temperature = 0} giúp giảm t
 
 \section{Cấu hình prompt trong module phân tích CV của hệ thống}
 
-Module \texttt{jd-analyze} của hệ thống ngoài việc chấm điểm còn sinh gợi ý cải thiện cho từng phần của CV nên có prompt và schema phong phú hơn so với §C.1. Bảng~\ref{tab:llm-compare} liệt kê các điểm khác biệt chính.
+Module \texttt{jd-analyze} của hệ thống ngoài việc chấm điểm còn sinh gợi ý cải thiện cho từng phần của CV nên có prompt và schema phong phú hơn so với mục~B.1. Bảng~\ref{tab:llm-compare} liệt kê các điểm khác biệt chính.
 
 \begin{table}[H]
 \centering
-\caption{So sánh cấu hình LLM giữa thí nghiệm Chương 5 và module sản phẩm}
+\caption{So sánh cấu hình LLM giữa module so khớp và module phân tích JD}
 \label{tab:llm-compare}
 \begin{tabular}{|l|l|l|}
 \hline
-\textbf{Tham số} & \textbf{Thí nghiệm Ch.5} & \textbf{Module jd-analyze} \\
+\textbf{Tham số} & \textbf{Module so khớp} & \textbf{Module jd-analyze} \\
 \hline
 max\_tokens & 400 & 3000 \\
 \hline
@@ -128,11 +128,11 @@ Bảng~\ref{tab:jd-analyze-schema} mô tả các nhóm trường chính của JS
 \end{tabular}
 \end{table}
 
-Vì payload đầu ra dài (\texttt{max\_tokens = 3000}), prompt của module sản phẩm không phù hợp cho thí nghiệm Chương 5: nếu dùng cho 400 cặp đánh giá, chi phí ước tính sẽ tăng khoảng 10 lần so với cấu hình §C.1, vượt ngưỡng ngân sách đặt trong khóa luận.
+Vì payload đầu ra dài (\texttt{max\_tokens = 3000}), prompt của module phân tích JD tạo ra lượng token lớn hơn đáng kể so với các module khác trong hệ thống.
 
 \section{Các prompt khác trong hệ thống}
 
-Bảng~\ref{tab:other-llm} liệt kê các điểm API còn lại có sử dụng LLM nhưng không tham gia vào thí nghiệm Chương 5.
+Bảng~\ref{tab:other-llm} liệt kê các điểm API còn lại có sử dụng LLM trong hệ thống.
 
 \begin{table}[H]
 \centering

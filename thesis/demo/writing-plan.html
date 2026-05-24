@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing Plan — Bổ sung Ch4 & Ch5</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.6; }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white; padding: 40px 48px; margin-bottom: 32px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .header p { opacity: 0.75; font-size: 15px; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 64px; }
+
+  /* Summary row */
+  .summary-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px; }
+  .summary-card {
+    background: white; border-radius: 12px; padding: 20px 24px;
+    border-left: 4px solid #0f3460; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .summary-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
+  .summary-card .value { font-size: 22px; font-weight: 700; color: #0f3460; }
+  .summary-card .sub { font-size: 13px; color: #666; margin-top: 2px; }
+
+  /* Section blocks */
+  .section { background: white; border-radius: 16px; padding: 32px; margin-bottom: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .section-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 2px solid #f0f2f5; }
+  .section-badge {
+    background: #0f3460; color: white; font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; white-space: nowrap; margin-top: 3px;
+  }
+  .section-badge.ch4 { background: #0f3460; }
+  .section-badge.ch5 { background: #533483; }
+  .section-badge.new { background: #e94560; }
+  .section-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+  .section-subtitle { font-size: 13px; color: #888; }
+
+  /* Subsections */
+  .subsection { margin-bottom: 24px; }
+  .subsection:last-child { margin-bottom: 0; }
+  .sub-title {
+    font-size: 14px; font-weight: 700; color: #0f3460;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .sub-title::before { content: ''; display: block; width: 3px; height: 16px; background: #0f3460; border-radius: 2px; }
+
+  /* Content list */
+  .content-list { list-style: none; padding: 0; }
+  .content-list li {
+    display: flex; gap: 10px; padding: 10px 14px; border-radius: 8px;
+    font-size: 14px; margin-bottom: 6px; background: #f8f9fc;
+    border: 1px solid #eef0f5;
+  }
+  .content-list li .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .content-list li .text { flex: 1; }
+  .content-list li .text strong { display: block; color: #1a1a2e; margin-bottom: 2px; }
+  .content-list li .text span { color: #666; font-size: 13px; }
+
+  /* Highlight box */
+  .highlight-box {
+    background: linear-gradient(135deg, #f0f4ff, #f8f0ff);
+    border: 1px solid #d0d8ff; border-radius: 10px;
+    padding: 16px 20px; margin-top: 16px;
+    font-size: 13px; color: #444;
+  }
+  .highlight-box strong { color: #0f3460; }
+
+  /* Two column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* Flow diagram */
+  .flow {
+    background: #f8f9fc; border-radius: 10px; padding: 20px;
+    font-size: 13px; margin-top: 12px;
+  }
+  .flow-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .flow-row:last-child { margin-bottom: 0; }
+  .flow-box {
+    padding: 6px 14px; border-radius: 6px; font-weight: 600; font-size: 12px;
+    border: 1.5px solid;
+  }
+  .flow-box.input { background: #e8f4fd; border-color: #90caf9; color: #0d47a1; }
+  .flow-box.process { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+  .flow-box.llm { background: #fce4ec; border-color: #f48fb1; color: #880e4f; }
+  .flow-box.output { background: #fff3e0; border-color: #ffcc02; color: #e65100; }
+  .flow-box.fallback { background: #f3e5f5; border-color: #ce93d8; color: #4a148c; }
+  .flow-arrow { color: #999; font-size: 18px; }
+  .flow-label { font-size: 11px; color: #888; font-style: italic; }
+
+  /* Effort tag */
+  .effort { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+  .effort.low { background: #e8f5e9; color: #2e7d32; }
+  .effort.med { background: #fff3e0; color: #e65100; }
+  .effort.high { background: #fce4ec; color: #c62828; }
+
+  /* Delete zone */
+  .delete-zone {
+    background: #fff5f5; border: 2px dashed #ffcdd2; border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 28px;
+  }
+  .delete-zone .dz-title { color: #c62828; font-weight: 700; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .delete-zone ul { list-style: none; padding: 0; }
+  .delete-zone ul li { font-size: 13px; color: #888; padding: 4px 0; display: flex; gap: 8px; }
+  .delete-zone ul li::before { content: '✗'; color: #ef9a9a; }
+
+  /* Keep zone */
+  .keep-zone {
+    background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px;
+    padding: 20px 24px; margin-bottom: 28px;
+  }
+  .keep-zone .kz-title { color: #166534; font-weight: 700; font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .keep-zone ul { list-style: none; padding: 0; }
+  .keep-zone ul li { font-size: 13px; color: #555; padding: 4px 0; display: flex; gap: 8px; }
+  .keep-zone ul li::before { content: '✓'; color: #4ade80; }
+
+  /* Timeline */
+  .timeline { margin-top: 12px; }
+  .tl-item { display: flex; gap: 16px; margin-bottom: 12px; align-items: flex-start; }
+  .tl-num {
+    background: #0f3460; color: white; width: 28px; height: 28px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .tl-content { flex: 1; padding-top: 4px; }
+  .tl-content strong { font-size: 14px; color: #1a1a2e; }
+  .tl-content span { font-size: 13px; color: #666; display: block; margin-top: 2px; }
+
+  /* Tag */
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin: 2px; font-weight: 600; }
+  .tag.blue { background: #dbeafe; color: #1d4ed8; }
+  .tag.green { background: #dcfce7; color: #166534; }
+  .tag.orange { background: #ffedd5; color: #c2410c; }
+  .tag.purple { background: #ede9fe; color: #6d28d9; }
+
+  hr.divider { border: none; border-top: 1px solid #eef0f5; margin: 20px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Writing Plan — Bổ sung khóa luận</h1>
+  <p>Dựa trên phân tích mã nguồn thực tế · 3 mục bổ sung vào Chương 4 + viết lại mục 5.2</p>
+</div>
+
+<div class="container">
+
+  <!-- Summary -->
+  <div class="summary-row">
+    <div class="summary-card">
+      <div class="label">Mục cần bổ sung</div>
+      <div class="value">3</div>
+      <div class="sub">vào Chương 4</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Mục cần viết lại</div>
+      <div class="value">1</div>
+      <div class="sub">Ch5.2 thay thí nghiệm Kaggle</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Thời gian ước tính</div>
+      <div class="value">5–7</div>
+      <div class="sub">ngày viết thực tế</div>
+    </div>
+  </div>
+
+  <!-- What to remove -->
+  <div class="delete-zone">
+    <div class="dz-title">🗑 Xóa / thay thế</div>
+    <ul>
+      <li>Ch5 §5.2 — Thí nghiệm so sánh TF-IDF vs Embedding vs LLM trên 400 cặp Kaggle (ground truth yếu, không liên quan đến hệ thống thực)</li>
+      <li>Ch6 — Phần "Kết quả nghiên cứu" dẫn chiếu kết quả Kaggle → cập nhật lại theo nội dung mới</li>
+      <li>Ch1 §1.2 "Bài toán 2" — bỏ mô tả "so sánh 3 cách" → thay bằng "phân tích thiết kế AI pipeline"</li>
+    </ul>
+  </div>
+
+  <!-- What to keep -->
+  <div class="keep-zone">
+    <div class="kz-title">✅ Giữ nguyên</div>
+    <ul>
+      <li>Ch5 §5.1 — 28 test cases kiểm thử chức năng (đầy đủ, không cần sửa)</li>
+      <li>Ch5 §5.3 — So sánh với các giải pháp hiện có (bảng comparison)</li>
+      <li>Ch3 — Phân tích yêu cầu và thiết kế hệ thống (giữ nguyên)</li>
+      <li>Ch4 §4.1–4.5 hiện tại — Auth, upload, editor, export (chỉ bổ sung thêm, không sửa)</li>
+    </ul>
+  </div>
+
+  <!-- ======================== PHẦN 1 ======================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-badge ch4">Ch4 · Mới</span>
+      <div>
+        <div class="section-title">§4.6 — Tiền xử lý văn bản CV (EnhancedTextProcessor) <span class="effort med">~1.5 ngày</span></div>
+        <div class="section-subtitle">Tầng xử lý bị bỏ sót hoàn toàn trong khóa luận hiện tại — thực ra là module phức tạp nhất của hybrid parser</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Tại sao cần viết mục này</div>
+      <p style="font-size:14px; color:#555; margin-bottom:12px;">
+        Khóa luận hiện tại nói "hybrid parser dùng regex + LLM" nhưng bỏ qua hoàn toàn bước đầu tiên:
+        PDF raw text thường bị vỡ format, chữ bị tách ra, header bị mất.
+        <code style="background:#f0f2f5; padding:2px 6px; border-radius:4px; font-size:12px;">EnhancedTextProcessor</code>
+        là tầng sửa những lỗi này trước khi regex hay LLM làm việc. Không viết thì thiếu một mắt xích quan trọng.
+      </p>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Flow hoạt động cần vẽ</div>
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-box input">PDF raw text</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box process">Bước 1: Làm sạch cơ bản</div>
+          <span class="flow-label">(normalize newlines, khoảng trắng)</span>
+        </div>
+        <div class="flow-row">
+          <span style="width:120px"></span>
+          <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box process">Bước 2: Sửa lỗi PDF</div>
+          <span class="flow-label">(gộp chữ bị tách: "W O R K" → "WORK", email vỡ, số điện thoại vỡ)</span>
+        </div>
+        <div class="flow-row">
+          <span style="width:120px"></span>
+          <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box process">Bước 3: Chuẩn hóa section header</div>
+          <span class="flow-label">(regex map 20+ biến thể → tên chuẩn)</span>
+        </div>
+        <div class="flow-row">
+          <span style="width:120px"></span>
+          <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box process">Bước 4: Section detection</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box fallback">Strategy 2: Content-based</div>
+          <span class="flow-label">(fallback nếu không tìm được header)</span>
+        </div>
+        <div class="flow-row">
+          <span style="width:120px"></span>
+          <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box output">textQuality: high/medium/low + detectedSections</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Nội dung cần viết</div>
+      <ul class="content-list">
+        <li>
+          <span class="icon">📌</span>
+          <div class="text">
+            <strong>Vấn đề thực tế của PDF extraction</strong>
+            <span>Giải thích tại sao PDF.js và pdf-parse sinh ra text vỡ — chữ bị tách, header mất, số điện thoại bị cắt. Đây là vấn đề thực tế, không phải lý thuyết.</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🔧</span>
+          <div class="text">
+            <strong>5 bước xử lý tuần tự</strong>
+            <span>Mô tả từng bước: làm sạch → fix PDF issues → chuẩn hóa header → detect section → đánh giá quality. Mỗi bước giải quyết một loại lỗi cụ thể.</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🌿</span>
+          <div class="text">
+            <strong>Hai chiến lược section detection</strong>
+            <span>Strategy 1: dựa vào header rõ ràng. Strategy 2 (fallback): dựa vào nội dung khi header không rõ. Giải thích khi nào trigger Strategy 2.</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">📊</span>
+          <div class="text">
+            <strong>Điểm chất lượng văn bản (textQuality)</strong>
+            <span>Cơ chế tính điểm 0–100 và phân loại high/medium/low. Điểm này ảnh hưởng gì đến downstream processing.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Điểm quan trọng cần nhấn:</strong> EnhancedTextProcessor chạy trước khi regex và LLM bắt đầu làm việc.
+      Nếu không có bước này, regex sẽ miss email vỡ, LLM sẽ nhận được text lộn xộn.
+      Đây là lý do hybrid parser hoạt động tốt hơn naive regex-only.
+    </div>
+  </div>
+
+  <!-- ======================== PHẦN 2 ======================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-badge ch4">Ch4 · Mới</span>
+      <div>
+        <div class="section-title">§4.7 — Module phân tích JD và gợi ý tối ưu CV <span class="effort med">~2 ngày</span></div>
+        <div class="section-subtitle">Feature phức tạp nhất của hệ thống — Ch4 hiện tại bỏ qua hoàn toàn dù đây là tính năng AI chính hướng tới người dùng</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Tại sao khác với LLM Matching đã viết</div>
+      <div class="two-col">
+        <div style="background:#fff5f5; border-radius:8px; padding:16px; font-size:13px;">
+          <strong style="color:#c62828; display:block; margin-bottom:8px;">LLM Matching (đã có trong Ch4)</strong>
+          Input: CV text + JD text<br>
+          Output: 1 số (overallScore 0–100)<br>
+          Mục đích: ranking / so sánh<br>
+          Người dùng cuối thấy: ✗ (chỉ dùng trong thí nghiệm nội bộ)
+        </div>
+        <div style="background:#f0fdf4; border-radius:8px; padding:16px; font-size:13px;">
+          <strong style="color:#166534; display:block; margin-bottom:8px;">JD Analysis (cần viết thêm)</strong>
+          Input: CV structured data + JD text<br>
+          Output: score + matchedKeywords + missingKeywords + <strong>gợi ý chỉnh sửa theo từng mục</strong><br>
+          Mục đích: hướng dẫn người dùng sửa CV<br>
+          Người dùng cuối thấy: ✓ (feature chính của app)
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Flow hoạt động cần vẽ</div>
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-box input">CV structured data</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box process">cvDataToText()</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box input">CV text có cấu trúc</div>
+        </div>
+        <div class="flow-row">
+          <span style="width:50px"></span>
+          <span class="flow-label">+ JD text</span>
+          <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row">
+          <div class="flow-box llm">gpt-4o-mini · temperature=0.3 · max_tokens=3000</div>
+        </div>
+        <div class="flow-row">
+          <span style="width:50px"></span>
+          <span class="flow-arrow">↓</span>
+        </div>
+        <div class="flow-row" style="flex-wrap:wrap; gap:8px;">
+          <div class="flow-box output">jobMatch (score + keywords)</div>
+          <div class="flow-box output">suggestions.summary</div>
+          <div class="flow-box output">suggestions.experience</div>
+          <div class="flow-box output">suggestions.skills</div>
+          <div class="flow-box output">globalRecommendations</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Nội dung cần viết</div>
+      <ul class="content-list">
+        <li>
+          <span class="icon">🔄</span>
+          <div class="text">
+            <strong>Bước tiền xử lý: cvDataToText()</strong>
+            <span>Giải thích tại sao cần chuyển structured CV data sang text có nhãn section trước khi gửi LLM. Mô hình ngôn ngữ hiểu nội dung tốt hơn khi biết đâu là phần kinh nghiệm, đâu là phần kỹ năng.</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">📝</span>
+          <div class="text">
+            <strong>Cấu trúc output: suggestions theo từng section</strong>
+            <span>Mỗi gợi ý có đầy đủ: tiêu đề, mô tả chi tiết, mức độ ưu tiên (cao/trung bình/thấp), nội dung đề xuất cụ thể, từ khóa cần thêm, độ tin cậy, và lý do. Cấu trúc này giúp giao diện hiển thị gợi ý ngay bên cạnh đúng phần CV cần sửa.</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">⚖️</span>
+          <div class="text">
+            <strong>Tại sao temperature=0.3 (không phải 0 như matching)</strong>
+            <span>Chấm điểm cần kết quả giống nhau mỗi lần chạy (temperature=0). Phân tích cần gợi ý linh hoạt theo ngữ cảnh nhưng không quá ngẫu nhiên → temperature=0.3 là điểm cân bằng hợp lý.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Điểm quan trọng cần nhấn:</strong> Đây là feature phân biệt hệ thống với các tool ATS thương mại.
+      Resume.io và Canva chỉ cho điểm tổng. Hệ thống này trả về <em>"phần summary cần thêm từ khóa TypeScript vì JD yêu cầu nhưng CV chưa đề cập"</em> —
+      đây là lý do tính năng này có giá trị thực tế với người dùng.
+    </div>
+  </div>
+
+  <!-- ======================== PHẦN 3 ======================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-badge ch4">Ch4 · Mới</span>
+      <div>
+        <div class="section-title">§4.8 — Thiết kế prompt theo loại tác vụ AI <span class="effort low">~1 ngày</span></div>
+        <div class="section-subtitle">Hiện tại Ch4 chỉ có bảng tham số — cần phân tích tại sao chọn những con số đó</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">4 loại tác vụ và tham số tương ứng</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin-top:8px;">
+          <thead>
+            <tr style="background:#0f3460; color:white;">
+              <th style="padding:10px 14px; text-align:left; border-radius:6px 0 0 0;">Loại tác vụ</th>
+              <th style="padding:10px 14px; text-align:left;">Áp dụng cho tính năng</th>
+              <th style="padding:10px 14px; text-align:center;">Temperature</th>
+              <th style="padding:10px 14px; text-align:left; border-radius:0 6px 0 0;">Lý do</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#f8f9fc; border-bottom:1px solid #eef0f5;">
+              <td style="padding:10px 14px; font-weight:600;"><span class="tag blue">Extraction</span></td>
+              <td style="padding:10px 14px;">Trích xuất CV (hybridParser)</td>
+              <td style="padding:10px 14px; text-align:center; font-weight:700; color:#1b5e20;">0.1</td>
+              <td style="padding:10px 14px; color:#555;">Chỉ trích xuất thông tin có sẵn, không sáng tạo thêm. Gần như cố định để kết quả ổn định giữa các lần chạy.</td>
+            </tr>
+            <tr style="background:white; border-bottom:1px solid #eef0f5;">
+              <td style="padding:10px 14px; font-weight:600;"><span class="tag purple">Scoring</span></td>
+              <td style="padding:10px 14px;">Chấm điểm độ phù hợp CV–JD</td>
+              <td style="padding:10px 14px; text-align:center; font-weight:700; color:#1b5e20;">0</td>
+              <td style="padding:10px 14px; color:#555;">Cần kết quả hoàn toàn cố định để điểm số nhất quán khi so sánh nhiều CV với cùng tin tuyển dụng.</td>
+            </tr>
+            <tr style="background:#f8f9fc; border-bottom:1px solid #eef0f5;">
+              <td style="padding:10px 14px; font-weight:600;"><span class="tag orange">Analysis</span></td>
+              <td style="padding:10px 14px;">Phân tích JD, đánh giá chất lượng CV</td>
+              <td style="padding:10px 14px; text-align:center; font-weight:700; color:#e65100;">0.3</td>
+              <td style="padding:10px 14px; color:#555;">Cần suy luận linh hoạt để tạo gợi ý phù hợp với từng trường hợp, nhưng không được quá ngẫu nhiên.</td>
+            </tr>
+            <tr style="background:white;">
+              <td style="padding:10px 14px; font-weight:600;"><span class="tag green">Generation</span></td>
+              <td style="padding:10px 14px;">Viết tóm tắt, viết lại gạch đầu dòng</td>
+              <td style="padding:10px 14px; text-align:center; font-weight:700; color:#c2410c;">0.5–0.6</td>
+              <td style="padding:10px 14px; color:#555;">Cần tạo ra 4 phương án đa dạng. Temperature thấp sẽ cho 4 phương án gần giống nhau, không có giá trị gì cho người dùng.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="subsection">
+      <div class="sub-title">Nội dung cần viết</div>
+      <ul class="content-list">
+        <li>
+          <span class="icon">🌡</span>
+          <div class="text">
+            <strong>Temperature là tham số quan trọng nhất</strong>
+            <span>Giải thích temperature ảnh hưởng đến mức độ ngẫu nhiên của kết quả trả về. Không phải chọn số tùy ý — mỗi loại tác vụ có yêu cầu khác nhau giữa "cần ổn định" và "cần đa dạng".</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">📏</span>
+          <div class="text">
+            <strong>max_tokens được chọn theo mục đích</strong>
+            <span>Chấm điểm: 400 token (chỉ cần điểm số và từ khóa). Phân tích JD: 3000 token (cần gợi ý chi tiết cho 3 mục CV). Viết tóm tắt: 1500 token (4 phương án × khoảng 100 từ). Không phải đặt số cao cho "an toàn".</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ======================== PHẦN 4 — CH5 ======================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-badge new">Ch5 · Viết lại</span>
+      <div>
+        <div class="section-title">§5.2 — Đánh giá thiết kế AI pipeline <span class="effort high">~2 ngày</span></div>
+        <div class="section-subtitle">Thay thế thí nghiệm 400 cặp Kaggle bằng phân tích có chiều sâu từ số liệu hệ thống thực</div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">Tại sao thay thế</div>
+      <p style="font-size:14px; color:#555; margin-bottom:12px;">
+        Thí nghiệm Kaggle hiện tại có 3 điểm yếu: (1) nhãn phân loại dựa trên nhóm nghề là nhãn chất lượng thấp,
+        (2) data tiếng Anh nhưng hệ thống phục vụ tiếng Việt, (3) kết quả không ảnh hưởng đến quyết định thiết kế —
+        hệ thống vẫn dùng mô hình ngôn ngữ dù phương pháp so sánh nghĩa "thắng" trong thí nghiệm.
+        Phần mới sẽ phân tích <em>những quyết định kỹ thuật đã làm</em> và đánh giá chúng bằng số liệu thực.
+      </p>
+    </div>
+
+    <div class="subsection">
+      <div class="sub-title">3 phân tích cần có</div>
+      <ul class="content-list">
+        <li>
+          <span class="icon">📊</span>
+          <div class="text">
+            <strong>Phân tích 1 — Hiệu quả Hybrid Parser vs Full-LLM</strong>
+            <span>
+              Bạn đã có số liệu: hybrid giảm 56% token, accuracy giảm 2-3%.
+              Viết thành bảng so sánh rõ ràng: số lượng thẻ bài thực tế, chi phí trên 1000 CV, thời gian xử lý, độ chính xác từng trường (liên hệ / tóm tắt / học vấn / kỹ năng).
+              Kết luận: khi nào nên dùng hybrid, khi nào nên full-LLM.
+            </span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🌡</span>
+          <div class="text">
+            <strong>Phân tích 2 — Ảnh hưởng của Temperature đến chất lượng output</strong>
+            <span>
+              Lấy feature summary generation (temperature=0.6) làm ví dụ:
+              chạy cùng đầu vào với temperature lần lượt 0, 0.3, 0.6 rồi đo mức độ khác nhau giữa 4 phương án trả về (ví dụ: tỉ lệ phần trăm từ không trùng nhau).
+              Không cần dataset lớn — 10–15 CV mẫu là đủ.
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="highlight-box">
+      <strong>Điểm mạnh của hướng này:</strong> Toàn bộ số liệu lấy từ hệ thống thật của bạn —
+      giám khảo không thể phản bác vì bạn tự xây hệ thống, tự đo, tự phân tích.
+      Không cần dataset mới, không cần ground truth bên ngoài.
+    </div>
+  </div>
+
+  <!-- ======================== TIMELINE ======================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-badge" style="background:#888;">Kế hoạch</span>
+      <div>
+        <div class="section-title">Thứ tự viết khuyến nghị</div>
+        <div class="section-subtitle">Từ dễ đến khó, từ ít phụ thuộc đến nhiều phụ thuộc</div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-num">1</div>
+        <div class="tl-content">
+          <strong>§4.8 — Prompt design (dễ nhất, viết trước)</strong>
+          <span>~1 ngày · Không cần đọc thêm code · Chỉ cần diễn giải bảng tham số thành phân tích có chiều sâu</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">2</div>
+        <div class="tl-content">
+          <strong>§4.6 — EnhancedTextProcessor</strong>
+          <span>~1.5 ngày · Code đã đọc kỹ · Vẽ flow diagram, mô tả 5 bước, giải thích 2 strategy</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">3</div>
+        <div class="tl-content">
+          <strong>§4.7 — JD Analysis module</strong>
+          <span>~2 ngày · Phức tạp nhất về nội dung · Cần giải thích flow + cấu trúc output + fallback</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">4</div>
+        <div class="tl-content">
+          <strong>§5.2 — Phân tích AI pipeline (viết sau cùng)</strong>
+          <span>~2 ngày · Cần chạy đo thêm số liệu về ảnh hưởng của temperature · Phụ thuộc vào §4.6–4.8 đã viết xong</span>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">5</div>
+        <div class="tl-content">
+          <strong>Cập nhật Ch1, Ch6 cho nhất quán</strong>
+          <span>~0.5 ngày · Sửa mô tả "Bài toán 2" ở Ch1 · Cập nhật kết luận Ch6 theo nội dung mới</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center; color:#aaa; font-size:12px; margin-top:32px;">
+    Tổng hợp từ phân tích mã nguồn thực tế · /Users/dale/pmf/app · Tháng 5 năm 2026
+  </p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giải thích logic chi tiết — 3 phần bổ sung khóa luận</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.7; font-size: 15px; }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: white; padding: 40px 48px 32px;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .header p { opacity: 0.7; font-size: 14px; }
+
+  .toc {
+    background: white; border-bottom: 1px solid #e0e4ee;
+    padding: 16px 48px; display: flex; gap: 32px; flex-wrap: wrap;
+  }
+  .toc a { color: #0f3460; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* Chapter block */
+  .chapter {
+    background: white; border-radius: 16px; padding: 36px 40px;
+    margin-bottom: 36px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .chapter-tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    padding: 3px 12px; border-radius: 20px; margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .tag-blue { background: #dbeafe; color: #1d4ed8; }
+  .tag-purple { background: #ede9fe; color: #6d28d9; }
+  .tag-red { background: #fee2e2; color: #b91c1c; }
+
+  .chapter h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .chapter .subtitle { color: #888; font-size: 14px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #f0f2f5; }
+
+  /* Section within chapter */
+  .section { margin-bottom: 32px; }
+  .section:last-child { margin-bottom: 0; }
+  .section h3 {
+    font-size: 15px; font-weight: 700; color: #0f3460;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .section h3::before {
+    content: ''; display: block; width: 4px; height: 18px;
+    background: #0f3460; border-radius: 2px; flex-shrink: 0;
+  }
+
+  p { color: #444; margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* Step list */
+  .steps { list-style: none; padding: 0; margin-top: 8px; }
+  .steps li {
+    display: flex; gap: 14px; padding: 14px 16px;
+    background: #f8f9fc; border: 1px solid #eef0f5;
+    border-radius: 10px; margin-bottom: 8px;
+  }
+  .step-num {
+    background: #0f3460; color: white; width: 26px; height: 26px; min-width: 26px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; margin-top: 1px;
+  }
+  .step-body strong { display: block; color: #1a1a2e; margin-bottom: 3px; font-size: 14px; }
+  .step-body span { color: #666; font-size: 13px; line-height: 1.5; }
+
+  /* Code snippet */
+  .code-block {
+    background: #1e2235; color: #e8eaf6; border-radius: 10px;
+    padding: 18px 20px; font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 12.5px; line-height: 1.7; margin: 12px 0; overflow-x: auto;
+  }
+  .code-block .c { color: #7c83a0; }
+  .code-block .k { color: #82aaff; }
+  .code-block .s { color: #c3e88d; }
+  .code-block .n { color: #f78c6c; }
+  .code-block .p { color: #89ddff; }
+
+  /* Comparison table */
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0; }
+  .cmp-table th {
+    background: #0f3460; color: white; padding: 10px 14px; text-align: left;
+  }
+  .cmp-table th:first-child { border-radius: 6px 0 0 0; }
+  .cmp-table th:last-child { border-radius: 0 6px 0 0; }
+  .cmp-table td { padding: 10px 14px; border-bottom: 1px solid #eef0f5; color: #444; }
+  .cmp-table tr:nth-child(even) td { background: #f8f9fc; }
+  .cmp-table tr:last-child td { border-bottom: none; }
+  .cmp-table .good { color: #166534; font-weight: 600; }
+  .cmp-table .bad { color: #991b1b; }
+
+  /* Highlight box */
+  .note {
+    border-left: 4px solid #0f3460; background: #f0f4ff;
+    padding: 14px 18px; border-radius: 0 8px 8px 0;
+    font-size: 13.5px; color: #333; margin: 14px 0;
+  }
+  .note strong { color: #0f3460; }
+
+  .warn {
+    border-left: 4px solid #d97706; background: #fffbeb;
+    padding: 14px 18px; border-radius: 0 8px 8px 0;
+    font-size: 13.5px; color: #333; margin: 14px 0;
+  }
+
+  /* Two column */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .col-box { background: #f8f9fc; border: 1px solid #eef0f5; border-radius: 10px; padding: 16px 18px; font-size: 13px; }
+  .col-box strong { display: block; margin-bottom: 8px; font-size: 14px; }
+  .col-box.green { border-left: 3px solid #4ade80; }
+  .col-box.blue { border-left: 3px solid #60a5fa; }
+  .col-box.orange { border-left: 3px solid #fb923c; }
+  .col-box.purple { border-left: 3px solid #a78bfa; }
+
+  /* Inline code */
+  code { background: #eef0f5; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 12.5px; color: #333; }
+
+  /* Flow */
+  .flow { background: #f8f9fc; border-radius: 10px; padding: 20px 24px; margin: 12px 0; }
+  .flow-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .flow-row:last-child { margin-bottom: 0; }
+  .fbox {
+    padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid; white-space: nowrap;
+  }
+  .fbox.in { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+  .fbox.proc { background: #dcfce7; border-color: #86efac; color: #166534; }
+  .fbox.llm { background: #fce7f3; border-color: #f9a8d4; color: #9d174d; }
+  .fbox.out { background: #fff7ed; border-color: #fdba74; color: #c2410c; }
+  .fbox.alt { background: #f3e8ff; border-color: #c4b5fd; color: #6d28d9; }
+  .farr { color: #94a3b8; font-size: 18px; }
+  .flabel { font-size: 11px; color: #94a3b8; font-style: italic; }
+
+  /* Divider */
+  hr { border: none; border-top: 1px solid #eef0f5; margin: 28px 0; }
+
+  /* prompt box */
+  .prompt-box {
+    background: #0d1117; border-radius: 10px; padding: 20px 24px;
+    font-family: monospace; font-size: 12.5px; line-height: 1.8;
+    color: #e6edf3; margin: 12px 0; border: 1px solid #30363d;
+  }
+  .prompt-box .role { color: #79c0ff; font-weight: 700; margin-bottom: 4px; display: block; }
+  .prompt-box .constraint { color: #ffa657; }
+  .prompt-box .instruction { color: #a5d6ff; }
+  .prompt-box .forbidden { color: #ff7b72; }
+  .prompt-box .example { color: #7ee787; }
+  .prompt-box .neutral { color: #e6edf3; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Giải thích logic chi tiết — 3 phần bổ sung khóa luận</h1>
+  <p>Tất cả nội dung đều xác minh từ mã nguồn thực tế · /Users/dale/pmf/app</p>
+</div>
+
+<div class="toc">
+  <a href="#s46">§4.6 — Tiền xử lý văn bản CV</a>
+  <a href="#s47">§4.7 — Phân tích JD và gợi ý tối ưu CV</a>
+  <a href="#s48">§4.8 — Thiết kế prompt theo loại tác vụ</a>
+</div>
+
+<div class="container">
+
+<!-- ====================================================== -->
+<!-- §4.6                                                   -->
+<!-- ====================================================== -->
+<div class="chapter" id="s46">
+  <div class="chapter-tag tag-blue">Chương 4 · Mục 4.6</div>
+  <h2>Tiền xử lý văn bản CV — EnhancedTextProcessor</h2>
+  <div class="subtitle">
+    File: <code>shared/services/enhancedTextProcessor.ts</code> ·
+    Chạy trước mọi bước phân tích — regex lẫn mô hình ngôn ngữ đều phụ thuộc vào đầu ra của module này
+  </div>
+
+  <div class="section">
+    <h3>Tại sao cần bước tiền xử lý riêng</h3>
+    <p>
+      Khi người dùng tải CV lên, hệ thống dùng thư viện <code>pdf-parse</code> và <code>pdfjs-dist</code>
+      để trích xuất văn bản thô từ file PDF. Quá trình này thường sinh ra nhiều lỗi định dạng
+      không thể đoán trước, ví dụ:
+    </p>
+    <div class="two-col">
+      <div class="col-box" style="border-left: 3px solid #f87171;">
+        <strong style="color:#b91c1c;">Văn bản PDF bị vỡ</strong>
+        <code style="display:block; background:#1e2235; color:#fca5a5; padding:8px 10px; border-radius:6px; margin-top:8px; font-size:12px; line-height:1.8;">
+          W O R K  E X P E R I E N C E<br>
+          nguyen.van.a @ gmail . com<br>
+          linkedin . com / in / nguyenvana<br>
+          2021 – 2 0 2 3
+        </code>
+      </div>
+      <div class="col-box" style="border-left: 3px solid #4ade80;">
+        <strong style="color:#166534;">Sau khi tiền xử lý</strong>
+        <code style="display:block; background:#1e2235; color:#86efac; padding:8px 10px; border-radius:6px; margin-top:8px; font-size:12px; line-height:1.8;">
+          WORK EXPERIENCE<br>
+          nguyen.van.a@gmail.com<br>
+          linkedin.com/in/nguyenvana<br>
+          2021-2023
+        </code>
+      </div>
+    </div>
+    <p style="margin-top:12px;">
+      Nếu bỏ qua bước này, biểu thức chính quy tìm email sẽ không nhận ra
+      <code>nguyen.van.a @ gmail . com</code>, và mô hình ngôn ngữ sẽ nhận được
+      văn bản lộn xộn khó đọc hơn. Module tiền xử lý giải quyết tất cả những lỗi
+      này trước khi bất kỳ bước phân tích nào bắt đầu.
+    </p>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>5 bước xử lý tuần tự</h3>
+    <div class="flow">
+      <div class="flow-row">
+        <div class="fbox in">Văn bản thô từ PDF/DOCX</div>
+        <span class="farr">→</span>
+        <div class="fbox proc">Bước 1</div>
+        <span class="farr">→</span>
+        <div class="fbox proc">Bước 2</div>
+        <span class="farr">→</span>
+        <div class="fbox proc">Bước 3</div>
+        <span class="farr">→</span>
+        <div class="fbox proc">Bước 4</div>
+        <span class="farr">→</span>
+        <div class="fbox proc">Bước 5</div>
+        <span class="farr">→</span>
+        <div class="fbox out">Văn bản sạch + danh sách mục + điểm chất lượng</div>
+      </div>
+    </div>
+
+    <ul class="steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <strong>Làm sạch cơ bản</strong>
+          <span>
+            Chuẩn hóa ký tự xuống dòng (<code>\r\n</code> và <code>\r</code> đều chuyển thành <code>\n</code>),
+            gộp nhiều dòng trống liên tiếp thành tối đa 2, xóa khoảng trắng thừa giữa các từ.
+            Đây là bước dọn dẹp nền tảng, không mất thông tin.
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <strong>Sửa lỗi phổ biến do trích xuất PDF</strong>
+          <span>
+            Gộp chữ bị tách (<code>W O R K</code> → <code>WORK</code>),
+            nối lại email vỡ (<code>a @ b . com</code> → <code>a@b.com</code>),
+            số điện thoại bị ngắt (<code>+84 0 83 94 777 28</code> giữ nguyên khoảng cách đúng chuẩn),
+            LinkedIn bị tách (<code>linkedin.com / in / ten</code> → <code>linkedin.com/in/ten</code>),
+            ngày tháng bị vỡ (<code>2021 – 2 0 2 3</code> → <code>2021-2023</code>).
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <strong>Chuẩn hóa tên mục (section header)</strong>
+          <span>
+            Map hơn 20 biến thể tên mục về dạng chuẩn bằng biểu thức chính quy.
+            Ví dụ: <code>PROFESSIONAL EXPERIENCE</code>, <code>EMPLOYMENT HISTORY</code>,
+            <code>CAREER HISTORY</code>, <code>K I N H  N G H I Ệ M</code>
+            đều được chuẩn hóa thành <code>WORK EXPERIENCE</code>.
+            Hỗ trợ cả tiếng Anh và tiếng Việt.
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <strong>Nhận diện và tách các mục CV</strong>
+          <span>
+            Dùng 2 chiến lược (xem chi tiết bên dưới). Kết quả là một từ điển
+            ánh xạ tên mục → nội dung: <code>{ contact: "...", experience: "...", skills: "..." }</code>.
+            Các bước phân tích phía sau chỉ nhận đúng phần văn bản của mục mình cần xử lý.
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <strong>Đánh giá điểm chất lượng văn bản</strong>
+          <span>
+            Tính điểm từ 0–100 dựa trên số mục tìm được, độ dài văn bản, sự hiện diện
+            của email và số điện thoại hợp lệ, và số vấn đề chất lượng phát hiện được.
+            Phân loại thành 3 mức: <strong>cao</strong> (≥70), <strong>trung bình</strong> (≥40), <strong>thấp</strong> (&lt;40).
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Hai chiến lược nhận diện mục</h3>
+    <p>
+      Không phải CV nào cũng có tên mục rõ ràng. Module dùng 2 chiến lược theo thứ tự ưu tiên:
+    </p>
+    <div class="two-col">
+      <div class="col-box blue">
+        <strong>Chiến lược 1 — Dựa vào tên mục</strong>
+        Quét từng dòng, tìm dòng khớp với danh sách tên mục chuẩn.
+        Khi tìm thấy, gom tất cả dòng từ đó đến tên mục tiếp theo thành nội dung của mục đó.
+        <br><br>
+        <em style="color:#888; font-size:12px;">Áp dụng khi: CV có cấu trúc rõ ràng, có dòng tiêu đề mục.</em>
+      </div>
+      <div class="col-box purple">
+        <strong>Chiến lược 2 — Dựa vào nội dung</strong>
+        Nếu Chiến lược 1 không tìm được mục nào, dùng đặc điểm nội dung để phân loại:
+        dòng có <code>@</code> hoặc <code>+84</code> → thông tin liên hệ;
+        dòng có "university", "bachelor" → học vấn;
+        dòng có năm tháng kiểu "2021–2023" → kinh nghiệm.
+        <br><br>
+        <em style="color:#888; font-size:12px;">Áp dụng khi: CV không có tên mục hoặc định dạng sáng tạo.</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Điểm quan trọng khi viết khóa luận:</strong>
+    Module này không dùng mô hình ngôn ngữ — hoàn toàn chạy bằng biểu thức chính quy và quy tắc.
+    Chi phí xử lý gần như bằng 0 và chạy trong vài mili giây.
+    Đây là lý do hybrid parser tiết kiệm chi phí hơn cách gửi toàn bộ văn bản CV thô trực tiếp cho mô hình ngôn ngữ.
+  </div>
+</div>
+
+
+<!-- ====================================================== -->
+<!-- §4.7                                                   -->
+<!-- ====================================================== -->
+<div class="chapter" id="s47">
+  <div class="chapter-tag tag-purple">Chương 4 · Mục 4.7</div>
+  <h2>Phân tích tin tuyển dụng và gợi ý tối ưu CV</h2>
+  <div class="subtitle">
+    File: <code>app/api/cv/jd-analyze/route.ts</code> ·
+    Tính năng AI trực tiếp hướng tới người dùng — khác hoàn toàn với module chấm điểm dùng trong thí nghiệm
+  </div>
+
+  <div class="section">
+    <h3>Sự khác biệt với module chấm điểm CV–JD</h3>
+    <p>Hai module đều nhận CV và tin tuyển dụng làm đầu vào nhưng phục vụ mục đích hoàn toàn khác:</p>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>Tiêu chí</th>
+          <th>Module chấm điểm (llmMatcher)</th>
+          <th>Module phân tích JD (jd-analyze)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Đầu ra chính</td>
+          <td>1 con số (0–100)</td>
+          <td>Điểm + danh sách từ khóa + <strong class="good">gợi ý sửa từng mục CV</strong></td>
+        </tr>
+        <tr>
+          <td>Mục đích</td>
+          <td>So sánh, xếp hạng nhiều CV</td>
+          <td class="good">Hướng dẫn người dùng cải thiện CV của mình</td>
+        </tr>
+        <tr>
+          <td>Người dùng thấy</td>
+          <td class="bad">Không (chỉ dùng trong thí nghiệm)</td>
+          <td class="good">Có — hiển thị trực tiếp trên giao diện</td>
+        </tr>
+        <tr>
+          <td>Giới hạn token đầu ra</td>
+          <td>400 token</td>
+          <td>3000 token</td>
+        </tr>
+        <tr>
+          <td>Temperature</td>
+          <td>0 (hoàn toàn cố định)</td>
+          <td>0.3 (linh hoạt theo ngữ cảnh)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Luồng xử lý đầy đủ</h3>
+    <div class="flow">
+      <div class="flow-row">
+        <div class="fbox in">CV dạng cấu trúc<br><small>(JSON từ editor)</small></div>
+        <span class="farr">→</span>
+        <div class="fbox proc">cvDataToText()<br><small>chuyển sang văn bản có nhãn mục</small></div>
+        <span class="farr">→</span>
+        <div class="fbox in">Văn bản CV có nhãn</div>
+      </div>
+      <div class="flow-row" style="margin-left: 20px;">
+        <span class="flabel">+ Nội dung tin tuyển dụng</span>
+        <span class="farr">↓</span>
+      </div>
+      <div class="flow-row">
+        <div class="fbox llm">gpt-4o-mini · temperature=0.3 · max_tokens=3000<br>
+        <small>Prompt yêu cầu trả về JSON gồm điểm, từ khóa, và gợi ý theo từng mục</small></div>
+      </div>
+      <div class="flow-row" style="margin-top:8px;">
+        <span class="farr">↓</span>
+      </div>
+      <div class="flow-row" style="flex-wrap:wrap; gap:8px;">
+        <div class="fbox out">Điểm tổng (0–100)</div>
+        <div class="fbox out">Từ khóa khớp</div>
+        <div class="fbox out">Từ khóa còn thiếu</div>
+        <div class="fbox out">Gợi ý sửa mục tóm tắt</div>
+        <div class="fbox out">Gợi ý sửa mục kinh nghiệm</div>
+        <div class="fbox out">Gợi ý sửa mục kỹ năng</div>
+        <div class="fbox out">Khuyến nghị tổng thể</div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Bước tiền xử lý: tại sao cần chuyển CV sang văn bản có nhãn</h3>
+    <p>
+      Dữ liệu CV trong hệ thống được lưu dạng JSON có cấu trúc. Nếu gửi thẳng JSON cho mô hình ngôn ngữ,
+      mô hình phải tự suy ra đâu là phần kinh nghiệm, đâu là kỹ năng — dễ nhầm lẫn.
+      Hàm <code>cvDataToText()</code> chuyển JSON thành văn bản có đánh nhãn rõ từng mục:
+    </p>
+    <div class="prompt-box">
+<span class="neutral">=== THÔNG TIN LIÊN HỆ ===
+Họ tên: Nguyễn Văn A
+
+=== TÓM TẮT CHUYÊN MÔN ===
+Kỹ sư phần mềm 5 năm kinh nghiệm...
+
+=== KINH NGHIỆM LÀM VIỆC (2 mục) ===
+[1] Software Engineer tại Công ty X (2021-01 - Hiện tại)
+  - Xây dựng hệ thống xử lý 1 triệu giao dịch/ngày
+  - Giảm thời gian phản hồi API xuống 40%
+
+=== KỸ NĂNG (12) ===
+React, TypeScript, Node.js, PostgreSQL...</span>
+    </div>
+    <p>
+      Nhờ có nhãn rõ ràng, mô hình ngôn ngữ biết chính xác đang đọc phần nào của CV
+      và có thể tạo gợi ý nhắm đúng vào từng mục — ví dụ gợi ý cho mục tóm tắt khác
+      với gợi ý cho mục kỹ năng.
+    </p>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Cấu trúc gợi ý trả về — tại sao cần chi tiết đến vậy</h3>
+    <p>
+      Mỗi gợi ý trả về không chỉ là một câu nhận xét chung chung mà có đủ thông tin
+      để giao diện hiển thị trực tiếp bên cạnh đúng mục CV cần sửa:
+    </p>
+    <div class="code-block">
+<span class="p">{</span>
+  <span class="k">"id"</span><span class="p">:</span> <span class="s">"sum-1"</span><span class="p">,</span>
+  <span class="k">"type"</span><span class="p">:</span> <span class="s">"optimization"</span><span class="p">,</span>
+  <span class="k">"title"</span><span class="p">:</span> <span class="s">"Thêm từ khóa TypeScript vào phần tóm tắt"</span><span class="p">,</span>
+  <span class="k">"description"</span><span class="p">:</span> <span class="s">"Tin tuyển dụng yêu cầu TypeScript nhưng tóm tắt CV chưa đề cập"</span><span class="p">,</span>
+  <span class="k">"priority"</span><span class="p">:</span> <span class="s">"high"</span><span class="p">,</span>          <span class="c">← cao / trung bình / thấp</span>
+  <span class="k">"suggestedText"</span><span class="p">:</span> <span class="s">"...chuyên sâu về React và TypeScript..."</span><span class="p">,</span>
+  <span class="k">"originalText"</span><span class="p">:</span> <span class="s">"...chuyên sâu về React..."</span><span class="p">,</span>
+  <span class="k">"addedKeywords"</span><span class="p">:</span> <span class="p">[</span><span class="s">"TypeScript"</span><span class="p">],</span>
+  <span class="k">"confidence"</span><span class="p">:</span> <span class="n">88</span><span class="p">,</span>              <span class="c">← độ tin cậy của gợi ý (0–100)</span>
+  <span class="k">"reasoning"</span><span class="p">:</span> <span class="s">"Từ khóa này xuất hiện 4 lần trong JD"</span>
+<span class="p">}</span>
+    </div>
+    <p>
+      Trường <code>suggestedText</code> cho phép người dùng nhấn một nút để áp dụng gợi ý ngay mà
+      không cần tự sửa tay. Trường <code>reasoning</code> giải thích lý do để người dùng hiểu
+      và tự quyết định có chấp nhận gợi ý hay không.
+      Mỗi mục CV (tóm tắt, kinh nghiệm, kỹ năng) nhận tối đa 3 gợi ý — đủ để hữu ích
+      mà không làm người dùng choáng ngợp.
+    </p>
+  </div>
+
+  <div class="note">
+    <strong>Điểm phân biệt với các công cụ thương mại:</strong>
+    Resume.io, Canva chỉ cung cấp mẫu thiết kế.
+    Các công cụ như Enhancv chỉ cho điểm tổng hoặc danh sách từ khóa chung.
+    Hệ thống này trả về gợi ý nhắm đúng từng mục, kèm nội dung đề xuất cụ thể có thể áp dụng ngay —
+    đây là điểm khác biệt thực sự.
+  </div>
+</div>
+
+
+<!-- ====================================================== -->
+<!-- §4.8                                                   -->
+<!-- ====================================================== -->
+<div class="chapter" id="s48">
+  <div class="chapter-tag tag-red">Chương 4 · Mục 4.8</div>
+  <h2>Thiết kế prompt theo loại tác vụ</h2>
+  <div class="subtitle">
+    6 điểm gọi mô hình ngôn ngữ trong hệ thống · Mỗi loại tác vụ có yêu cầu khác nhau
+    nên được thiết kế prompt khác nhau có chủ đích
+  </div>
+
+  <div class="section">
+    <h3>Temperature — tham số ảnh hưởng lớn nhất</h3>
+    <p>
+      Temperature kiểm soát mức độ ngẫu nhiên của kết quả mô hình ngôn ngữ trả về.
+      Giá trị bằng 0 có nghĩa là mô hình luôn chọn từ có xác suất cao nhất —
+      kết quả gần như cố định mỗi lần chạy. Giá trị càng cao, mô hình càng
+      sẵn sàng chọn những từ ít phổ biến hơn — kết quả đa dạng hơn nhưng khó đoán hơn.
+    </p>
+    <p>
+      Hệ thống dùng 4 mức temperature khác nhau tùy theo bản chất của từng tác vụ:
+    </p>
+
+    <ul class="steps">
+      <li>
+        <div class="step-num" style="background:#1d4ed8;">0.0</div>
+        <div class="step-body">
+          <strong>Chấm điểm độ phù hợp CV–JD</strong>
+          <span>
+            Khi so sánh nhiều CV với cùng một tin tuyển dụng, yêu cầu quan trọng nhất là
+            <em>nhất quán</em>: cùng một CV phải nhận cùng một điểm số mỗi lần chạy.
+            Temperature=0 đảm bảo điều này. Ngoài ra, tham số <code>seed=42</code>
+            được đặt thêm để yêu cầu OpenAI cố định nguồn ngẫu nhiên ở phía máy chủ.
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num" style="background:#166534;">0.1</div>
+        <div class="step-body">
+          <strong>Trích xuất thông tin từ CV (hybrid parser)</strong>
+          <span>
+            Tác vụ này chỉ yêu cầu mô hình <em>đọc và sao chép lại</em> thông tin có sẵn trong văn bản —
+            không được sáng tạo hay suy đoán thêm. Temperature gần 0 để tránh mô hình
+            "điền thêm" thông tin không có trong CV gốc. Prompt cũng ràng buộc thêm bằng
+            các lệnh viết hoa: "CHỈ TRÍCH XUẤT", "TUYỆT ĐỐI KHÔNG suy đoán".
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num" style="background:#c2410c;">0.3</div>
+        <div class="step-body">
+          <strong>Phân tích JD, đánh giá chất lượng CV</strong>
+          <span>
+            Khác với trích xuất thuần túy, tác vụ phân tích cần mô hình <em>suy luận</em>:
+            đánh giá mức độ phù hợp, xác định điểm mạnh/yếu, đề xuất hướng cải thiện.
+            Mỗi CV–JD là một ngữ cảnh khác nhau nên cần mức độ linh hoạt nhất định.
+            Temperature=0.3 cho phép điều này trong khi vẫn giữ kết quả có thể dự đoán được.
+          </span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num" style="background:#7c3aed;">0.6</div>
+        <div class="step-body">
+          <strong>Viết tóm tắt bản thân, viết lại gạch đầu dòng kinh nghiệm</strong>
+          <span>
+            Tác vụ này yêu cầu trả về <em>4 phương án khác nhau</em> để người dùng lựa chọn.
+            Nếu dùng temperature thấp, 4 phương án sẽ gần giống nhau — người dùng không có lý do gì
+            để không chọn phương án đầu tiên. Temperature=0.6 đảm bảo mỗi phương án
+            có góc nhìn thực sự khác biệt (hướng thành tích, hướng chuyên môn, hướng định hướng, cân bằng).
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Giới hạn token đầu ra — chọn theo mục đích, không phải "đặt cao cho chắc"</h3>
+    <p>
+      Giới hạn token đầu ra (<code>max_tokens</code>) ảnh hưởng trực tiếp đến chi phí và tốc độ.
+      Mỗi tính năng được đặt giới hạn khác nhau dựa trên lượng thông tin thực sự cần trả về:
+    </p>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>Tính năng</th>
+          <th>max_tokens</th>
+          <th>Lý do</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Chấm điểm CV–JD</td>
+          <td><strong>400</strong></td>
+          <td>Chỉ cần 1 điểm số, tối đa 10 từ khóa khớp, 10 từ khóa thiếu, và 1 câu giải thích ngắn.</td>
+        </tr>
+        <tr>
+          <td>Trích xuất kinh nghiệm làm việc</td>
+          <td><strong>2000</strong></td>
+          <td>Cần trả về toàn bộ danh sách vị trí công việc với tất cả gạch đầu dòng. Nhiều CV có 4–5 vị trí, mỗi vị trí 6–8 gạch đầu dòng.</td>
+        </tr>
+        <tr>
+          <td>Phân tích JD và gợi ý sửa CV</td>
+          <td><strong>3000</strong></td>
+          <td>Cần gợi ý chi tiết cho 3 mục CV, mỗi mục tối đa 3 gợi ý, mỗi gợi ý có nhiều trường. Đây là tác vụ đầu ra phức tạp nhất.</td>
+        </tr>
+        <tr>
+          <td>Viết tóm tắt bản thân</td>
+          <td><strong>1500</strong></td>
+          <td>4 phương án × khoảng 100 từ mỗi phương án. Không cần nhiều hơn.</td>
+        </tr>
+        <tr>
+          <td>Viết lại gạch đầu dòng</td>
+          <td><strong>600</strong></td>
+          <td>4 phương án × tối đa 180 ký tự mỗi phương án — ngắn gọn theo đúng yêu cầu của gạch đầu dòng CV.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+
+  <div class="section">
+    <h3>Cách ràng buộc đầu ra trong prompt</h3>
+    <p>
+      Ngoài temperature và giới hạn token, các prompt còn dùng 3 kỹ thuật để
+      kiểm soát chất lượng và định dạng đầu ra:
+    </p>
+
+    <div class="two-col">
+      <div class="col-box green">
+        <strong>1. Yêu cầu trả về JSON cố định</strong>
+        Tất cả prompt đều có tham số <code>response_format: json_object</code>
+        và mô tả cấu trúc JSON cụ thể trong prompt. Điều này giúp code phía sau
+        parse kết quả đáng tin cậy mà không cần xử lý văn bản tự do.
+      </div>
+      <div class="col-box orange">
+        <strong>2. Đặt vai trò cho mô hình</strong>
+        Mỗi prompt bắt đầu bằng một vai trò cụ thể, ví dụ "chuyên gia HR 15 năm kinh nghiệm"
+        hay "chuyên gia trích xuất dữ liệu". Vai trò khác nhau giúp mô hình
+        điều chỉnh giọng văn và mức độ chi tiết phù hợp với từng tác vụ.
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:12px;">
+      <div class="col-box purple">
+        <strong>3. Ràng buộc phủ định rõ ràng</strong>
+        Prompt trích xuất dùng lệnh cấm rõ ràng: "TUYỆT ĐỐI KHÔNG suy đoán",
+        "KHÔNG bịa số liệu". Prompt viết tóm tắt cấm các cụm sáo mòn:
+        "KHÔNG bắt đầu bằng 'Là một...' hay 'Tôi là...'".
+        Ràng buộc phủ định thường hiệu quả hơn hướng dẫn tích cực khi cần
+        tránh những lỗi mô hình hay mắc.
+      </div>
+      <div class="col-box blue">
+        <strong>4. Ví dụ kèm theo (tác vụ tạo nội dung)</strong>
+        Prompt viết tóm tắt và gạch đầu dòng mô tả 4 góc nhìn cụ thể:
+        "hướng thành tích", "hướng chuyên môn", "hướng định hướng", "cân bằng".
+        Mô tả cụ thể từng phương án giúp mô hình tạo ra 4 văn bản
+        thực sự khác nhau về góc nhìn.
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:16px;">
+      <strong>Ví dụ so sánh:</strong>
+      Prompt trích xuất kinh nghiệm có 3 dòng viết hoa nhấn mạnh:
+      "CHỈ TRÍCH XUẤT — KHÔNG được sửa đổi, viết lại hay tóm tắt",
+      "GIỮ NGUYÊN TẤT CẢ — Trách nhiệm, thành tích, số liệu từ CV gốc",
+      "KHÔNG GIỚI HẠN — Thêm tất cả bullets cần thiết".
+      Trong khi đó, prompt viết tóm tắt lại có hướng dẫn ngược: "4 PHƯƠNG ÁN KHÁC NHAU VỀ GÓC NHÌN".
+      Cùng một mô hình nhưng được điều hướng hoàn toàn khác nhau tùy theo mục đích.
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center; color:#aaa; font-size:12px; margin-top:24px;">
+  Xác minh từ mã nguồn thực tế · enhancedTextProcessor.ts · jd-analyze/route.ts · llmMatcher.ts · summary/route.ts · Tháng 5 năm 2026
+</p>
+
+</div>
+</body>
+</html>

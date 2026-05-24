@@ -1,0 +1,7180 @@
+[
+  {
+    "resumeId": "11759079",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0049504950495049506,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03225806451612903,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03571428571428571,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "24240349",
+    "category": "TEACHER",
+    "n_relevant": 2,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01639344262295082,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004629629629629629,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0056179775280898875,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005649717514124294,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "13907230",
+    "category": "CONSTRUCTION",
+    "n_relevant": 2,
+    "tfidf_only": {
+      "recall@20": 0.5,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02631578947368421,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.047619047619047616,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.5,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    }
+  },
+  {
+    "resumeId": "38216888",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02040816326530612,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    }
+  },
+  {
+    "resumeId": "11197262",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010526315789473684,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0043859649122807015,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "39970711",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "19037403",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.043478260869565216,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    }
+  },
+  {
+    "resumeId": "38059130",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005780346820809248,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005235602094240838,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005235602094240838,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "24643412",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00411522633744856,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011494252873563218,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009174311926605505,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009433962264150943,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "12415691",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009615384615384616,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014705882352941176,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014492753623188406,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014705882352941176,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "14611516",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "15850434",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "28631840",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    }
+  },
+  {
+    "resumeId": "17276884",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "14146106",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003367003367003367,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0033112582781456954,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0033112582781456954,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0033112582781456954,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "29028935",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03225806451612903,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0047169811320754715,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006802721088435374,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006802721088435374,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "31016926",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.024390243902439025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.034482758620689655,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.041666666666666664,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "31064969",
+    "category": "BPO",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0049504950495049506,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004424778761061947,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004329004329004329,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004347826086956522,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "40883703",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05555555555555555,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23540891336663824
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.045454545454545456,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "18488289",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    }
+  },
+  {
+    "resumeId": "32518109",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.024390243902439025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.047619047619047616,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "14181049",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "20905088",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013513513513513514,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006172839506172839,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007142857142857143,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007142857142857143,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "23636277",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "48580330",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "29297973",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017543859649122806,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.015625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017857142857142856,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.018867924528301886,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "10182582",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017543859649122806,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01282051282051282,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.016129032258064516,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.016666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "47487091",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017241379310344827,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.024390243902439025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02702702702702703,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "11958994",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010526315789473684,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.034482758620689655,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02702702702702703,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "12065211",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    }
+  },
+  {
+    "resumeId": "16172429",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007518796992481203,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007352941176470588,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007407407407407408,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "22852364",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0037313432835820895,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035587188612099642,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035211267605633804,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035211267605633804,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "51415089",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.045454545454545456,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    }
+  },
+  {
+    "resumeId": "21334981",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "30709029",
+    "category": "BPO",
+    "n_relevant": 2,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.030303030303030304,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.024390243902439025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.027777777777777776,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03225806451612903,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "26091595",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009345794392523364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00909090909090909,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009174311926605505,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "69097572",
+    "category": "BPO",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003875968992248062,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011494252873563218,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007518796992481203,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007518796992481203,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "12011623",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00847457627118644,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.022727272727272728,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.018518518518518517,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.019230769230769232,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "12155206",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004694835680751174,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0038910505836575876,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0038022813688212928,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0038022813688212928,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "34131484",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009900990099009901,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.015151515151515152,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.015384615384615385,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "15790602",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007633587786259542,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005235602094240838,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005847953216374269,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005847953216374269,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "35564026",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    }
+  },
+  {
+    "resumeId": "28359817",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "22455205",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00641025641025641,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006993006993006993,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006289308176100629,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006369426751592357,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "98108571",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0034602076124567475,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0034965034965034965,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035087719298245615,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "89197180",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003278688524590164,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003484320557491289,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003401360544217687,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003401360544217687,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "23933031",
+    "category": "BPO",
+    "n_relevant": 2,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0196078431372549,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02631578947368421,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25706337",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    }
+  },
+  {
+    "resumeId": "13879043",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    }
+  },
+  {
+    "resumeId": "19532392",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01282051282051282,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23137821315975915
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "18084150",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010416666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03571428571428571,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "15573418",
+    "category": "BPO",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005988023952095809,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005076142131979695,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005076142131979695,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "84373843",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008849557522123894,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004784688995215311,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005076142131979695,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00510204081632653,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "24559558",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010309278350515464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009174311926605505,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "10953078",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02127659574468085,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00411522633744856,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005235602094240838,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005235602094240838,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "29297393",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013513513513513514,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.018867924528301886,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.019230769230769232,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "17392859",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.022222222222222223,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02564102564102564,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "13313917",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    }
+  },
+  {
+    "resumeId": "27789372",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    }
+  },
+  {
+    "resumeId": "25001005",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "14140903",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.034482758620689655,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008264462809917356,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "35172961",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    }
+  },
+  {
+    "resumeId": "26341987",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 2,
+    "tfidf_only": {
+      "recall@20": 0.5,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006944444444444444,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008547008547008548,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008547008547008548,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "59487170",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0196078431372549,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    }
+  },
+  {
+    "resumeId": "17252448",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    }
+  },
+  {
+    "resumeId": "13491889",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23137821315975915
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "16861758",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006896551724137931,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005714285714285714,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005714285714285714,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005747126436781609,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "26975573",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "25862026",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05555555555555555,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23540891336663824
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "49997097",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03571428571428571,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "18062906",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0064516129032258064,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006329113924050633,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005917159763313609,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005917159763313609,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "27000192",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "12814706",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.024390243902439025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23137821315975915
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.034482758620689655,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "49937469",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003703703703703704,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.030303030303030304,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013157894736842105,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013333333333333334,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "23032182",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006097560975609756,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006289308176100629,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006329113924050633,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "11957080",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.012195121951219513,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00847457627118644,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00847457627118644,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25482567",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.043478260869565216,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    }
+  },
+  {
+    "resumeId": "12546838",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.045454545454545456,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    }
+  },
+  {
+    "resumeId": "20824105",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009900990099009901,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25974844",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02564102564102564,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01282051282051282,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017857142857142856,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.018867924528301886,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "38565119",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009523809523809525,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0064516129032258064,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007042253521126761,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007042253521126761,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "14014749",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.029411764705882353,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.029411764705882353,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03571428571428571,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05555555555555555,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23540891336663824
+    }
+  },
+  {
+    "resumeId": "14569498",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "15145575",
+    "category": "BPO",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004310344827586207,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0044444444444444444,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004291845493562232,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004291845493562232,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "26586477",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    }
+  },
+  {
+    "resumeId": "20408458",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.016129032258064516,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010869565217391304,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01282051282051282,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013157894736842105,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "37540732",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2890648263178879
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005494505494505495,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02127659574468085,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.021739130434782608,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "36517781",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "60624892",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.018867924528301886,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.041666666666666664,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "26896699",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "17199951",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05555555555555555,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23540891336663824
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    }
+  },
+  {
+    "resumeId": "67582956",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013513513513513514,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017543859649122806,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017543859649122806,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017543859649122806,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "18757174",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.037037037037037035,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    }
+  },
+  {
+    "resumeId": "10480456",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005847953216374269,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008928571428571428,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008130081300813009,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008130081300813009,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "20230207",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2890648263178879
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    }
+  },
+  {
+    "resumeId": "30430249",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05555555555555555,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23540891336663824
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    }
+  },
+  {
+    "resumeId": "24977396",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008771929824561403,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004629629629629629,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0049504950495049506,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004975124378109453,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "11698189",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.029411764705882353,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00980392156862745,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.015873015873015872,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.016666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "39805617",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02564102564102564,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010101010101010102,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.012048192771084338,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01282051282051282,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "37058472",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05555555555555555,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23540891336663824
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "28862054",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009259259259259259,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0078125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00819672131147541,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00819672131147541,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "18509268",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    }
+  },
+  {
+    "resumeId": "24550866",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.047619047619047616,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.043478260869565216,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    }
+  },
+  {
+    "resumeId": "75297735",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008771929824561403,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004651162790697674,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005050505050505051,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005050505050505051,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "19124258",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.043478260869565216,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2890648263178879
+    }
+  },
+  {
+    "resumeId": "17213671",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "37664296",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    }
+  },
+  {
+    "resumeId": "47919212",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02040816326530612,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    }
+  },
+  {
+    "resumeId": "10738095",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008695652173913044,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010101010101010102,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009523809523809525,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009523809523809525,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "18448085",
+    "category": "AUTOMOBILE",
+    "n_relevant": 2,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011764705882352941,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0049261083743842365,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0055248618784530384,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0056179775280898875,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "28139742",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.027777777777777776,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.043478260869565216,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "90468982",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035842293906810036,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003937007874015748,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0037735849056603774,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0037735849056603774,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "21366189",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004149377593360996,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0045662100456621,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0045662100456621,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "17688766",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01818181818181818,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.037037037037037035,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "13367322",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02040816326530612,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014705882352941176,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017857142857142856,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01818181818181818,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "27974588",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.029411764705882353,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    }
+  },
+  {
+    "resumeId": "28745844",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004405286343612335,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02040816326530612,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "11835339",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004219409282700422,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036101083032490976,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036363636363636364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036363636363636364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "40311088",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0045045045045045045,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006896551724137931,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006944444444444444,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "10504237",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    }
+  },
+  {
+    "resumeId": "23591247",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009708737864077669,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.017857142857142856,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01694915254237288,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02040816326530612,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "75950464",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035087719298245615,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005494505494505495,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004545454545454545,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004545454545454545,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "27770859",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "20977412",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01282051282051282,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    }
+  },
+  {
+    "resumeId": "22718826",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.041666666666666664,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2890648263178879
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "22391901",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005555555555555556,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036900369003690036,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003745318352059925,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003745318352059925,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25813953",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    }
+  },
+  {
+    "resumeId": "28623782",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.043478260869565216,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011494252873563218,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "23032276",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    }
+  },
+  {
+    "resumeId": "17165107",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008064516129032258,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003289473684210526,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003367003367003367,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003367003367003367,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "87867370",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023809523809523808,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "39674782",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02702702702702703,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.022222222222222223,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "11887930",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0053475935828877,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0033222591362126247,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003367003367003367,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003367003367003367,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "27884470",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007518796992481203,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0072992700729927005,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0070921985815602835,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0070921985815602835,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "46055835",
+    "category": "ARTS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0033112582781456954,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0033003300330033004,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003257328990228013,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003257328990228013,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "24410405",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003676470588235294,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00847457627118644,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005681818181818182,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005714285714285714,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "26530575",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03571428571428571,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "80527194",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0034482758620689655,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003875968992248062,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0037593984962406013,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0037593984962406013,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "14346702",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006993006993006993,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0196078431372549,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013888888888888888,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014925373134328358,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "17421910",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.02857142857142857,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.025,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.027777777777777776,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "16509761",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "24580361",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "23918545",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007462686567164179,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013888888888888888,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011904761904761904,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.012048192771084338,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "28733974",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003367003367003367,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004048582995951417,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003676470588235294,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003676470588235294,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "32109048",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005952380952380952,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009345794392523364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008130081300813009,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008264462809917356,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "23139437",
+    "category": "ARTS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0035211267605633804,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004310344827586207,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003952569169960474,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003952569169960474,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "21856577",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "38750659",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010416666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0056179775280898875,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006172839506172839,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006172839506172839,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "13411858",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "86595128",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.029411764705882353,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.045454545454545456,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25656981",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "37402097",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0072992700729927005,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0064516129032258064,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0064516129032258064,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0064516129032258064,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "26341645",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00684931506849315,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.004347826086956522,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0044444444444444444,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0044444444444444444,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "15891494",
+    "category": "FINANCE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023255813953488372,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.045454545454545456,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    }
+  },
+  {
+    "resumeId": "23568731",
+    "category": "CHEF",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "15293959",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    }
+  },
+  {
+    "resumeId": "23138078",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2890648263178879
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.022222222222222223,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.041666666666666664,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "14752209",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23137821315975915
+    }
+  },
+  {
+    "resumeId": "22968380",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011235955056179775,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.012658227848101266,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "22632070",
+    "category": "TEACHER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.041666666666666664,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.045454545454545456,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23137821315975915
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "54308684",
+    "category": "APPAREL",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    }
+  },
+  {
+    "resumeId": "14496667",
+    "category": "ACCOUNTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003875968992248062,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008928571428571428,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008928571428571428,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "14358578",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    }
+  },
+  {
+    "resumeId": "52246737",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    }
+  },
+  {
+    "resumeId": "34657584",
+    "category": "DESIGNER",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014705882352941176,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009259259259259259,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25959103",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.08333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27023815442731974
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    }
+  },
+  {
+    "resumeId": "18827609",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.011764705882352941,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2890648263178879
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23137821315975915
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.014084507042253521,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "16899268",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.029411764705882353,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.05,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.227670248696953
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    }
+  },
+  {
+    "resumeId": "19090468",
+    "category": "HEALTHCARE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006944444444444444,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010416666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01020408163265306,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01020408163265306,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "25315791",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.047619047619047616,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.022727272727272728,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "39142536",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.037037037037037035,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.023809523809523808,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03225806451612903,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "18264694",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003937007874015748,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005917159763313609,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005376344086021506,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005376344086021506,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "29087505",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "21614256",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.008620689655172414,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005263157894736842,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00546448087431694,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005555555555555556,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "70603826",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    }
+  },
+  {
+    "resumeId": "91539554",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006134969325153374,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0625,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.24465054211822604
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003703703703703704,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "93436805",
+    "category": "CONSTRUCTION",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013513513513513514,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013157894736842105,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013333333333333334,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0136986301369863,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "14455622",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.022222222222222223,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.015151515151515152,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "31217840",
+    "category": "CONSULTANT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.012048192771084338,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.037037037037037035,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "38314236",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    }
+  },
+  {
+    "resumeId": "25905275",
+    "category": "INFORMATION-TECHNOLOGY",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.14285714285714285,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3333333333333333
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.16666666666666666,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3562071871080222
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    }
+  },
+  {
+    "resumeId": "24754689",
+    "category": "ADVOCATE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003436426116838488,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003745318352059925,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036363636363636364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036363636363636364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "41152404",
+    "category": "BPO",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006211180124223602,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006993006993006993,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007042253521126761,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "28640735",
+    "category": "HR",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.06666666666666667,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.25
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.09090909090909091,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.27894294565112987
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07142857142857142,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.2559580248098155
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.07692307692307693,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.26264953503719357
+    }
+  },
+  {
+    "resumeId": "21298336",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.2,
+      "ndcg@5": 0.38685280723454163,
+      "ndcg@20": 0.38685280723454163
+    }
+  },
+  {
+    "resumeId": "23009962",
+    "category": "AUTOMOBILE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0038461538461538464,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.003745318352059925,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036363636363636364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0036363636363636364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "12085736",
+    "category": "DIGITAL-MEDIA",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.006802721088435374,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.0125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010526315789473684,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010526315789473684,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "11635137",
+    "category": "PUBLIC-RELATIONS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 1.0,
+      "ndcg@5": 1.0,
+      "ndcg@20": 1.0
+    }
+  },
+  {
+    "resumeId": "35673335",
+    "category": "BUSINESS-DEVELOPMENT",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.25,
+      "ndcg@5": 0.43067655807339306,
+      "ndcg@20": 0.43067655807339306
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03225806451612903,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "16474898",
+    "category": "FITNESS",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.058823529411764705,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.23981246656813146
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.125,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.31546487678572877
+    }
+  },
+  {
+    "resumeId": "12341902",
+    "category": "AGRICULTURE",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.005208333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.010526315789473684,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009259259259259259,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009345794392523364,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "29815762",
+    "category": "SALES",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.01639344262295082,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.007633587786259542,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.00980392156862745,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.009900990099009901,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  },
+  {
+    "resumeId": "19612167",
+    "category": "ENGINEERING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.3333333333333333,
+      "ndcg@5": 0.5,
+      "ndcg@20": 0.5
+    },
+    "embedding_only": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid": {
+      "recall@20": 1.0,
+      "recall@5": 1.0,
+      "precision@5": 0.2,
+      "mrr": 0.5,
+      "ndcg@5": 0.6309297535714575,
+      "ndcg@20": 0.6309297535714575
+    },
+    "hybrid+structural": {
+      "recall@20": 1.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.1111111111111111,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.3010299956639812
+    }
+  },
+  {
+    "resumeId": "28895997",
+    "category": "BANKING",
+    "n_relevant": 1,
+    "tfidf_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.013333333333333334,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "embedding_only": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.04,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03225806451612903,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    },
+    "hybrid+structural": {
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "precision@5": 0.0,
+      "mrr": 0.03333333333333333,
+      "ndcg@5": 0.0,
+      "ndcg@20": 0.0
+    }
+  }
+]
